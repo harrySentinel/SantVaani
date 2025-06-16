@@ -48,7 +48,7 @@ export default function HeroSection() {
           <div className="space-y-4">
             <div className="flex justify-center items-center space-x-2 mb-6">
               <Sparkles className="w-8 h-8 text-orange-500 animate-pulse" />
-              <span className="text-2xl">🕉️</span>
+              <span className="text-5xl">ॐ</span>
               <Sparkles className="w-8 h-8 text-orange-500 animate-pulse" />
             </div>
             
