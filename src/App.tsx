@@ -9,6 +9,7 @@ import Saints from "./pages/saints/index";
 import LivingSaints from "./pages/living-saints/index";
 import Divine from "./pages/divine/index";
 import Bhajans from "./pages/bhajans/index";
+import Donation from "./pages/donation/index";
 import About from "./pages/about/index";
 import NotFound from "./pages/NotFound";
 
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/living-saints" element={<LivingSaints />} />
           <Route path="/divine" element={<Divine />} />
           <Route path="/bhajans" element={<Bhajans />} />
+          <Route path="/donation" element={<Donation />} />
           <Route path="/about" element={<About />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

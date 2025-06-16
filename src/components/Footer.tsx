@@ -1,4 +1,3 @@
-
 import { Link } from 'react-router-dom';
 import { Heart, Mail, Phone } from 'lucide-react';
 
@@ -38,6 +37,9 @@ export default function Footer() {
               </Link>
               <Link to="/bhajans" className="block text-gray-600 hover:text-orange-600 transition-colors text-sm">
                 Bhajans & Quotes
+              </Link>
+              <Link to="/donation" className="block text-gray-600 hover:text-orange-600 transition-colors text-sm">
+                Donation
               </Link>
             </div>
           </div>

@@ -1,9 +1,8 @@
-
 'use client';
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, Home, Users, Heart, Sparkles, Book, Info } from 'lucide-react';
+import { Menu, X, Home, Users, Heart, Sparkles, Book, Info, DollarSign } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function Navbar() {
@@ -20,6 +19,7 @@ export default function Navbar() {
     { to: '/living-saints', label: 'Living Saints', labelHi: 'जीवित संत', icon: Heart },
     { to: '/divine', label: 'Divine Forms', labelHi: 'दिव्य रूप', icon: Sparkles },
     { to: '/bhajans', label: 'Bhajans & Quotes', labelHi: 'भजन और उद्धरण', icon: Book },
+    { to: '/donation', label: 'Donation', labelHi: 'दान', icon: DollarSign },
     { to: '/about', label: 'About', labelHi: 'हमारे बारे में', icon: Info },
   ];
 
