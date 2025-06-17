@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Sparkles, Crown } from 'lucide-react';
@@ -7,13 +6,12 @@ import { Button } from '@/components/ui/button';
 interface DivineForm {
   id: number;
   name: string;
-  nameHi: string;
-  symbol: string;
+  name_hi: string;
   domain: string;
-  domainHi: string;
-  image: string;
+  domain_hi: string;
+  image_url: string;
   description: string;
-  descriptionHi: string;
+  description_hi: string;
   attributes: string[];
   mantra: string;
   significance: string;
@@ -74,7 +72,7 @@ const DivineFormModal: React.FC<DivineFormModalProps> = ({ divineForm, isOpen, o
                     >
                       <div className="relative w-48 h-48 md:w-64 md:h-64 mx-auto lg:mx-0 rounded-3xl overflow-hidden shadow-2xl ring-4 ring-purple-200/50">
                         <img
-                          src={divineForm.image}
+                          src={divineForm.image_url}
                           alt={divineForm.name}
                           className="w-full h-full object-cover"
                         />
@@ -99,7 +97,7 @@ const DivineFormModal: React.FC<DivineFormModalProps> = ({ divineForm, isOpen, o
                           {divineForm.name}
                         </h1>
                         <p className="text-xl md:text-2xl text-purple-600 font-medium">
-                          {divineForm.nameHi}
+                          {divineForm.name_hi}
                         </p>
                       </div>
 
@@ -109,8 +107,8 @@ const DivineFormModal: React.FC<DivineFormModalProps> = ({ divineForm, isOpen, o
                           <span className="font-medium">{divineForm.domain}</span>
                         </div>
                         <div className="flex items-center justify-center lg:justify-start space-x-2 text-gray-600 bg-white/70 backdrop-blur-sm rounded-full px-4 py-2 shadow-sm">
-                          <span className="text-lg">{divineForm.symbol}</span>
-                          <span className="font-medium">{divineForm.domainHi}</span>
+                          <Sparkles className="w-5 h-5 text-orange-500" />
+                          <span className="font-medium">{divineForm.domain_hi}</span>
                         </div>
                       </div>
 
@@ -153,7 +151,7 @@ const DivineFormModal: React.FC<DivineFormModalProps> = ({ divineForm, isOpen, o
                         आध्यात्मिक सार
                       </h3>
                       <p className="text-gray-700 leading-relaxed text-base md:text-lg">
-                        {divineForm.descriptionHi}
+                        {divineForm.description_hi}
                       </p>
                     </div>
 
@@ -166,6 +164,21 @@ const DivineFormModal: React.FC<DivineFormModalProps> = ({ divineForm, isOpen, o
                       <p className="text-gray-700 leading-relaxed text-base md:text-lg">
                         {divineForm.significance}
                       </p>
+                    </div>
+
+                    {/* Attributes Section */}
+                    <div className="bg-gradient-to-r from-purple-50 to-orange-50 rounded-2xl p-6 md:p-8 shadow-lg border border-purple-200/50">
+                      <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                        <Crown className="w-6 h-6 text-purple-500 mr-3" />
+                        Divine Attributes
+                      </h3>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        {divineForm.attributes.map((attr, index) => (
+                          <div key={index} className="bg-white/70 backdrop-blur-sm rounded-lg px-3 py-2 text-center border border-purple-100">
+                            <span className="text-sm font-medium text-gray-700">{attr}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </motion.div>
                 </div>

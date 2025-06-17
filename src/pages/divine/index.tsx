@@ -1,14 +1,42 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabaseClient'; // Adjust path as needed
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import DivineFormModal from '@/components/DivineFormModal';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Sparkles, Crown, Shield, Zap } from 'lucide-react';
+import { Sparkles, Crown, Shield, Zap, Loader2 } from 'lucide-react';
 
 const Divine = () => {
   const [selectedDivineForm, setSelectedDivineForm] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [divineforms, setDivineForms] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch divine forms from Supabase
+  useEffect(() => {
+    fetchDivineForms();
+  }, []);
+
+  const fetchDivineForms = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('divine_forms')
+        .select('*')
+        .order('id');
+
+      if (error) throw error;
+
+      setDivineForms(data || []);
+    } catch (error) {
+      console.error('Error fetching divine forms:', error);
+      setError('Failed to load divine forms. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleDivineFormClick = (form) => {
     setSelectedDivineForm(form);
@@ -20,99 +48,50 @@ const Divine = () => {
     setSelectedDivineForm(null);
   };
 
-  const divineforms = [
-    {
-      id: 1,
-      name: "Thakur Ji (Krishna)",
-      nameHi: "ठाकुर जी (कृष्ण)",
-      symbol: "🦚",
-      domain: "Love & Compassion",
-      domainHi: "प्रेम और करुणा",
-      image: "https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=400&h=400&fit=crop",
-      description: "The supreme deity of love, known for his playful nature and divine wisdom. Krishna represents the perfect balance of divine love and cosmic consciousness.",
-      descriptionHi: "प्रेम के सर्वोच्च देवता, अपनी मनमोहक प्रकृति और दिव्य ज्ञान के लिए प्रसिद्ध। कृष्ण दिव्य प्रेम और ब्रह्मांडीय चेतना के पूर्ण संतुलन का प्रतिनिधित्व करते हैं।",
-      attributes: ["Divine Love", "Wisdom", "Protection", "Leela (Divine Play)"],
-      mantra: "हरे कृष्ण हरे कृष्ण कृष्ण कृष्ण हरे हरे",
-      significance: "Represents the ultimate reality and divine consciousness accessible through pure love and devotion."
-    },
-    {
-      id: 2,
-      name: "Khatu Shyam Ji",
-      nameHi: "खाटू श्याम जी",
-      symbol: "🚩",
-      domain: "Justice & Valor",
-      domainHi: "न्याय और वीरता",
-      image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=400&fit=crop",
-      description: "A form of Krishna known for his supreme sacrifice and unwavering devotion to dharma. Worshipped for justice and protection of the righteous.",
-      descriptionHi: "कृष्ण का एक रूप जो अपने सर्वोच्च बलिदान और धर्म के प्रति अटूट समर्पण के लिए प्रसिद्ध है। न्याय और धर्मियों की सुरक्षा के लिए पूजे जाते हैं।",
-      attributes: ["Sacrifice", "Justice", "Valor", "Protection"],
-      mantra: "श्री खाटू श्याम जी की जय",
-      significance: "Teaches the value of supreme sacrifice for righteousness and protection of dharma."
-    },
-    {
-      id: 3,
-      name: "Hanuman Ji",
-      nameHi: "हनुमान जी",
-      symbol: "🔥",
-      domain: "Strength & Devotion",
-      domainHi: "शक्ति और भक्ति",
-      image: "https://images.unsplash.com/photo-1582896911227-c966f6b06bdc?w=400&h=400&fit=crop",
-      description: "The mighty devotee of Lord Rama, symbolizing unwavering faith, courage, and selfless service. Hanuman represents the power of true devotion.",
-      descriptionHi: "भगवान राम के महान भक्त, अटूट विश्वास, साहस और निस्वार्थ सेवा के प्रतीक। हनुमान सच्ची भक्ति की शक्ति का प्रतिनिधित्व करते हैं।",
-      attributes: ["Strength", "Devotion", "Courage", "Service"],
-      mantra: "हनुमान चालीसा",
-      significance: "Embodies the power of devotion and shows how surrender to the divine grants infinite strength."
-    },
-    {
-      id: 4,
-      name: "Ganesha",
-      nameHi: "गणेश",
-      symbol: "🐘",
-      domain: "Wisdom & New Beginnings",
-      domainHi: "बुद्धि और नई शुरुआत",
-      image: "https://images.unsplash.com/photo-1565193566173-7a0691aa3a2e?w=400&h=400&fit=crop",
-      description: "The remover of obstacles and patron of arts and sciences. Ganesha blesses new ventures and grants wisdom to overcome challenges.",
-      descriptionHi: "विघ्न हर्ता और कला तथा विज्ञान के संरक्षक। गणेश नए उपक्रमों को आशीर्वाद देते हैं और चुनौतियों पर काबू पाने के लिए बुद्धि प्रदान करते हैं।",
-      attributes: ["Wisdom", "Obstacle Removal", "New Beginnings", "Prosperity"],
-      mantra: "ॐ गं गणपतये नमः",
-      significance: "Teaches that wisdom and humility can overcome any obstacle in the spiritual and material journey."
-    },
-    {
-      id: 5,
-      name: "Shiva",
-      nameHi: "शिव",
-      symbol: "🔱",
-      domain: "Transformation & Liberation",
-      domainHi: "परिवर्तन और मुक्ति",
-      image: "https://images.unsplash.com/photo-1571115764595-644a1f56a55c?w=400&h=400&fit=crop",
-      description: "The supreme destroyer and transformer, representing the cycle of creation, preservation, and destruction. Shiva embodies pure consciousness.",
-      descriptionHi: "सर्वोच्च संहारक और परिवर्तनकर्ता, सृष्टि, पालन और संहार के चक्र का प्रतिनिधित्व करते हैं। शिव शुद्ध चेतना के प्रतीक हैं।",
-      attributes: ["Transformation", "Meditation", "Cosmic Dance", "Liberation"],
-      mantra: "ॐ नमः शिवाय",
-      significance: "Represents the ultimate reality beyond form and the path to self-realization through meditation."
-    },
-    {
-      id: 6,
-      name: "Radha Rani",
-      nameHi: "राधा रानी",
-      symbol: "🌹",
-      domain: "Divine Love & Grace",
-      domainHi: "दिव्य प्रेम और कृपा",
-      image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=400&fit=crop",
-      description: "The supreme devotee and beloved of Krishna, representing the soul's love for the divine. Radha embodies pure, selfless love.",
-      descriptionHi: "कृष्ण की सर्वोच्च भक्त और प्रिया, परमात्मा के लिए आत्मा के प्रेम का प्रतिनिधित्व करती हैं। राधा शुद्ध, निस्वार्थ प्रेम की मूर्ति हैं।",
-      attributes: ["Divine Love", "Devotion", "Grace", "Compassion"],
-      mantra: "राधे राधे",
-      significance: "Shows the path of love and devotion as the highest form of spiritual practice and union with the divine."
-    }
-  ];
-
-  const getIconForDomain = (domain: string) => {
+  const getIconForDomain = (domain) => {
     if (domain.includes('Love') || domain.includes('Grace')) return Sparkles;
     if (domain.includes('Justice') || domain.includes('Wisdom')) return Crown;
     if (domain.includes('Strength') || domain.includes('Protection')) return Shield;
     return Zap;
   };
+
+
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-orange-50">
+        <Navbar />
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center space-y-4">
+            <Loader2 className="w-12 h-12 animate-spin text-purple-600 mx-auto" />
+            <p className="text-lg text-gray-600">Loading divine forms...</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-orange-50">
+        <Navbar />
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center space-y-4">
+            <div className="text-red-500 text-6xl mb-4">⚠️</div>
+            <p className="text-lg text-gray-600">{error}</p>
+            <button 
+              onClick={fetchDivineForms}
+              className="px-6 py-3 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-orange-50">
@@ -149,6 +128,7 @@ const Divine = () => {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {divineforms.map((form) => {
               const DomainIcon = getIconForDomain(form.domain);
+              
               return (
                 <Card 
                   key={form.id} 
@@ -157,16 +137,11 @@ const Divine = () => {
                 >
                   <div className="relative">
                     <img 
-                      src={form.image} 
+                      src={form.image_url} 
                       alt={form.name}
                       className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    <div className="absolute top-4 right-4">
-                      <div className="bg-white/90 rounded-full p-2">
-                        <span className="text-2xl">{form.symbol}</span>
-                      </div>
-                    </div>
                     <div className="absolute bottom-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       <div className="flex items-center space-x-2 text-white">
                         <DomainIcon className="w-5 h-5" />
@@ -181,7 +156,7 @@ const Divine = () => {
                         {form.name}
                       </h3>
                       <p className="text-sm text-purple-600 font-medium">
-                        {form.nameHi}
+                        {form.name_hi}
                       </p>
                       <div className="flex items-center space-x-2 text-sm text-gray-500">
                         <DomainIcon className="w-4 h-4" />
