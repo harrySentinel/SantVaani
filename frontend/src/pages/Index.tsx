@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Users, Heart, Sparkles, Book, ArrowDown } from 'lucide-react';
+import ChatBot from '@/components/chatBot';
 
 const Index = () => {
   const features = [
@@ -135,6 +136,7 @@ const Index = () => {
         </div>
       </section>
 
+      <ChatBot />
       <Footer />
     </div>
   );
