@@ -12,7 +12,8 @@ SantVaani is a full-stack web app designed to spread spiritual knowledge and ins
 - 🧘‍♂️ **Life stories** of saints like Meera Bai, Kabir, Tulsidas, and more  
 - 🎶 **Bhajans** in Hindi & Hinglish (with lyrics, audio playback, and shareable modals)  
 - 💬 **Quotes** with authorship (e.g., Kabir, Tulsidas) and calm UI animations  
-- 🛕 Listings of **Old Age Homes** and **Orphanages** for seva & support  
+- 🛕 **Old Age Homes & Orphanages** listing with donation support  
+- 💝 A dedicated **Donation Page** to directly support listed Ashrams and Orphanages  
 - 🌅 Aesthetic and modern UI with a peaceful **saffron/orange theme**
 
 ---
@@ -32,14 +33,27 @@ Built with a modern, scalable, and spiritual tech stack:
 
 ## 📌 Features (Implemented & Upcoming)
 
-- ✅ Divine homepage with calm animations  
+- ✅ Divine homepage with calm, spiritual animations  
 - ✅ Saint Stories in Hindi & English  
 - ✅ Bhajans & Quotes section with modals, copy/share/audio  
-- 🔄 Category listing of Old Age Homes and Orphanages  
-- 🔄 Contact flow for ashrams to submit listing (via santvaani@gmail.com)  
-- 🔜 Bhagavad Gita Chatbot (voice/text)  
+- ✅ Category-wise listing of **Old Age Homes** and **Orphanages**  
+- ✅ **Donation Page** to support verified Ashrams and Orphanages  
+- 🔄 Contact flow for institutions to submit their listing (via santvaani@gmail.com)  
+- 🔜 Bhagavad Gita Chatbot (voice + text)  
 - 🔜 Bookmark & Save your favorite bhajans/quotes  
-- 🔜 Admin dashboard for content upload and user feedback  
+- 🔜 Admin dashboard for content uploads and feedback management  
+
+---
+
+## 💝 Support Seva – Donate with Heart
+
+SantVaani is not just a platform for devotion but also for **compassionate action**.  
+We’ve built a dedicated **Donation Page** where users can explore, support, and directly contribute to:
+
+- Verified **Vridh Ashrams** (Old Age Homes)  
+- Trusted **Orphanages** in need of support  
+
+Help us spread joy and dignity to those who need it most 🕊️
 
 ---
 
