@@ -39,7 +39,7 @@ Built with a modern, scalable, and spiritual tech stack:
 - ✅ Category-wise listing of **Old Age Homes** and **Orphanages**  
 - ✅ **Donation Page** to support verified Ashrams and Orphanages  
 - 🔄 Contact flow for institutions to submit their listing (via santvaani@gmail.com)  
-- 🔜 Bhagavad Gita Chatbot (voice + text)  
+- 🔜 Bhagavad Gita Chatbot 
 - 🔜 Bookmark & Save your favorite bhajans/quotes  
 - 🔜 Admin dashboard for content uploads and feedback management  
 
