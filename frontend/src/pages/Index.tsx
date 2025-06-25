@@ -59,13 +59,6 @@ const Index = () => {
       {/* Hero Section */}
       <HeroSection />
 
-            {/* Visitor Counter Section */}
-      <section className="py-12 bg-gradient-to-br from-white via-orange-25 to-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <VisitorCounter count={visitorCount} className="mb-8" />
-        </div>
-      </section>
-
       {/* Features Section */}
       <section className="py-20 bg-gradient-to-br from-white to-orange-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -107,6 +100,13 @@ const Index = () => {
               );
             })}
           </div>
+        </div>
+      </section>
+
+                  {/* Visitor Counter Section */}
+      <section className="py-12 bg-gradient-to-br from-white via-orange-25 to-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <VisitorCounter count={visitorCount} className="mb-8" />
         </div>
       </section>
 
