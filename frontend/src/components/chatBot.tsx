@@ -16,7 +16,7 @@ interface ChatBotProps {
 
 const ChatBot: React.FC<ChatBotProps> = ({ 
   className = '',
-  initialMessage = 'नमस्ते! 🙏 Welcome to SantVaani. I am here to guide you through the wisdom of Shreemad Bhagavad Gita. How may I assist you on your spiritual journey today?',
+  initialMessage = 'Hey 😊, I am SantVaani. If your heart feels heavy or things don’t make sense right now, I am here to listen and help through the Gita wisdom.',
 }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [messages, setMessages] = useState<Message[]>([
