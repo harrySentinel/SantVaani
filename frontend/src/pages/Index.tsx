@@ -7,8 +7,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Users, Heart, Sparkles, Book, ArrowDown } from 'lucide-react';
 import ChatBot from '@/components/chatBot';
+import VisitorCounter from '@/components/VisitorCounter';
 
 const Index = () => {
+
+  // have to replace this with actual supabase data
+  const visitorCount = 12547; // this will be fetched from supabase later on
   const features = [
     {
       icon: Users,
@@ -54,6 +58,13 @@ const Index = () => {
       
       {/* Hero Section */}
       <HeroSection />
+
+            {/* Visitor Counter Section */}
+      <section className="py-12 bg-gradient-to-br from-white via-orange-25 to-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <VisitorCounter count={visitorCount} className="mb-8" />
+        </div>
+      </section>
 
       {/* Features Section */}
       <section className="py-20 bg-gradient-to-br from-white to-orange-50">
