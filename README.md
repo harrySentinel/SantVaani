@@ -38,6 +38,7 @@ Built with a modern, scalable, and spiritual tech stack:
 - ✅ Bhajans & Quotes section with modals, copy/share/audio  
 - ✅ Category-wise listing of **Old Age Homes** and **Orphanages**  
 - ✅ **Donation Page** to support verified Ashrams and Orphanages  
+  ✅ **Visitor Counter** to display how many people have visited SantVaani — beautifully animated and integrated with Supabase 
 - 🔄 Contact flow for institutions to submit their listing (via santvaani@gmail.com)  
 - 🔜 Bhagavad Gita Chatbot 
 - 🔜 Bookmark & Save your favorite bhajans/quotes  
