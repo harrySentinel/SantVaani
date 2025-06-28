@@ -103,7 +103,7 @@ const Index = () => {
         </div>
       </section>
 
-                  {/* Visitor Counter Section */}
+      {/* Visitor Counter Section */}
       <section className="py-12 bg-gradient-to-br from-white via-orange-25 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <VisitorCounter count={visitorCount} className="mb-8" />
