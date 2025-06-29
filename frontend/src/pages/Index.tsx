@@ -5,7 +5,7 @@ import Footer from '@/components/Footer';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Users, Heart, Sparkles, Book, ArrowDown } from 'lucide-react';
+import { Users, Heart, Sparkles, Book, ArrowDown, Video } from 'lucide-react';
 import ChatBot from '@/components/chatBot';
 import VisitorCounter from '@/components/VisitorCounter';
 
@@ -102,6 +102,51 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* Featured Live Bhajan Section */}
+<section className="py-16 bg-gradient-to-br from-orange-50 to-red-50">
+  <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="text-center mb-12">
+      <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+        🎬 Live Bhajan Stream
+      </h2>
+      <p className="text-lg text-gray-600">
+        Watch devotional bhajans and spiritual content streaming live
+      </p>
+    </div>
+    
+    <Link to="/live-bhajan">
+      <Card className="group hover:shadow-2xl transition-all duration-300 transform hover:scale-105 border-0 shadow-xl bg-gradient-to-br from-white to-orange-50 backdrop-blur-sm max-w-md mx-auto">
+        <CardContent className="p-8 text-center space-y-6">
+          <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg relative">
+            <Video className="w-10 h-10 text-white ml-1" fill="white" />
+            {/* Live indicator dot */}
+            <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full animate-pulse border-2 border-white"></div>
+          </div>
+          
+          <div className="space-y-3">
+            <h3 className="text-2xl font-bold text-gray-800 group-hover:text-orange-600 transition-colors">
+              Watch Live Bhajans
+            </h3>
+            <p className="text-gray-600 leading-relaxed">
+              Experience devotional bhajans and spiritual videos streaming live from YouTube
+            </p>
+            <div className="flex items-center justify-center space-x-2">
+              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+              <p className="text-sm text-red-600 font-medium">
+                LIVE NOW
+              </p>
+            </div>
+          </div>
+
+          <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <ArrowDown className="w-6 h-6 text-orange-500 mx-auto transform rotate-[-90deg]" />
+          </div>
+        </CardContent>
+      </Card>
+    </Link>
+  </div>
+</section>
 
       {/* Visitor Counter Section */}
       <section className="py-12 bg-gradient-to-br from-white via-orange-25 to-white">
