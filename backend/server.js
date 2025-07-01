@@ -1,72 +1,523 @@
 const express = require('express');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
+const axios = require('axios');
 require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5000; 
 
-// Rate limiting - prevent API abuse
+// In-memory cache to store bhajan data
+let bhajanCache = {
+  data: null,
+  lastUpdated: null,
+  isUpdating: false
+};
+
+// Cache duration from env (default 6 hours)
+const CACHE_DURATION = (process.env.CACHE_DURATION_HOURS || 6) * 60 * 60 * 1000;
+
+// YouTube API configuration
+const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
+const YOUTUBE_BASE_URL = 'https://www.googleapis.com/youtube/v3';
+
+// Bhajan-related search terms and channel IDs
+const BHAJAN_KEYWORDS = [
+  'bhajan live',
+  'krishna bhajan live',
+  'hanuman chalisa live',
+  'ram bhajan live',
+  'shiv bhajan live',
+  'devotional songs live',
+  'kirtan live',
+  'aarti live'
+];
+
+const DEVOTIONAL_CHANNELS = [
+  'UC8cdNXD02kuSeMyzjrROfvg', // Bhajan Saar - verified manually
+  'UCEk1jBxAl6fe-_G37G7huQA', // Bhajan Marg - verified manually
+  'UCsjMAEPcv7-oNGHtRU9Vg6w', // BhaktiPath -  verified manually
+  'UC_fmMgNql89jbFI8TNcq9Vg', // Shri Hit Radha Kripa - vrified manually
+];
+
+// Rate limiting
 const limiter = rateLimit({
-  windowMs: 2 * 60 * 60 * 1000, // 2 hours
-  max: 10, // limit each IP to 100 requests per windowMs
-  message: `🙏 कृपया धैर्य रखें। अधिक पूछने की सीमा हो गई है।
-
-गीता कहती है: "शांति ही सर्वोत्तम मार्ग है।" 🌿
-`
+  windowMs: 2 * 60 * 60 * 1000,
+  max: 100,
+  message: `🙏 कृपया धैर्य रखें। अधिक पूछने की सीमा हो गई है।\n\nगीता कहती है: "शांति ही सर्वोत्तम मार्ग है।" 🌿`
 });
 
-// CORS configuration with multiple allowed origins
+// UPDATED CORS configuration - This fixes your issue!
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow multiple frontend URLs
     const allowedOrigins = [
       'http://localhost:3000',
-      'http://localhost:8080', 
-      'http://localhost:5173', // Vite default
+      'http://localhost:8080',
+      'http://localhost:8081',  // Added your frontend port
+      'http://localhost:5173',
       'http://127.0.0.1:3000',
       'http://127.0.0.1:8080',
+      'http://127.0.0.1:8081',  // Added your frontend port
       'http://127.0.0.1:5173',
       process.env.FRONTEND_URL
-    ].filter(Boolean); // Remove undefined values
+    ].filter(Boolean);
 
-    // Allow requests with no origin (mobile apps, curl, etc.)
+    // Allow requests with no origin (like mobile apps, curl, Postman)
     if (!origin) return callback(null, true);
     
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
       console.log(`CORS blocked origin: ${origin}`);
-      console.log(`Allowed origins: ${allowedOrigins.join(', ')}`);
       callback(new Error('Not allowed by CORS policy'));
     }
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 };
 
-// Middleware
+// Middleware - Order matters!
 app.use(cors(corsOptions));
 app.use(express.json({ limit: '10mb' }));
 app.use(limiter);
 
+// Add explicit OPTIONS handler for preflight requests
+app.options('*', cors(corsOptions));
+
+// Helper function to format view count
+function formatViewCount(viewCount) {
+  const count = parseInt(viewCount);
+  if (count >= 1000000) {
+    return (count / 1000000).toFixed(1) + 'M';
+  } else if (count >= 1000) {
+    return (count / 1000).toFixed(1) + 'K';
+  }
+  return count.toString();
+}
+
+// Helper function to format duration
+function formatDuration(duration) {
+  const match = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
+  if (!match) return '0:00';
+  
+  const hours = parseInt(match[1]) || 0;
+  const minutes = parseInt(match[2]) || 0;
+  const seconds = parseInt(match[3]) || 0;
+  
+  if (hours > 0) {
+    return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  }
+  return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+}
+
+// Function to check if content is bhajan-related
+function isBhajanContent(title, description, channelTitle) {
+  const bhajanKeywords = [
+    'bhajan', 'kirtan', 'aarti', 'chalisa', 'mantra', 'devotional',
+    'krishna', 'rama', 'shiva', 'hanuman', 'ganesh', 'durga',
+    'bhakti', 'spiritual', 'prayer', 'divine', 'sacred', 'temple',
+    'god', 'goddess', 'hindi devotional', 'sanskrit'
+  ];
+  
+  const content = `${title} ${description} ${channelTitle}`.toLowerCase();
+  return bhajanKeywords.some(keyword => content.includes(keyword));
+}
+
+// Function to validate channel IDs
+async function validateChannelIds() {
+  if (!YOUTUBE_API_KEY) {
+    console.log('⚠️ YouTube API key not configured, skipping channel validation');
+    return { validChannels: [], invalidChannels: DEVOTIONAL_CHANNELS };
+  }
+
+  console.log('🔍 Validating channel IDs...');
+  const validChannels = [];
+  const invalidChannels = [];
+  
+  for (const channelId of DEVOTIONAL_CHANNELS) {
+    try {
+      const response = await axios.get(`${YOUTUBE_BASE_URL}/channels`, {
+        params: {
+          key: YOUTUBE_API_KEY,
+          part: 'snippet,statistics',
+          id: channelId
+        }
+      });
+      
+      if (response.data.items && response.data.items.length > 0) {
+        const channel = response.data.items[0];
+        validChannels.push({
+          id: channelId,
+          title: channel.snippet.title,
+          subscriberCount: channel.statistics.subscriberCount
+        });
+        console.log(`✅ Valid: ${channel.snippet.title} (${channelId})`);
+      } else {
+        invalidChannels.push(channelId);
+        console.log(`❌ Invalid: ${channelId}`);
+      }
+    } catch (error) {
+      invalidChannels.push(channelId);
+      console.log(`❌ Error checking ${channelId}:`, error.message);
+    }
+    
+    // Add delay to avoid rate limiting
+    await new Promise(resolve => setTimeout(resolve, 100));
+  }
+  
+  console.log(`\n📊 Validation Results:`);
+  console.log(`✅ Valid channels: ${validChannels.length}`);
+  console.log(`❌ Invalid channels: ${invalidChannels.length}`);
+  
+  if (invalidChannels.length > 0) {
+    console.log(`\n🚨 Remove these invalid channel IDs from DEVOTIONAL_CHANNELS:`);
+    invalidChannels.forEach(id => console.log(`'${id}',`));
+  }
+  
+  return { validChannels, invalidChannels };
+}
+
+// Fetch live bhajans
+async function fetchLiveBhajans() {
+  try {
+    console.log('🔍 Fetching live bhajans...');
+    const liveBhajans = [];
+    
+    // Search for live bhajan streams
+    for (const keyword of BHAJAN_KEYWORDS) {
+      try {
+        const searchResponse = await axios.get(`${YOUTUBE_BASE_URL}/search`, {
+          params: {
+            key: YOUTUBE_API_KEY,
+            part: 'snippet',
+            q: keyword,
+            type: 'video',
+            eventType: 'live',
+            maxResults: 5,
+            order: 'viewCount',
+            regionCode: 'IN'
+          }
+        });
+
+        for (const item of searchResponse.data.items) {
+          if (isBhajanContent(item.snippet.title, item.snippet.description, item.snippet.channelTitle)) {
+            // Get additional video details
+            const videoDetailsResponse = await axios.get(`${YOUTUBE_BASE_URL}/videos`, {
+              params: {
+                key: YOUTUBE_API_KEY,
+                part: 'statistics,contentDetails',
+                id: item.id.videoId
+              }
+            });
+
+            const videoDetails = videoDetailsResponse.data.items[0];
+            
+            liveBhajans.push({
+              id: item.id.videoId,
+              title: item.snippet.title,
+              channel: item.snippet.channelTitle,
+              thumbnail: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.medium?.url,
+              videoId: item.id.videoId,
+              views: videoDetails ? formatViewCount(videoDetails.statistics.viewCount) : '0',
+              duration: 'LIVE',
+              isLive: true,
+              publishedAt: item.snippet.publishedAt
+            });
+          }
+        }
+      } catch (error) {
+        console.error(`Error fetching live streams for ${keyword}:`, error.message);
+      }
+    }
+
+    return liveBhajans.slice(0, 10); // Limit to 10 live streams
+  } catch (error) {
+    console.error('Error in fetchLiveBhajans:', error);
+    return [];
+  }
+}
+
+// Fetch recent bhajans from devotional channels
+async function fetchRecentBhajans() {
+  try {
+    console.log('📺 Fetching recent bhajans from devotional channels...');
+    const recentBhajans = [];
+    
+    for (const channelId of DEVOTIONAL_CHANNELS) {
+      try {
+        // Get channel's recent uploads
+        const channelResponse = await axios.get(`${YOUTUBE_BASE_URL}/channels`, {
+          params: {
+            key: YOUTUBE_API_KEY,
+            part: 'contentDetails',
+            id: channelId
+          }
+        });
+
+        // Add proper error checking here
+        if (!channelResponse.data || !channelResponse.data.items || channelResponse.data.items.length === 0) {
+          console.log(`⚠️ Channel ${channelId} not found or has no data`);
+          continue; // Skip this channel and move to the next one
+        }
+
+        const uploadsPlaylistId = channelResponse.data.items[0].contentDetails?.relatedPlaylists?.uploads;
+        
+        if (!uploadsPlaylistId) {
+          console.log(`⚠️ Channel ${channelId} has no uploads playlist`);
+          continue;
+        }
+        
+        // Get recent videos from uploads playlist
+        const playlistResponse = await axios.get(`${YOUTUBE_BASE_URL}/playlistItems`, {
+          params: {
+            key: YOUTUBE_API_KEY,
+            part: 'snippet',
+            playlistId: uploadsPlaylistId,
+            maxResults: 10,
+            order: 'date'
+          }
+        });
+
+        // Add error checking for playlist response too
+        if (!playlistResponse.data || !playlistResponse.data.items) {
+          console.log(`⚠️ No playlist items found for channel ${channelId}`);
+          continue;
+        }
+
+        for (const item of playlistResponse.data.items) {
+          if (isBhajanContent(item.snippet.title, item.snippet.description, item.snippet.channelTitle)) {
+            // Get video statistics and duration
+            const videoDetailsResponse = await axios.get(`${YOUTUBE_BASE_URL}/videos`, {
+              params: {
+                key: YOUTUBE_API_KEY,
+                part: 'statistics,contentDetails',
+                id: item.snippet.resourceId.videoId
+              }
+            });
+
+            const videoDetails = videoDetailsResponse.data.items?.[0];
+            
+            recentBhajans.push({
+              id: item.snippet.resourceId.videoId,
+              title: item.snippet.title,
+              channel: item.snippet.channelTitle,
+              thumbnail: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.medium?.url,
+              videoId: item.snippet.resourceId.videoId,
+              views: videoDetails ? formatViewCount(videoDetails.statistics.viewCount) : '0',
+              duration: videoDetails ? formatDuration(videoDetails.contentDetails.duration) : '0:00',
+              isLive: false,
+              publishedAt: item.snippet.publishedAt
+            });
+          }
+        }
+      } catch (error) {
+        console.error(`❌ Error fetching recent videos for channel ${channelId}:`, {
+          message: error.message,
+          status: error.response?.status,
+          statusText: error.response?.statusText
+        });
+        
+        // Log more details if it's a YouTube API error
+        if (error.response?.data) {
+          console.error(`YouTube API Error Details:`, error.response.data);
+        }
+      }
+      
+      // Add delay between channel requests to avoid rate limiting
+      await new Promise(resolve => setTimeout(resolve, 100)); // 100ms delay
+    }
+
+    // Sort by published date and limit
+    return recentBhajans
+      .sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt))
+      .slice(0, 16);
+      
+  } catch (error) {
+    console.error('❌ Error in fetchRecentBhajans:', error);
+    return [];
+  }
+}
+
+// Main function to fetch all bhajan data
+async function fetchBhajanData() {
+  if (bhajanCache.isUpdating) {
+    console.log('⏳ Update already in progress...');
+    return bhajanCache.data;
+  }
+
+  bhajanCache.isUpdating = true;
+  
+  try {
+    console.log('🚀 Starting bhajan data fetch...');
+    
+    const [liveBhajans, recentBhajans] = await Promise.all([
+      fetchLiveBhajans(),
+      fetchRecentBhajans()
+    ]);
+
+    const allBhajans = [...liveBhajans, ...recentBhajans];
+    
+    // Remove duplicates based on videoId
+    const uniqueBhajans = allBhajans.filter((bhajan, index, self) => 
+      index === self.findIndex(b => b.videoId === bhajan.videoId)
+    );
+
+    bhajanCache.data = uniqueBhajans;
+    bhajanCache.lastUpdated = new Date();
+    
+    console.log(`✅ Successfully fetched ${uniqueBhajans.length} bhajans (${liveBhajans.length} live, ${recentBhajans.length} recent)`);
+    
+    return uniqueBhajans;
+    
+  } catch (error) {
+    console.error('❌ Error fetching bhajan data:', error);
+    
+    // Return cached data if available, otherwise sample data
+    if (bhajanCache.data) {
+      return bhajanCache.data;
+    }
+    
+    // Fallback sample data
+    return [
+      {
+        id: 1,
+        title: "Hare Krishna Hare Rama - Peaceful Chanting",
+        channel: "Divine Bhajans",
+        duration: "LIVE",
+        thumbnail: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=225&fit=crop&auto=format",
+        videoId: "dQw4w9WgXcQ",
+        views: "1.2K",
+        isLive: true
+      }
+    ];
+  } finally {
+    bhajanCache.isUpdating = false;
+  }
+}
+
+// Function to check if cache needs update
+function shouldUpdateCache() {
+  if (!bhajanCache.data || !bhajanCache.lastUpdated) {
+    return true;
+  }
+  
+  const timeSinceUpdate = Date.now() - bhajanCache.lastUpdated.getTime();
+  return timeSinceUpdate > CACHE_DURATION;
+}
+
+// Auto-update cache every 6 hours
+setInterval(async () => {
+  if (shouldUpdateCache() && !bhajanCache.isUpdating) {
+    console.log('🔄 Auto-updating bhajan cache...');
+    await fetchBhajanData();
+  }
+}, CACHE_DURATION);
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-  res.json({ 
-    status: 'OK', 
+  res.json({
+    status: 'OK',
     message: 'SantVaani Backend is running',
     timestamp: new Date().toISOString(),
-    corsOrigin: req.headers.origin || 'No origin header'
+    youtubeApi: YOUTUBE_API_KEY ? 'Configured' : 'Not Configured',
+    geminiApi: process.env.GEMINI_API_KEY ? 'Configured' : 'Not Configured',
+    cacheStatus: {
+      hasData: !!bhajanCache.data,
+      lastUpdated: bhajanCache.lastUpdated,
+      isUpdating: bhajanCache.isUpdating,
+      nextUpdate: bhajanCache.lastUpdated ? 
+        new Date(bhajanCache.lastUpdated.getTime() + CACHE_DURATION) : 'Unknown'
+    },
+    corsOrigins: [
+      'http://localhost:3000',
+      'http://localhost:8080', 
+      'http://localhost:8081',
+      'http://localhost:5173'
+    ]
   });
 });
 
-// Chat endpoint - handles Gemini API calls
+// Bhajan data endpoint
+app.get('/api/bhajans', async (req, res) => {
+  try {
+    // Check if we need to fetch new data
+    if (shouldUpdateCache()) {
+      console.log('🔄 Cache expired, fetching fresh data...');
+      await fetchBhajanData();
+    }
+    
+    // Return cached data
+    const bhajans = bhajanCache.data || [];
+    
+    res.json({
+      success: true,
+      data: bhajans,
+      lastUpdated: bhajanCache.lastUpdated,
+      totalCount: bhajans.length,
+      liveCount: bhajans.filter(b => b.isLive).length,
+      nextUpdate: bhajanCache.lastUpdated ? 
+        new Date(bhajanCache.lastUpdated.getTime() + CACHE_DURATION) : null
+    });
+    
+  } catch (error) {
+    console.error('Error in /api/bhajans:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch bhajan data',
+      message: 'कृपया कुछ समय बाद पुनः प्रयास करें। 🙏'
+    });
+  }
+});
+
+// Force refresh endpoint (for development)
+app.post('/api/refresh-bhajans', async (req, res) => {
+  try {
+    console.log('🔄 Manual refresh triggered...');
+    const freshData = await fetchBhajanData();
+    
+    res.json({
+      success: true,
+      message: 'Bhajan data refreshed successfully',
+      data: freshData,
+      lastUpdated: bhajanCache.lastUpdated
+    });
+    
+  } catch (error) {
+    console.error('Error in manual refresh:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to refresh bhajan data'
+    });
+  }
+});
+
+// Channel validation endpoint (for debugging)
+app.get('/api/validate-channels', async (req, res) => {
+  try {
+    const validationResult = await validateChannelIds();
+    res.json({
+      success: true,
+      ...validationResult,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Error in channel validation:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to validate channels',
+      message: error.message
+    });
+  }
+});
+
+// Existing chat endpoint (keeping your spiritual guidance feature)
 app.post('/api/chat', async (req, res) => {
   try {
     const { message } = req.body;
 
-    // Validate input
     if (!message || typeof message !== 'string' || message.trim().length === 0) {
       return res.status(400).json({
         error: 'Invalid message',
@@ -74,7 +525,6 @@ app.post('/api/chat', async (req, res) => {
       });
     }
 
-    // Check if message is too long
     if (message.length > 1000) {
       return res.status(400).json({
         error: 'Message too long',
@@ -82,7 +532,6 @@ app.post('/api/chat', async (req, res) => {
       });
     }
 
-    // Check if Gemini API key is configured
     const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
     if (!GEMINI_API_KEY) {
       console.error('Gemini API key not configured');
@@ -92,7 +541,6 @@ app.post('/api/chat', async (req, res) => {
       });
     }
 
-    // Enhanced system prompt for better spiritual guidance
     const systemPrompt = `You are SantVaani, a wise and compassionate spiritual guide who shares practical life wisdom inspired by the Shreemad Bhagavad Gita. You speak with the warmth and understanding of Bhagwan Krishna — not as a preacher, but as a close, caring friend.
 
 IMPORTANT GUIDELINES:
@@ -115,12 +563,10 @@ If the user seems emotionally off — begin with gentle empathy (don't use "are 
 If the user asks something unrelated to Gita/spiritual guidance, respond with:
 "मैं गीता के ज्ञान से आपकी मदद कर सकता हूँ। आपको किस बात की परेशानी है?" (I can help you with Gita wisdom. What's troubling you?)
 
-
 User's message: "${message}"
 
 Please respond with genuine compassion and practical spiritual guidance.`;
 
-    // Make API call to Gemini
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
       method: 'POST',
       headers: {
@@ -144,7 +590,7 @@ Please respond with genuine compassion and practical spiritual guidance.`;
             threshold: "BLOCK_MEDIUM_AND_ABOVE"
           },
           {
-            category: "HARM_CATEGORY_HATE_SPEECH", 
+            category: "HARM_CATEGORY_HATE_SPEECH",
             threshold: "BLOCK_MEDIUM_AND_ABOVE"
           },
           {
@@ -181,7 +627,6 @@ Please respond with genuine compassion and practical spiritual guidance.`;
 
     const data = await response.json();
     
-    // Extract the response text
     if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0]) {
       const aiResponse = data.candidates[0].content.parts[0].text;
       
@@ -199,7 +644,6 @@ Please respond with genuine compassion and practical spiritual guidance.`;
   } catch (error) {
     console.error('Error in chat endpoint:', error);
     
-    // Provide helpful error messages
     let errorMessage = `मुझे खुशी है कि आपने प्रश्न पूछा। कृपया थोड़ी देर बाद पुनः प्रयास करें। 🙏
 
 तब तक गीता के इस श्लोक पर मनन करें:
@@ -218,7 +662,7 @@ Please respond with genuine compassion and practical spiritual guidance.`;
   }
 });
 
-// FIXED: Use proper catch-all route syntax
+// 404 handler
 app.use((req, res) => {
   res.status(404).json({
     error: 'Not Found',
@@ -235,11 +679,34 @@ app.use((error, req, res, next) => {
   });
 });
 
+// Initialize cache on startup and validate channels in development
+async function initializeServer() {
+  try {
+    // Load initial bhajan data
+    await fetchBhajanData();
+    console.log('🎵 Initial bhajan data loaded successfully');
+    
+    // Validate channels in development mode
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('🔧 Development mode detected - validating channels...');
+      await validateChannelIds();
+    }
+  } catch (error) {
+    console.error('❌ Failed to initialize server:', error);
+  }
+}
+
+// Initialize on startup
+initializeServer();
+
 // Start server
 app.listen(PORT, () => {
   console.log(`🚀 SantVaani Backend Server running on port ${PORT}`);
-  console.log(`📱 Allowed Origins: http://localhost:3000, http://localhost:8080, ${process.env.FRONTEND_URL || 'none'}`);
+  console.log(`📱 Allowed Origins: http://localhost:3000, http://localhost:8080, http://localhost:8081, http://localhost:5173, ${process.env.FRONTEND_URL || 'none'}`);
   console.log(`🔑 Gemini API: ${process.env.GEMINI_API_KEY ? 'Configured ✅' : 'Not Configured ❌'}`);
+  console.log(`🎵 YouTube API: ${YOUTUBE_API_KEY ? 'Configured ✅' : 'Not Configured ❌'}`);
+  console.log(`⏰ Cache Duration: ${CACHE_DURATION / (1000 * 60 * 60)} hours`);
+  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
 });
 
 module.exports = app;
