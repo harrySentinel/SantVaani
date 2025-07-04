@@ -12,6 +12,7 @@ SantVaani is a full-stack web app designed to spread spiritual knowledge and ins
 - 🧘‍♂️ **Life stories** of saints like Meera Bai, Kabir, Tulsidas, and more  
 - 🎶 **Bhajans** in Hindi & Hinglish (with lyrics, audio playback, and shareable modals)  
 - 💬 **Quotes** with authorship (e.g., Kabir, Tulsidas) and calm UI animations  
+- 📺 **YouTube Live Bhajans** and curated spiritual video playlists — now watch your favorite satsangs and bhajans live, directly from the platform  
 - 🛕 **Old Age Homes & Orphanages** listing with donation support  
 - 💝 A dedicated **Donation Page** to directly support listed Ashrams and Orphanages  
 - 🌅 Aesthetic and modern UI with a peaceful **saffron/orange theme**
@@ -27,7 +28,8 @@ Built with a modern, scalable, and spiritual tech stack:
 - **Database:** Supabase (PostgreSQL with Prisma ORM)  
 - **Authentication:** Supabase Auth  
 - **Optional AI/TTS:** Gemini API + ElevenLabs (for future spoken Gita chatbot)  
-- **Deployment:** Vercel
+- **Deployment:** Vercel  
+- **Media Integration:** YouTube Live Embed API
 
 ---
 
@@ -36,11 +38,12 @@ Built with a modern, scalable, and spiritual tech stack:
 - ✅ Divine homepage with calm, spiritual animations  
 - ✅ Saint Stories in Hindi & English  
 - ✅ Bhajans & Quotes section with modals, copy/share/audio  
+- ✅ Watch **Live Bhajans** & curated **YouTube Videos** from top devotional channels  
 - ✅ Category-wise listing of **Old Age Homes** and **Orphanages**  
 - ✅ **Donation Page** to support verified Ashrams and Orphanages  
-  ✅ **Visitor Counter** to display how many people have visited SantVaani — beautifully animated and integrated with Supabase 
+- ✅ **Visitor Counter** beautifully animated via Supabase  
 - 🔄 Contact flow for institutions to submit their listing (via santvaani@gmail.com)  
-- 🔜 Bhagavad Gita Chatbot 
+- 🔜 Bhagavad Gita Chatbot (AI + TTS)  
 - 🔜 Bookmark & Save your favorite bhajans/quotes  
 - 🔜 Admin dashboard for content uploads and feedback management  
 
@@ -58,6 +61,19 @@ Help us spread joy and dignity to those who need it most 🕊️
 
 ---
 
+## 🎥 Watch Live Bhajans Anytime, Anywhere
+
+Now, experience **live-streamed bhajans and satsangs** from top devotional YouTube channels — right within SantVaani.
+
+- No distractions, just devotion
+- Seamless YouTube Live embeds
+- Peaceful design with full-screen support
+- Channel list curated from trusted sources like T-Series Bhakti Sagar, Rajshri Soul, Bhajan Saar, and more
+
+> 🌐 **Live Bhakti meets Digital Simplicity.**
+
+---
+
 ## 🎯 Vision
 
 To revive and preserve the spiritual richness of Bharat through a digital-first approach.  
@@ -70,3 +86,4 @@ SantVaani aims to be a **peaceful space on the internet** where anyone—young o
 1. Clone the repository:
    ```bash
    git clone https://github.com/your-username/santvaani.git
+   cd santvaani
