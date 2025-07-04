@@ -27,7 +27,6 @@ Built with a modern, scalable, and spiritual tech stack:
 - **UI Enhancements:** Aceternity UI, Magic UI, smooth page transitions  
 - **Database:** Supabase (PostgreSQL with Prisma ORM)  
 - **Authentication:** Supabase Auth  
-- **Optional AI/TTS:** Gemini API + ElevenLabs (for future spoken Gita chatbot)  
 - **Deployment:** Vercel  
 - **Media Integration:** YouTube Live Embed API
 
