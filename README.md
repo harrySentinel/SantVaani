@@ -42,7 +42,7 @@ Built with a modern, scalable, and spiritual tech stack:
 - ✅ **Donation Page** to support verified Ashrams and Orphanages  
 - ✅ **Visitor Counter** beautifully animated via Supabase  
 - 🔄 Contact flow for institutions to submit their listing (via santvaani@gmail.com)  
-- 🔜 Bhagavad Gita Chatbot (AI + TTS)  
+- 🔜 Bhagavad Gita Chatbot (GEMINI AI)  
 - 🔜 Bookmark & Save your favorite bhajans/quotes  
 - 🔜 Admin dashboard for content uploads and feedback management  
 
