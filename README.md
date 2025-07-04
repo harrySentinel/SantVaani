@@ -10,7 +10,7 @@ From soul-touching bhajans to divine quotes and saintly life stories — SantVaa
 SantVaani is a full-stack web app designed to spread spiritual knowledge and inspire devotion through:
 
 - 🧘‍♂️ **Life stories** of saints like Meera Bai, Kabir, Tulsidas, and more  
-- 🎶 **Bhajans** in Hindi & Hinglish (with lyrics, audio playback, and shareable modals)  
+- 🎶 **Bhajans** in Hindi & Hinglish (with lyrics and shareable modals)  
 - 💬 **Quotes** with authorship (e.g., Kabir, Tulsidas) and calm UI animations  
 - 📺 **YouTube Live Bhajans** and curated spiritual video playlists — now watch your favorite satsangs and bhajans live, directly from the platform  
 - 🛕 **Old Age Homes & Orphanages** listing with donation support  
