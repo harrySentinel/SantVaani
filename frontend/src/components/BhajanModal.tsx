@@ -5,15 +5,15 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 
 interface Bhajan {
-  id: number;
+  id: string;
   title: string;
-  titleHi: string;
+  title_hi: string;
   category: string;
   lyrics: string;
-  lyricsHi: string;
+  lyrics_hi: string;
   meaning: string;
   author: string;
-  youtubeUrl?: string; // Optional YouTube URL
+  youtube_url?: string;
 }
 
 interface BhajanModalProps {
@@ -34,7 +34,7 @@ const BhajanModal: React.FC<BhajanModalProps> = ({ bhajan, isOpen, onClose }) =>
   const handleCopyLyrics = () => {
     if (!bhajan) return;
     
-    const textToCopy = `${bhajan.title}\n\n${bhajan.lyricsHi}\n\n${bhajan.lyrics}\n\nMeaning: ${bhajan.meaning}\n\n- ${bhajan.author}`;
+    const textToCopy = `${bhajan.title}\n\n${bhajan.lyrics_hi}\n\n${bhajan.lyrics}\n\nMeaning: ${bhajan.meaning}\n\n- ${bhajan.author}`;
     
     navigator.clipboard.writeText(textToCopy).then(() => {
       toast({
@@ -60,7 +60,7 @@ const BhajanModal: React.FC<BhajanModalProps> = ({ bhajan, isOpen, onClose }) =>
   };
 
   const handleListenOnYouTube = () => {
-    if (!bhajan?.youtubeUrl) {
+    if (!bhajan?.youtube_url) {
       // Generate a search URL if no specific URL is provided
       const searchQuery = `${bhajan?.title} bhajan devotional song`.replace(/\s+/g, '+');
       const searchUrl = `https://www.youtube.com/results?search_query=${searchQuery}`;
@@ -72,7 +72,7 @@ const BhajanModal: React.FC<BhajanModalProps> = ({ bhajan, isOpen, onClose }) =>
         duration: 2000,
       });
     } else {
-      window.open(bhajan.youtubeUrl, '_blank');
+      window.open(bhajan.youtube_url, '_blank');
       
       toast({
         title: "🎵 Opening YouTube",
@@ -135,7 +135,7 @@ const BhajanModal: React.FC<BhajanModalProps> = ({ bhajan, isOpen, onClose }) =>
                         {bhajan.title}
                       </h1>
                       <p className="text-xl md:text-2xl text-green-600 font-medium">
-                        {bhajan.titleHi}
+                        {bhajan.title_hi}
                       </p>
                     </div>
 
@@ -168,7 +168,7 @@ const BhajanModal: React.FC<BhajanModalProps> = ({ bhajan, isOpen, onClose }) =>
                         देवनागरी (Devanagari)
                       </h3>
                       <pre className="text-gray-700 leading-relaxed text-base md:text-lg whitespace-pre-wrap font-medium">
-                        {bhajan.lyricsHi}
+                        {bhajan.lyrics_hi}
                       </pre>
                     </div>
 
@@ -194,8 +194,6 @@ const BhajanModal: React.FC<BhajanModalProps> = ({ bhajan, isOpen, onClose }) =>
                       </p>
                       <p className="text-sm text-gray-500 mt-4 font-medium">- {bhajan.author}</p>
                     </div>
-
-
 
                     {/* Listen Section */}
                     <div className="bg-gradient-to-r from-red-50 via-white to-orange-50 rounded-2xl p-6 md:p-8 shadow-lg border border-red-200/50">
