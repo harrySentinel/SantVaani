@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabaseClient'; // Adjust path as needed
+import { supabase } from '@/lib/supabaseClient'; 
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import DivineFormModal from '@/components/DivineFormModal';
