@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { MessageCircle, X, Send, Sparkles, Heart, Flower2 } from 'lucide-react';
+import { MessageCircle, X, Send, Sparkles, Heart, Flower2, Loader2 } from 'lucide-react';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
 // Simple Message interface - only what we need
 interface Message {

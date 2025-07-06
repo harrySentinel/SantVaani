@@ -122,7 +122,7 @@ const VisitorCounter: React.FC<VisitorCounterProps> = ({ className = '' }) => {
 
     const updateParticles = () => {
       setParticles(prev => {
-        let newParticles = prev.map(particle => ({
+        const newParticles = prev.map(particle => ({
           ...particle,
           x: particle.x + particle.speedX * 0.8,
           y: particle.y + particle.speedY * 0.8,
