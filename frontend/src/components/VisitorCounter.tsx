@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Users, Sparkles, Star } from 'lucide-react';
+import { supabase } from '@/lib/supabaseClient';
 
 interface VisitorCounterProps {
-  count: number;
   className?: string;
 }
 
@@ -19,31 +19,95 @@ interface Particle {
   color: string;
 }
 
-const VisitorCounter: React.FC<VisitorCounterProps> = ({ count = 125847, className = '' }) => {
+const VisitorCounter: React.FC<VisitorCounterProps> = ({ className = '' }) => {
+  const [count, setCount] = useState(0);
   const [displayCount, setDisplayCount] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const [particles, setParticles] = useState<Particle[]>([]);
   const [isHovering, setIsHovering] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const animationRef = useRef<number>();
   const containerRef = useRef<HTMLDivElement>(null);
+  const hasTracked = useRef(false);
+
+  // Track visitor and get count
+  useEffect(() => {
+    const trackVisitor = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        // First, get current count
+        const { data: currentData, error: fetchError } = await supabase
+          .from('visitor_stats')
+          .select('total_visitors')
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
+
+        if (fetchError && fetchError.code !== 'PGRST116') {
+          throw fetchError;
+        }
+
+        const currentCount = currentData?.total_visitors || 0;
+
+        // Check if this is a new visitor (simple check - in production you'd use more sophisticated tracking)
+        const lastVisit = localStorage.getItem('santvaani_last_visit');
+        const now = new Date().toISOString();
+        const isNewVisitor = !lastVisit || 
+          (new Date(now).getTime() - new Date(lastVisit).getTime()) > 24 * 60 * 60 * 1000; // 24 hours
+
+        let newCount = currentCount;
+
+        if (isNewVisitor && !hasTracked.current) {
+          // Increment visitor count
+          const { error: insertError } = await supabase
+            .from('visitor_stats')
+            .insert([
+              { 
+                total_visitors: currentCount + 1,
+                last_updated: now 
+              }
+            ]);
+
+          if (insertError) throw insertError;
+
+          newCount = currentCount + 1;
+          localStorage.setItem('santvaani_last_visit', now);
+          hasTracked.current = true;
+        }
+
+        setCount(newCount);
+        setIsLoading(false);
+
+      } catch (err) {
+        console.error('Error tracking visitor:', err);
+        setError('Unable to load visitor count');
+        setCount(125847); // Fallback count
+        setIsLoading(false);
+      }
+    };
+
+    trackVisitor();
+  }, []);
 
   // Particle system
   useEffect(() => {
-    // Background particle creation (separate from click particles)
-  const createParticleForBackground = (): Particle => ({
-    id: Math.random(),
-    x: Math.random() * 600,
-    y: 600,
-    size: Math.random() * 2 + 1,
-    opacity: Math.random() * 0.3 + 0.1,
-    speedX: (Math.random() - 0.5) * 0.3,
-    speedY: -Math.random() * 1.5 - 0.3,
-    life: 0,
-    maxLife: Math.random() * 180 + 120,
-    color: ['#fb923c', '#f97316', '#ea580c', '#fdba74'][Math.floor(Math.random() * 4)]
-  });
+    const createParticleForBackground = (): Particle => ({
+      id: Math.random(),
+      x: Math.random() * 600,
+      y: 600,
+      size: Math.random() * 2 + 1,
+      opacity: Math.random() * 0.3 + 0.1,
+      speedX: (Math.random() - 0.5) * 0.3,
+      speedY: -Math.random() * 1.5 - 0.3,
+      life: 0,
+      maxLife: Math.random() * 180 + 120,
+      color: ['#fb923c', '#f97316', '#ea580c', '#fdba74'][Math.floor(Math.random() * 4)]
+    });
 
-  const createParticle = (): Particle => ({
+    const createParticle = (): Particle => ({
       id: Math.random(),
       x: Math.random() * 600,
       y: 600,
@@ -151,12 +215,12 @@ const VisitorCounter: React.FC<VisitorCounterProps> = ({ count = 125847, classNa
           isVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-8 scale-95'
         }`}
       >
-        {/* Main counter display - MUCH LARGER */}
+        {/* Main counter display */}
         <div className="relative">
           {/* Enhanced glowing background effect */}
           <div className="absolute inset-0 bg-gradient-to-r from-orange-200 to-orange-300 rounded-3xl blur-xl opacity-25 animate-pulse"></div>
           
-                      {/* Main card - Perfect balanced size with enhanced roundness */}
+          {/* Main card */}
           <div 
             className={`relative bg-white/95 backdrop-blur-xl rounded-3xl p-8 sm:p-10 shadow-2xl border border-orange-100/60 min-w-[320px] max-w-md mx-auto transition-all duration-500 cursor-pointer overflow-hidden ${isHovering ? 'scale-105 shadow-3xl border-orange-200/80 bg-white/98' : ''}`}
             onMouseEnter={() => setIsHovering(true)}
@@ -172,7 +236,7 @@ const VisitorCounter: React.FC<VisitorCounterProps> = ({ count = 125847, classNa
             {/* Shimmer effect on hover */}
             <div className={`absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent rounded-3xl transition-all duration-1000 ${isHovering ? 'translate-x-full opacity-100' : '-translate-x-full opacity-0'}`}></div>
             
-            {/* Header with perfectly sized icon */}
+            {/* Header with icon */}
             <div className="flex justify-center mb-6 relative z-10">
               <div className={`w-16 h-16 sm:w-18 sm:h-18 bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg transform transition-all duration-500 ${isHovering ? 'rotate-12 shadow-xl scale-110' : 'rotate-3'}`}>
                 <Users className="w-8 h-8 sm:w-9 sm:h-9 text-white drop-shadow-lg" />
@@ -184,22 +248,39 @@ const VisitorCounter: React.FC<VisitorCounterProps> = ({ count = 125847, classNa
               </div>
             </div>
             
-            {/* Perfectly sized Counter display */}
+            {/* Counter display */}
             <div className="text-center space-y-3 relative z-10">
-              <div className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-orange-500 via-orange-600 to-orange-700 bg-clip-text text-transparent leading-tight drop-shadow-sm">
-                {formatNumber(displayCount)}
-              </div>
+              {isLoading ? (
+                <div className="text-4xl sm:text-5xl font-bold text-orange-500 animate-pulse">
+                  Loading...
+                </div>
+              ) : error ? (
+                <div className="text-4xl sm:text-5xl font-bold text-orange-500">
+                  {formatNumber(displayCount)}
+                </div>
+              ) : (
+                <div className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-orange-500 via-orange-600 to-orange-700 bg-clip-text text-transparent leading-tight drop-shadow-sm">
+                  {formatNumber(displayCount)}
+                </div>
+              )}
               <div className="text-lg sm:text-xl text-orange-600/80 font-semibold tracking-wide uppercase">
                 Visitors
               </div>
             </div>
+
+            {/* Loading indicator */}
+            {isLoading && (
+              <div className="flex justify-center my-3">
+                <div className="animate-spin rounded-full h-4 w-4 border-2 border-orange-500 border-t-transparent"></div>
+              </div>
+            )}
 
             {/* Decorative line */}
             <div className="flex justify-center my-5">
               <div className="w-20 h-0.5 bg-gradient-to-r from-transparent via-orange-400 to-transparent rounded-full"></div>
             </div>
 
-            {/* Subtext - perfectly sized */}
+            {/* Subtext */}
             <div className="text-center relative z-10 space-y-1">
               <p className="text-gray-600 text-base font-medium leading-relaxed">
                 🙏 <span className="text-orange-600 font-bold">{displayCount.toLocaleString()}</span> souls have found
@@ -208,24 +289,33 @@ const VisitorCounter: React.FC<VisitorCounterProps> = ({ count = 125847, classNa
                 their way to <span className="bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent font-bold">SantVaani</span>
               </p>
             </div>
+
+            {/* Error message */}
+            {error && (
+              <div className="text-center mt-2">
+                <p className="text-xs text-red-500">
+                  {error}
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Enhanced decorative elements - LARGER */}
+      {/* Enhanced decorative elements */}
       <div 
         className={`flex items-center space-x-6 sm:space-x-8 transition-all duration-1000 delay-500 transform ${
           isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
         }`}
       >
-        {/* Floating dots with different animations - BIGGER */}
+        {/* Floating dots with different animations */}
         <div className="flex space-x-3 sm:space-x-4">
           <div className="w-3 h-3 sm:w-4 sm:h-4 bg-gradient-to-r from-orange-300 to-orange-400 rounded-full animate-bounce"></div>
           <div className="w-3 h-3 sm:w-4 sm:h-4 bg-gradient-to-r from-orange-400 to-orange-500 rounded-full animate-bounce delay-100"></div>
           <div className="w-3 h-3 sm:w-4 sm:h-4 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full animate-bounce delay-200"></div>
         </div>
         
-        {/* Om symbol with glow - LARGER */}
+        {/* Om symbol with glow */}
         <div className="text-3xl sm:text-4xl lg:text-5xl text-orange-500 animate-pulse mx-6 sm:mx-8 filter drop-shadow-lg">
           ॐ
         </div>
@@ -237,7 +327,7 @@ const VisitorCounter: React.FC<VisitorCounterProps> = ({ count = 125847, classNa
         </div>
       </div>
 
-      {/* Blessing text - LARGER */}
+      {/* Blessing text */}
       <div 
         className={`transition-all duration-1000 delay-700 transform ${
           isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
