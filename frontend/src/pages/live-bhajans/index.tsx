@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Play, Users, Eye, Clock, RefreshCw, Wifi, WifiOff, AlertCircle } from 'lucide-react';
@@ -73,6 +71,28 @@ const LiveBhajan = () => {
             videoId: "dQw4w9WgXcQ",
             views: "1.2K",
             isLive: true,
+            publishedAt: new Date().toISOString()
+          },
+          {
+            id: 'fallback-2',
+            title: "Om Namah Shivaya - Divine Meditation",
+            channel: "Spiritual Sounds",
+            duration: "LIVE",
+            thumbnail: "https://images.unsplash.com/photo-1524863479829-916d8e77f114?w=400&h=225&fit=crop&auto=format",
+            videoId: "dQw4w9WgXcQ",
+            views: "2.5K",
+            isLive: true,
+            publishedAt: new Date().toISOString()
+          },
+          {
+            id: 'fallback-3',
+            title: "Gayatri Mantra - Sacred Chanting",
+            channel: "Vedic Chants",
+            duration: "25:30",
+            thumbnail: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=225&fit=crop&auto=format",
+            videoId: "dQw4w9WgXcQ",
+            views: "15K",
+            isLive: false,
             publishedAt: new Date().toISOString()
           }
         ]);
@@ -159,8 +179,7 @@ const LiveBhajan = () => {
   if (loading && bhajans.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50">
-        <Navbar />
-        <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="flex items-center justify-center min-h-[100vh]">
           <div className="text-center space-y-6">
             <div className="w-20 h-20 bg-gradient-to-r from-orange-400 to-red-500 rounded-full mx-auto flex items-center justify-center animate-pulse">
               <Play className="w-10 h-10 text-white" fill="white" />
@@ -176,15 +195,12 @@ const LiveBhajan = () => {
             </div>
           </div>
         </div>
-        <Footer />
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50">
-      <Navbar />
-      
       {/* Hero Section */}
       <section className="relative py-20 bg-gradient-to-r from-orange-400 via-red-400 to-pink-500 overflow-hidden">
         {/* Animated background elements */}
@@ -298,7 +314,7 @@ const LiveBhajan = () => {
         </div>
       </section>
 
-      {/* Live Bhajans Section */}
+      {/* Live Bhajans Section - Enhanced with better layout */}
       {liveBhajans.length > 0 && (
         <section className="py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -314,7 +330,7 @@ const LiveBhajan = () => {
               </p>
             </div>
 
-            <div className="grid gap-8">
+            <div className="grid gap-6 lg:gap-8">
               {liveBhajans.map((bhajan, index) => (
                 <Card 
                   key={bhajan.id || `live-${index}`} 
@@ -322,39 +338,39 @@ const LiveBhajan = () => {
                 >
                   <CardContent className="p-0">
                     <div className="flex flex-col lg:flex-row">
-                      {/* Thumbnail */}
-                      <div className="relative lg:w-96 flex-shrink-0 group-hover:scale-105 transition-transform duration-500">
+                      {/* Thumbnail - Reduced size on desktop */}
+                      <div className="relative lg:w-80 xl:w-96 flex-shrink-0 group-hover:scale-105 transition-transform duration-500">
                         <img 
                           src={bhajan.thumbnail} 
                           alt={bhajan.title}
-                          className="w-full h-64 lg:h-56 object-cover"
+                          className="w-full h-48 lg:h-44 xl:h-52 object-cover"
                           loading="lazy"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
                         
                         {/* Live Badge */}
-                        <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold flex items-center space-x-1">
+                        <div className="absolute top-3 left-3 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold flex items-center space-x-1">
                           <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
                           <span>LIVE</span>
                         </div>
                         
                         {/* Play Button Overlay */}
                         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                          <div className="w-20 h-20 bg-white/95 rounded-full flex items-center justify-center shadow-2xl transform scale-95 group-hover:scale-100 transition-transform duration-300">
-                            <Play className="w-10 h-10 text-red-500 ml-1" fill="currentColor" />
+                          <div className="w-16 h-16 bg-white/95 rounded-full flex items-center justify-center shadow-2xl transform scale-95 group-hover:scale-100 transition-transform duration-300">
+                            <Play className="w-8 h-8 text-red-500 ml-1" fill="currentColor" />
                           </div>
                         </div>
                       </div>
 
-                      {/* Content */}
-                      <div className="flex-1 p-6 lg:p-8 flex flex-col justify-between">
-                        <div className="space-y-4">
-                          <h3 className="text-2xl lg:text-3xl font-bold text-gray-800 group-hover:text-red-600 transition-colors leading-tight">
+                      {/* Content - Better padding and spacing */}
+                      <div className="flex-1 p-6 lg:p-6 xl:p-8 flex flex-col justify-between">
+                        <div className="space-y-3">
+                          <h3 className="text-xl lg:text-2xl font-bold text-gray-800 group-hover:text-red-600 transition-colors leading-tight line-clamp-2">
                             {bhajan.title}
                           </h3>
                           
                           <div className="flex flex-wrap items-center gap-4 text-gray-600">
-                            <span className="text-red-600 font-semibold text-lg">
+                            <span className="text-red-600 font-semibold">
                               {bhajan.channel}
                             </span>
                             <div className="flex items-center space-x-1">
@@ -364,15 +380,15 @@ const LiveBhajan = () => {
                           </div>
                         </div>
 
-                        <div className="flex flex-col sm:flex-row gap-4 mt-6">
+                        <div className="flex flex-col sm:flex-row gap-3 mt-6">
                           <Button
                             onClick={() => openYouTube(bhajan.videoId, bhajan.title)}
-                            className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-8 py-4 rounded-full text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                            className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-6 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                           >
                             <Play className="w-5 h-5 mr-2" />
                             Watch Live
                           </Button>
-                          <div className="flex items-center space-x-2 text-sm text-gray-500 px-4">
+                          <div className="flex items-center space-x-2 text-sm text-gray-500 px-4 py-2">
                             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                             <span>Live now with {bhajan.views} viewers</span>
                           </div>
@@ -387,7 +403,7 @@ const LiveBhajan = () => {
         </section>
       )}
 
-      {/* Recent Bhajans Section */}
+      {/* Recent Bhajans Section - Enhanced grid layout */}
       {recentBhajans.length > 0 && (
         <section className="py-16 bg-gradient-to-br from-gray-50 to-orange-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -400,18 +416,18 @@ const LiveBhajan = () => {
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {recentBhajans.map((bhajan, index) => (
                 <Card 
                   key={bhajan.id || `recent-${index}`} 
-                  className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border-0 shadow-lg bg-white/90 backdrop-blur-sm overflow-hidden"
+                  className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-0 shadow-lg bg-white/90 backdrop-blur-sm overflow-hidden"
                 >
                   <CardContent className="p-0">
                     <div className="relative">
                       <img 
                         src={bhajan.thumbnail} 
                         alt={bhajan.title}
-                        className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
+                        className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-500"
                         loading="lazy"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -423,8 +439,8 @@ const LiveBhajan = () => {
                       
                       {/* Play Button */}
                       <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <div className="w-16 h-16 bg-white/95 rounded-full flex items-center justify-center shadow-xl">
-                          <Play className="w-8 h-8 text-orange-600 ml-1" fill="currentColor" />
+                        <div className="w-12 h-12 bg-white/95 rounded-full flex items-center justify-center shadow-xl">
+                          <Play className="w-6 h-6 text-orange-600 ml-1" fill="currentColor" />
                         </div>
                       </div>
                     </div>
@@ -486,8 +502,6 @@ const LiveBhajan = () => {
           </div>
         </div>
       </section>
-
-      <Footer />
     </div>
   );
 };
