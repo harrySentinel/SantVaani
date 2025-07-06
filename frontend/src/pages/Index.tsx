@@ -1,4 +1,3 @@
-
 import HeroSection from '@/components/HeroSection';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -10,9 +9,6 @@ import ChatBot from '@/components/chatBot';
 import VisitorCounter from '@/components/VisitorCounter';
 
 const Index = () => {
-
-  // have to replace this with actual supabase data
-  const visitorCount = 12547; // this will be fetched from supabase later on
   const features = [
     {
       icon: Users,
@@ -148,10 +144,10 @@ const Index = () => {
   </div>
 </section>
 
-      {/* Visitor Counter Section */}
+      {/* Visitor Counter Section - Now fully dynamic */}
       <section className="py-12 bg-gradient-to-br from-white via-orange-25 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <VisitorCounter count={visitorCount} className="mb-8" />
+          <VisitorCounter className="mb-8" />
         </div>
       </section>
 
