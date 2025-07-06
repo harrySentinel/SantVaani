@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Play, Users, Eye, Clock, RefreshCw, Wifi, WifiOff, AlertCircle } from 'lucide-react';
@@ -19,7 +19,7 @@ const LiveBhajan = () => {
     : 'http://localhost:5000/api';
 
   // Fetch bhajan data from backend
-  const fetchBhajans = async (isManualRefresh = false) => {
+  const fetchBhajans = useCallback(async (isManualRefresh = false) => {
     try {
       if (isManualRefresh) {
         setIsRefreshing(true);
@@ -60,51 +60,54 @@ const LiveBhajan = () => {
       setConnectionStatus('disconnected');
       
       // Fallback to sample data if no data exists
-      if (bhajans.length === 0) {
-        setBhajans([
-          {
-            id: 'fallback-1',
-            title: "Hare Krishna Hare Rama - Peaceful Chanting",
-            channel: "Divine Bhajans",
-            duration: "LIVE",
-            thumbnail: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=225&fit=crop&auto=format",
-            videoId: "dQw4w9WgXcQ",
-            views: "1.2K",
-            isLive: true,
-            publishedAt: new Date().toISOString()
-          },
-          {
-            id: 'fallback-2',
-            title: "Om Namah Shivaya - Divine Meditation",
-            channel: "Spiritual Sounds",
-            duration: "LIVE",
-            thumbnail: "https://images.unsplash.com/photo-1524863479829-916d8e77f114?w=400&h=225&fit=crop&auto=format",
-            videoId: "dQw4w9WgXcQ",
-            views: "2.5K",
-            isLive: true,
-            publishedAt: new Date().toISOString()
-          },
-          {
-            id: 'fallback-3',
-            title: "Gayatri Mantra - Sacred Chanting",
-            channel: "Vedic Chants",
-            duration: "25:30",
-            thumbnail: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=225&fit=crop&auto=format",
-            videoId: "dQw4w9WgXcQ",
-            views: "15K",
-            isLive: false,
-            publishedAt: new Date().toISOString()
-          }
-        ]);
-      }
+      setBhajans((prevBhajans) => {
+        if (prevBhajans.length === 0) {
+          return [
+            {
+              id: 'fallback-1',
+              title: "Hare Krishna Hare Rama - Peaceful Chanting",
+              channel: "Divine Bhajans",
+              duration: "LIVE",
+              thumbnail: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=225&fit=crop&auto=format",
+              videoId: "dQw4w9WgXcQ",
+              views: "1.2K",
+              isLive: true,
+              publishedAt: new Date().toISOString()
+            },
+            {
+              id: 'fallback-2',
+              title: "Om Namah Shivaya - Divine Meditation",
+              channel: "Spiritual Sounds",
+              duration: "LIVE",
+              thumbnail: "https://images.unsplash.com/photo-1524863479829-916d8e77f114?w=400&h=225&fit=crop&auto=format",
+              videoId: "dQw4w9WgXcQ",
+              views: "2.5K",
+              isLive: true,
+              publishedAt: new Date().toISOString()
+            },
+            {
+              id: 'fallback-3',
+              title: "Gayatri Mantra - Sacred Chanting",
+              channel: "Vedic Chants",
+              duration: "25:30",
+              thumbnail: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=225&fit=crop&auto=format",
+              videoId: "dQw4w9WgXcQ",
+              views: "15K",
+              isLive: false,
+              publishedAt: new Date().toISOString()
+            }
+          ];
+        }
+        return prevBhajans;
+      });
     } finally {
       setLoading(false);
       setIsRefreshing(false);
     }
-  };
+  }, [API_BASE_URL]);
 
   // Manual refresh function
-  const handleManualRefresh = async () => {
+  const handleManualRefresh = useCallback(async () => {
     try {
       setIsRefreshing(true);
       const response = await fetch(`${API_BASE_URL}/refresh-bhajans`, {
@@ -133,12 +136,12 @@ const LiveBhajan = () => {
     } finally {
       setIsRefreshing(false);
     }
-  };
+  }, [API_BASE_URL, fetchBhajans]);
 
   // Initial load
   useEffect(() => {
     fetchBhajans();
-  }, []);
+  }, [fetchBhajans]);
 
   // Auto-refresh every 30 minutes
   useEffect(() => {
@@ -149,7 +152,7 @@ const LiveBhajan = () => {
     }, 30 * 60 * 1000); // 30 minutes
 
     return () => clearInterval(interval);
-  }, [isRefreshing]);
+  }, [isRefreshing, fetchBhajans]);
 
   // Update current time every minute
   useEffect(() => {

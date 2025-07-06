@@ -32,7 +32,7 @@ export default function HeroSection() {
       setCurrentQuote((prev) => (prev + 1) % spiritualQuotes.length);
     }, 4000);
     return () => clearInterval(timer);
-  }, []);
+  }, [spiritualQuotes.length]);
 
   return (
     <section className="relative min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50 overflow-hidden">
