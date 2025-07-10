@@ -51,6 +51,17 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
+
+
+       {/* Beta Banner - Option 1: Top of page */}
+      <div className="bg-gradient-to-r from-orange-400 to-red-500 text-white text-center py-2 px-4 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-orange-400/20 to-red-500/20 animate-pulse"></div>
+        <p className="text-sm font-medium relative z-10">
+          🚀 <span className="font-bold">Beta Version</span> - Your feedback helps us improve | 
+          <span className="ml-2">बीटा संस्करण - आपकी प्रतिक्रिया हमें बेहतर बनाती है</span>
+        </p>
+      </div>
+
       
       {/* Hero Section */}
       <HeroSection />
