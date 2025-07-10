@@ -57,7 +57,7 @@ const Index = () => {
       <div className="bg-gradient-to-r from-orange-400 to-red-500 text-white text-center py-2 px-4 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-orange-400/20 to-red-500/20 animate-pulse"></div>
         <p className="text-sm font-medium relative z-10">
-          🚀 <span className="font-bold">Beta Version</span> - Your feedback helps us improve | 
+          ✨ <span className="font-bold">Beta Version</span> - Your feedback helps us improve | 
           <span className="ml-2">बीटा संस्करण - आपकी प्रतिक्रिया हमें बेहतर बनाती है</span>
         </p>
       </div>
@@ -73,6 +73,12 @@ const Index = () => {
             <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
               Explore Sacred Wisdom
             </h2>
+
+             {/* Beta Badge - Option 3: Next to heading */}
+              <span className="bg-gradient-to-r from-orange-500 to-red-600 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-md">
+                Beta
+              </span>
+
             <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
               Journey through the rich spiritual heritage of India through our carefully curated collection of saints, teachings, and divine forms.
             </p>
@@ -175,6 +181,15 @@ const Index = () => {
                 We believe that in today's fast-paced world, the teachings of these enlightened souls can provide guidance, 
                 peace, and direction to seekers on their spiritual journey.
               </p>
+
+               {/* Beta Notice - Option 4: In mission section */}
+              <div className="bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-lg p-4 mt-6">
+                <p className="text-sm text-gray-700">
+                  <span className="font-semibold text-orange-600">🛠️ Beta Version Notice:</span> 
+                  We are continuously improving SantVaani. Your feedback and suggestions help us enhance your spiritual journey experience.
+                </p>
+              </div>
+
             </div>
 
             <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-2xl p-8 border border-orange-200">
