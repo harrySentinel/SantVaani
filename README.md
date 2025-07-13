@@ -24,7 +24,7 @@ SantVaani is a full-stack web app designed to spread spiritual knowledge and ins
 Built with a modern, scalable, and spiritual tech stack:
 
 - **Frontend:** Next.js 14 (App Router), TypeScript, Tailwind CSS, shadcn/ui  
-- **UI Enhancements:** Aceternity UI, Magic UI, smooth page transitions  
+- **UI Enhancements:** Radix UI, smooth page transitions  
 - **Database:** Supabase (PostgreSQL with Prisma ORM)  
 - **Authentication:** Supabase Auth  
 - **Deployment:** Vercel  
