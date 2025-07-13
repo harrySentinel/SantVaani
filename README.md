@@ -27,7 +27,7 @@ Built with a modern, scalable, and spiritual tech stack:
 - **UI Enhancements:** Radix UI, smooth page transitions  
 - **Database:** Supabase (PostgreSQL with Prisma ORM)  
 - **Authentication:** Supabase Auth  
-- **Deployment:** Vercel  
+- **Deployment:** Vercel, Railway
 - **Media Integration:** YouTube Live Embed API
 
 ---
