@@ -50,7 +50,7 @@ Built with a modern, scalable, and spiritual tech stack:
 
 ## 💝 Support Seva – Donate with Heart
 
-SantVaani is not just a platform for devotion but also for **compassionate action**.  
+SantVaani is not just a platform for devotion but also for **compassionate action** for spiritual seekers.  
 We’ve built a dedicated **Donation Page** where users can explore, support, and directly contribute to:
 
 - Verified **Vridh Ashrams** (Old Age Homes)  
