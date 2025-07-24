@@ -146,7 +146,7 @@ npm run preview     # Preview production build
 ## 🧪 Testing
 
 We maintain comprehensive test coverage with:
-- **Unit Tests**: Component testing with Vitest + Testing Library
+- **Unit Tests**: Component testing with Vitest + Testing Library (Jest)
 - **Integration Tests**: API and routing tests
 - **Error Boundary Tests**: Production error handling
 
