@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import BhajanModal from '@/components/BhajanModal';
+import BhajanShareButton from '@/components/BhajanShareButton';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Book, Heart, Quote, Music, Loader2 } from 'lucide-react';
+import { Book, Heart, Quote, Music, Loader2, Search } from 'lucide-react';
 import { Toaster } from '@/components/ui/toaster';
 import { supabase } from '@/lib/supabaseClient';
 
@@ -33,6 +35,8 @@ const Bhajans = () => {
   const [selectedBhajan, setSelectedBhajan] = useState<Bhajan | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [bhajans, setBhajans] = useState<Bhajan[]>([]);
+  const [filteredBhajans, setFilteredBhajans] = useState<Bhajan[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [quotes, setQuotes] = useState<QuoteItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -47,9 +51,11 @@ const Bhajans = () => {
 
       if (error) throw error;
       setBhajans(data || []);
+      setFilteredBhajans(data || []); // Initialize filtered bhajans
     } catch (err) {
       console.error('Error fetching bhajans:', err);
       setError('Failed to load bhajans');
+      setFilteredBhajans([]);
     }
   };
 
@@ -79,6 +85,33 @@ const Bhajans = () => {
 
     loadData();
   }, []);
+
+  // Filter bhajans based on search query
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setFilteredBhajans(bhajans);
+      return;
+    }
+
+    const query = searchQuery.toLowerCase().trim();
+    const filtered = bhajans.filter(bhajan => {
+      return (
+        bhajan.title?.toLowerCase().includes(query) ||
+        bhajan.title_hi?.toLowerCase().includes(query) ||
+        bhajan.category?.toLowerCase().includes(query) ||
+        bhajan.author?.toLowerCase().includes(query) ||
+        bhajan.lyrics?.toLowerCase().includes(query) ||
+        bhajan.lyrics_hi?.toLowerCase().includes(query) ||
+        bhajan.meaning?.toLowerCase().includes(query)
+      );
+    });
+
+    setFilteredBhajans(filtered);
+  }, [searchQuery, bhajans]);
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
 
   const handleBhajanClick = (bhajan: Bhajan) => {
     console.log('Bhajan clicked:', bhajan.title);
@@ -153,7 +186,7 @@ const Bhajans = () => {
             </p>
             <div className="flex justify-center space-x-4">
               <Badge variant="secondary" className="bg-green-100 text-green-700 px-4 py-2">
-                {bhajans.length} Sacred Songs
+                {searchQuery ? `${filteredBhajans.length} of ${bhajans.length}` : `${bhajans.length}`} Sacred Songs
               </Badge>
               <Badge variant="secondary" className="bg-orange-100 text-orange-700 px-4 py-2">
                 {quotes.length} Divine Quotes
@@ -188,7 +221,45 @@ const Bhajans = () => {
                 </p>
               </div>
 
-              {bhajans.length === 0 ? (
+              {/* Bhajans Search Section */}
+              <div className="max-w-2xl mx-auto">
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Search className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <Input
+                    type="text"
+                    placeholder="खोजें: हनुमान चालीसा, राम भजन, कृष्ण... (Search by title, author, category, lyrics)"
+                    value={searchQuery}
+                    onChange={handleSearch}
+                    className="block w-full pl-10 pr-3 py-3 border-2 border-green-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900 placeholder-gray-500 bg-white/90 backdrop-blur-sm"
+                  />
+                  {searchQuery && (
+                    <button
+                      onClick={() => setSearchQuery('')}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    >
+                      <span className="text-gray-400 hover:text-gray-600 text-sm">Clear</span>
+                    </button>
+                  )}
+                </div>
+                {searchQuery && (
+                  <p className="mt-2 text-sm text-gray-600 text-center">
+                    {filteredBhajans.length === 0 
+                      ? `No bhajans found for "${searchQuery}"`
+                      : `Found ${filteredBhajans.length} bhajan${filteredBhajans.length !== 1 ? 's' : ''} matching "${searchQuery}"`
+                    }
+                  </p>
+                )}
+              </div>
+
+              {filteredBhajans.length === 0 && searchQuery ? (
+                <div className="text-center py-12">
+                  <div className="text-gray-400 text-6xl mb-4">🔍</div>
+                  <h3 className="text-2xl font-semibold text-gray-700 mb-2">No Results Found</h3>
+                  <p className="text-gray-500">No bhajans match your search "{searchQuery}". Try different keywords.</p>
+                </div>
+              ) : bhajans.length === 0 ? (
                 <div className="text-center py-12">
                   <Music className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-500 text-lg">No bhajans available yet</p>
@@ -196,7 +267,7 @@ const Bhajans = () => {
                 </div>
               ) : (
                 <div className="grid md:grid-cols-2 gap-6">
-                  {bhajans.map((bhajan) => (
+                  {filteredBhajans.map((bhajan) => (
                     <Card 
                       key={bhajan.id} 
                       className="group hover:shadow-xl transition-all duration-300 border-0 shadow-lg bg-white/90 backdrop-blur-sm cursor-pointer"
@@ -240,10 +311,30 @@ const Bhajans = () => {
 
                           <div className="flex items-center justify-between pt-2">
                             <p className="text-xs text-gray-500">- {bhajan.author}</p>
-                            <button className="flex items-center space-x-2 text-green-600 hover:text-green-700 transition-colors">
-                              <Heart className="w-4 h-4" />
-                              <span className="text-sm">Read Full</span>
-                            </button>
+                            <div className="flex items-center space-x-2">
+                              <button className="flex items-center space-x-2 text-green-600 hover:text-green-700 transition-colors">
+                                <Heart className="w-4 h-4" />
+                                <span className="text-sm">Read Full</span>
+                              </button>
+                              
+                              <div onClick={(e) => e.stopPropagation()}>
+                                <BhajanShareButton 
+                                  bhajan={{
+                                    id: bhajan.id,
+                                    title: bhajan.title,
+                                    title_hi: bhajan.title_hi,
+                                    category: bhajan.category,
+                                    lyrics: bhajan.lyrics,
+                                    lyrics_hi: bhajan.lyrics_hi,
+                                    author: bhajan.author,
+                                    meaning: bhajan.meaning
+                                  }}
+                                  variant="ghost"
+                                  size="sm"
+                                  className="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
+                                />
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </CardContent>

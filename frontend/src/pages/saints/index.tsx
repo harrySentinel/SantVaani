@@ -3,15 +3,19 @@ import { motion } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import SaintModal from '@/components/SaintModal';
+import ShareButton from '@/components/ShareButton';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Heart, Calendar, MapPin } from 'lucide-react';
+import { Heart, Calendar, MapPin, Search } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 import { supabase } from '@/lib/supabaseClient';
 
 const Saints = () => {
   const [selectedSaint, setSelectedSaint] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [saints, setSaints] = useState([]);
+  const [filteredSaints, setFilteredSaints] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -46,11 +50,13 @@ const Saints = () => {
         })) : [];
 
         setSaints(formatted);
+        setFilteredSaints(formatted); // Initialize filtered saints
       } catch (err) {
         console.error('Error fetching saints:', err);
         setError(err.message);
         // Fallback to empty array to prevent UI breaking
         setSaints([]);
+        setFilteredSaints([]);
       } finally {
         setLoading(false);
       }
@@ -58,6 +64,34 @@ const Saints = () => {
 
     fetchSaints();
   }, []);
+
+  // Filter saints based on search query
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setFilteredSaints(saints);
+      return;
+    }
+
+    const query = searchQuery.toLowerCase().trim();
+    const filtered = saints.filter(saint => {
+      return (
+        saint.name?.toLowerCase().includes(query) ||
+        saint.nameHi?.toLowerCase().includes(query) ||
+        saint.specialty?.toLowerCase().includes(query) ||
+        saint.specialtyHi?.toLowerCase().includes(query) ||
+        saint.region?.toLowerCase().includes(query) ||
+        saint.period?.toLowerCase().includes(query) ||
+        saint.description?.toLowerCase().includes(query) ||
+        saint.descriptionHi?.toLowerCase().includes(query)
+      );
+    });
+
+    setFilteredSaints(filtered);
+  }, [searchQuery, saints]);
+
+  const handleSearch = (e) => {
+    setSearchQuery(e.target.value);
+  };
 
   const handleSaintClick = (saint) => {
     setSelectedSaint(saint);
@@ -212,10 +246,44 @@ const Saints = () => {
             </p>
             <div className="flex justify-center">
               <Badge variant="secondary" className="bg-orange-100 text-orange-700 px-4 py-2">
-                {saints.length} Sacred Biographies
+                {searchQuery ? `${filteredSaints.length} of ${saints.length}` : `${saints.length}`} Sacred Biographies
               </Badge>
             </div>
           </motion.div>
+        </div>
+      </section>
+
+      {/* Search Section */}
+      <section className="pb-8">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Search className="h-5 w-5 text-gray-400" />
+            </div>
+            <Input
+              type="text"
+              placeholder="खोजें: मीरा बाई, कबीर दास, तुलसीदास... (Search by name, region, specialty)"
+              value={searchQuery}
+              onChange={handleSearch}
+              className="block w-full pl-10 pr-3 py-3 border-2 border-orange-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 placeholder-gray-500 bg-white/90 backdrop-blur-sm"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+              >
+                <span className="text-gray-400 hover:text-gray-600 text-sm">Clear</span>
+              </button>
+            )}
+          </div>
+          {searchQuery && (
+            <p className="mt-2 text-sm text-gray-600 text-center">
+              {filteredSaints.length === 0 
+                ? `No saints found for "${searchQuery}"`
+                : `Found ${filteredSaints.length} saint${filteredSaints.length !== 1 ? 's' : ''} matching "${searchQuery}"`
+              }
+            </p>
+          )}
         </div>
       </section>
 
@@ -223,7 +291,7 @@ const Saints = () => {
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {saints.map((saint, index) => (
+            {filteredSaints.map((saint, index) => (
               <motion.div
                 key={saint.id}
                 initial={{ opacity: 0, y: 50 }}
@@ -273,11 +341,26 @@ const Saints = () => {
                       {saint.description}
                     </p>
                     
-                    <div className="pt-2">
+                    <div className="flex items-center justify-between pt-2">
                       <button className="flex items-center space-x-2 text-orange-600 hover:text-orange-700 transition-colors group">
                         <Heart className="w-4 h-4" />
                         <span className="text-sm font-medium">Read More</span>
                       </button>
+                      
+                      <ShareButton 
+                        saint={{
+                          name: saint.name,
+                          nameHi: saint.nameHi,
+                          specialty: saint.specialty,
+                          specialtyHi: saint.specialtyHi,
+                          description: saint.description,
+                          descriptionHi: saint.descriptionHi,
+                          id: saint.id
+                        }}
+                        variant="ghost"
+                        size="sm"
+                        className="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
+                      />
                     </div>
                   </CardContent>
                 </Card>
