@@ -44,7 +44,7 @@ const DEVOTIONAL_CHANNELS = [
 const limiter = rateLimit({
   windowMs: 2 * 60 * 60 * 1000,
   max: 100,
-  message: `🙏 कृपया धैर्य रखें। अधिक पूछने की सीमा हो गई है।\n\nगीता कहती है: "शांति ही सर्वोत्तम मार्ग है।" 🌿`
+  message: `🙏 कृपया धैर्य रखें। अधिक पूछने की सीमा हो गई है। गीता कहती है: "शांति ही सर्वोत्तम मार्ग है।" 🌿`
 });
 
 // UPDATED CORS configuration - This fixes your issue!
@@ -169,8 +169,8 @@ async function validateChannelIds() {
   }
   
   console.log(`\n📊 Validation Results:`);
-  console.log(`✅ Valid channels: ${validChannels.length}`);
-  console.log(`❌ Invalid channels: ${invalidChannels.length}`);
+  console.log(` Valid channels: ${validChannels.length}`);
+  console.log(` Invalid channels: ${invalidChannels.length}`);
   
   if (invalidChannels.length > 0) {
     console.log(`\n🚨 Remove these invalid channel IDs from DEVOTIONAL_CHANNELS:`);
