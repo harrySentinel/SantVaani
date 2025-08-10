@@ -3,14 +3,18 @@ import { supabase } from '@/lib/supabaseClient';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import DivineFormModal from '@/components/DivineFormModal';
+import DivineFormShareButton from '@/components/DivineFormShareButton';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Sparkles, Crown, Shield, Zap, Loader2 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Sparkles, Crown, Shield, Zap, Loader2, Search } from 'lucide-react';
 
 const Divine = () => {
   const [selectedDivineForm, setSelectedDivineForm] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [divineforms, setDivineForms] = useState([]);
+  const [filteredForms, setFilteredForms] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -18,6 +22,37 @@ const Divine = () => {
   useEffect(() => {
     fetchDivineForms();
   }, []);
+
+  // Filter divine forms based on search query
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setFilteredForms(divineforms);
+      return;
+    }
+
+    const query = searchQuery.toLowerCase().trim();
+    const filtered = divineforms.filter(form => {
+      return (
+        form.name?.toLowerCase().includes(query) ||
+        form.name_hi?.toLowerCase().includes(query) ||
+        form.domain?.toLowerCase().includes(query) ||
+        form.domain_hi?.toLowerCase().includes(query) ||
+        form.description?.toLowerCase().includes(query) ||
+        form.description_hi?.toLowerCase().includes(query) ||
+        form.mantra?.toLowerCase().includes(query) ||
+        form.significance?.toLowerCase().includes(query) ||
+        (form.attributes && form.attributes.some(attr => 
+          attr.toLowerCase().includes(query)
+        ))
+      );
+    });
+
+    setFilteredForms(filtered);
+  }, [searchQuery, divineforms]);
+
+  const handleSearch = (e) => {
+    setSearchQuery(e.target.value);
+  };
 
   const fetchDivineForms = async () => {
     try {
@@ -30,9 +65,11 @@ const Divine = () => {
       if (error) throw error;
 
       setDivineForms(data || []);
+      setFilteredForms(data || []); // Initialize filtered forms
     } catch (error) {
       console.error('Error fetching divine forms:', error);
       setError('Failed to load divine forms. Please try again.');
+      setFilteredForms([]);
     } finally {
       setLoading(false);
     }
@@ -115,18 +152,59 @@ const Divine = () => {
             </p>
             <div className="flex justify-center">
               <Badge variant="secondary" className="bg-purple-100 text-purple-700 px-4 py-2">
-                {divineforms.length} Sacred Forms
+                {searchQuery ? `${filteredForms.length} of ${divineforms.length}` : `${divineforms.length}`} Sacred Forms
               </Badge>
             </div>
           </div>
         </div>
       </section>
 
+      {/* Search Section */}
+      <section className="pb-8">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Search className="h-5 w-5 text-gray-400" />
+            </div>
+            <Input
+              type="text"
+              placeholder="खोजें: गणेश, शिव, विष्णु, दुर्गा... (Search by name, domain, mantra, attributes)"
+              value={searchQuery}
+              onChange={handleSearch}
+              className="block w-full pl-10 pr-3 py-3 border-2 border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-gray-900 placeholder-gray-500 bg-white/90 backdrop-blur-sm"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+              >
+                <span className="text-gray-400 hover:text-gray-600 text-sm">Clear</span>
+              </button>
+            )}
+          </div>
+          {searchQuery && (
+            <p className="mt-2 text-sm text-gray-600 text-center">
+              {filteredForms.length === 0 
+                ? `No divine forms found for "${searchQuery}"`
+                : `Found ${filteredForms.length} divine form${filteredForms.length !== 1 ? 's' : ''} matching "${searchQuery}"`
+              }
+            </p>
+          )}
+        </div>
+      </section>
+
       {/* Divine Forms Grid */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {divineforms.map((form) => {
+          {filteredForms.length === 0 && searchQuery ? (
+            <div className="text-center py-16">
+              <div className="text-gray-400 text-6xl mb-4">🔍</div>
+              <h3 className="text-2xl font-semibold text-gray-700 mb-2">No Results Found</h3>
+              <p className="text-gray-500">No divine forms match your search "{searchQuery}". Try different keywords.</p>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filteredForms.map((form) => {
               const DomainIcon = getIconForDomain(form.domain);
               
               return (
@@ -186,17 +264,37 @@ const Divine = () => {
                       <p className="text-sm text-gray-700 font-medium">{form.mantra}</p>
                     </div>
                     
-                    <div className="pt-2">
+                    <div className="flex items-center justify-between pt-2">
                       <button className="flex items-center space-x-2 text-purple-600 hover:text-purple-700 transition-colors group">
                         <Sparkles className="w-4 h-4" />
                         <span className="text-sm font-medium">Explore Deeper</span>
                       </button>
+                      
+                      <div onClick={(e) => e.stopPropagation()}>
+                        <DivineFormShareButton 
+                          form={{
+                            name: form.name,
+                            name_hi: form.name_hi,
+                            domain: form.domain,
+                            domain_hi: form.domain_hi,
+                            description: form.description,
+                            description_hi: form.description_hi,
+                            mantra: form.mantra,
+                            attributes: form.attributes || [],
+                            id: form.id
+                          }}
+                          variant="ghost"
+                          size="sm"
+                          className="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
+                        />
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
               );
             })}
           </div>
+          )}
         </div>
       </section>
 

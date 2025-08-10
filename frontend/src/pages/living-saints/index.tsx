@@ -3,14 +3,18 @@ import { supabase } from '@/lib/supabaseClient';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import LivingSaintModal from '@/components/LivingSaintModal';
+import LivingSaintShareButton from '@/components/LivingSaintShareButton';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ExternalLink, Users, Globe, Heart, Loader2 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { ExternalLink, Users, Globe, Heart, Loader2, Search } from 'lucide-react';
 
 const LivingSaints = () => {
   const [selectedSaint, setSelectedSaint] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [livingSaints, setLivingSaints] = useState([]);
+  const [filteredSaints, setFilteredSaints] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -63,9 +67,11 @@ const LivingSaints = () => {
         }));
 
         setLivingSaints(transformedData);
+        setFilteredSaints(transformedData); // Initialize filtered saints
       } catch (err) {
         console.error('Error fetching living saints:', err);
         setError('Failed to load living saints. Please try again later.');
+        setFilteredSaints([]);
       } finally {
         setLoading(false);
       }
@@ -73,6 +79,44 @@ const LivingSaints = () => {
 
     fetchLivingSaints();
   }, []);
+
+  // Filter living saints based on search query
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setFilteredSaints(livingSaints);
+      return;
+    }
+
+    const query = searchQuery.toLowerCase().trim();
+    const filtered = livingSaints.filter(saint => {
+      return (
+        saint.name?.toLowerCase().includes(query) ||
+        saint.nameHi?.toLowerCase().includes(query) ||
+        saint.organization?.toLowerCase().includes(query) ||
+        saint.specialty?.toLowerCase().includes(query) ||
+        saint.specialtyHi?.toLowerCase().includes(query) ||
+        saint.currentLocation?.toLowerCase().includes(query) ||
+        saint.currentLocationHi?.toLowerCase().includes(query) ||
+        saint.birthPlace?.toLowerCase().includes(query) ||
+        saint.birthPlaceHi?.toLowerCase().includes(query) ||
+        saint.description?.toLowerCase().includes(query) ||
+        saint.descriptionHi?.toLowerCase().includes(query) ||
+        saint.ashram?.toLowerCase().includes(query) ||
+        saint.ashramHi?.toLowerCase().includes(query) ||
+        saint.lineage?.toLowerCase().includes(query) ||
+        saint.lineageHi?.toLowerCase().includes(query) ||
+        (saint.teachings && saint.teachings.some(teaching => 
+          teaching.toLowerCase().includes(query)
+        ))
+      );
+    });
+
+    setFilteredSaints(filtered);
+  }, [searchQuery, livingSaints]);
+
+  const handleSearch = (e) => {
+    setSearchQuery(e.target.value);
+  };
 
   const handleCardClick = (saint) => {
     setSelectedSaint(saint);
@@ -140,17 +184,57 @@ const LivingSaints = () => {
             </p>
             <div className="flex justify-center">
               <Badge variant="secondary" className="bg-red-100 text-red-700 px-4 py-2">
-                {livingSaints.length} Contemporary Guides
+                {searchQuery ? `${filteredSaints.length} of ${livingSaints.length}` : `${livingSaints.length}`} Contemporary Guides
               </Badge>
             </div>
           </div>
         </div>
       </section>
 
+      {/* Search Section */}
+      <section className="pb-8">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Search className="h-5 w-5 text-gray-400" />
+            </div>
+            <Input
+              type="text"
+              placeholder="खोजें: समसाधि, शिवानंद आश्रम, योग... (Search by name, organization, location, teachings)"
+              value={searchQuery}
+              onChange={handleSearch}
+              className="block w-full pl-10 pr-3 py-3 border-2 border-red-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 text-gray-900 placeholder-gray-500 bg-white/90 backdrop-blur-sm"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+              >
+                <span className="text-gray-400 hover:text-gray-600 text-sm">Clear</span>
+              </button>
+            )}
+          </div>
+          {searchQuery && (
+            <p className="mt-2 text-sm text-gray-600 text-center">
+              {filteredSaints.length === 0 
+                ? `No living saints found for "${searchQuery}"`
+                : `Found ${filteredSaints.length} living saint${filteredSaints.length !== 1 ? 's' : ''} matching "${searchQuery}"`
+              }
+            </p>
+          )}
+        </div>
+      </section>
+
       {/* Living Saints Grid */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {livingSaints.length === 0 ? (
+          {filteredSaints.length === 0 && searchQuery ? (
+            <div className="text-center py-16">
+              <div className="text-gray-400 text-6xl mb-4">🔍</div>
+              <h3 className="text-2xl font-semibold text-gray-700 mb-2">No Results Found</h3>
+              <p className="text-gray-500">No living saints match your search "{searchQuery}". Try different keywords.</p>
+            </div>
+          ) : livingSaints.length === 0 ? (
             <div className="text-center py-16">
               <div className="text-gray-400 text-6xl mb-4">🙏</div>
               <h3 className="text-2xl font-semibold text-gray-700 mb-2">No Living Saints Found</h3>
@@ -158,7 +242,7 @@ const LivingSaints = () => {
             </div>
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {livingSaints.map((saint) => (
+              {filteredSaints.map((saint) => (
                 <Card 
                   key={saint.id} 
                   className="group hover:shadow-2xl transition-all duration-300 transform hover:scale-105 border-0 shadow-lg bg-white/90 backdrop-blur-sm overflow-hidden cursor-pointer"
@@ -225,18 +309,40 @@ const LivingSaints = () => {
                         <span className="text-sm font-medium">Learn More</span>
                       </button>
                       
-                      {saint.website && (
-                        <a 
-                          href={saint.website} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="flex items-center space-x-1 text-gray-500 hover:text-red-600 transition-colors"
-                          onClick={(e) => e.stopPropagation()} // Prevent card click
-                        >
-                          <Globe className="w-4 h-4" />
-                          <ExternalLink className="w-3 h-3" />
-                        </a>
-                      )}
+                      <div className="flex items-center space-x-2">
+                        {saint.website && (
+                          <a 
+                            href={saint.website} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="flex items-center space-x-1 text-gray-500 hover:text-red-600 transition-colors"
+                            onClick={(e) => e.stopPropagation()} // Prevent card click
+                          >
+                            <Globe className="w-4 h-4" />
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+                        )}
+                        
+                        <div onClick={(e) => e.stopPropagation()}>
+                          <LivingSaintShareButton 
+                            saint={{
+                              name: saint.name,
+                              nameHi: saint.nameHi,
+                              organization: saint.organization,
+                              specialty: saint.specialty,
+                              specialtyHi: saint.specialtyHi,
+                              description: saint.description,
+                              descriptionHi: saint.descriptionHi,
+                              currentLocation: saint.currentLocation,
+                              currentLocationHi: saint.currentLocationHi,
+                              id: saint.id
+                            }}
+                            variant="ghost"
+                            size="sm"
+                            className="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
+                          />
+                        </div>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
