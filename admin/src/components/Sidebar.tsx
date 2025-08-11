@@ -6,6 +6,7 @@ import {
   Sparkles, 
   Music, 
   Quote,
+  Lightbulb,
   Settings,
   X
 } from 'lucide-react'
@@ -57,6 +58,13 @@ const navigation = [
     icon: Quote,
     description: 'Spiritual wisdom and sayings',
     count: 45
+  },
+  {
+    name: 'Spiritual Facts',
+    href: '/spiritual-facts',
+    icon: Lightbulb,
+    description: 'Interesting spiritual facts for homepage',
+    count: 0
   }
 ]
 
