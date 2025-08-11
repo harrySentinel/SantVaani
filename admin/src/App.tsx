@@ -7,6 +7,7 @@ import LivingSaintsPage from '@/pages/LivingSaints'
 import DivineFormsPage from '@/pages/DivineForms'
 import BhajansPage from '@/pages/Bhajans'
 import QuotesPage from '@/pages/Quotes'
+import SpiritualFactsPage from '@/pages/SpiritualFacts'
 
 // All content management pages are now complete
 
@@ -37,6 +38,9 @@ function App() {
           
           {/* Quotes Management */}
           <Route path="quotes" element={<QuotesPage />} />
+          
+          {/* Spiritual Facts Management */}
+          <Route path="spiritual-facts" element={<SpiritualFactsPage />} />
           
           {/* 404 fallback */}
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
