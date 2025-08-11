@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowDown, Sparkles, Heart } from 'lucide-react';
+import { ArrowDown, Sparkles, Heart, Shield, Users, Unlock } from 'lucide-react';
 
 export default function HeroSection() {
   const [currentQuote, setCurrentQuote] = useState(0);
@@ -74,6 +74,7 @@ export default function HeroSection() {
             </p>
           </div>
 
+
           {/* Rotating Quotes */}
           <div className="max-w-2xl mx-auto bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-orange-100">
             <div className="space-y-3 min-h-[100px] flex flex-col justify-center">
@@ -120,6 +121,13 @@ export default function HeroSection() {
                 Divine Forms
               </Button>
             </Link>
+          </div>
+
+          {/* Simple Free Access Message */}
+          <div className="max-w-3xl mx-auto pt-6">
+            <p className="text-center text-gray-600 font-medium">
+              🙏 <em>Completely free • No registration required • Pure spiritual content</em> 🙏
+            </p>
           </div>
 
           {/* Scroll Indicator */}

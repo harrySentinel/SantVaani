@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { MapPin, Calendar, Phone, Mail, Heart, Users, Home } from 'lucide-react';
 import DonationModal from '@/components/DonationModal';
+import DonationInstructions from '@/components/DonationInstructions';
 
 interface Organization {
   id: number;
@@ -367,6 +368,9 @@ const Donation = () => {
             </Button>
           </div>
         </div>
+
+        {/* How to Donate Instructions */}
+        <DonationInstructions />
 
         {/* Inspirational Quote */}
         <div className="text-center mt-16 mb-8">

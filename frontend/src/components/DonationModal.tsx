@@ -37,15 +37,33 @@ interface DonationModalProps {
   onClose: () => void;
 }
 
-// Generate UPI ID based on organization name
-const generateUpiId = (orgName: string): string => {
-  const cleanName = orgName.toLowerCase().replace(/[^a-z0-9]/g, '');
-  return `${cleanName}@paytm`;
+// Real UPI IDs for organizations (you need to replace with actual UPI IDs)
+const getUpiId = (orgId: number): string => {
+  const upiMapping: { [key: number]: string } = {
+    1: "sevasadan@paytm", // Replace with actual UPI ID
+    2: "balseva@paytm", // Replace with actual UPI ID  
+    3: "matrusadan@paytm", // Replace with actual UPI ID
+    4: "sunshine@paytm", // Replace with actual UPI ID
+    5: "vrindavanseva@paytm", // Replace with actual UPI ID
+    6: "hopefoundation@paytm" // Replace with actual UPI ID
+  };
+  return upiMapping[orgId] || "santvaani@paytm"; // Default fallback
 };
 
 const DonationModal: React.FC<DonationModalProps> = ({ organization, onClose }) => {
   const { toast } = useToast();
-  const upiId = generateUpiId(organization.name);
+  const upiId = getUpiId(organization.id);
+  
+  // Generate UPI QR code URL using Google Charts API
+  const generateQRCode = (upiId: string, amount?: number) => {
+    const upiString = amount 
+      ? `upi://pay?pa=${upiId}&pn=${encodeURIComponent(organization.name)}&am=${amount}&cu=INR&tn=Donation for ${encodeURIComponent(organization.name)}`
+      : `upi://pay?pa=${upiId}&pn=${encodeURIComponent(organization.name)}&cu=INR&tn=Donation for ${encodeURIComponent(organization.name)}`;
+    
+    return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiString)}`;
+  };
+  
+  const qrCodeUrl = generateQRCode(upiId);
 
   const handleCopyUpiId = async () => {
     try {
@@ -105,21 +123,25 @@ const DonationModal: React.FC<DonationModalProps> = ({ organization, onClose }) 
           <div className="text-center">
             <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl p-4 sm:p-8 border border-orange-200">
               <div className="w-40 h-40 sm:w-48 sm:h-48 mx-auto bg-white rounded-xl shadow-lg flex items-center justify-center border-2 border-orange-200 overflow-hidden">
-                {organization.qrCodeUrl ? (
-                  <img 
-                    src={organization.qrCodeUrl} 
-                    alt={`QR Code for ${organization.name}`}
-                    className="w-full h-full object-cover rounded-lg"
-                  />
-                ) : (
-                  <div className="text-center p-4">
-                    <div className="w-20 h-20 sm:w-32 sm:h-32 mx-auto bg-gray-100 rounded-lg flex items-center justify-center mb-2">
-                      <span className="text-gray-400 text-xs sm:text-sm">QR Code</span>
-                    </div>
-                    <p className="text-xs text-gray-500">QR Code for</p>
-                    <p className="text-xs text-gray-700 font-medium break-words">{organization.name}</p>
-                  </div>
-                )}
+                <img 
+                  src={qrCodeUrl} 
+                  alt={`UPI QR Code for ${organization.name}`}
+                  className="w-full h-full object-contain rounded-lg p-2"
+                  onError={(e) => {
+                    // Fallback if QR generation fails
+                    (e.target as HTMLImageElement).style.display = 'none';
+                    const fallback = document.createElement('div');
+                    fallback.innerHTML = `
+                      <div class="text-center p-4">
+                        <div class="w-20 h-20 mx-auto bg-gray-100 rounded-lg flex items-center justify-center mb-2">
+                          <span class="text-gray-400 text-xs">QR Code</span>
+                        </div>
+                        <p class="text-xs text-gray-700 font-medium">${organization.name}</p>
+                      </div>
+                    `;
+                    (e.target as HTMLImageElement).parentNode?.appendChild(fallback);
+                  }}
+                />
               </div>
               <p className="text-xs sm:text-sm text-gray-600 mt-4">
                 Scan this QR code with any UPI app to donate
@@ -127,11 +149,48 @@ const DonationModal: React.FC<DonationModalProps> = ({ organization, onClose }) 
             </div>
           </div>
 
+          {/* Quick Amount Selection */}
+          <div className="space-y-3">
+            <p className="text-sm font-medium text-gray-700 text-center">Quick Donation Amounts</p>
+            <div className="grid grid-cols-3 gap-2">
+              {[100, 500, 1000].map((amount) => (
+                <Button
+                  key={amount}
+                  onClick={() => {
+                    const qrWithAmount = generateQRCode(upiId, amount);
+                    window.open(qrWithAmount.replace('api.qrserver.com', 'api.qrserver.com'), '_blank');
+                  }}
+                  variant="outline"
+                  size="sm"
+                  className="border-orange-300 text-orange-600 hover:bg-orange-50"
+                >
+                  ₹{amount}
+                </Button>
+              ))}
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              {[2000, 5000].map((amount) => (
+                <Button
+                  key={amount}
+                  onClick={() => {
+                    const qrWithAmount = generateQRCode(upiId, amount);
+                    window.open(qrWithAmount.replace('api.qrserver.com', 'api.qrserver.com'), '_blank');
+                  }}
+                  variant="outline"
+                  size="sm"
+                  className="border-orange-300 text-orange-600 hover:bg-orange-50"
+                >
+                  ₹{amount}
+                </Button>
+              ))}
+            </div>
+          </div>
+
           {/* UPI ID Section */}
           <div className="bg-gray-50 rounded-xl p-3 sm:p-4 border border-gray-200">
             <div className="flex items-center justify-between gap-2">
               <div className="flex-1 min-w-0">
-                <p className="text-xs sm:text-sm font-medium text-gray-700 mb-1">UPI ID</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-700 mb-1">UPI ID (Manual Payment)</p>
                 <p className="text-sm sm:text-lg font-mono text-gray-800 break-all">{upiId}</p>
               </div>
               <Button

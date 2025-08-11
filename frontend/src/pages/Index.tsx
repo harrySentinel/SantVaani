@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Users, Heart, Sparkles, Book, ArrowDown, Video } from 'lucide-react';
 import ChatBot from '@/components/chatBot';
 import VisitorCounter from '@/components/VisitorCounter';
+import SpiritualFactBox from '@/components/SpiritualFactBox';
 
 const Index = () => {
   const features = [
@@ -65,6 +66,11 @@ const Index = () => {
       
       {/* Hero Section */}
       <HeroSection />
+
+      {/* Spiritual Fact Box */}
+      <section className="py-16 bg-gradient-to-br from-white to-orange-25">
+        <SpiritualFactBox />
+      </section>
 
       {/* Features Section */}
       <section className="py-20 bg-gradient-to-br from-white to-orange-50">
