@@ -11,6 +11,8 @@ import QuotesPage from '@/pages/Quotes'
 // All content management pages are now complete
 
 function App() {
+  console.log('App component rendering...')
+  
   return (
     <div className="min-h-screen bg-gray-50">
       <Routes>
