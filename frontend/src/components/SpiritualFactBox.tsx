@@ -100,7 +100,7 @@ const SpiritualFactBox = () => {
   // Show loading state if no facts loaded yet
   if (loading || facts.length === 0) {
     return (
-      <div className="max-w-5xl mx-auto px-4">
+      <div className="w-full px-4 md:px-8 lg:px-16">
         <div className="relative overflow-hidden">
           <div className="bg-gradient-to-br from-orange-50 via-white to-orange-100 rounded-3xl p-8 md:p-12 border-2 border-orange-200 shadow-2xl">
             <div className="text-center">
@@ -118,7 +118,7 @@ const SpiritualFactBox = () => {
   const currentFact = facts[currentFactIndex];
 
   return (
-    <div className="max-w-5xl mx-auto px-4">
+    <div className="w-full px-4 md:px-8 lg:px-16">
       <div className="relative overflow-hidden">
         
         {/* Background Pattern - matches your theme */}
@@ -127,11 +127,11 @@ const SpiritualFactBox = () => {
           <div className="absolute bottom-10 right-10 w-40 h-40 bg-orange-300 rounded-full blur-3xl animate-pulse delay-1000"></div>
         </div>
 
-        <div className={`relative bg-gradient-to-br from-orange-50 via-white to-orange-100 rounded-3xl p-8 md:p-12 border-2 border-orange-200 shadow-2xl transition-all duration-700 ${isAnimating ? 'scale-95 opacity-80' : 'scale-100 opacity-100'} hover:shadow-3xl hover:scale-[1.02]`}>
+        <div className={`relative bg-gradient-to-br from-orange-50 via-white to-orange-100 rounded-3xl p-8 md:p-12 lg:p-16 border-2 border-orange-200 shadow-2xl transition-all duration-700 ${isAnimating ? 'scale-95 opacity-80' : 'scale-100 opacity-100'} hover:shadow-3xl hover:scale-[1.01]`}>
           
           {/* Glowing border effect */}
           <div className="absolute inset-0 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-400 rounded-3xl opacity-20 animate-pulse"></div>
-          <div className="relative bg-gradient-to-br from-orange-50 via-white to-orange-100 rounded-3xl p-8 md:p-10 m-0.5">
+          <div className="relative bg-gradient-to-br from-orange-50 via-white to-orange-100 rounded-3xl p-8 md:p-10 lg:p-12 m-0.5">
             
             {/* Header with enhanced design */}
             <div className="text-center mb-8">
@@ -157,8 +157,8 @@ const SpiritualFactBox = () => {
             {/* Fact Content with enhanced styling */}
             <div className="mb-8">
               <div className={`transition-all duration-500 ${isAnimating ? 'opacity-0 translate-y-6' : 'opacity-100 translate-y-0'}`}>
-                <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 md:p-8 shadow-lg border border-orange-200">
-                  <p className="text-gray-800 text-lg md:text-xl leading-relaxed font-medium text-center">
+                <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 md:p-8 shadow-lg border border-orange-200 max-w-5xl mx-auto">
+                  <p className="text-gray-800 text-lg md:text-xl leading-relaxed font-medium text-center max-w-4xl mx-auto">
                     {currentFact.text}
                   </p>
                 </div>

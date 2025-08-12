@@ -1,15 +1,19 @@
+import { useState } from 'react';
 import HeroSection from '@/components/HeroSection';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Users, Heart, Sparkles, Book, ArrowDown, Video } from 'lucide-react';
+import { Users, Heart, Sparkles, Book, ArrowDown, Video, MessageSquare } from 'lucide-react';
 import ChatBot from '@/components/chatBot';
 import VisitorCounter from '@/components/VisitorCounter';
 import SpiritualFactBox from '@/components/SpiritualFactBox';
+import FeedbackForm from '@/components/FeedbackForm';
 
 const Index = () => {
+  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
+  
   const features = [
     {
       icon: Users,
@@ -207,19 +211,34 @@ const Index = () => {
               </p>
             </div>
 
-            <Link to="/about">
-              <Button 
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
+              <Link to="/about">
+                <Button 
+                  size="lg"
+                  variant="outline"
+                  className="border-2 border-orange-500 text-orange-600 hover:bg-orange-50 px-6 py-3 rounded-full w-full sm:w-auto"
+                >
+                  Learn More About Us
+                </Button>
+              </Link>
+              
+              <Button
+                onClick={() => setIsFeedbackOpen(true)}
                 size="lg"
-                variant="outline"
-                className="border-2 border-orange-500 text-orange-600 hover:bg-orange-50 px-8 py-3 rounded-full mt-5"
+                className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-6 py-3 rounded-full w-full sm:w-auto"
               >
-                Learn More About Us
+                <MessageSquare className="w-4 h-4 mr-2" />
+                Share Feedback
               </Button>
-            </Link>
+            </div>
           </div>
         </div>
       </section>
 
+      <FeedbackForm 
+        isOpen={isFeedbackOpen} 
+        onClose={() => setIsFeedbackOpen(false)} 
+      />
       <ChatBot />
       <Footer />
     </div>
