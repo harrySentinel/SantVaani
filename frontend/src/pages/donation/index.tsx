@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { MapPin, Calendar, Phone, Mail, Heart, Users, Home } from 'lucide-react';
 import DonationModal from '@/components/DonationModal';
 import DonationInstructions from '@/components/DonationInstructions';
+import AshramContactForm from '@/components/AshramContactForm';
 
 interface Organization {
   id: number;
@@ -371,6 +372,22 @@ const Donation = () => {
 
         {/* How to Donate Instructions */}
         <DonationInstructions />
+
+        {/* Ashram/Orphanage Contact Form */}
+        <div className="mt-16">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+              {getText('Register Your Organization', 'अपना संगठन पंजीकृत करें')}
+            </h2>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              {getText(
+                'Are you running an ashram, orphanage, or religious organization? Join our network and receive donations through SantVaani platform.',
+                'क्या आप आश्रम, अनाथालय या धार्मिक संगठन चला रहे हैं? हमारे नेटवर्क में शामिल हों और संतवाणी प्लेटफॉर्म के माध्यम से दान प्राप्त करें।'
+              )}
+            </p>
+          </div>
+          <AshramContactForm />
+        </div>
 
         {/* Inspirational Quote */}
         <div className="text-center mt-16 mb-8">
