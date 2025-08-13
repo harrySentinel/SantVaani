@@ -10,6 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Book, Heart, Quote, Music, Loader2, Search } from 'lucide-react';
 import { Toaster } from '@/components/ui/toaster';
 import { supabase } from '@/lib/supabaseClient';
+import { usePagination } from '@/hooks/usePagination';
+import BhajanPagination from '@/components/BhajanPagination';
 
 interface Bhajan {
   id: string;
@@ -40,6 +42,7 @@ const Bhajans = () => {
   const [quotes, setQuotes] = useState<QuoteItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [itemsPerPage, setItemsPerPage] = useState(8); // 2x4 grid for bhajans
 
   // Fetch bhajans from Supabase
   const fetchBhajans = async () => {
@@ -109,8 +112,44 @@ const Bhajans = () => {
     setFilteredBhajans(filtered);
   }, [searchQuery, bhajans]);
 
+  // Pagination for bhajans
+  const bhajanPagination = usePagination({
+    items: filteredBhajans,
+    itemsPerPage: itemsPerPage,
+    initialPage: 1,
+  });
+
+  // Pagination for quotes
+  const quotesPagination = usePagination({
+    items: quotes,
+    itemsPerPage: 12, // 3x4 grid for quotes
+    initialPage: 1,
+  });
+
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage);
+  };
+
+  const handleBhajanPageChange = (page: number) => {
+    bhajanPagination.goToPage(page);
+    // Smooth scroll to bhajans section
+    const bhajansSection = document.querySelector('#bhajans-grid');
+    if (bhajansSection) {
+      bhajansSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  const handleQuotesPageChange = (page: number) => {
+    quotesPagination.goToPage(page);
+    // Smooth scroll to quotes section
+    const quotesSection = document.querySelector('#quotes-grid');
+    if (quotesSection) {
+      quotesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   };
 
   const handleBhajanClick = (bhajan: Bhajan) => {
@@ -186,10 +225,15 @@ const Bhajans = () => {
             </p>
             <div className="flex justify-center space-x-4">
               <Badge variant="secondary" className="bg-green-100 text-green-700 px-4 py-2">
-                {searchQuery ? `${filteredBhajans.length} of ${bhajans.length}` : `${bhajans.length}`} Sacred Songs
+                {searchQuery 
+                  ? `${bhajanPagination.totalItems} of ${bhajans.length}` 
+                  : `${bhajans.length}`
+                } Sacred Songs
+                {bhajanPagination.totalPages > 1 && ` • Page ${bhajanPagination.currentPage} of ${bhajanPagination.totalPages}`}
               </Badge>
               <Badge variant="secondary" className="bg-orange-100 text-orange-700 px-4 py-2">
                 {quotes.length} Divine Quotes
+                {quotesPagination.totalPages > 1 && ` • Page ${quotesPagination.currentPage} of ${quotesPagination.totalPages}`}
               </Badge>
             </div>
           </div>
@@ -245,15 +289,16 @@ const Bhajans = () => {
                 </div>
                 {searchQuery && (
                   <p className="mt-2 text-sm text-gray-600 text-center">
-                    {filteredBhajans.length === 0 
+                    {bhajanPagination.totalItems === 0 
                       ? `No bhajans found for "${searchQuery}"`
-                      : `Found ${filteredBhajans.length} bhajan${filteredBhajans.length !== 1 ? 's' : ''} matching "${searchQuery}"`
+                      : `Found ${bhajanPagination.totalItems} bhajan${bhajanPagination.totalItems !== 1 ? 's' : ''} matching "${searchQuery}"`
                     }
+                    {bhajanPagination.totalPages > 1 && ` • Showing ${bhajanPagination.startIndex}-${bhajanPagination.endIndex}`}
                   </p>
                 )}
               </div>
 
-              {filteredBhajans.length === 0 && searchQuery ? (
+              {bhajanPagination.totalItems === 0 && searchQuery ? (
                 <div className="text-center py-12">
                   <div className="text-gray-400 text-6xl mb-4">🔍</div>
                   <h3 className="text-2xl font-semibold text-gray-700 mb-2">No Results Found</h3>
@@ -266,8 +311,9 @@ const Bhajans = () => {
                   <p className="text-gray-400 text-sm">Check back soon for sacred melodies</p>
                 </div>
               ) : (
-                <div className="grid md:grid-cols-2 gap-6">
-                  {filteredBhajans.map((bhajan) => (
+                <div id="bhajans-grid" className="space-y-8">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    {bhajanPagination.currentItems.map((bhajan) => (
                     <Card 
                       key={bhajan.id} 
                       className="group hover:shadow-xl transition-all duration-300 border-0 shadow-lg bg-white/90 backdrop-blur-sm cursor-pointer"
@@ -340,6 +386,26 @@ const Bhajans = () => {
                       </CardContent>
                     </Card>
                   ))}
+                  </div>
+                  
+                  {/* Bhajans Pagination */}
+                  {bhajanPagination.totalItems > 0 && (
+                    <BhajanPagination
+                      currentPage={bhajanPagination.currentPage}
+                      totalPages={bhajanPagination.totalPages}
+                      totalItems={bhajanPagination.totalItems}
+                      itemsPerPage={bhajanPagination.itemsPerPage}
+                      startIndex={bhajanPagination.startIndex}
+                      endIndex={bhajanPagination.endIndex}
+                      hasNextPage={bhajanPagination.hasNextPage}
+                      hasPreviousPage={bhajanPagination.hasPreviousPage}
+                      visiblePages={bhajanPagination.visiblePages}
+                      onPageChange={handleBhajanPageChange}
+                      showStats={true}
+                      showFirstLast={true}
+                      theme="green"
+                    />
+                  )}
                 </div>
               )}
             </TabsContent>
@@ -361,8 +427,9 @@ const Bhajans = () => {
                   <p className="text-gray-400 text-sm">Check back soon for divine wisdom</p>
                 </div>
               ) : (
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {quotes.map((quote) => (
+                <div id="quotes-grid" className="space-y-8">
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {quotesPagination.currentItems.map((quote) => (
                     <Card key={quote.id} className="group hover:shadow-xl transition-all duration-300 transform hover:scale-105 border-0 shadow-lg bg-white/90 backdrop-blur-sm">
                       <CardContent className="p-6 space-y-4 h-full flex flex-col">
                         <div className="flex items-start justify-between">
@@ -391,6 +458,26 @@ const Bhajans = () => {
                       </CardContent>
                     </Card>
                   ))}
+                  </div>
+                  
+                  {/* Quotes Pagination */}
+                  {quotesPagination.totalItems > 0 && (
+                    <BhajanPagination
+                      currentPage={quotesPagination.currentPage}
+                      totalPages={quotesPagination.totalPages}
+                      totalItems={quotesPagination.totalItems}
+                      itemsPerPage={quotesPagination.itemsPerPage}
+                      startIndex={quotesPagination.startIndex}
+                      endIndex={quotesPagination.endIndex}
+                      hasNextPage={quotesPagination.hasNextPage}
+                      hasPreviousPage={quotesPagination.hasPreviousPage}
+                      visiblePages={quotesPagination.visiblePages}
+                      onPageChange={handleQuotesPageChange}
+                      showStats={true}
+                      showFirstLast={true}
+                      theme="orange"
+                    />
+                  )}
                 </div>
               )}
             </TabsContent>

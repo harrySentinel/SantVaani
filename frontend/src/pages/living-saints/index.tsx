@@ -8,6 +8,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { ExternalLink, Users, Globe, Heart, Loader2, Search } from 'lucide-react';
+import { usePagination } from '@/hooks/usePagination';
+import BeautifulPagination from '@/components/BeautifulPagination';
 
 const LivingSaints = () => {
   const [selectedSaint, setSelectedSaint] = useState(null);
@@ -17,6 +19,7 @@ const LivingSaints = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [itemsPerPage, setItemsPerPage] = useState(12);
 
   // Fetch living saints from Supabase
   useEffect(() => {
@@ -114,8 +117,23 @@ const LivingSaints = () => {
     setFilteredSaints(filtered);
   }, [searchQuery, livingSaints]);
 
+  // Pagination for living saints
+  const pagination = usePagination({
+    items: filteredSaints,
+    itemsPerPage: itemsPerPage,
+    initialPage: 1,
+  });
+
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
+  };
+
+  const handlePageChange = (page) => {
+    pagination.goToPage(page);
+    const saintsSection = document.querySelector('#living-saints-grid');
+    if (saintsSection) {
+      saintsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   };
 
   const handleCardClick = (saint) => {
@@ -184,7 +202,11 @@ const LivingSaints = () => {
             </p>
             <div className="flex justify-center">
               <Badge variant="secondary" className="bg-red-100 text-red-700 px-4 py-2">
-                {searchQuery ? `${filteredSaints.length} of ${livingSaints.length}` : `${livingSaints.length}`} Contemporary Guides
+                {searchQuery 
+                  ? `${pagination.totalItems} of ${livingSaints.length}` 
+                  : `${livingSaints.length}`
+                } Contemporary Guides
+                {pagination.totalPages > 1 && ` • Page ${pagination.currentPage} of ${pagination.totalPages}`}
               </Badge>
             </div>
           </div>
@@ -216,10 +238,11 @@ const LivingSaints = () => {
           </div>
           {searchQuery && (
             <p className="mt-2 text-sm text-gray-600 text-center">
-              {filteredSaints.length === 0 
+              {pagination.totalItems === 0 
                 ? `No living saints found for "${searchQuery}"`
-                : `Found ${filteredSaints.length} living saint${filteredSaints.length !== 1 ? 's' : ''} matching "${searchQuery}"`
+                : `Found ${pagination.totalItems} living saint${pagination.totalItems !== 1 ? 's' : ''} matching "${searchQuery}"`
               }
+              {pagination.totalPages > 1 && ` • Showing ${pagination.startIndex}-${pagination.endIndex}`}
             </p>
           )}
         </div>
@@ -228,7 +251,7 @@ const LivingSaints = () => {
       {/* Living Saints Grid */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {filteredSaints.length === 0 && searchQuery ? (
+          {pagination.totalItems === 0 && searchQuery ? (
             <div className="text-center py-16">
               <div className="text-gray-400 text-6xl mb-4">🔍</div>
               <h3 className="text-2xl font-semibold text-gray-700 mb-2">No Results Found</h3>
@@ -241,8 +264,9 @@ const LivingSaints = () => {
               <p className="text-gray-500">Please check back later or contact support.</p>
             </div>
           ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredSaints.map((saint) => (
+            <div id="living-saints-grid" className="space-y-8">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {pagination.currentItems.map((saint) => (
                 <Card 
                   key={saint.id} 
                   className="group hover:shadow-2xl transition-all duration-300 transform hover:scale-105 border-0 shadow-lg bg-white/90 backdrop-blur-sm overflow-hidden cursor-pointer"
@@ -347,6 +371,25 @@ const LivingSaints = () => {
                   </CardContent>
                 </Card>
               ))}
+              </div>
+              
+              {/* Living Saints Pagination */}
+              {pagination.totalItems > 0 && (
+                <BeautifulPagination
+                  currentPage={pagination.currentPage}
+                  totalPages={pagination.totalPages}
+                  totalItems={pagination.totalItems}
+                  itemsPerPage={pagination.itemsPerPage}
+                  startIndex={pagination.startIndex}
+                  endIndex={pagination.endIndex}
+                  hasNextPage={pagination.hasNextPage}
+                  hasPreviousPage={pagination.hasPreviousPage}
+                  visiblePages={pagination.visiblePages}
+                  onPageChange={handlePageChange}
+                  showStats={true}
+                  showFirstLast={true}
+                />
+              )}
             </div>
           )}
         </div>
