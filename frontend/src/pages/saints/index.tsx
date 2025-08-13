@@ -9,15 +9,18 @@ import { Badge } from '@/components/ui/badge';
 import { Heart, Calendar, MapPin, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { supabase } from '@/lib/supabaseClient';
+import { usePagination } from '@/hooks/usePagination';
+import BeautifulPagination from '@/components/BeautifulPagination';
 
 const Saints = () => {
-  const [selectedSaint, setSelectedSaint] = useState(null);
+  const [selectedSaint, setSelectedSaint] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [saints, setSaints] = useState([]);
-  const [filteredSaints, setFilteredSaints] = useState([]);
+  const [saints, setSaints] = useState<any[]>([]);
+  const [filteredSaints, setFilteredSaints] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
+  const [itemsPerPage, setItemsPerPage] = useState(12);
 
   // Fetch saints from Supabase
   useEffect(() => {
@@ -89,11 +92,31 @@ const Saints = () => {
     setFilteredSaints(filtered);
   }, [searchQuery, saints]);
 
-  const handleSearch = (e) => {
+  // Pagination hook
+  const pagination = usePagination({
+    items: filteredSaints,
+    itemsPerPage: itemsPerPage,
+    initialPage: 1,
+  });
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   };
 
-  const handleSaintClick = (saint) => {
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage);
+  };
+
+  const handlePageChange = (page: number) => {
+    pagination.goToPage(page);
+    // Smooth scroll to top of saints grid
+    const saintsSection = document.querySelector('#saints-grid');
+    if (saintsSection) {
+      saintsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  const handleSaintClick = (saint: any) => {
     setSelectedSaint(saint);
     setIsModalOpen(true);
   };
@@ -246,7 +269,11 @@ const Saints = () => {
             </p>
             <div className="flex justify-center">
               <Badge variant="secondary" className="bg-orange-100 text-orange-700 px-4 py-2">
-                {searchQuery ? `${filteredSaints.length} of ${saints.length}` : `${saints.length}`} Sacred Biographies
+                {searchQuery 
+                  ? `${pagination.totalItems} of ${saints.length}` 
+                  : `${saints.length}`
+                } Sacred Biographies
+                {pagination.totalPages > 1 && ` • Page ${pagination.currentPage} of ${pagination.totalPages}`}
               </Badge>
             </div>
           </motion.div>
@@ -278,20 +305,21 @@ const Saints = () => {
           </div>
           {searchQuery && (
             <p className="mt-2 text-sm text-gray-600 text-center">
-              {filteredSaints.length === 0 
+              {pagination.totalItems === 0 
                 ? `No saints found for "${searchQuery}"`
-                : `Found ${filteredSaints.length} saint${filteredSaints.length !== 1 ? 's' : ''} matching "${searchQuery}"`
+                : `Found ${pagination.totalItems} saint${pagination.totalItems !== 1 ? 's' : ''} matching "${searchQuery}"`
               }
+              {pagination.totalPages > 1 && ` • Showing ${pagination.startIndex}-${pagination.endIndex}`}
             </p>
           )}
         </div>
       </section>
 
       {/* Saints Grid */}
-      <section className="py-16">
+      <section id="saints-grid" className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredSaints.map((saint, index) => (
+            {pagination.currentItems.map((saint, index) => (
               <motion.div
                 key={saint.id}
                 initial={{ opacity: 0, y: 50 }}
@@ -368,6 +396,24 @@ const Saints = () => {
             ))}
           </div>
         </div>
+
+        {/* Pagination */}
+        <BeautifulPagination
+          currentPage={pagination.currentPage}
+          totalPages={pagination.totalPages}
+          totalItems={pagination.totalItems}
+          itemsPerPage={pagination.itemsPerPage}
+          startIndex={pagination.startIndex}
+          endIndex={pagination.endIndex}
+          hasNextPage={pagination.hasNextPage}
+          hasPreviousPage={pagination.hasPreviousPage}
+          visiblePages={pagination.visiblePages}
+          onPageChange={handlePageChange}
+          onItemsPerPageChange={handleItemsPerPageChange}
+          showItemsPerPage={false}
+          showStats={true}
+          showFirstLast={true}
+        />
       </section>
 
       {/* Call to Action */}

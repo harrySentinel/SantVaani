@@ -8,6 +8,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Sparkles, Crown, Shield, Zap, Loader2, Search } from 'lucide-react';
+import { usePagination } from '@/hooks/usePagination';
+import BhajanPagination from '@/components/BhajanPagination';
 
 const Divine = () => {
   const [selectedDivineForm, setSelectedDivineForm] = useState(null);
@@ -17,6 +19,7 @@ const Divine = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [itemsPerPage, setItemsPerPage] = useState(9); // 3x3 grid for divine forms
 
   // Fetch divine forms from Supabase
   useEffect(() => {
@@ -50,8 +53,28 @@ const Divine = () => {
     setFilteredForms(filtered);
   }, [searchQuery, divineforms]);
 
+  // Pagination for divine forms
+  const pagination = usePagination({
+    items: filteredForms,
+    itemsPerPage: itemsPerPage,
+    initialPage: 1,
+  });
+
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage) => {
+    setItemsPerPage(newItemsPerPage);
+  };
+
+  const handlePageChange = (page) => {
+    pagination.goToPage(page);
+    // Smooth scroll to divine forms grid
+    const formsSection = document.querySelector('#divine-forms-grid');
+    if (formsSection) {
+      formsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   };
 
   const fetchDivineForms = async () => {
@@ -152,7 +175,11 @@ const Divine = () => {
             </p>
             <div className="flex justify-center">
               <Badge variant="secondary" className="bg-purple-100 text-purple-700 px-4 py-2">
-                {searchQuery ? `${filteredForms.length} of ${divineforms.length}` : `${divineforms.length}`} Sacred Forms
+                {searchQuery 
+                  ? `${pagination.totalItems} of ${divineforms.length}` 
+                  : `${divineforms.length}`
+                } Sacred Forms
+                {pagination.totalPages > 1 && ` • Page ${pagination.currentPage} of ${pagination.totalPages}`}
               </Badge>
             </div>
           </div>
@@ -184,10 +211,11 @@ const Divine = () => {
           </div>
           {searchQuery && (
             <p className="mt-2 text-sm text-gray-600 text-center">
-              {filteredForms.length === 0 
+              {pagination.totalItems === 0 
                 ? `No divine forms found for "${searchQuery}"`
-                : `Found ${filteredForms.length} divine form${filteredForms.length !== 1 ? 's' : ''} matching "${searchQuery}"`
+                : `Found ${pagination.totalItems} divine form${pagination.totalItems !== 1 ? 's' : ''} matching "${searchQuery}"`
               }
+              {pagination.totalPages > 1 && ` • Showing ${pagination.startIndex}-${pagination.endIndex}`}
             </p>
           )}
         </div>
@@ -196,15 +224,16 @@ const Divine = () => {
       {/* Divine Forms Grid */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {filteredForms.length === 0 && searchQuery ? (
+          {pagination.totalItems === 0 && searchQuery ? (
             <div className="text-center py-16">
               <div className="text-gray-400 text-6xl mb-4">🔍</div>
               <h3 className="text-2xl font-semibold text-gray-700 mb-2">No Results Found</h3>
               <p className="text-gray-500">No divine forms match your search "{searchQuery}". Try different keywords.</p>
             </div>
           ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredForms.map((form) => {
+            <div id="divine-forms-grid" className="space-y-8">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {pagination.currentItems.map((form) => {
               const DomainIcon = getIconForDomain(form.domain);
               
               return (
@@ -293,7 +322,27 @@ const Divine = () => {
                 </Card>
               );
             })}
-          </div>
+              </div>
+              
+              {/* Divine Forms Pagination */}
+              {pagination.totalItems > 0 && (
+                <BhajanPagination
+                  currentPage={pagination.currentPage}
+                  totalPages={pagination.totalPages}
+                  totalItems={pagination.totalItems}
+                  itemsPerPage={pagination.itemsPerPage}
+                  startIndex={pagination.startIndex}
+                  endIndex={pagination.endIndex}
+                  hasNextPage={pagination.hasNextPage}
+                  hasPreviousPage={pagination.hasPreviousPage}
+                  visiblePages={pagination.visiblePages}
+                  onPageChange={handlePageChange}
+                  showStats={true}
+                  showFirstLast={true}
+                  theme="purple"
+                />
+              )}
+            </div>
           )}
         </div>
       </section>
