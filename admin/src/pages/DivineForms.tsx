@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
-import { Plus, Search, Edit, Trash2, Eye } from 'lucide-react'
+import { Plus, Search, Edit, Trash2, Eye, Upload } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/hooks/use-toast'
 import { supabase, TABLES } from '@/lib/supabase'
 import { formatDate } from '@/lib/utils'
 import DivineFormForm from '@/components/DivineFormForm'
 import DivineFormViewModal from '@/components/DivineFormViewModal'
+import BulkImport from '@/components/BulkImport'
 
 // Divine Form interface matching your database schema
 interface DivineForm {
@@ -39,6 +40,7 @@ export default function DivineFormsPage() {
   const [editingForm, setEditingForm] = useState<DivineForm | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
   const [viewingForm, setViewingForm] = useState<DivineForm | null>(null)
+  const [isBulkImportOpen, setIsBulkImportOpen] = useState(false)
   
   const { toast } = useToast()
 
@@ -169,6 +171,14 @@ export default function DivineFormsPage() {
           <p className="text-gray-600 mt-1">Manage sacred manifestations and their descriptions</p>
         </div>
         <div className="flex space-x-3">
+          <Button
+            onClick={() => setIsBulkImportOpen(true)}
+            variant="outline"
+            className="w-full sm:w-auto"
+          >
+            <Upload className="h-4 w-4 mr-2" />
+            Bulk Import
+          </Button>
           <Button
             onClick={() => setIsAddModalOpen(true)}
             className="bg-purple-600 hover:bg-purple-700 w-full sm:w-auto"
@@ -467,6 +477,35 @@ export default function DivineFormsPage() {
         onSave={() => {
           fetchDivineForms()
         }}
+      />
+
+      {/* Bulk Import Modal */}
+      <BulkImport
+        isOpen={isBulkImportOpen}
+        onClose={() => setIsBulkImportOpen(false)}
+        onImportComplete={fetchDivineForms}
+        tableName="divine_forms"
+        tableDisplayName="Divine Forms"
+        sampleFormat={`[
+  {
+    "name": "Lord Ganesha",
+    "name_hi": "भगवान गणेश",
+    "domain": "Remover of Obstacles",
+    "domain_hi": "विघ्न हर्ता",
+    "image_url": "https://example.com/ganesha.jpg",
+    "description": "The elephant-headed deity",
+    "description_hi": "गज मुख देवता",
+    "mantra": "ॐ गं गणपतये नमः",
+    "significance": "Lord of beginnings and remover of obstacles",
+    "significance_hi": "नई शुरुआत के स्वामी और विघ्न हर्ता",
+    "attributes": ["Elephant head", "Four arms", "Modaka", "Wisdom"],
+    "stories": "Stories of Ganesha...",
+    "stories_hi": "गणेश की कहानियाँ...",
+    "festivals": ["Ganesh Chaturthi", "Vinayaka Chavithi"],
+    "temples": ["Siddhivinayak Temple", "Ashtavinayak Temples"],
+    "symbols": ["Om", "Lotus", "Mouse", "Modaka"]
+  }
+]`}
       />
     </div>
   )
