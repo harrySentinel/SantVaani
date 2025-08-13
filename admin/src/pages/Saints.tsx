@@ -6,6 +6,7 @@ import { supabase, TABLES } from '@/lib/supabase'
 import { formatDate, truncateText } from '@/lib/utils'
 import SaintForm from '@/components/SaintForm'
 import SaintViewModal from '@/components/SaintViewModal'
+import BulkImport from '@/components/BulkImport'
 
 // Saint interface matching your database schema
 interface Saint {
@@ -34,6 +35,7 @@ export default function SaintsPage() {
   const [editingSaint, setEditingSaint] = useState<Saint | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
   const [viewingSaint, setViewingSaint] = useState<Saint | null>(null)
+  const [isBulkImportOpen, setIsBulkImportOpen] = useState(false)
   
   const { toast } = useToast()
 
@@ -160,6 +162,14 @@ export default function SaintsPage() {
           <p className="text-gray-600 mt-1">Manage spiritual masters and their biographies</p>
         </div>
         <div className="flex space-x-3">
+          <Button
+            onClick={() => setIsBulkImportOpen(true)}
+            variant="outline"
+            className="w-full sm:w-auto"
+          >
+            <Upload className="h-4 w-4 mr-2" />
+            Bulk Import
+          </Button>
           <Button
             onClick={() => setIsAddModalOpen(true)}
             className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto"
@@ -448,6 +458,30 @@ export default function SaintsPage() {
         onSave={() => {
           fetchSaints()
         }}
+      />
+
+      {/* Bulk Import Modal */}
+      <BulkImport
+        isOpen={isBulkImportOpen}
+        onClose={() => setIsBulkImportOpen(false)}
+        onImportComplete={fetchSaints}
+        tableName="saints"
+        tableDisplayName="Saints"
+        sampleFormat={`[
+  {
+    "name": "Sant Tukaram",
+    "name_hi": "संत तुकाराम",
+    "period": "17th Century",
+    "region": "Maharashtra",
+    "image_url": "https://example.com/image.jpg",
+    "description": "Great devotee of Lord Vitthala",
+    "description_hi": "भगवान विट्ठल के महान भक्त",
+    "specialty": "Devotional Poetry",
+    "specialty_hi": "भक्ति काव्य",
+    "biography": "Full biography here...",
+    "biography_hi": "पूरी जीवनी यहाँ..."
+  }
+]`}
       />
     </div>
   )

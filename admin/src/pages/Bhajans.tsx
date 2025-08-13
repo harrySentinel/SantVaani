@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
-import { Plus, Search, Edit, Trash2, Eye, Music } from 'lucide-react'
+import { Plus, Search, Edit, Trash2, Eye, Music, Upload } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/hooks/use-toast'
 import { supabase, TABLES } from '@/lib/supabase'
 import { formatDate } from '@/lib/utils'
 import BhajanForm from '@/components/BhajanForm'
 import BhajanViewModal from '@/components/BhajanViewModal'
+import BulkImport from '@/components/BulkImport'
 
 // Bhajan interface matching your database schema
 interface Bhajan {
@@ -31,6 +32,7 @@ export default function BhajansPage() {
   const [editingBhajan, setEditingBhajan] = useState<Bhajan | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
   const [viewingBhajan, setViewingBhajan] = useState<Bhajan | null>(null)
+  const [isBulkImportOpen, setIsBulkImportOpen] = useState(false)
   
   const { toast } = useToast()
 
@@ -159,6 +161,14 @@ export default function BhajansPage() {
           <p className="text-gray-600 mt-1">Manage sacred songs and devotional music</p>
         </div>
         <div className="flex space-x-3">
+          <Button
+            onClick={() => setIsBulkImportOpen(true)}
+            variant="outline"
+            className="w-full sm:w-auto"
+          >
+            <Upload className="h-4 w-4 mr-2" />
+            Bulk Import
+          </Button>
           <Button
             onClick={() => setIsAddModalOpen(true)}
             className="bg-green-600 hover:bg-green-700 w-full sm:w-auto"
@@ -445,6 +455,27 @@ export default function BhajansPage() {
         onSave={() => {
           fetchBhajans()
         }}
+      />
+
+      {/* Bulk Import Modal */}
+      <BulkImport
+        isOpen={isBulkImportOpen}
+        onClose={() => setIsBulkImportOpen(false)}
+        onImportComplete={fetchBhajans}
+        tableName="bhajans"
+        tableDisplayName="Bhajans"
+        sampleFormat={`[
+  {
+    "title": "Hanuman Chalisa",
+    "title_hi": "हनुमान चालीसा",
+    "category": "Devotional",
+    "lyrics": "श्रीगुरु चरन सरोज रज...",
+    "lyrics_hi": "श्रीगुरु चरन सरोज रज...",
+    "meaning": "Prayer to Lord Hanuman for strength and devotion",
+    "author": "Tulsidas",
+    "youtube_url": "https://www.youtube.com/watch?v=..."
+  }
+]`}
       />
     </div>
   )
