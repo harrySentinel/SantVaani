@@ -16,6 +16,8 @@ SantVaani is a full-stack web app designed to spread spiritual knowledge and ins
 - 🛕 **Old Age Homes & Orphanages** listing with donation support  
 - 💝 A dedicated **Donation Page** to directly support listed Ashrams and Orphanages  
 - 🌅 Aesthetic and modern UI with a peaceful **saffron/orange theme**
+- Added form in donation and as feedback form
+- added working email
 
 ---
 
@@ -27,7 +29,7 @@ Built with a modern, scalable, and spiritual tech stack:
 - **UI Enhancements:** Radix UI, smooth page transitions  
 - **Database:** Supabase (PostgreSQL with Prisma ORM)  
 - **Authentication:** Supabase Auth  
-- **Deployment:** Vercel, Railway
+- **Deployment:** Vercel, Railway (not sure for now)
 - **Media Integration:** YouTube Live Embed API
 
 ---
