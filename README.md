@@ -18,6 +18,7 @@ SantVaani is a full-stack web app designed to spread spiritual knowledge and ins
 - 🌅 Aesthetic and modern UI with a peaceful **saffron/orange theme**
 - Added form in donation and as feedback form
 - added working email
+- added google form
 
 ---
 
