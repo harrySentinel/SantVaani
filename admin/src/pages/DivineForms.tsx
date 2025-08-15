@@ -8,7 +8,7 @@ import DivineFormForm from '@/components/DivineFormForm'
 import DivineFormViewModal from '@/components/DivineFormViewModal'
 import BulkImport from '@/components/BulkImport'
 
-// Divine Form interface matching your database schema
+// Divine Form interface matching your actual database schema
 interface DivineForm {
   id: string
   name: string
@@ -18,15 +18,9 @@ interface DivineForm {
   image_url: string | null
   description: string | null
   description_hi: string | null
+  attributes: string[] | null
   mantra: string | null
   significance: string | null
-  significance_hi: string | null
-  attributes: string[] | null
-  stories: string | null
-  stories_hi: string | null
-  festivals: string[] | null
-  temples: string[] | null
-  symbols: string[] | null
   created_at: string
   updated_at: string | null
 }
@@ -493,17 +487,11 @@ export default function DivineFormsPage() {
     "domain": "Remover of Obstacles",
     "domain_hi": "विघ्न हर्ता",
     "image_url": "https://example.com/ganesha.jpg",
-    "description": "The elephant-headed deity",
-    "description_hi": "गज मुख देवता",
-    "mantra": "ॐ गं गणपतये नमः",
-    "significance": "Lord of beginnings and remover of obstacles",
-    "significance_hi": "नई शुरुआत के स्वामी और विघ्न हर्ता",
+    "description": "The elephant-headed deity who removes obstacles and brings wisdom",
+    "description_hi": "गज मुख देवता जो बाधाओं को दूर करते हैं और ज्ञान लाते हैं",
     "attributes": ["Elephant head", "Four arms", "Modaka", "Wisdom"],
-    "stories": "Stories of Ganesha...",
-    "stories_hi": "गणेश की कहानियाँ...",
-    "festivals": ["Ganesh Chaturthi", "Vinayaka Chavithi"],
-    "temples": ["Siddhivinayak Temple", "Ashtavinayak Temples"],
-    "symbols": ["Om", "Lotus", "Mouse", "Modaka"]
+    "mantra": "ॐ गं गणपतये नमः",
+    "significance": "Lord of beginnings and remover of obstacles"
   }
 ]`}
       />
