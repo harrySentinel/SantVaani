@@ -23,15 +23,9 @@ interface DivineForm {
   image_url: string | null
   description: string | null
   description_hi: string | null
+  attributes: string[] | null
   mantra: string | null
   significance: string | null
-  significance_hi: string | null
-  attributes: string[] | null
-  stories: string | null
-  stories_hi: string | null
-  festivals: string[] | null
-  temples: string[] | null
-  symbols: string[] | null
   created_at: string
   updated_at: string | null
 }
@@ -52,15 +46,9 @@ export default function DivineFormForm({ divineForm, isOpen, onClose, onSave }: 
     image_url: '',
     description: '',
     description_hi: '',
+    attributes: '',
     mantra: '',
     significance: '',
-    significance_hi: '',
-    attributes: '',
-    stories: '',
-    stories_hi: '',
-    festivals: '',
-    temples: '',
-    symbols: '',
   })
 
   const [loading, setLoading] = useState(false)
@@ -77,15 +65,9 @@ export default function DivineFormForm({ divineForm, isOpen, onClose, onSave }: 
         image_url: divineForm.image_url || '',
         description: divineForm.description || '',
         description_hi: divineForm.description_hi || '',
+        attributes: divineForm.attributes ? divineForm.attributes.join(', ') : '',
         mantra: divineForm.mantra || '',
         significance: divineForm.significance || '',
-        significance_hi: divineForm.significance_hi || '',
-        attributes: divineForm.attributes ? divineForm.attributes.join(', ') : '',
-        stories: divineForm.stories || '',
-        stories_hi: divineForm.stories_hi || '',
-        festivals: divineForm.festivals ? divineForm.festivals.join(', ') : '',
-        temples: divineForm.temples ? divineForm.temples.join(', ') : '',
-        symbols: divineForm.symbols ? divineForm.symbols.join(', ') : '',
       })
     } else {
       // Reset form for new divine form
@@ -97,15 +79,9 @@ export default function DivineFormForm({ divineForm, isOpen, onClose, onSave }: 
         image_url: '',
         description: '',
         description_hi: '',
+        attributes: '',
         mantra: '',
         significance: '',
-        significance_hi: '',
-        attributes: '',
-        stories: '',
-        stories_hi: '',
-        festivals: '',
-        temples: '',
-        symbols: '',
       })
     }
   }, [divineForm, isOpen])
@@ -129,30 +105,18 @@ export default function DivineFormForm({ divineForm, isOpen, onClose, onSave }: 
       // Process arrays from comma-separated strings
       const attributesArray = formData.attributes ? 
         formData.attributes.split(',').map(a => a.trim()).filter(a => a) : []
-      const festivalsArray = formData.festivals ? 
-        formData.festivals.split(',').map(f => f.trim()).filter(f => f) : []
-      const templesArray = formData.temples ? 
-        formData.temples.split(',').map(t => t.trim()).filter(t => t) : []
-      const symbolsArray = formData.symbols ? 
-        formData.symbols.split(',').map(s => s.trim()).filter(s => s) : []
 
       const dataToSave = {
         name: formData.name.trim(),
-        name_hi: formData.name_hi.trim() || '',
-        domain: formData.domain.trim() || '',
-        domain_hi: formData.domain_hi.trim() || '',
-        image_url: formData.image_url.trim() || '',
-        description: formData.description.trim() || '',
-        description_hi: formData.description_hi.trim() || '',
-        mantra: formData.mantra.trim() || '',
-        significance: formData.significance.trim() || '',
-        significance_hi: formData.significance_hi.trim() || '',
+        name_hi: formData.name_hi.trim() || null,
+        domain: formData.domain.trim() || null,
+        domain_hi: formData.domain_hi.trim() || null,
+        image_url: formData.image_url.trim() || null,
+        description: formData.description.trim() || null,
+        description_hi: formData.description_hi.trim() || null,
         attributes: attributesArray.length > 0 ? attributesArray : null,
-        stories: formData.stories.trim() || '',
-        stories_hi: formData.stories_hi.trim() || '',
-        festivals: festivalsArray.length > 0 ? festivalsArray : null,
-        temples: templesArray.length > 0 ? templesArray : null,
-        symbols: symbolsArray.length > 0 ? symbolsArray : null,
+        mantra: formData.mantra.trim() || null,
+        significance: formData.significance.trim() || null,
       }
 
       console.log('💾 Saving divine form data:', dataToSave)
@@ -362,28 +326,15 @@ export default function DivineFormForm({ divineForm, isOpen, onClose, onSave }: 
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="significance">Significance (English)</Label>
-                <Textarea
-                  id="significance"
-                  value={formData.significance}
-                  onChange={(e) => handleInputChange('significance', e.target.value)}
-                  placeholder="Spiritual significance and importance..."
-                  rows={3}
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="significance_hi">Significance (Hindi)</Label>
-                <Textarea
-                  id="significance_hi"
-                  value={formData.significance_hi}
-                  onChange={(e) => handleInputChange('significance_hi', e.target.value)}
-                  placeholder="आध्यात्मिक महत्व और प्रासंगिकता..."
-                  rows={3}
-                />
-              </div>
+            <div>
+              <Label htmlFor="significance">Significance</Label>
+              <Textarea
+                id="significance"
+                value={formData.significance}
+                onChange={(e) => handleInputChange('significance', e.target.value)}
+                placeholder="Spiritual significance and importance..."
+                rows={3}
+              />
             </div>
 
             <div>
@@ -396,66 +347,6 @@ export default function DivineFormForm({ divineForm, isOpen, onClose, onSave }: 
               />
             </div>
 
-            <div>
-              <Label htmlFor="symbols">Sacred Symbols (comma-separated)</Label>
-              <Input
-                id="symbols"
-                value={formData.symbols}
-                onChange={(e) => handleInputChange('symbols', e.target.value)}
-                placeholder="e.g., Om, Lotus, Trishul, Conch"
-              />
-            </div>
-          </div>
-
-          {/* Stories & Cultural Information */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">Stories & Culture</h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="stories">Stories (English)</Label>
-                <Textarea
-                  id="stories"
-                  value={formData.stories}
-                  onChange={(e) => handleInputChange('stories', e.target.value)}
-                  placeholder="Famous stories and legends..."
-                  rows={4}
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="stories_hi">Stories (Hindi)</Label>
-                <Textarea
-                  id="stories_hi"
-                  value={formData.stories_hi}
-                  onChange={(e) => handleInputChange('stories_hi', e.target.value)}
-                  placeholder="प्रसिद्ध कहानियाँ और किंवदंतियाँ..."
-                  rows={4}
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="festivals">Associated Festivals (comma-separated)</Label>
-                <Input
-                  id="festivals"
-                  value={formData.festivals}
-                  onChange={(e) => handleInputChange('festivals', e.target.value)}
-                  placeholder="e.g., Ganesh Chaturthi, Vinayaka Chavithi"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="temples">Famous Temples (comma-separated)</Label>
-                <Input
-                  id="temples"
-                  value={formData.temples}
-                  onChange={(e) => handleInputChange('temples', e.target.value)}
-                  placeholder="e.g., Siddhivinayak Temple, Tirupati"
-                />
-              </div>
-            </div>
           </div>
 
           <DialogFooter>

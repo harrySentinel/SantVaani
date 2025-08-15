@@ -18,15 +18,9 @@ interface DivineForm {
   image_url: string | null
   description: string | null
   description_hi: string | null
+  attributes: string[] | null
   mantra: string | null
   significance: string | null
-  significance_hi: string | null
-  attributes: string[] | null
-  stories: string | null
-  stories_hi: string | null
-  festivals: string[] | null
-  temples: string[] | null
-  symbols: string[] | null
   created_at: string
   updated_at: string | null
 }
@@ -293,46 +287,6 @@ export default function DivineFormViewModal({ divineForm, isOpen, onClose, onEdi
             </div>
           )}
 
-          {/* Cultural Information */}
-          {(divineForm.festivals || divineForm.temples) && (
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900 border-b border-purple-200 pb-2">Cultural Information</h3>
-              <div className="grid md:grid-cols-2 gap-6">
-                {divineForm.festivals && divineForm.festivals.length > 0 && (
-                  <div>
-                    <h4 className="font-medium text-gray-700 mb-2 flex items-center">
-                      <Calendar className="h-4 w-4 mr-2 text-purple-500" />
-                      Associated Festivals
-                    </h4>
-                    <div className="space-y-2">
-                      {divineForm.festivals.map((festival, index) => (
-                        <div key={index} className="flex items-center">
-                          <span className="text-purple-500 mr-2">🎊</span>
-                          <span className="text-gray-600">{festival}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {divineForm.temples && divineForm.temples.length > 0 && (
-                  <div>
-                    <h4 className="font-medium text-gray-700 mb-2 flex items-center">
-                      <MapPin className="h-4 w-4 mr-2 text-orange-500" />
-                      Famous Temples
-                    </h4>
-                    <div className="space-y-2">
-                      {divineForm.temples.map((temple, index) => (
-                        <div key={index} className="flex items-center">
-                          <span className="text-orange-500 mr-2">🏛️</span>
-                          <span className="text-gray-600">{temple}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
 
           {/* Metadata Section */}
           <div className="border-t pt-6 space-y-3">

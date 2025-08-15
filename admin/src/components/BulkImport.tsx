@@ -92,25 +92,16 @@ export default function BulkImport({
             }
             transformedItem = {
               name: item.name,
-              name_hi: item.name_hi || '',
-              domain: item.domain || '',
-              domain_hi: item.domain_hi || '',
-              image_url: item.image_url || '',
-              description: item.description || '',
-              description_hi: item.description_hi || '',
-              mantra: item.mantra || '',
-              significance: item.significance || '',
-              significance_hi: item.significance_hi || '',
+              name_hi: item.name_hi || null,
+              domain: item.domain || null,
+              domain_hi: item.domain_hi || null,
+              image_url: item.image_url || null,
+              description: item.description || null,
+              description_hi: item.description_hi || null,
               attributes: Array.isArray(item.attributes) ? item.attributes : 
                          (item.attributes ? item.attributes.split(',').map((a: string) => a.trim()) : null),
-              stories: item.stories || '',
-              stories_hi: item.stories_hi || '',
-              festivals: Array.isArray(item.festivals) ? item.festivals :
-                        (item.festivals ? item.festivals.split(',').map((f: string) => f.trim()) : null),
-              temples: Array.isArray(item.temples) ? item.temples :
-                      (item.temples ? item.temples.split(',').map((t: string) => t.trim()) : null),
-              symbols: Array.isArray(item.symbols) ? item.symbols :
-                      (item.symbols ? item.symbols.split(',').map((s: string) => s.trim()) : null)
+              mantra: item.mantra || null,
+              significance: item.significance || null,
             }
             break
 
