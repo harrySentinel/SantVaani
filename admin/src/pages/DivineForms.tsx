@@ -115,24 +115,16 @@ export default function DivineFormsPage() {
     }
   }
 
-  // Export divine forms list to CSV
+  // Export divine forms list to JSON
   const exportDivineFormsToCSV = () => {
-    const csvData = divineForms.map(form => ({
-      'Name (English)': form.name,
-      'Name (Hindi)': form.name_hi || ''
-    }))
+    const divineFormNames = divineForms.map(form => form.name)
+    const jsonContent = JSON.stringify(divineFormNames, null, 2)
 
-    const headers = Object.keys(csvData[0] || {})
-    const csvContent = [
-      headers.join(','),
-      ...csvData.map(row => headers.map(header => `"${row[header]}"`).join(','))
-    ].join('\n')
-
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const blob = new Blob([jsonContent], { type: 'application/json;charset=utf-8;' })
     const link = document.createElement('a')
     const url = URL.createObjectURL(blob)
     link.setAttribute('href', url)
-    link.setAttribute('download', `divine_forms_names_${new Date().toISOString().split('T')[0]}.csv`)
+    link.setAttribute('download', `divine_forms_names_${new Date().toISOString().split('T')[0]}.json`)
     link.style.visibility = 'hidden'
     document.body.appendChild(link)
     link.click()
@@ -140,7 +132,7 @@ export default function DivineFormsPage() {
 
     toast({
       title: "Export Successful",
-      description: `Exported ${divineForms.length} divine form names to CSV file`
+      description: `Exported ${divineForms.length} divine form names to JSON file`
     })
   }
 
