@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Plus, Search, Edit, Trash2, Eye } from 'lucide-react'
+import { Plus, Search, Edit, Trash2, Eye, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/hooks/use-toast'
 import { supabase, TABLES } from '@/lib/supabase'
@@ -130,6 +130,27 @@ export default function LivingSaintsPage() {
     }
   }
 
+  // Export living saints list to JSON
+  const exportLivingSaintsToJSON = () => {
+    const saintNames = saints.map(saint => saint.name)
+    const jsonContent = JSON.stringify(saintNames, null, 2)
+
+    const blob = new Blob([jsonContent], { type: 'application/json;charset=utf-8;' })
+    const link = document.createElement('a')
+    const url = URL.createObjectURL(blob)
+    link.setAttribute('href', url)
+    link.setAttribute('download', `living_saints_names_${new Date().toISOString().split('T')[0]}.json`)
+    link.style.visibility = 'hidden'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+
+    toast({
+      title: "Export Successful",
+      description: `Exported ${saints.length} living saint names to JSON file`
+    })
+  }
+
   // Filter saints based on search
   const filteredSaints = saints.filter(saint => 
     saint.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -177,6 +198,14 @@ export default function LivingSaintsPage() {
           <p className="text-gray-600 mt-1">Manage contemporary spiritual masters</p>
         </div>
         <div className="flex space-x-3">
+          <Button
+            onClick={exportLivingSaintsToJSON}
+            variant="outline"
+            className="w-full sm:w-auto text-green-600 border-green-200 hover:bg-green-50"
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Export List
+          </Button>
           <Button
             onClick={() => setIsAddModalOpen(true)}
             className="bg-red-600 hover:bg-red-700 w-full sm:w-auto"
