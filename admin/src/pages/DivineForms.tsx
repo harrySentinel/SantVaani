@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Plus, Search, Edit, Trash2, Eye, Upload } from 'lucide-react'
+import { Plus, Search, Edit, Trash2, Eye, Upload, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/hooks/use-toast'
 import { supabase, TABLES } from '@/lib/supabase'
@@ -115,6 +115,35 @@ export default function DivineFormsPage() {
     }
   }
 
+  // Export divine forms list to CSV
+  const exportDivineFormsToCSV = () => {
+    const csvData = divineForms.map(form => ({
+      'Name (English)': form.name,
+      'Name (Hindi)': form.name_hi || ''
+    }))
+
+    const headers = Object.keys(csvData[0] || {})
+    const csvContent = [
+      headers.join(','),
+      ...csvData.map(row => headers.map(header => `"${row[header]}"`).join(','))
+    ].join('\n')
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    const url = URL.createObjectURL(blob)
+    link.setAttribute('href', url)
+    link.setAttribute('download', `divine_forms_names_${new Date().toISOString().split('T')[0]}.csv`)
+    link.style.visibility = 'hidden'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+
+    toast({
+      title: "Export Successful",
+      description: `Exported ${divineForms.length} divine form names to CSV file`
+    })
+  }
+
   // Filter divine forms based on search
   const filteredForms = divineForms.filter(form => 
     form.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -165,6 +194,14 @@ export default function DivineFormsPage() {
           <p className="text-gray-600 mt-1">Manage sacred manifestations and their descriptions</p>
         </div>
         <div className="flex space-x-3">
+          <Button
+            onClick={exportDivineFormsToCSV}
+            variant="outline"
+            className="w-full sm:w-auto text-green-600 border-green-200 hover:bg-green-50"
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Export List
+          </Button>
           <Button
             onClick={() => setIsBulkImportOpen(true)}
             variant="outline"

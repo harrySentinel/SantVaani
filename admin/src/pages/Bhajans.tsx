@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Plus, Search, Edit, Trash2, Eye, Music, Upload } from 'lucide-react'
+import { Plus, Search, Edit, Trash2, Eye, Music, Upload, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/hooks/use-toast'
 import { supabase, TABLES } from '@/lib/supabase'
@@ -113,6 +113,35 @@ export default function BhajansPage() {
     }
   }
 
+  // Export bhajans list to CSV
+  const exportBhajansToCSV = () => {
+    const csvData = bhajans.map(bhajan => ({
+      'Title (English)': bhajan.title,
+      'Title (Hindi)': bhajan.title_hi || ''
+    }))
+
+    const headers = Object.keys(csvData[0] || {})
+    const csvContent = [
+      headers.join(','),
+      ...csvData.map(row => headers.map(header => `"${row[header]}"`).join(','))
+    ].join('\n')
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    const url = URL.createObjectURL(blob)
+    link.setAttribute('href', url)
+    link.setAttribute('download', `bhajan_titles_${new Date().toISOString().split('T')[0]}.csv`)
+    link.style.visibility = 'hidden'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+
+    toast({
+      title: "Export Successful",
+      description: `Exported ${bhajans.length} bhajan titles to CSV file`
+    })
+  }
+
   // Filter bhajans based on search
   const filteredBhajans = bhajans.filter(bhajan => 
     bhajan.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -161,6 +190,14 @@ export default function BhajansPage() {
           <p className="text-gray-600 mt-1">Manage sacred songs and devotional music</p>
         </div>
         <div className="flex space-x-3">
+          <Button
+            onClick={exportBhajansToCSV}
+            variant="outline"
+            className="w-full sm:w-auto text-green-600 border-green-200 hover:bg-green-50"
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Export List
+          </Button>
           <Button
             onClick={() => setIsBulkImportOpen(true)}
             variant="outline"

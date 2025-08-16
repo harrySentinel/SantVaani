@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Plus, Search, Edit, Trash2, Eye, Upload, Filter } from 'lucide-react'
+import { Plus, Search, Edit, Trash2, Eye, Upload, Filter, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/hooks/use-toast'
 import { supabase, TABLES } from '@/lib/supabase'
@@ -116,6 +116,35 @@ export default function SaintsPage() {
     }
   }
 
+  // Export saints list to CSV
+  const exportSaintsToCSV = () => {
+    const csvData = saints.map(saint => ({
+      'Name (English)': saint.name,
+      'Name (Hindi)': saint.name_hi || ''
+    }))
+
+    const headers = Object.keys(csvData[0] || {})
+    const csvContent = [
+      headers.join(','),
+      ...csvData.map(row => headers.map(header => `"${row[header]}"`).join(','))
+    ].join('\n')
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    const url = URL.createObjectURL(blob)
+    link.setAttribute('href', url)
+    link.setAttribute('download', `saints_names_${new Date().toISOString().split('T')[0]}.csv`)
+    link.style.visibility = 'hidden'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+
+    toast({
+      title: "Export Successful",
+      description: `Exported ${saints.length} saint names to CSV file`
+    })
+  }
+
   // Filter saints based on search
   const filteredSaints = saints.filter(saint => 
     saint.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -162,6 +191,14 @@ export default function SaintsPage() {
           <p className="text-gray-600 mt-1">Manage spiritual masters and their biographies</p>
         </div>
         <div className="flex space-x-3">
+          <Button
+            onClick={exportSaintsToCSV}
+            variant="outline"
+            className="w-full sm:w-auto text-green-600 border-green-200 hover:bg-green-50"
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Export List
+          </Button>
           <Button
             onClick={() => setIsBulkImportOpen(true)}
             variant="outline"
