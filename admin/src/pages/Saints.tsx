@@ -116,24 +116,16 @@ export default function SaintsPage() {
     }
   }
 
-  // Export saints list to CSV
+  // Export saints list to JSON
   const exportSaintsToCSV = () => {
-    const csvData = saints.map(saint => ({
-      'Name (English)': saint.name,
-      'Name (Hindi)': saint.name_hi || ''
-    }))
+    const saintNames = saints.map(saint => saint.name)
+    const jsonContent = JSON.stringify(saintNames, null, 2)
 
-    const headers = Object.keys(csvData[0] || {})
-    const csvContent = [
-      headers.join(','),
-      ...csvData.map(row => headers.map(header => `"${row[header]}"`).join(','))
-    ].join('\n')
-
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const blob = new Blob([jsonContent], { type: 'application/json;charset=utf-8;' })
     const link = document.createElement('a')
     const url = URL.createObjectURL(blob)
     link.setAttribute('href', url)
-    link.setAttribute('download', `saints_names_${new Date().toISOString().split('T')[0]}.csv`)
+    link.setAttribute('download', `saints_names_${new Date().toISOString().split('T')[0]}.json`)
     link.style.visibility = 'hidden'
     document.body.appendChild(link)
     link.click()
@@ -141,7 +133,7 @@ export default function SaintsPage() {
 
     toast({
       title: "Export Successful",
-      description: `Exported ${saints.length} saint names to CSV file`
+      description: `Exported ${saints.length} saint names to JSON file`
     })
   }
 

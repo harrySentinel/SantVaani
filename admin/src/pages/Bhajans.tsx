@@ -113,24 +113,16 @@ export default function BhajansPage() {
     }
   }
 
-  // Export bhajans list to CSV
+  // Export bhajans list to JSON
   const exportBhajansToCSV = () => {
-    const csvData = bhajans.map(bhajan => ({
-      'Title (English)': bhajan.title,
-      'Title (Hindi)': bhajan.title_hi || ''
-    }))
+    const bhajanTitles = bhajans.map(bhajan => bhajan.title)
+    const jsonContent = JSON.stringify(bhajanTitles, null, 2)
 
-    const headers = Object.keys(csvData[0] || {})
-    const csvContent = [
-      headers.join(','),
-      ...csvData.map(row => headers.map(header => `"${row[header]}"`).join(','))
-    ].join('\n')
-
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const blob = new Blob([jsonContent], { type: 'application/json;charset=utf-8;' })
     const link = document.createElement('a')
     const url = URL.createObjectURL(blob)
     link.setAttribute('href', url)
-    link.setAttribute('download', `bhajan_titles_${new Date().toISOString().split('T')[0]}.csv`)
+    link.setAttribute('download', `bhajan_titles_${new Date().toISOString().split('T')[0]}.json`)
     link.style.visibility = 'hidden'
     document.body.appendChild(link)
     link.click()
@@ -138,7 +130,7 @@ export default function BhajansPage() {
 
     toast({
       title: "Export Successful",
-      description: `Exported ${bhajans.length} bhajan titles to CSV file`
+      description: `Exported ${bhajans.length} bhajan titles to JSON file`
     })
   }
 
