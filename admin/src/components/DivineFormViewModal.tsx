@@ -188,104 +188,40 @@ export default function DivineFormViewModal({ divineForm, isOpen, onClose, onEdi
             </div>
           )}
 
-          {/* Attributes & Symbols Section */}
-          {(divineForm.attributes || divineForm.symbols) && (
+          {/* Attributes Section */}
+          {divineForm.attributes && divineForm.attributes.length > 0 && (
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900 border-b border-purple-200 pb-2">Attributes & Symbols</h3>
+              <h3 className="text-lg font-semibold text-gray-900 border-b border-purple-200 pb-2">Attributes</h3>
               
-              {divineForm.attributes && divineForm.attributes.length > 0 && (
-                <div>
-                  <h4 className="font-medium text-gray-700 mb-3">Key Attributes</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {divineForm.attributes.map((attribute, index) => (
-                      <span key={index} className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-purple-100 text-purple-800">
-                        {attribute}
-                      </span>
-                    ))}
-                  </div>
+              <div>
+                <h4 className="font-medium text-gray-700 mb-3">Key Attributes</h4>
+                <div className="flex flex-wrap gap-2">
+                  {divineForm.attributes.map((attribute, index) => (
+                    <span key={index} className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-purple-100 text-purple-800">
+                      {attribute}
+                    </span>
+                  ))}
                 </div>
-              )}
-
-              {divineForm.symbols && divineForm.symbols.length > 0 && (
-                <div>
-                  <h4 className="font-medium text-gray-700 mb-3">Sacred Symbols</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {divineForm.symbols.map((symbol, index) => (
-                      <span key={index} className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-orange-100 text-orange-800">
-                        {symbol}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
+              </div>
             </div>
           )}
 
           {/* Significance Section */}
-          {(divineForm.significance || divineForm.significance_hi) && (
+          {divineForm.significance && (
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-gray-900 border-b border-purple-200 pb-2">Significance</h3>
-              <div className="grid lg:grid-cols-2 gap-6">
-                {divineForm.significance && (
-                  <div>
-                    <h4 className="font-medium text-gray-700 mb-3">English</h4>
-                    <div className="text-gray-600 leading-relaxed bg-gray-50 p-4 rounded-lg max-h-60 overflow-y-auto">
-                      {divineForm.significance.split('\\n').map((paragraph, index) => (
-                        <p key={index} className="mb-3 last:mb-0">
-                          {paragraph}
-                        </p>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {divineForm.significance_hi && (
-                  <div>
-                    <h4 className="font-medium text-gray-700 mb-3">Hindi</h4>
-                    <div className="text-gray-600 leading-relaxed bg-purple-50 p-4 rounded-lg max-h-60 overflow-y-auto">
-                      {divineForm.significance_hi.split('\\n').map((paragraph, index) => (
-                        <p key={index} className="mb-3 last:mb-0">
-                          {paragraph}
-                        </p>
-                      ))}
-                    </div>
-                  </div>
-                )}
+              <div>
+                <div className="text-gray-600 leading-relaxed bg-gray-50 p-4 rounded-lg max-h-60 overflow-y-auto">
+                  {divineForm.significance.split('\\n').map((paragraph, index) => (
+                    <p key={index} className="mb-3 last:mb-0">
+                      {paragraph}
+                    </p>
+                  ))}
+                </div>
               </div>
             </div>
           )}
 
-          {/* Stories Section */}
-          {(divineForm.stories || divineForm.stories_hi) && (
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900 border-b border-purple-200 pb-2">Stories & Legends</h3>
-              <div className="grid lg:grid-cols-2 gap-6">
-                {divineForm.stories && (
-                  <div>
-                    <h4 className="font-medium text-gray-700 mb-3">English Stories</h4>
-                    <div className="text-gray-600 leading-relaxed bg-blue-50 p-4 rounded-lg max-h-80 overflow-y-auto">
-                      {divineForm.stories.split('\\n').map((paragraph, index) => (
-                        <p key={index} className="mb-3 last:mb-0">
-                          {paragraph}
-                        </p>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {divineForm.stories_hi && (
-                  <div>
-                    <h4 className="font-medium text-gray-700 mb-3">Hindi Stories</h4>
-                    <div className="text-gray-600 leading-relaxed bg-blue-50 p-4 rounded-lg max-h-80 overflow-y-auto">
-                      {divineForm.stories_hi.split('\\n').map((paragraph, index) => (
-                        <p key={index} className="mb-3 last:mb-0">
-                          {paragraph}
-                        </p>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
 
 
           {/* Metadata Section */}
