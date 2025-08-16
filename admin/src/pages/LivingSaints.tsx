@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
-import { Plus, Search, Edit, Trash2, Eye, Download } from 'lucide-react'
+import { Plus, Search, Edit, Trash2, Eye, Download, Upload } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/hooks/use-toast'
 import { supabase, TABLES } from '@/lib/supabase'
 import { formatDate } from '@/lib/utils'
 import LivingSaintForm from '@/components/LivingSaintForm'
 import LivingSaintViewModal from '@/components/LivingSaintViewModal'
+import BulkImport from '@/components/BulkImport'
 
 // Living Saint interface matching your database schema
 interface LivingSaint {
@@ -50,6 +51,7 @@ export default function LivingSaintsPage() {
   const [editingSaint, setEditingSaint] = useState<LivingSaint | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
   const [viewingSaint, setViewingSaint] = useState<LivingSaint | null>(null)
+  const [isBulkImportOpen, setIsBulkImportOpen] = useState(false)
   
   const { toast } = useToast()
 
@@ -205,6 +207,14 @@ export default function LivingSaintsPage() {
           >
             <Download className="h-4 w-4 mr-2" />
             Export List
+          </Button>
+          <Button
+            onClick={() => setIsBulkImportOpen(true)}
+            variant="outline"
+            className="w-full sm:w-auto"
+          >
+            <Upload className="h-4 w-4 mr-2" />
+            Bulk Import
           </Button>
           <Button
             onClick={() => setIsAddModalOpen(true)}
@@ -503,6 +513,46 @@ export default function LivingSaintsPage() {
         onSave={() => {
           fetchSaints()
         }}
+      />
+
+      {/* Bulk Import Modal */}
+      <BulkImport
+        isOpen={isBulkImportOpen}
+        onClose={() => setIsBulkImportOpen(false)}
+        onImportComplete={fetchSaints}
+        tableName="living_saints"
+        tableDisplayName="Living Saints"
+        sampleFormat={`[
+  {
+    "name": "Sadhguru Jaggi Vasudev",
+    "name_hi": "सद्गुरु जग्गी वासुदेव",
+    "organization": "Isha Foundation",
+    "specialty": "Yoga and Meditation",
+    "specialty_hi": "योग और ध्यान",
+    "image": "https://example.com/image.jpg",
+    "description": "Contemporary spiritual leader and mystic",
+    "description_hi": "समकालीन आध्यात्मिक नेता और रहस्यवादी",
+    "website": "https://isha.sadhguru.org",
+    "followers": "Millions worldwide",
+    "teachings": ["Inner Engineering", "Yoga", "Meditation"],
+    "birth_place": "Mysore, Karnataka",
+    "birth_place_hi": "मैसूर, कर्नाटक",
+    "current_location": "Isha Yoga Center, Coimbatore",
+    "current_location_hi": "ईशा योग केंद्र, कोयंबटूर",
+    "biography": "Full biography here...",
+    "biography_hi": "पूरी जीवनी यहाँ...",
+    "spiritual_journey": "Spiritual journey details...",
+    "spiritual_journey_hi": "आध्यात्मिक यात्रा विवरण...",
+    "key_teachings": ["Consciousness", "Self-realization"],
+    "key_teachings_hi": ["चेतना", "आत्म-साक्षात्कार"],
+    "quotes": ["Life is not a problem to be solved"],
+    "quotes_hi": ["जीवन कोई समस्या नहीं है जिसे हल करना हो"],
+    "ashram": "Isha Yoga Center",
+    "ashram_hi": "ईशा योग केंद्र",
+    "lineage": "Contemporary spiritual tradition",
+    "lineage_hi": "समकालीन आध्यात्मिक परंपरा"
+  }
+]`}
       />
     </div>
   )
