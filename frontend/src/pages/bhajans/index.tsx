@@ -12,6 +12,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { supabase } from '@/lib/supabaseClient';
 import { usePagination } from '@/hooks/usePagination';
 import BhajanPagination from '@/components/BhajanPagination';
+import { CopyButton, QuickCopyButton } from '@/components/ui/copy-button';
 
 interface Bhajan {
   id: string;
@@ -436,7 +437,14 @@ const Bhajans = () => {
                           <Badge variant="outline" className="border-orange-200 text-orange-600">
                             {quote.category}
                           </Badge>
-                          <Quote className="w-5 h-5 text-orange-500" />
+                          <div className="flex items-center space-x-2">
+                            <Quote className="w-5 h-5 text-orange-500" />
+                            <QuickCopyButton 
+                              text={quote.text}
+                              author={quote.author}
+                              className="opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                            />
+                          </div>
                         </div>
 
                         <div className="flex-grow space-y-3">
@@ -451,9 +459,20 @@ const Bhajans = () => {
 
                         <div className="flex items-center justify-between pt-2 border-t border-gray-100">
                           <p className="text-sm text-gray-500 font-medium">- {quote.author}</p>
-                          <button className="flex items-center space-x-1 text-orange-600 hover:text-orange-700 transition-colors">
-                            <Heart className="w-4 h-4" />
-                          </button>
+                          <div className="flex items-center space-x-2">
+                            <button className="flex items-center space-x-1 text-orange-600 hover:text-orange-700 transition-colors">
+                              <Heart className="w-4 h-4" />
+                            </button>
+                            <CopyButton
+                              text={quote.text}
+                              textHi={quote.text_hi}
+                              author={quote.author}
+                              category={quote.category}
+                              variant="ghost"
+                              size="sm"
+                              className="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300"
+                            />
+                          </div>
                         </div>
                       </CardContent>
                     </Card>
