@@ -12,7 +12,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { supabase } from '@/lib/supabaseClient';
 import { usePagination } from '@/hooks/usePagination';
 import BhajanPagination from '@/components/BhajanPagination';
-import { CopyButton, QuickCopyButton } from '@/components/ui/copy-button';
+import { QuickCopyButton } from '@/components/ui/copy-button';
 
 interface Bhajan {
   id: string;
@@ -441,8 +441,10 @@ const Bhajans = () => {
                             <Quote className="w-5 h-5 text-orange-500" />
                             <QuickCopyButton 
                               text={quote.text}
+                              textHi={quote.text_hi}
                               author={quote.author}
-                              className="opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                              category={quote.category}
+                              className="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300"
                             />
                           </div>
                         </div>
@@ -459,20 +461,9 @@ const Bhajans = () => {
 
                         <div className="flex items-center justify-between pt-2 border-t border-gray-100">
                           <p className="text-sm text-gray-500 font-medium">- {quote.author}</p>
-                          <div className="flex items-center space-x-2">
-                            <button className="flex items-center space-x-1 text-orange-600 hover:text-orange-700 transition-colors">
-                              <Heart className="w-4 h-4" />
-                            </button>
-                            <CopyButton
-                              text={quote.text}
-                              textHi={quote.text_hi}
-                              author={quote.author}
-                              category={quote.category}
-                              variant="ghost"
-                              size="sm"
-                              className="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300"
-                            />
-                          </div>
+                          <button className="flex items-center space-x-1 text-orange-600 hover:text-orange-700 transition-colors">
+                            <Heart className="w-4 h-4" />
+                          </button>
                         </div>
                       </CardContent>
                     </Card>

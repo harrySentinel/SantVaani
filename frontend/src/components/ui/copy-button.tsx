@@ -182,13 +182,17 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
 
 interface QuickCopyButtonProps {
   text: string;
+  textHi?: string;
   author: string;
+  category?: string;
   className?: string;
 }
 
 export const QuickCopyButton: React.FC<QuickCopyButtonProps> = ({
   text,
+  textHi,
   author,
+  category,
   className
 }) => {
   const [isCopied, setIsCopied] = useState(false);
@@ -198,7 +202,12 @@ export const QuickCopyButton: React.FC<QuickCopyButtonProps> = ({
     e.preventDefault();
     e.stopPropagation();
 
-    const success = await CopyToClipboard.copySimpleQuote(text, author);
+    const success = await CopyToClipboard.copyQuote({
+      text,
+      text_hi: textHi,
+      author,
+      category
+    });
 
     if (success) {
       setIsCopied(true);
