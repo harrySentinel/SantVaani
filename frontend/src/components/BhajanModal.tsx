@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Music, Copy, Quote, Play, ExternalLink, Youtube } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { CopyToClipboard } from '@/utils/copyUtils';
 
 interface Bhajan {
   id: string;
@@ -31,32 +32,35 @@ const BhajanModal: React.FC<BhajanModalProps> = ({ bhajan, isOpen, onClose }) =>
     }
   };
 
-  const handleCopyLyrics = () => {
+  const handleCopyLyrics = async () => {
     if (!bhajan) return;
     
-    const textToCopy = `${bhajan.title}\n\n${bhajan.lyrics_hi}\n\n${bhajan.lyrics}\n\nMeaning: ${bhajan.meaning}\n\n- ${bhajan.author}`;
-    
-    navigator.clipboard.writeText(textToCopy).then(() => {
-      toast({
-        title: "✅ Copied!",
-        description: "Bhajan lyrics copied to clipboard",
-        duration: 2000,
-      });
-    }).catch(() => {
-      // Fallback for older browsers
-      const textArea = document.createElement('textarea');
-      textArea.value = textToCopy;
-      document.body.appendChild(textArea);
-      textArea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textArea);
-      
-      toast({
-        title: "✅ Copied!",
-        description: "Bhajan lyrics copied to clipboard",
-        duration: 2000,
-      });
+    const formattedText = CopyToClipboard.formatBhajanForSharing({
+      title: bhajan.title,
+      title_hi: bhajan.title_hi,
+      lyrics: bhajan.lyrics,
+      lyrics_hi: bhajan.lyrics_hi,
+      meaning: bhajan.meaning,
+      author: bhajan.author,
+      category: bhajan.category
     });
+    
+    const success = await CopyToClipboard.copyText(formattedText);
+    
+    if (success) {
+      toast({
+        title: "🎵 Bhajan Copied!",
+        description: CopyToClipboard.getSuccessMessage(),
+        duration: 3000,
+      });
+    } else {
+      toast({
+        title: "Copy Failed",
+        description: CopyToClipboard.getErrorMessage(),
+        variant: "destructive",
+        duration: 4000,
+      });
+    }
   };
 
   const handleListenOnYouTube = () => {
