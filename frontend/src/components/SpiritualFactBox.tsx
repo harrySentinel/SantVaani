@@ -64,9 +64,7 @@ const SpiritualFactBox = () => {
     fetchFacts();
   }, []);
 
-  const [nextFactTimer, setNextFactTimer] = useState(12 * 60 * 60);
-
-  // Simple fact rotation without complex typing animation
+  // Simple fact rotation with fixed interval
   useEffect(() => {
     if (facts.length === 0) return;
     
@@ -77,25 +75,10 @@ const SpiritualFactBox = () => {
         setCurrentFactIndex((prev) => (prev + 1) % facts.length);
         setIsAnimating(false);
       }, 500);
-    }, 8000); // Change every 8 seconds for demo
+    }, 7000); // Change every 7 seconds
 
     return () => clearInterval(interval);
   }, [facts.length]);
-
-  // Timer countdown for next fact (demo)
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setNextFactTimer((prev) => (prev > 0 ? prev - 1 : 12 * 60 * 60));
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, []);
-
-  const formatTime = (seconds: number) => {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    return `${hours}h ${minutes}m`;
-  };
 
   // Show loading state if no facts loaded yet
   if (loading || facts.length === 0) {
@@ -127,11 +110,11 @@ const SpiritualFactBox = () => {
           <div className="absolute bottom-10 right-10 w-40 h-40 bg-orange-300 rounded-full blur-3xl animate-pulse delay-1000"></div>
         </div>
 
-        <div className={`relative bg-gradient-to-br from-orange-50 via-white to-orange-100 rounded-3xl p-8 md:p-12 lg:p-16 border-2 border-orange-200 shadow-2xl transition-all duration-700 ${isAnimating ? 'scale-95 opacity-80' : 'scale-100 opacity-100'} hover:shadow-3xl hover:scale-[1.01]`}>
+        <div className={`relative bg-gradient-to-br from-orange-100 via-orange-50 to-orange-100 rounded-3xl p-8 md:p-12 lg:p-16 border border-orange-300 shadow-xl backdrop-blur-sm hover:shadow-2xl transition-all duration-700 ${isAnimating ? 'scale-95 opacity-80' : 'scale-100 opacity-100'}`}>
           
           {/* Glowing border effect */}
-          <div className="absolute inset-0 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-400 rounded-3xl opacity-20 animate-pulse"></div>
-          <div className="relative bg-gradient-to-br from-orange-50 via-white to-orange-100 rounded-3xl p-8 md:p-10 lg:p-12 m-0.5">
+          <div className="absolute inset-0 bg-gradient-to-r from-orange-500 via-orange-600 to-orange-500 rounded-3xl opacity-25 blur-sm"></div>
+          <div className="relative bg-gradient-to-br from-white/80 via-orange-50 to-white/80 rounded-2xl p-8 md:p-10 lg:p-12 backdrop-blur-lg border border-orange-200">
             
             {/* Header with enhanced design */}
             <div className="text-center mb-8">
@@ -157,50 +140,27 @@ const SpiritualFactBox = () => {
             {/* Fact Content with enhanced styling */}
             <div className="mb-8">
               <div className={`transition-all duration-500 ${isAnimating ? 'opacity-0 translate-y-6' : 'opacity-100 translate-y-0'}`}>
-                <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 md:p-8 shadow-lg border border-orange-200 max-w-5xl mx-auto">
-                  <p className="text-gray-800 text-lg md:text-xl leading-relaxed font-medium text-center max-w-4xl mx-auto">
+                <div className="bg-white/90 backdrop-blur-md rounded-xl p-6 md:p-8 shadow-lg border border-orange-200 max-w-5xl mx-auto ring-1 ring-orange-300/60">
+                  <p className="text-gray-900 text-lg md:text-xl leading-relaxed font-semibold text-center max-w-4xl mx-auto tracking-wide">
                     {currentFact.text}
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* Enhanced bottom section */}
-            <div className="flex flex-col md:flex-row items-center justify-between pt-6 border-t border-orange-200">
-              <div className="flex items-center space-x-3 mb-4 md:mb-0">
-                <div className="bg-orange-100 rounded-full p-2">
-                  <Clock className="w-5 h-5 text-orange-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600">Next wisdom in</p>
-                  <p className="text-orange-700 font-bold">{formatTime(nextFactTimer)}</p>
-                </div>
-              </div>
-              
-              <div className="flex items-center space-x-4">
-                {/* Enhanced progress indicators */}
-                <div className="flex space-x-2">
-                  {facts.slice(0, 5).map((_, index) => (
-                    <div
-                      key={index}
-                      className={`rounded-full transition-all duration-500 ${
-                        index === currentFactIndex % 5
-                          ? 'bg-gradient-to-r from-orange-500 to-orange-600 w-8 h-3 shadow-lg' 
-                          : 'bg-orange-200 w-3 h-3'
-                      }`}
-                    />
-                  ))}
-                  {facts.length > 5 && (
-                    <div className="text-orange-600 text-sm font-medium">
-                      +{facts.length - 5} more
-                    </div>
-                  )}
-                </div>
-                
-                {/* Refresh indicator */}
-                <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-full p-2 shadow-lg">
-                  <Star className={`w-5 h-5 text-white ${isAnimating ? 'animate-spin' : 'animate-pulse'}`} />
-                </div>
+            {/* Simple bottom section */}
+            <div className="flex items-center justify-center pt-6 border-t border-white/30">
+              <div className="flex space-x-3">
+                {facts.slice(0, Math.min(5, facts.length)).map((_, index) => (
+                  <div
+                    key={index}
+                    className={`rounded-full transition-all duration-700 ease-out ${
+                      index === currentFactIndex % facts.length
+                        ? 'bg-gradient-to-r from-orange-400 to-orange-500 w-10 h-3 shadow-md' 
+                        : 'bg-orange-200/60 w-3 h-3 hover:bg-orange-300/60'
+                    }`}
+                  />
+                ))}
               </div>
             </div>
 

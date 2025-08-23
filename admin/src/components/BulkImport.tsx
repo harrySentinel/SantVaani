@@ -143,6 +143,25 @@ export default function BulkImport({
             }
             break
 
+          case 'spiritual_facts':
+            if (!item.text) {
+              errors.push(`Item ${index + 1}: Fact text is required`)
+              return
+            }
+            if (item.text.length > 200) {
+              errors.push(`Item ${index + 1}: Fact text should be under 200 characters`)
+              return
+            }
+            transformedItem = {
+              text: item.text,
+              text_hi: item.text_hi || null,
+              category: item.category || 'Hindu Deities',
+              icon: item.icon || '🕉️',
+              source: item.source || null,
+              is_active: item.is_active !== undefined ? item.is_active : true
+            }
+            break
+
           default:
             errors.push(`Unknown table: ${tableName}`)
             return

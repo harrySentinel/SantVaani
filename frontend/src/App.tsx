@@ -7,15 +7,18 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Suspense } from "react";
 import { LoadingPage } from "@/components/ui/loading-spinner";
-import Index from "./pages/Index";
-import Saints from "./pages/saints/index";
-import LivingSaints from "./pages/living-saints/index";
-import Divine from "./pages/divine/index";
-import Bhajans from "./pages/bhajans/index";
-import LiveBhajan from "./pages/live-bhajans/index";
-import Donation from "./pages/donation/index";
-import About from "./pages/about/index";
-import NotFound from "./pages/NotFound";
+import { lazy } from "react";
+
+// Lazy load pages for better code splitting
+const Index = lazy(() => import("./pages/Index"));
+const Saints = lazy(() => import("./pages/saints/index"));
+const LivingSaints = lazy(() => import("./pages/living-saints/index"));
+const Divine = lazy(() => import("./pages/divine/index"));
+const Bhajans = lazy(() => import("./pages/bhajans/index"));
+const LiveBhajan = lazy(() => import("./pages/live-bhajans/index"));
+const Donation = lazy(() => import("./pages/donation/index"));
+const About = lazy(() => import("./pages/about/index"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
 

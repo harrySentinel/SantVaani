@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, Suspense, lazy } from 'react';
 import HeroSection from '@/components/HeroSection';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -6,10 +6,12 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Users, Heart, Sparkles, Book, ArrowDown, Video, MessageSquare } from 'lucide-react';
-import ChatBot from '@/components/chatBot';
 import VisitorCounter from '@/components/VisitorCounter';
 import SpiritualFactBox from '@/components/SpiritualFactBox';
 import FeedbackForm from '@/components/FeedbackForm';
+
+// Lazy load ChatBot for better performance
+const ChatBot = lazy(() => import('@/components/chatBot'));
 
 const Index = () => {
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
@@ -239,7 +241,9 @@ const Index = () => {
         isOpen={isFeedbackOpen} 
         onClose={() => setIsFeedbackOpen(false)} 
       />
-      <ChatBot />
+      <Suspense fallback={null}>
+        <ChatBot />
+      </Suspense>
       <Footer />
     </div>
   );

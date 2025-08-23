@@ -12,11 +12,26 @@ import { supabase } from '@/lib/supabaseClient';
 import { usePagination } from '@/hooks/usePagination';
 import BeautifulPagination from '@/components/BeautifulPagination';
 
+interface Saint {
+  id: string;
+  name: string;
+  nameHi?: string;
+  specialty?: string;
+  specialtyHi?: string;
+  region?: string;
+  period?: string;
+  description?: string;
+  descriptionHi?: string;
+  imageUrl?: string;
+  biography?: string;
+  biographyHi?: string;
+}
+
 const Saints = () => {
-  const [selectedSaint, setSelectedSaint] = useState<any>(null);
+  const [selectedSaint, setSelectedSaint] = useState<Saint | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [saints, setSaints] = useState<any[]>([]);
-  const [filteredSaints, setFilteredSaints] = useState<any[]>([]);
+  const [saints, setSaints] = useState<Saint[]>([]);
+  const [filteredSaints, setFilteredSaints] = useState<Saint[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -116,7 +131,7 @@ const Saints = () => {
     }
   };
 
-  const handleSaintClick = (saint: any) => {
+  const handleSaintClick = (saint: Saint) => {
     setSelectedSaint(saint);
     setIsModalOpen(true);
   };
