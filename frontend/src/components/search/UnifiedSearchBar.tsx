@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useSearch, useSearchHistory } from '@/hooks/useSearch';
+import { SearchResult } from '@/services/searchService';
 import { cn } from '@/lib/utils';
 
 // ===============================================
@@ -15,7 +16,7 @@ interface UnifiedSearchBarProps {
   placeholder?: string;
   className?: string;
   onSearch?: (query: string) => void;
-  onResultSelect?: (result: any) => void;
+  onResultSelect?: (result: SearchResult) => void;
   autoFocus?: boolean;
   showSuggestions?: boolean;
   showHistory?: boolean;

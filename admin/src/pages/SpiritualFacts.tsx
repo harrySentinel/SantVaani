@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Plus, Search, Edit, Trash2, Eye, BookOpen } from 'lucide-react'
+import { Plus, Search, Edit, Trash2, Eye, BookOpen, Upload, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useToast } from '@/hooks/use-toast'
@@ -7,6 +7,7 @@ import { supabase, TABLES } from '@/lib/supabase'
 import { formatDate } from '@/lib/utils'
 import SpiritualFactForm from '@/components/SpiritualFactForm'
 import SpiritualFactViewModal from '@/components/SpiritualFactViewModal'
+import BulkImport from '@/components/BulkImport'
 
 interface SpiritualFact {
   id: string
@@ -29,6 +30,7 @@ export default function SpiritualFactsPage() {
   const [editingFact, setEditingFact] = useState<SpiritualFact | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
   const [viewingFact, setViewingFact] = useState<SpiritualFact | null>(null)
+  const [isBulkImportOpen, setIsBulkImportOpen] = useState(false)
   
   const { toast } = useToast()
 
@@ -109,6 +111,34 @@ export default function SpiritualFactsPage() {
     }
   }
 
+  // Export spiritual facts to JSON
+  const exportFactsToJSON = () => {
+    const factsData = facts.map(fact => ({
+      text: fact.text,
+      text_hi: fact.text_hi,
+      category: fact.category,
+      icon: fact.icon,
+      source: fact.source,
+      is_active: fact.is_active
+    }))
+    const jsonContent = JSON.stringify(factsData, null, 2)
+
+    const blob = new Blob([jsonContent], { type: 'application/json;charset=utf-8;' })
+    const link = document.createElement('a')
+    const url = URL.createObjectURL(blob)
+    link.setAttribute('href', url)
+    link.setAttribute('download', `spiritual_facts_${new Date().toISOString().split('T')[0]}.json`)
+    link.style.visibility = 'hidden'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+
+    toast({
+      title: "Export Successful",
+      description: `Exported ${facts.length} spiritual facts to JSON file`
+    })
+  }
+
   // Filter facts based on search
   const filteredFacts = facts.filter(fact => 
     fact.text.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -154,6 +184,22 @@ export default function SpiritualFactsPage() {
           <p className="text-gray-600 mt-1">Manage interesting spiritual facts displayed on homepage</p>
         </div>
         <div className="flex space-x-3">
+          <Button
+            onClick={exportFactsToJSON}
+            variant="outline"
+            className="w-full sm:w-auto text-green-600 border-green-200 hover:bg-green-50"
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Export List
+          </Button>
+          <Button
+            onClick={() => setIsBulkImportOpen(true)}
+            variant="outline"
+            className="w-full sm:w-auto"
+          >
+            <Upload className="h-4 w-4 mr-2" />
+            Bulk Import
+          </Button>
           <Button
             onClick={() => setIsAddModalOpen(true)}
             className="bg-orange-600 hover:bg-orange-700 w-full sm:w-auto"
@@ -429,6 +475,33 @@ export default function SpiritualFactsPage() {
         onSave={() => {
           fetchFacts()
         }}
+      />
+
+      {/* Bulk Import Modal */}
+      <BulkImport
+        isOpen={isBulkImportOpen}
+        onClose={() => setIsBulkImportOpen(false)}
+        onImportComplete={fetchFacts}
+        tableName="spiritual_facts"
+        tableDisplayName="Spiritual Facts"
+        sampleFormat={`[
+  {
+    "text": "Hanuman's heart contains an image of Rama and Sita inside it",
+    "text_hi": "हनुमान के हृदय में राम और सीता की छवि है",
+    "category": "Hindu Deities",
+    "icon": "🕉️",
+    "source": "Ramayana",
+    "is_active": true
+  },
+  {
+    "text": "The sacred syllable 'Om' is considered the primordial sound of the universe",
+    "text_hi": "पवित्र अक्षर 'ॐ' को ब्रह्मांड की आदि ध्वनि माना जाता है",
+    "category": "Mantras",
+    "icon": "🔉",
+    "source": "Vedas",
+    "is_active": true
+  }
+]`}
       />
     </div>
   )
