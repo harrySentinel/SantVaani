@@ -3,6 +3,12 @@ const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const axios = require('axios');
 const { createClient } = require('@supabase/supabase-js');
+const { 
+  registerFCMToken, 
+  scheduleNotifications, 
+  sendTestNotification,
+  getNotificationStats 
+} = require('./fcm_scheduler');
 require('dotenv').config();
 
 const app = express();
@@ -869,6 +875,11 @@ async function initializeServer() {
   }
 }
 
+// FCM Notification Routes
+app.post('/api/fcm/register-token', registerFCMToken);
+app.post('/api/fcm/send-test', sendTestNotification);
+app.get('/api/fcm/stats', getNotificationStats);
+
 // Initialize on startup
 initializeServer();
 
@@ -879,6 +890,10 @@ app.listen(PORT, () => {
   console.log(`🔑 Gemini API: ${process.env.GEMINI_API_KEY ? 'Configured ✅' : 'Not Configured ❌'}`);
   console.log(`🎵 YouTube API: ${YOUTUBE_API_KEY ? 'Configured ✅' : 'Not Configured ❌'}`);
   console.log(`⏰ Cache Duration: ${CACHE_DURATION / (1000 * 60 * 60)} hours`);
+  
+  // Initialize FCM notification scheduler
+  console.log(`🔥 Initializing Firebase FCM notification scheduler...`);
+  scheduleNotifications();
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
 });
 
