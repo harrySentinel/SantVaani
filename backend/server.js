@@ -2,10 +2,17 @@ const express = require('express');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const axios = require('axios');
+const { createClient } = require('@supabase/supabase-js');
 require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 5000; 
+const PORT = process.env.PORT || 5000;
+
+// Initialize Supabase client
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_ANON_KEY
+); 
 
 // In-memory cache to store bhajan data
 let bhajanCache = {
@@ -421,6 +428,166 @@ setInterval(async () => {
     await fetchBhajanData();
   }
 }, CACHE_DURATION);
+
+// ===================================
+// HOROSCOPE API ROUTES
+// ===================================
+
+// AI-Generated Horoscope Helper Function
+async function generateHoroscope(zodiacSign) {
+  const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+  if (!GEMINI_API_KEY) {
+    throw new Error('Gemini API key not configured');
+  }
+
+  const today = new Date().toLocaleDateString('en-US', { 
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  });
+
+  const prompt = `Generate a daily horoscope for ${zodiacSign} for ${today}. 
+
+REQUIREMENTS:
+1. Write a spiritual and positive prediction (2-3 sentences)
+2. Include both English and Hindi versions
+3. Provide realistic scores (1-5) for Love, Career, Health, Money
+4. Suggest a lucky color and lucky number (1-12)
+5. Make it inspiring and spiritual, focusing on growth and positivity
+
+RESPONSE FORMAT (JSON only):
+{
+  "prediction": "English prediction here",
+  "prediction_hi": "Hindi prediction here",
+  "love_score": 4,
+  "career_score": 3,
+  "health_score": 5,
+  "money_score": 3,
+  "lucky_color": "Golden",
+  "lucky_number": 7
+}
+
+Generate fresh, unique content. Focus on spiritual growth, positivity, and practical life guidance.`;
+
+  try {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{
+            text: prompt
+          }]
+        }],
+        generationConfig: {
+          temperature: 0.8,
+          topK: 40,
+          topP: 0.95,
+          maxOutputTokens: 1024,
+        }
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Gemini API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
+      throw new Error('Invalid response from Gemini API');
+    }
+
+    const generatedText = data.candidates[0].content.parts[0].text;
+    
+    // Extract JSON from response
+    const jsonMatch = generatedText.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new Error('No JSON found in Gemini response');
+    }
+
+    const horoscopeData = JSON.parse(jsonMatch[0]);
+    
+    return {
+      zodiac_sign: zodiacSign.toLowerCase(),
+      date: new Date().toISOString().split('T')[0],
+      period: 'daily',
+      ...horoscopeData
+    };
+  } catch (error) {
+    console.error('Error generating horoscope:', error);
+    throw error;
+  }
+}
+
+// Get daily horoscope for a zodiac sign (AI-Generated)
+app.get('/api/horoscope/:zodiacSign', async (req, res) => {
+  try {
+    const { zodiacSign } = req.params;
+    
+    // Generate AI horoscope
+    const horoscope = await generateHoroscope(zodiacSign);
+    
+    res.json({
+      success: true,
+      horoscope,
+      source: 'AI-Generated'
+    });
+  } catch (error) {
+    console.error('Horoscope API error:', error);
+    
+    // Fallback to basic prediction if AI fails
+    const fallbackHoroscope = {
+      zodiac_sign: zodiacSign.toLowerCase(),
+      date: new Date().toISOString().split('T')[0],
+      period: 'daily',
+      prediction: `Today brings spiritual energy and growth opportunities for ${zodiacSign}. Focus on inner peace and positive actions.`,
+      prediction_hi: `आज ${zodiacSign} के लिए आध्यात्मिक ऊर्जा और विकास के अवसर हैं। आंतरिक शांति और सकारात्मक कार्यों पर ध्यान दें।`,
+      love_score: Math.floor(Math.random() * 2) + 3, // 3-4 range
+      career_score: Math.floor(Math.random() * 2) + 3,
+      health_score: Math.floor(Math.random() * 2) + 3,
+      money_score: Math.floor(Math.random() * 2) + 3,
+      lucky_color: ['Golden', 'Orange', 'Red', 'Blue', 'Green'][Math.floor(Math.random() * 5)],
+      lucky_number: Math.floor(Math.random() * 12) + 1
+    };
+
+    res.json({
+      success: true,
+      horoscope: fallbackHoroscope,
+      source: 'Fallback'
+    });
+  }
+});
+
+// Get all zodiac signs list
+app.get('/api/horoscope/zodiac/list', (req, res) => {
+  const zodiacSigns = [
+    { id: 'aries', name: 'Aries', nameHi: 'मेष', symbol: '♈', dates: 'Mar 21 - Apr 19' },
+    { id: 'taurus', name: 'Taurus', nameHi: 'वृषभ', symbol: '♉', dates: 'Apr 20 - May 20' },
+    { id: 'gemini', name: 'Gemini', nameHi: 'मिथुन', symbol: '♊', dates: 'May 21 - Jun 20' },
+    { id: 'cancer', name: 'Cancer', nameHi: 'कर्क', symbol: '♋', dates: 'Jun 21 - Jul 22' },
+    { id: 'leo', name: 'Leo', nameHi: 'सिंह', symbol: '♌', dates: 'Jul 23 - Aug 22' },
+    { id: 'virgo', name: 'Virgo', nameHi: 'कन्या', symbol: '♍', dates: 'Aug 23 - Sep 22' },
+    { id: 'libra', name: 'Libra', nameHi: 'तुला', symbol: '♎', dates: 'Sep 23 - Oct 22' },
+    { id: 'scorpio', name: 'Scorpio', nameHi: 'वृश्चिक', symbol: '♏', dates: 'Oct 23 - Nov 21' },
+    { id: 'sagittarius', name: 'Sagittarius', nameHi: 'धनु', symbol: '♐', dates: 'Nov 22 - Dec 21' },
+    { id: 'capricorn', name: 'Capricorn', nameHi: 'मकर', symbol: '♑', dates: 'Dec 22 - Jan 19' },
+    { id: 'aquarius', name: 'Aquarius', nameHi: 'कुम्भ', symbol: '♒', dates: 'Jan 20 - Feb 18' },
+    { id: 'pisces', name: 'Pisces', nameHi: 'मीन', symbol: '♓', dates: 'Feb 19 - Mar 20' }
+  ];
+
+  res.json({
+    success: true,
+    zodiacSigns
+  });
+});
+
+// ===================================
+// EXISTING ROUTES BELOW
+// ===================================
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, Users, Heart, Sparkles, Book, Info, IndianRupee } from 'lucide-react';
+import { Menu, X, Users, Heart, Sparkles, Book, Info, IndianRupee, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function Navbar() {
@@ -14,6 +14,7 @@ export default function Navbar() {
   };
 
   const menuItems = [
+    { to: '/daily-guide', label: 'Daily Guide', labelHi: 'दैनिक मार्गदर्शन', icon: Calendar },
     { to: '/saints', label: 'Saints', labelHi: 'संत', icon: Users },
     { to: '/living-saints', label: 'Living Saints', labelHi: 'जीवित संत', icon: Heart },
     { to: '/divine', label: 'Divine Forms', labelHi: 'दिव्य रूप', icon: Sparkles },
