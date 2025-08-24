@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "santvaani-production",
+  "private_key_id": "f3fc68341fd8c94d85c861570bf02fb3a95df57a",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDGK0ZmD6SzRCQm\nb0tVxR2FeeHOhc07c3uj8VnFl0BSW76CAGsis6PUxlZGZ1Q4Ra0oCzm14+HGEXk9\n1SbkMbdwsccm0QweqOV+Su/DGpdunfBzMlisiu9AQ1OnlkxdB+2lB7aYlp10Ythi\nGwufhkTdrkBxTUY/xlQ7TzdX/1rf8KkvYbdwwBFP59bhfJBuybcUp7FK+rSNws40\nXa+YB06y72b5wlkRTVnYtS/QvCh9uPB80D9LCX78xBwU0429BX4lHIrL9RKxSXzR\nKUK+bj3DIQxd2WelIcKN0gyT/yhCHl3IHODiyYlHnWyZVcA7sWsLC2QyYSF0zK7p\nR3zzYZdRAgMBAAECggEAAnOmV/VCjPOfWi7rlmY+hMckn6YqyzqQGOhoTw+Tq1Jq\nJLDhDsIaVFsl6Yh/7qck9Kh4lqRWfgDn1yjUFvK050hvyrM/c8/jBF7Q3DwcKVPU\nVeFy/CNawSd/Ko7hk6NPdD7DjOXvER4BG8SLPTZZOuKqsaJR8Yt5Bm3TQqM970vn\ndvhnko9NyWZa+2/GZFFg2biv7Qs9OF/kTpyzv0zQdjOwRjxyB4bb3Oa5o+HYX5Pr\nJZpoVgaUBK3Gsc6gys6IXxI2LnrlQ5XxWyyI45qH6zlmORB+Q6OtwCq2epdAtF9f\nynxiezpY+hEKMhF+MSNWJnKCbmYpKTGDyHg3B2bJhQKBgQDq/0ZRNJrOZu34w9pH\nQMk+lTjq88FqKnrrmPJPB3tSPDRCCqFYOv8ympUEKda0MyyKK0uf4OnLIBXU2i4d\ng4BIF+ZRglBTgKoB5eu3yksp2rWAc6A2XrYp460+dQkHmo6mCD+D/HLDXv4Nm/uO\n8afcN+cos7XZ/QbgHHPyXx5XlQKBgQDX4V/YDbx9CvHXenF7Mv4RW2v++Jr3m203\nmm1GAaYUGg3aom9cAYpgapv7sDDKMwghU0FtsL190/dOSdbDfnVyjayjh68QgfkG\nfPC9kOJjnX4KEk0ToLMnx74ZasQZ0JAVyH3iTrXdHIMK+NxH7n9zoZa4yEVtFd25\nuWQ6085hzQKBgFqM1OaTk5c22DnEFgbgsur3iwAVvxCOn+DKhYvoQR+17RkJiZQ6\n33z7TbJWANJc6auv9Sr8+nl3upHTJHPg6PxeoTQFN7iFWnzywHqIa6AME2YUp8Zr\nhlvrzCTF6h3Q82iMwxSzoPEhWFmcIjm5akoUDHGFlewScKTIsfDRsBplAoGATWmv\nId3DIp/jG174BLLDctvyvSrO/02H+7Fvz/PVZ030e9tVzYtr4Kk6KCYFSOzF1JVz\nV+9R9CYnf7Zwwge9/AcbykRknanN7+qrtX6YABrA0MHBS/GLbQ9udtTXX15v3K/Z\nnGaXRqPrxep5q321zHQ8hSSj6Ls3mFsHuySq1F0CgYEAtvUYCQzxwyQNkxJarGgG\nW38cDeaWFqo9qNeJFsoXCts857DBHAwuwi1LPun2RPflILCu15A72X4qUSD9enld\nOkqEORsB0Mqa6zYJlxODEHt7M0j5eih2XXqRZf1UoacamxX7hw4yLc/nRQGAITPf\niTdknqvGWbk9cuTAgY/69ik=\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-fbsvc@santvaani-production.iam.gserviceaccount.com",
+  "client_id": "102596623115142700855",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40santvaani-production.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
