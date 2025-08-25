@@ -5,9 +5,10 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import { LoadingPage } from "@/components/ui/loading-spinner";
 import { lazy } from "react";
+import { getFCMToken, onFCMMessage } from "@/lib/firebase";
 
 // Lazy load pages for better code splitting
 const Index = lazy(() => import("./pages/Index"));
@@ -23,13 +24,38 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <ErrorBoundary>
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
+const App = () => {
+  useEffect(() => {
+    // Initialize Firebase FCM on app load
+    const initializeFCM = async () => {
+      console.log('🔥 Initializing Firebase FCM...');
+      
+      // Firebase automatically registers firebase-messaging-sw.js
+      // No need to manually register service worker
+      
+      // Request FCM token
+      const token = await getFCMToken();
+      if (token) {
+        console.log('✅ FCM initialized successfully');
+      }
+      
+      // Listen for foreground messages
+      onFCMMessage((payload) => {
+        console.log('📱 Received foreground message:', payload);
+        // You can show toast notifications here
+      });
+    };
+
+    initializeFCM();
+  }, []);
+
+  return (
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
           <Suspense fallback={<LoadingPage text="Loading SantVaani..." />}>
             <Routes>
               <Route path="/" element={<Index />} />
@@ -46,9 +72,10 @@ const App = () => (
             </Routes>
           </Suspense>
         </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-  </ErrorBoundary>
-);
+      </TooltipProvider>
+    </QueryClientProvider>
+    </ErrorBoundary>
+  );
+};
 
 export default App;

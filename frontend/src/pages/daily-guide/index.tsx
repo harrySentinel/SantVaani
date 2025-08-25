@@ -52,11 +52,8 @@ const DailyGuide = () => {
     }
   };
 
-  const upcomingFestivals = [
-    { name: 'Diwali', nameHi: 'दिवाली', daysLeft: 15, significance: 'Festival of Lights' },
-    { name: 'Karva Chauth', nameHi: 'करवा चौथ', daysLeft: 8, significance: 'Fast for husband\'s long life' },
-    { name: 'Dhanteras', nameHi: 'धनतेरस', daysLeft: 13, significance: 'Worship of wealth and prosperity' }
-  ];
+  // Use dynamic festival data from backend
+  const upcomingFestivals = todaysContent?.festivals || [];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-100">
@@ -99,86 +96,54 @@ const DailyGuide = () => {
                   <Bell className="w-6 h-6 text-orange-500 mr-2" />
                   <CardTitle className="text-2xl text-gray-800">Daily Blessings Notifications</CardTitle>
                 </div>
-                <p className="text-gray-600">Receive spiritual guidance directly to your device</p>
+                <p className="text-gray-600">Get reminded for morning prayers, evening aarti, and festivals</p>
               </CardHeader>
               <CardContent className="space-y-6">
-                {/* Main Toggle */}
-                <div className="flex items-center justify-between p-4 bg-orange-50 rounded-lg border border-orange-200">
-                  <div>
-                    <h3 className="font-semibold text-gray-800 mb-1">Enable Daily Notifications</h3>
-                    <p className="text-sm text-gray-600">Get morning mantras, evening prayers & festival reminders</p>
-                  </div>
-                  <Switch 
-                    checked={notificationsEnabled} 
+                <div className="flex items-center justify-center space-x-4">
+                  <span className="text-gray-700">Disable Notifications</span>
+                  <Switch
+                    checked={notificationsEnabled}
                     onCheckedChange={handleNotificationToggle}
                     className="data-[state=checked]:bg-orange-500"
                   />
+                  <span className="text-gray-700">Enable Notifications</span>
                 </div>
-
-                {/* Notification Types */}
+                
                 {notificationsEnabled && (
-                  <motion.div 
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    className="grid md:grid-cols-2 gap-4"
-                  >
+                  <div className="grid md:grid-cols-2 gap-4 pt-4 border-t border-orange-100">
                     {[
-                      { key: 'morning', icon: Sunrise, title: 'Morning Mantras', desc: 'Start your day with divine blessings (7:00 AM)' },
-                      { key: 'evening', icon: Sunset, title: 'Evening Prayers', desc: 'End your day with gratitude (6:30 PM)' },
-                      { key: 'festivals', icon: Gift, title: 'Festival Alerts', desc: 'Never miss important Hindu festivals' },
-                      { key: 'ekadashi', icon: Moon, title: 'Ekadashi Reminders', desc: 'Fasting days and spiritual observances' }
-                    ].map((item) => (
-                      <div key={item.key} className="flex items-center space-x-3 p-3 rounded-lg border border-orange-100 hover:bg-orange-50/50 transition-colors">
-                        <item.icon className="w-5 h-5 text-orange-500" />
-                        <div className="flex-1">
-                          <h4 className="font-medium text-gray-800">{item.title}</h4>
-                          <p className="text-xs text-gray-600">{item.desc}</p>
+                      { key: 'morning', label: 'Morning Prayers', time: '6:00 AM' },
+                      { key: 'evening', label: 'Evening Aarti', time: '6:00 PM' },
+                      { key: 'festivals', label: 'Festival Reminders', time: 'As needed' },
+                      { key: 'ekadashi', label: 'Ekadashi Alerts', time: 'Monthly' }
+                    ].map((reminder) => (
+                      <div key={reminder.key} className="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
+                        <div>
+                          <p className="font-medium text-gray-800">{reminder.label}</p>
+                          <p className="text-sm text-gray-500">{reminder.time}</p>
                         </div>
-                        <Switch 
-                          checked={selectedReminders[item.key as keyof typeof selectedReminders]} 
+                        <Switch
+                          checked={selectedReminders[reminder.key as keyof typeof selectedReminders]}
                           onCheckedChange={(checked) => 
-                            setSelectedReminders(prev => ({ ...prev, [item.key]: checked }))
+                            setSelectedReminders(prev => ({ ...prev, [reminder.key]: checked }))
                           }
-                          className="data-[state=checked]:bg-orange-400"
-                          size="sm"
+                          className="data-[state=checked]:bg-orange-500"
                         />
                       </div>
                     ))}
-                  </motion.div>
+                  </div>
                 )}
-
-                {/* Preview Button */}
-                <div className="text-center">
-                  <Button 
-                    variant="outline" 
-                    className="border-orange-300 text-orange-600 hover:bg-orange-50"
-                    onClick={() => {
-                      // Show preview notification
-                      if ('Notification' in window && Notification.permission === 'granted') {
-                        new Notification('🕉️ SantVaani Daily Blessing', {
-                          body: 'Good morning! Today\'s mantra: Om Namah Shivaya 🙏',
-                          icon: '/favicon.ico'
-                        });
-                      }
-                    }}
-                  >
-                    <Bell className="w-4 h-4 mr-2" />
-                    Preview Notification
-                  </Button>
-                </div>
               </CardContent>
             </Card>
           </motion.div>
 
-          {/* Today's Spiritual Content Grid */}
-          <div className="grid lg:grid-cols-3 gap-8">
-            
-            {/* Hindu Calendar (Panchang) */}
+          {/* Main Content Grid */}
+          <div className="grid lg:grid-cols-2 gap-8">
+            {/* Panchang Card */}
             <motion.div 
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
-              className="lg:col-span-2"
             >
               <Card className="border-orange-200 shadow-lg bg-white/90 backdrop-blur-sm h-full">
                 <CardHeader>
@@ -189,31 +154,91 @@ const DailyGuide = () => {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {panchangLoading ? (
+                  {panchangLoading || contentLoading ? (
                     <div className="animate-pulse space-y-3">
                       <div className="h-4 bg-orange-100 rounded w-3/4"></div>
                       <div className="h-4 bg-orange-100 rounded w-1/2"></div>
                       <div className="h-4 bg-orange-100 rounded w-5/6"></div>
                     </div>
                   ) : (
-                    <div className="grid md:grid-cols-2 gap-4">
-                      {[
-                        { label: 'Today', labelHi: 'आज', value: panchang?.date || 'Loading...', icon: Calendar },
-                        { label: 'Tithi', labelHi: 'तिथि', value: panchang?.tithi || 'Shukla Tritiya', icon: Moon },
-                        { label: 'Nakshatra', labelHi: 'नक्षत्र', value: panchang?.nakshatra || 'Rohini', icon: Star },
-                        { label: 'Sunrise', labelHi: 'सूर्योदय', value: panchang?.sunrise || '6:15 AM', icon: Sunrise },
-                        { label: 'Sunset', labelHi: 'सूर्यास्त', value: panchang?.sunset || '6:45 PM', icon: Sunset },
-                        { label: 'Muhurat', labelHi: 'मुहूर्त', value: panchang?.muhurat || '8:30-9:15 AM', icon: Clock }
-                      ].map((item, index) => (
-                        <div key={index} className="p-3 bg-gradient-to-br from-orange-50 to-orange-100/50 rounded-lg border border-orange-200">
-                          <div className="flex items-center space-x-2 mb-1">
-                            <item.icon className="w-4 h-4 text-orange-600" />
-                            <span className="font-medium text-gray-800">{item.label}</span>
-                            <span className="text-sm text-orange-600">({item.labelHi})</span>
+                    <div className="space-y-4">
+                      {/* Date and Location */}
+                      <div className="text-center p-4 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg text-white">
+                        <h3 className="text-lg font-semibold">
+                          {new Date().toLocaleDateString('en-IN', { 
+                            weekday: 'long', 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric' 
+                          })}
+                        </h3>
+                        <p className="text-sm opacity-90">Delhi, India</p>
+                      </div>
+
+                      {/* Panchang Elements Grid */}
+                      <div className="grid md:grid-cols-2 gap-4">
+                        {[
+                          { 
+                            label: 'Tithi', 
+                            labelHi: 'तिथि', 
+                            value: todaysContent?.specialDay?.name || 'Shukla Tritiya',
+                            icon: Moon 
+                          },
+                          { 
+                            label: 'Sunrise', 
+                            labelHi: 'सूर्योदय', 
+                            value: '6:15 AM', 
+                            icon: Sunrise 
+                          },
+                          { 
+                            label: 'Sunset', 
+                            labelHi: 'सूर्यास्त', 
+                            value: '6:45 PM', 
+                            icon: Sunset 
+                          },
+                          { 
+                            label: 'Nakshatra', 
+                            labelHi: 'नक्षत्र', 
+                            value: 'Rohini', 
+                            icon: Star 
+                          },
+                          { 
+                            label: 'Muhurat', 
+                            labelHi: 'मुहूर्त', 
+                            value: '8:30-9:15 AM', 
+                            icon: Clock 
+                          },
+                          { 
+                            label: 'Moon Phase', 
+                            labelHi: 'चंद्र स्थिति', 
+                            value: 'Waxing', 
+                            icon: Moon 
+                          }
+                        ].map((item, index) => (
+                          <div key={index} className="p-3 bg-gradient-to-br from-orange-50 to-orange-100/50 rounded-lg border border-orange-200 hover:shadow-md transition-shadow">
+                            <div className="flex items-center space-x-2 mb-2">
+                              <item.icon className="w-4 h-4 text-orange-600" />
+                              <span className="font-medium text-gray-800 text-sm">{item.label}</span>
+                              <span className="text-xs text-orange-600">({item.labelHi})</span>
+                            </div>
+                            <p className="text-gray-700 font-medium text-sm">{item.value}</p>
                           </div>
-                          <p className="text-gray-700 font-medium">{item.value}</p>
+                        ))}
+                      </div>
+
+                      {/* Special Message */}
+                      {todaysContent?.specialDay?.description && (
+                        <div className="p-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg border-l-4 border-orange-400">
+                          <p className="text-sm text-gray-700 italic">
+                            ✨ {todaysContent.specialDay.description}
+                          </p>
+                          {todaysContent.specialDay.descriptionHi && (
+                            <p className="text-xs text-gray-600 mt-1">
+                              {todaysContent.specialDay.descriptionHi}
+                            </p>
+                          )}
                         </div>
-                      ))}
+                      )}
                     </div>
                   )}
                 </CardContent>
@@ -238,13 +263,13 @@ const DailyGuide = () => {
                 <CardContent>
                   <div className="text-center space-y-3">
                     <p className="text-2xl font-bold text-orange-700 tracking-wide">
-                      ॐ नमः शिवाय
+                      {todaysContent?.mantra?.sanskrit || 'ॐ नमः शिवाय'}
                     </p>
                     <p className="text-gray-600 font-medium">
-                      Om Namah Shivaya
+                      {todaysContent?.mantra?.transliteration || 'Om Namah Shivaya'}
                     </p>
                     <p className="text-sm text-gray-500 leading-relaxed">
-                      "I bow to Shiva" - A powerful mantra for inner peace and spiritual awakening
+                      {todaysContent?.mantra?.meaning || '"I bow to Shiva" - A powerful mantra for inner peace and spiritual awakening'}
                     </p>
                     <Button 
                       variant="outline" 
@@ -268,9 +293,11 @@ const DailyGuide = () => {
                 </CardHeader>
                 <CardContent>
                   <blockquote className="text-gray-700 italic leading-relaxed">
-                    "The mind is everything. What you think you become."
+                    {todaysContent?.quote?.quote || '"The mind is everything. What you think you become."'}
                   </blockquote>
-                  <p className="text-orange-600 font-medium mt-2 text-sm">- Buddha</p>
+                  <p className="text-orange-600 font-medium mt-2 text-sm">
+                    - {todaysContent?.quote?.author || 'Buddha'}
+                  </p>
                 </CardContent>
               </Card>
             </motion.div>
@@ -292,18 +319,25 @@ const DailyGuide = () => {
               </CardHeader>
               <CardContent>
                 <div className="grid md:grid-cols-3 gap-4">
-                  {upcomingFestivals.map((festival, index) => (
+                  {upcomingFestivals.length > 0 ? upcomingFestivals.map((festival, index) => (
                     <div key={index} className="p-4 bg-gradient-to-br from-orange-50 to-red-50 rounded-lg border border-orange-200 hover:shadow-md transition-shadow">
                       <div className="flex items-center justify-between mb-2">
                         <h3 className="font-semibold text-gray-800">{festival.name}</h3>
                         <Badge variant="secondary" className="bg-orange-200 text-orange-800">
-                          {festival.daysLeft} days
+                          {festival.daysLeft === 0 ? 'Today!' :
+                           festival.daysLeft === 1 ? 'Tomorrow' :
+                           `${festival.daysLeft} days`}
                         </Badge>
                       </div>
-                      <p className="text-sm text-orange-600 mb-1">{festival.nameHi}</p>
-                      <p className="text-xs text-gray-600 leading-relaxed">{festival.significance}</p>
+                      <p className="text-sm text-orange-600 mb-1">{festival.nameHi || festival.name}</p>
+                      <p className="text-xs text-gray-600 leading-relaxed">{festival.significance || festival.description}</p>
                     </div>
-                  ))}
+                  )) : (
+                    <div className="col-span-3 text-center py-8 text-gray-500">
+                      <Calendar className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                      <p>Loading upcoming festivals...</p>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>

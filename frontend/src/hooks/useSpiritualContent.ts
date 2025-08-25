@@ -165,14 +165,55 @@ export const useSpiritualContent = () => {
         const data = await response.json();
         
         if (data.success) {
+          console.log('🔥 Backend data received:', data.data);
+          
+          // Transform backend festival data to match frontend interface
+          const transformedFestivals = (data.data.upcomingFestivals || []).map((festival: any) => ({
+            id: festival.name.toLowerCase().replace(/\s+/g, '-'),
+            name: festival.name,
+            nameHi: festival.name, // Use same for now
+            date: festival.date,
+            daysLeft: festival.days,
+            significance: festival.description || festival.significance,
+            significanceHi: festival.description || festival.significance,
+            rituals: ['Traditional prayers', 'Special offerings', 'Family gatherings'],
+            ritualsHi: ['पारंपरिक प्रार्थना', 'विशेष प्रसाद', 'पारिवारिक सभा'],
+            category: festival.type === 'Major Festival' ? 'major' as const : 
+                     festival.type === 'Vrat' ? 'vrat' as const : 'regional' as const,
+            isToday: festival.isToday,
+            isTomorrow: festival.isTomorrow,
+            isThisWeek: festival.isThisWeek
+          }));
+
+
+          // Transform backend mantra data
+          const transformedMantra = data.data.todaysMantra ? {
+            id: 'backend-mantra',
+            sanskrit: data.data.todaysMantra.text || data.data.todaysMantra.sanskrit,
+            transliteration: data.data.todaysMantra.text_english || data.data.todaysMantra.transliteration,
+            meaning: data.data.todaysMantra.meaning || 'Divine blessing for today',
+            meaningHi: data.data.todaysMantra.meaning_hi || 'आज का दिव्य आशीर्वाद',
+            deity: 'Divine',
+            deityHi: 'दिव्य',
+            benefits: 'Spiritual growth and inner peace',
+            benefitsHi: 'आध्यात्मिक विकास और आंतरिक शांति',
+            category: 'morning' as const
+          } : mantras[0];
+
           // Use real backend data
           const content: TodaysContent = {
-            mantra: data.data.todaysMantra || mantras[0], // Fallback to mock
+            mantra: transformedMantra,
             quote: quotes[new Date().getDay() % quotes.length], // Keep quotes as mock for now
-            festivals: data.data.upcomingFestivals || upcomingFestivals,
-            specialDay: getSpecialDay(new Date())
+            festivals: transformedFestivals,
+            specialDay: data.data.specialMessage ? {
+              name: 'Today\'s Blessing',
+              nameHi: 'आज का आशीर्वाद',
+              description: data.data.specialMessage,
+              descriptionHi: data.data.specialMessage
+            } : getSpecialDay(new Date())
           };
           
+          console.log('✅ Transformed content:', content);
           setTodaysContent(content);
         } else {
           // Fallback to mock data
