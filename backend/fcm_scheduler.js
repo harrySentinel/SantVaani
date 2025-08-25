@@ -1,6 +1,7 @@
 const admin = require('firebase-admin');
 const cron = require('node-cron');
 const path = require('path');
+const { getTodaysPanchang } = require('./panchang_service');
 
 // Initialize Firebase Admin SDK with service account
 const serviceAccount = require('./firebase-admin-key.json');
@@ -87,18 +88,38 @@ const sendNotificationToAll = async (title, body, data = {}) => {
 
 // Daily spiritual notifications scheduler
 const scheduleNotifications = () => {
-  // Morning blessing at 6:00 AM
+  // Morning blessing at 6:00 AM with dynamic Panchang
   cron.schedule('0 6 * * *', async () => {
     console.log('🌅 Sending morning blessing notification...');
-    await sendNotificationToAll(
-      '🌅 Good Morning Blessing',
-      'Start your day with divine blessings. Check today\'s spiritual guidance.',
-      { 
+    
+    try {
+      const panchangData = await getTodaysPanchang();
+      const tithi = panchangData.tithi.english || panchangData.tithi.name;
+      const isAuspicious = panchangData.isAuspiciousDay;
+      
+      const title = isAuspicious ? '🌅 शुभ प्रभात - Auspicious Morning' : '🌅 Good Morning Blessing';
+      const body = `Today is ${tithi}. ${panchangData.specialMessage}`;
+      
+      await sendNotificationToAll(title, body, { 
         url: '/daily-guide',
         type: 'morning-blessing',
-        time: 'morning'
-      }
-    );
+        time: 'morning',
+        tithi: tithi,
+        isAuspicious: isAuspicious
+      });
+    } catch (error) {
+      console.error('❌ Error getting Panchang for morning notification:', error);
+      // Fallback notification
+      await sendNotificationToAll(
+        '🌅 Good Morning Blessing',
+        'Start your day with divine blessings. Check today\'s spiritual guidance.',
+        { 
+          url: '/daily-guide',
+          type: 'morning-blessing',
+          time: 'morning'
+        }
+      );
+    }
   }, {
     timezone: "Asia/Kolkata"
   });
@@ -119,18 +140,54 @@ const scheduleNotifications = () => {
     timezone: "Asia/Kolkata"
   });
 
-  // Special festival notifications (can be enhanced with dynamic data)
+  // Dynamic festival notifications 
   cron.schedule('0 9 * * 1', async () => { // Every Monday at 9 AM
-    console.log('🎉 Sending weekly spiritual wisdom...');
-    await sendNotificationToAll(
-      '🕉️ Weekly Spiritual Wisdom',
-      'Discover new teachings and divine wisdom for the week ahead.',
-      { 
-        url: '/saints',
-        type: 'weekly-wisdom',
-        time: 'weekly'
+    console.log('🎉 Checking for upcoming festivals...');
+    
+    try {
+      const panchangData = await getTodaysPanchang();
+      const upcomingFestivals = panchangData.festivals.filter(f => f.days <= 3 && f.days > 0);
+      
+      if (upcomingFestivals.length > 0) {
+        const festival = upcomingFestivals[0];
+        const daysText = festival.days === 1 ? 'tomorrow' : `in ${festival.days} days`;
+        
+        await sendNotificationToAll(
+          `🎉 ${festival.name} ${daysText}`,
+          `Prepare for the sacred festival of ${festival.name}. Get ready for divine celebrations!`,
+          { 
+            url: '/daily-guide',
+            type: 'festival-alert',
+            time: 'weekly',
+            festival: festival.name,
+            days: festival.days
+          }
+        );
+      } else {
+        // Regular weekly wisdom if no festivals
+        await sendNotificationToAll(
+          '🕉️ Weekly Spiritual Wisdom',
+          'Discover new teachings and divine wisdom for the week ahead.',
+          { 
+            url: '/saints',
+            type: 'weekly-wisdom',
+            time: 'weekly'
+          }
+        );
       }
-    );
+    } catch (error) {
+      console.error('❌ Error getting festivals for notification:', error);
+      // Fallback to regular weekly wisdom
+      await sendNotificationToAll(
+        '🕉️ Weekly Spiritual Wisdom',
+        'Discover new teachings and divine wisdom for the week ahead.',
+        { 
+          url: '/saints',
+          type: 'weekly-wisdom',
+          time: 'weekly'
+        }
+      );
+    }
   }, {
     timezone: "Asia/Kolkata"
   });

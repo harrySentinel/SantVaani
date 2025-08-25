@@ -3,7 +3,14 @@
     "allow": [
       "Bash(rm:*)",
       "Bash(npm run lint)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Read(/E:\\E/**)",
+      "Bash(curl:*)",
+      "WebSearch",
+      "WebFetch(domain:freeastrologyapi.com)",
+      "WebFetch(domain:panchang.click)",
+      "WebFetch(domain:astrologyapi.com)",
+      "WebFetch(domain:www.drikpanchang.com)"
     ],
     "deny": [],
     "ask": []

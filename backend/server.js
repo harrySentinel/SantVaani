@@ -9,6 +9,10 @@ const {
   sendTestNotification,
   getNotificationStats 
 } = require('./fcm_scheduler');
+const { 
+  getTodaysPanchang, 
+  fetchRealPanchangData 
+} = require('./panchang_service');
 require('dotenv').config();
 
 const app = express();
@@ -841,7 +845,151 @@ Please respond with genuine compassion and practical spiritual guidance.`;
   }
 });
 
-// 404 handler
+// FCM Notification Routes (MUST be before 404 handler)
+console.log('🔧 Registering FCM routes...');
+app.post('/api/fcm/register-token', (req, res) => {
+  console.log('🔥 FCM register-token endpoint hit');
+  registerFCMToken(req, res);
+});
+app.post('/api/fcm/send-test', (req, res) => {
+  console.log('🔥 FCM send-test endpoint hit');
+  sendTestNotification(req, res);
+});
+app.get('/api/fcm/stats', (req, res) => {
+  console.log('🔥 FCM stats endpoint hit');
+  getNotificationStats(req, res);
+});
+console.log('✅ FCM routes registered successfully');
+
+// Panchang API Routes
+console.log('📅 Registering Panchang routes...');
+app.get('/api/panchang/today', async (req, res) => {
+  try {
+    console.log('📅 Panchang today endpoint hit');
+    const location = {
+      latitude: parseFloat(req.query.lat) || 28.6139,
+      longitude: parseFloat(req.query.lng) || 77.2090,
+      timezone: parseFloat(req.query.tz) || 5.5,
+      place: req.query.place || 'Delhi, India'
+    };
+    
+    const panchangData = await getTodaysPanchang(location);
+    res.json({
+      success: true,
+      data: panchangData,
+      generated: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('❌ Error fetching Panchang data:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch Panchang data'
+    });
+  }
+});
+
+app.get('/api/panchang/festivals', async (req, res) => {
+  try {
+    console.log('🎉 Festivals endpoint hit');
+    const panchangData = await getTodaysPanchang();
+    res.json({
+      success: true,
+      festivals: panchangData.festivals,
+      generated: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('❌ Error fetching festivals:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch festival data'
+    });
+  }
+});
+
+// Enhanced Daily Guide API with dynamic Panchang
+app.get('/api/daily-guide/complete', async (req, res) => {
+  try {
+    console.log('📅 Complete daily guide endpoint hit');
+    
+    // Get location from query params or use default
+    const location = {
+      latitude: parseFloat(req.query.lat) || 28.6139,
+      longitude: parseFloat(req.query.lng) || 77.2090,
+      timezone: parseFloat(req.query.tz) || 5.5,
+      place: req.query.place || 'Delhi, India'
+    };
+    
+    // Fetch dynamic Panchang data
+    const panchangData = await getTodaysPanchang(location);
+    
+    // Fetch mantras and festivals from database (if available)
+    let mantras = [];
+    let festivals = [];
+    
+    try {
+      const [mantrasResult, festivalsResult] = await Promise.all([
+        supabase.from('mantras').select('*').eq('is_active', true).limit(5),
+        supabase.from('festivals').select('*').eq('is_active', true)
+          .gte('date', new Date().toISOString().split('T')[0])
+          .order('date', { ascending: true }).limit(5)
+      ]);
+      
+      mantras = mantrasResult.data || [];
+      festivals = festivalsResult.data || [];
+    } catch (dbError) {
+      console.log('⚠️ Database not available, using Panchang festivals');
+      // Use festivals from Panchang data as fallback
+      festivals = panchangData.festivals || [];
+    }
+    
+    const today = new Date().getDay();
+    const todaysMantra = mantras.length > 0 ? mantras[today % mantras.length] : {
+      id: 1,
+      text: 'ॐ गं गणपतये नमः',
+      text_english: 'Om Gam Ganapataye Namaha',
+      meaning: 'Salutations to Lord Ganesha, the remover of obstacles',
+      meaning_hi: 'विघ्न हर्ता भगवान गणेश को प्रणाम'
+    };
+    
+    res.json({
+      success: true,
+      data: {
+        date: panchangData.date,
+        location: panchangData.location,
+        panchang: {
+          sunrise: panchangData.sunrise,
+          sunset: panchangData.sunset,
+          moonrise: panchangData.moonrise,
+          moonset: panchangData.moonset,
+          tithi: panchangData.tithi,
+          nakshatra: panchangData.nakshatra,
+          yoga: panchangData.yoga,
+          karana: panchangData.karana,
+          muhurat: panchangData.muhurat,
+          rahukaal: panchangData.rahukaal,
+          paksha: panchangData.paksha,
+          moonPhase: panchangData.moonPhase,
+          isAuspiciousDay: panchangData.isAuspiciousDay
+        },
+        todaysMantra,
+        upcomingFestivals: panchangData.festivals,
+        specialMessage: panchangData.specialMessage,
+        generated: new Date().toISOString()
+      }
+    });
+  } catch (error) {
+    console.error('❌ Complete daily guide API error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch daily guide data',
+      error: error.message
+    });
+  }
+});
+
+console.log('✅ Panchang routes registered successfully');
+
+// 404 handler (MUST be last)
 app.use((req, res) => {
   res.status(404).json({
     error: 'Not Found',
@@ -875,10 +1023,6 @@ async function initializeServer() {
   }
 }
 
-// FCM Notification Routes
-app.post('/api/fcm/register-token', registerFCMToken);
-app.post('/api/fcm/send-test', sendTestNotification);
-app.get('/api/fcm/stats', getNotificationStats);
 
 // Initialize on startup
 initializeServer();
