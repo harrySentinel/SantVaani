@@ -7,12 +7,12 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
-import { 
-  Calendar, 
-  Bell, 
-  Sunrise, 
-  Sunset, 
-  Moon, 
+import {
+  Calendar,
+  Bell,
+  Sunrise,
+  Sunset,
+  Moon,
   Star,
   Clock,
   Sparkles,
@@ -20,12 +20,12 @@ import {
   Volume2,
   Settings,
   Gift,
-  Flame
+  Flame,
+  Sun
 } from 'lucide-react';
 import { usePanchang } from '@/hooks/usePanchang';
 import { useSpiritualContent } from '@/hooks/useSpiritualContent';
 import { useNotifications } from '@/hooks/useNotifications';
-import HoroscopeSection from '@/components/HoroscopeSection';
 
 const DailyGuide = () => {
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
@@ -343,14 +343,53 @@ const DailyGuide = () => {
             </Card>
           </motion.div>
 
-          {/* Horoscope Section */}
-          <motion.div 
+          {/* Horoscope CTA Section */}
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 1.0 }}
             className="mt-8"
           >
-            <HoroscopeSection />
+            <Card className="border-purple-200 shadow-lg bg-gradient-to-br from-purple-50 to-indigo-50 backdrop-blur-sm">
+              <CardContent className="p-8 text-center">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-center space-x-2">
+                    <Sparkles className="w-8 h-8 text-purple-500" />
+                    <h3 className="text-2xl font-bold text-gray-800">Daily Horoscope</h3>
+                    <Sparkles className="w-8 h-8 text-purple-500" />
+                  </div>
+                  <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Discover what the stars have in store for you with personalized daily, weekly, and monthly predictions
+                  </p>
+                  <p className="text-purple-600 font-medium">
+                    अपनी दैनिक, साप्ताहिक और मासिक राशिफल जानें
+                  </p>
+                  <div className="pt-4">
+                    <a
+                      href="/horoscope"
+                      className="inline-flex items-center justify-center px-8 py-3 bg-gradient-to-r from-purple-500 to-indigo-600 text-white rounded-full hover:from-purple-600 hover:to-indigo-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
+                    >
+                      <Star className="w-5 h-5 mr-2" />
+                      View Your Horoscope
+                    </a>
+                  </div>
+                  <div className="grid grid-cols-3 gap-4 mt-6 text-sm">
+                    <div className="bg-white/60 rounded-lg p-3">
+                      <Sun className="w-6 h-6 text-orange-500 mx-auto mb-1" />
+                      <p className="font-medium text-gray-700">Daily</p>
+                    </div>
+                    <div className="bg-white/60 rounded-lg p-3">
+                      <Calendar className="w-6 h-6 text-blue-500 mx-auto mb-1" />
+                      <p className="font-medium text-gray-700">Weekly</p>
+                    </div>
+                    <div className="bg-white/60 rounded-lg p-3">
+                      <Moon className="w-6 h-6 text-purple-500 mx-auto mb-1" />
+                      <p className="font-medium text-gray-700">Monthly</p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </motion.div>
         </div>
       </section>
