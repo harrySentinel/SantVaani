@@ -18,6 +18,7 @@ const Divine = lazy(() => import("./pages/divine/index"));
 const Bhajans = lazy(() => import("./pages/bhajans/index"));
 const LiveBhajan = lazy(() => import("./pages/live-bhajans/index"));
 const DailyGuide = lazy(() => import("./pages/daily-guide/index"));
+const Horoscope = lazy(() => import("./pages/horoscope/index"));
 const Donation = lazy(() => import("./pages/donation/index"));
 const About = lazy(() => import("./pages/about/index"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -65,6 +66,7 @@ const App = () => {
               <Route path="/bhajans" element={<Bhajans />} />
                <Route path="/live-bhajan" element={<LiveBhajan />} />
               <Route path="/daily-guide" element={<DailyGuide />} />
+              <Route path="/horoscope" element={<Horoscope />} />
               <Route path="/donation" element={<Donation />} />
               <Route path="/about" element={<About />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

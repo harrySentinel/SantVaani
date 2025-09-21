@@ -5,7 +5,7 @@ import Footer from '@/components/Footer';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Users, Heart, Sparkles, Book, ArrowDown, Video, MessageSquare } from 'lucide-react';
+import { Users, Heart, Sparkles, Book, ArrowDown, Video, MessageSquare, Star } from 'lucide-react';
 import VisitorCounter from '@/components/VisitorCounter';
 import SpiritualFactBox from '@/components/SpiritualFactBox';
 import FeedbackForm from '@/components/FeedbackForm';
@@ -52,6 +52,15 @@ const Index = () => {
       descriptionHi: "भक्ति गीतों और प्रेरणादायक आध्यात्मिक उद्धरणों में खुद को डुबोएं",
       to: "/bhajans",
       color: "from-green-500 to-green-600"
+    },
+    {
+      icon: Star,
+      title: "Daily Horoscope",
+      titleHi: "दैनिक राशिफल",
+      description: "Get personalized daily, weekly, and monthly astrological predictions",
+      descriptionHi: "व्यक्तिगत दैनिक, साप्ताहिक और मासिक ज्योतिषीय भविष्यवाणी प्राप्त करें",
+      to: "/horoscope",
+      color: "from-purple-500 to-purple-600"
     }
   ];
 
@@ -96,7 +105,7 @@ const Index = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
             {features.map((feature, index) => {
               const Icon = feature.icon;
               return (
