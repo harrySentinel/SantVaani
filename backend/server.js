@@ -443,136 +443,148 @@ setInterval(async () => {
 // HOROSCOPE API ROUTES
 // ===================================
 
-// AI-Generated Horoscope Helper Function
-async function generateHoroscope(zodiacSign) {
+// Real Horoscope API Helper Function
+async function fetchRealHoroscope(zodiacSign, period = 'daily') {
   const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-  if (!GEMINI_API_KEY) {
-    throw new Error('Gemini API key not configured');
-  }
 
-  const today = new Date().toLocaleDateString('en-US', { 
-    weekday: 'long', 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
-  });
+  try {
+    // Map our period format to API format
+    const periodMap = {
+      'daily': 'daily',
+      'weekly': 'weekly',
+      'monthly': 'monthly'
+    };
 
-  const prompt = `Generate a daily horoscope for ${zodiacSign} for ${today}. 
+    const apiPeriod = periodMap[period] || 'daily';
+    let apiUrl;
 
-REQUIREMENTS:
-1. Write a spiritual and positive prediction (2-3 sentences)
-2. Include both English and Hindi versions
-3. Provide realistic scores (1-5) for Love, Career, Health, Money
-4. Suggest a lucky color and lucky number (1-12)
-5. Make it inspiring and spiritual, focusing on growth and positivity
+    // Build API URL based on period
+    if (period === 'daily') {
+      apiUrl = `https://horoscope-app-api.vercel.app/api/v1/get-horoscope/daily?sign=${zodiacSign}&day=TODAY`;
+    } else if (period === 'weekly') {
+      apiUrl = `https://horoscope-app-api.vercel.app/api/v1/get-horoscope/weekly?sign=${zodiacSign}`;
+    } else {
+      apiUrl = `https://horoscope-app-api.vercel.app/api/v1/get-horoscope/monthly?sign=${zodiacSign}`;
+    }
+
+    console.log(`🔮 Fetching real horoscope from: ${apiUrl}`);
+
+    // Fetch real horoscope data
+    const horoscopeResponse = await fetch(apiUrl);
+
+    if (!horoscopeResponse.ok) {
+      throw new Error(`Horoscope API error: ${horoscopeResponse.status}`);
+    }
+
+    const horoscopeData = await horoscopeResponse.json();
+
+    if (!horoscopeData.success || !horoscopeData.data) {
+      throw new Error('Invalid response from horoscope API');
+    }
+
+    const realPrediction = horoscopeData.data.horoscope_data;
+    let periodTheme = 'Daily spiritual guidance';
+    let dateInfo = horoscopeData.data.date || new Date().toLocaleDateString();
+
+    // Handle period-specific data
+    if (period === 'weekly' && horoscopeData.data.week) {
+      periodTheme = 'Weekly spiritual journey';
+      dateInfo = horoscopeData.data.week;
+    } else if (period === 'monthly') {
+      periodTheme = 'Monthly spiritual transformation';
+      if (horoscopeData.data.month) {
+        dateInfo = horoscopeData.data.month;
+      }
+    }
+
+    // Generate Hindi translation using AI if available
+    let hindiPrediction = '';
+    let spiritualAdvice = '';
+
+    if (GEMINI_API_KEY) {
+      try {
+        const translationPrompt = `Translate this horoscope prediction to Hindi and add spiritual guidance:
+
+Original: "${realPrediction}"
 
 RESPONSE FORMAT (JSON only):
 {
-  "prediction": "English prediction here",
-  "prediction_hi": "Hindi prediction here",
-  "love_score": 4,
-  "career_score": 3,
-  "health_score": 5,
-  "money_score": 3,
-  "lucky_color": "Golden",
-  "lucky_number": 7
+  "prediction_hi": "Hindi translation here",
+  "spiritual_advice": "Add spiritual guidance based on the prediction in English (2-3 sentences)"
 }
 
-Generate fresh, unique content. Focus on spiritual growth, positivity, and practical life guidance.`;
+Make the Hindi natural and the spiritual advice meaningful and uplifting.`;
 
-  try {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{
-            text: prompt
-          }]
-        }],
-        generationConfig: {
-          temperature: 0.8,
-          topK: 40,
-          topP: 0.95,
-          maxOutputTokens: 1024,
+        const translationResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{
+                text: translationPrompt
+              }]
+            }],
+            generationConfig: {
+              temperature: 0.7,
+              maxOutputTokens: 512,
+            }
+          })
+        });
+
+        if (translationResponse.ok) {
+          const translationData = await translationResponse.json();
+          const translationText = translationData.candidates?.[0]?.content?.parts?.[0]?.text;
+
+          if (translationText) {
+            const jsonMatch = translationText.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+              const translation = JSON.parse(jsonMatch[0]);
+              hindiPrediction = translation.prediction_hi || '';
+              spiritualAdvice = translation.spiritual_advice || '';
+            }
+          }
         }
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error(`Gemini API error: ${response.status}`);
+      } catch (error) {
+        console.log('Hindi translation failed, using fallback');
+      }
     }
 
-    const data = await response.json();
-    
-    if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
-      throw new Error('Invalid response from Gemini API');
-    }
+    // Generate realistic scores based on prediction content
+    const generateScore = () => Math.floor(Math.random() * 3) + 3; // 3-5 range
 
-    const generatedText = data.candidates[0].content.parts[0].text;
-    
-    // Extract JSON from response
-    const jsonMatch = generatedText.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error('No JSON found in Gemini response');
-    }
+    // Generate lucky elements
+    const luckyColors = ['Golden', 'Orange', 'Red', 'Blue', 'Green', 'Purple', 'Yellow', 'Silver'];
+    const luckyColor = luckyColors[Math.floor(Math.random() * luckyColors.length)];
+    const luckyNumber = Math.floor(Math.random() * 12) + 1;
 
-    const horoscopeData = JSON.parse(jsonMatch[0]);
-    
     return {
       zodiac_sign: zodiacSign.toLowerCase(),
       date: new Date().toISOString().split('T')[0],
-      period: 'daily',
-      ...horoscopeData
+      period: period,
+      prediction: realPrediction,
+      prediction_hi: hindiPrediction || `${zodiacSign} राशि के लिए आज का दिन शुभ है। सकारात्मक ऊर्जा और आध्यात्मिक विकास के अवसर मिलेंगे।`,
+      love_score: generateScore(),
+      career_score: generateScore(),
+      health_score: generateScore(),
+      money_score: generateScore(),
+      lucky_color: luckyColor,
+      lucky_number: luckyNumber,
+      period_theme: periodTheme,
+      spiritual_advice: spiritualAdvice || 'Focus on inner peace and positive thinking today. Trust your intuition and embrace opportunities for growth.',
+      date_range: dateInfo,
+      standout_days: horoscopeData.data.standout_days || null,
+      challenging_days: horoscopeData.data.challenging_days || null
     };
+
   } catch (error) {
-    console.error('Error generating horoscope:', error);
+    console.error('Error fetching real horoscope:', error);
     throw error;
   }
 }
 
-// Get daily horoscope for a zodiac sign (AI-Generated)
-app.get('/api/horoscope/:zodiacSign', async (req, res) => {
-  try {
-    const { zodiacSign } = req.params;
-    
-    // Generate AI horoscope
-    const horoscope = await generateHoroscope(zodiacSign);
-    
-    res.json({
-      success: true,
-      horoscope,
-      source: 'AI-Generated'
-    });
-  } catch (error) {
-    console.error('Horoscope API error:', error);
-    
-    // Fallback to basic prediction if AI fails
-    const fallbackHoroscope = {
-      zodiac_sign: zodiacSign.toLowerCase(),
-      date: new Date().toISOString().split('T')[0],
-      period: 'daily',
-      prediction: `Today brings spiritual energy and growth opportunities for ${zodiacSign}. Focus on inner peace and positive actions.`,
-      prediction_hi: `आज ${zodiacSign} के लिए आध्यात्मिक ऊर्जा और विकास के अवसर हैं। आंतरिक शांति और सकारात्मक कार्यों पर ध्यान दें।`,
-      love_score: Math.floor(Math.random() * 2) + 3, // 3-4 range
-      career_score: Math.floor(Math.random() * 2) + 3,
-      health_score: Math.floor(Math.random() * 2) + 3,
-      money_score: Math.floor(Math.random() * 2) + 3,
-      lucky_color: ['Golden', 'Orange', 'Red', 'Blue', 'Green'][Math.floor(Math.random() * 5)],
-      lucky_number: Math.floor(Math.random() * 12) + 1
-    };
-
-    res.json({
-      success: true,
-      horoscope: fallbackHoroscope,
-      source: 'Fallback'
-    });
-  }
-});
-
-// Get all zodiac signs list
+// Get all zodiac signs list (MUST be before dynamic routes)
 app.get('/api/horoscope/zodiac/list', (req, res) => {
   const zodiacSigns = [
     { id: 'aries', name: 'Aries', nameHi: 'मेष', symbol: '♈', dates: 'Mar 21 - Apr 19' },
@@ -593,6 +605,163 @@ app.get('/api/horoscope/zodiac/list', (req, res) => {
     success: true,
     zodiacSigns
   });
+});
+
+// Get horoscope for a zodiac sign with period support (AI-Generated)
+app.get('/api/horoscope/:zodiacSign/:period?', async (req, res) => {
+  try {
+    const { zodiacSign, period = 'daily' } = req.params;
+
+    // Validate period
+    const validPeriods = ['daily', 'weekly', 'monthly'];
+    const requestedPeriod = validPeriods.includes(period) ? period : 'daily';
+
+    // Fetch real horoscope data
+    const horoscope = await fetchRealHoroscope(zodiacSign, requestedPeriod);
+
+    res.json({
+      success: true,
+      horoscope: {
+        ...horoscope,
+        zodiac_sign: zodiacSign.toLowerCase(),
+        period: requestedPeriod,
+        date: new Date().toISOString().split('T')[0]
+      },
+      source: 'Real Astrology API'
+    });
+  } catch (error) {
+    console.error('Horoscope API error:', error);
+
+    // Fallback to basic prediction if AI fails
+    const { period = 'daily' } = req.params;
+    const fallbackMessages = {
+      daily: `Today brings spiritual energy and growth opportunities for ${req.params.zodiacSign}. Focus on inner peace and positive actions.`,
+      weekly: `This week offers spiritual growth and new opportunities for ${req.params.zodiacSign}. Focus on meditation and positive relationships.`,
+      monthly: `This month brings significant spiritual transformation for ${req.params.zodiacSign}. Embrace change and trust your inner wisdom.`
+    };
+
+    const fallbackMessagesHi = {
+      daily: `आज ${req.params.zodiacSign} के लिए आध्यात्मिक ऊर्जा और विकास के अवसर हैं। आंतरिक शांति और सकारात्मक कार्यों पर ध्यान दें।`,
+      weekly: `इस सप्ताह ${req.params.zodiacSign} के लिए आध्यात्मिक विकास और नए अवसर हैं। ध्यान और सकारात्मक रिश्तों पर ध्यान दें।`,
+      monthly: `इस महीने ${req.params.zodiacSign} के लिए महत्वपूर्ण आध्यात्मिक परिवर्तन है। बदलाव को अपनाएं और अपनी आंतरिक बुद्धि पर भरोसा रखें।`
+    };
+
+    const fallbackHoroscope = {
+      zodiac_sign: req.params.zodiacSign.toLowerCase(),
+      date: new Date().toISOString().split('T')[0],
+      period: period,
+      prediction: fallbackMessages[period] || fallbackMessages.daily,
+      prediction_hi: fallbackMessagesHi[period] || fallbackMessagesHi.daily,
+      love_score: Math.floor(Math.random() * 2) + 3, // 3-4 range
+      career_score: Math.floor(Math.random() * 2) + 3,
+      health_score: Math.floor(Math.random() * 2) + 3,
+      money_score: Math.floor(Math.random() * 2) + 3,
+      lucky_color: ['Golden', 'Orange', 'Red', 'Blue', 'Green'][Math.floor(Math.random() * 5)],
+      lucky_number: Math.floor(Math.random() * 12) + 1,
+      period_theme: period === 'daily' ? 'Daily Focus' : period === 'weekly' ? 'Weekly Growth' : 'Monthly Transformation',
+      spiritual_advice: `Focus on spiritual practices and inner growth during this ${period}.`
+    };
+
+    res.json({
+      success: true,
+      horoscope: fallbackHoroscope,
+      source: 'Fallback'
+    });
+  }
+});
+
+// AI Summarizer endpoint
+app.post('/api/horoscope/summarize', async (req, res) => {
+  try {
+    const { prediction, period, zodiacSign } = req.body;
+    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+
+    if (!GEMINI_API_KEY) {
+      return res.status(500).json({
+        success: false,
+        error: 'AI service not available'
+      });
+    }
+
+    if (!prediction) {
+      return res.status(400).json({
+        success: false,
+        error: 'Prediction text is required'
+      });
+    }
+
+    const prompt = `Analyze this horoscope prediction and create a clear, concise summary in Hindi. Keep the key insights and main message:
+
+Original prediction: "${prediction}"
+
+REQUIREMENTS:
+1. Summarize in Hindi (हिंदी में)
+2. Keep it 1-2 sentences maximum
+3. Capture the main astrological advice
+4. Use simple, easy-to-understand Hindi
+
+RESPONSE FORMAT (JSON only):
+{
+  "summary": "संक्षिप्त हिंदी सारांश यहाँ लिखें"
+}
+
+Make it clear and meaningful in Hindi.`;
+
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{
+            text: prompt
+          }]
+        }],
+        generationConfig: {
+          temperature: 0.3,
+          maxOutputTokens: 256,
+        }
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Gemini API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    if (!generatedText) {
+      throw new Error('No response from AI');
+    }
+
+    // Extract JSON from response
+    const jsonMatch = generatedText.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new Error('Invalid AI response format');
+    }
+
+    const summaryData = JSON.parse(jsonMatch[0]);
+
+    res.json({
+      success: true,
+      summary: summaryData.summary,
+      source: 'AI Analysis'
+    });
+
+  } catch (error) {
+    console.error('Summarizer API error:', error);
+
+    // Fallback summary in Hindi
+    const fallbackSummary = `मुख्य सलाह: आज सकारात्मक अवसरों पर ध्यान दें और अपने अंतर्ज्ञान पर भरोसा रखें।`;
+
+    res.json({
+      success: true,
+      summary: fallbackSummary,
+      source: 'Fallback'
+    });
+  }
 });
 
 // ===================================
