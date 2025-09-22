@@ -34,22 +34,19 @@ const About = () => {
 
   const team = [
     {
-      name: "Spiritual Advisory Board",
-      nameHi: "आध्यात्मिक सलाहकार बोर्ड",
-      role: "Guiding the authentic representation of teachings",
+      name: "Founder & Developer",
+      role: "Devotee & Software Engineer - Building spiritual technology to serve humanity",
+      image: "/profie.jpg"
+    },
+    {
+      name: "Project Supporter",
+      role: "Spiritual patron enabling this divine mission to reach millions of souls",
       image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop"
     },
     {
-      name: "Content Curators",
-      nameHi: "सामग्री क्यूरेटर",
-      role: "Researching and verifying spiritual content",
+      name: "Spiritual Advisory Board",
+      role: "Guiding the authentic representation of teachings",
       image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop"
-    },
-    {
-      name: "Translation Team",
-      nameHi: "अनुवाद दल",
-      role: "Making wisdom accessible in multiple languages",
-      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop"
     }
   ];
 
@@ -197,9 +194,6 @@ const About = () => {
                     <h3 className="text-lg font-semibold text-gray-800">
                       {member.name}
                     </h3>
-                    <p className="text-sm text-blue-600 font-medium">
-                      {member.nameHi}
-                    </p>
                   </div>
                   
                   <p className="text-gray-600 text-sm leading-relaxed">
