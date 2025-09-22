@@ -35,7 +35,8 @@ const About = () => {
   const team = [
     {
       name: "Aditya Srivastava",
-      role: "Founder & Developer - Devotee & Software Engineer building spiritual technology to serve humanity",
+      title: "Founder & Developer",
+      role: "Devotee & Software Engineer building spiritual technology to serve humanity",
       image: "/profie.jpg"
     }
   ];
@@ -184,8 +185,11 @@ const About = () => {
                     <h3 className="text-lg font-semibold text-gray-800">
                       {member.name}
                     </h3>
+                    <p className="text-blue-600 text-sm font-medium">
+                      {member.title}
+                    </p>
                   </div>
-                  
+
                   <p className="text-gray-600 text-sm leading-relaxed">
                     {member.role}
                   </p>
