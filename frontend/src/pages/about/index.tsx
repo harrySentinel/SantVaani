@@ -34,19 +34,9 @@ const About = () => {
 
   const team = [
     {
-      name: "Founder & Developer",
-      role: "Devotee & Software Engineer - Building spiritual technology to serve humanity",
+      name: "Aditya Srivastava",
+      role: "Founder & Developer - Devotee & Software Engineer building spiritual technology to serve humanity",
       image: "/profie.jpg"
-    },
-    {
-      name: "Project Supporter",
-      role: "Spiritual patron enabling this divine mission to reach millions of souls",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop"
-    },
-    {
-      name: "Spiritual Advisory Board",
-      role: "Guiding the authentic representation of teachings",
-      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop"
     }
   ];
 
