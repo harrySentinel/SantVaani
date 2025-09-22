@@ -1,0 +1,745 @@
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Calendar, MapPin, Users, Clock, Plus, Bell, X, User, Phone, Mail, BellRing, CheckCircle, Shield } from 'lucide-react';
+import { useState } from 'react';
+import { toast } from '@/hooks/use-toast';
+
+const Events = () => {
+  const [isCreateFormOpen, setIsCreateFormOpen] = useState(false);
+  const [subscribedEvents, setSubscribedEvents] = useState(new Set());
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    type: '',
+    otherEventDetails: '',
+    date: '',
+    startTime: '',
+    endTime: '',
+    location: '',
+    address: '',
+    organizerName: '',
+    organizerPhone: '',
+    organizerEmail: '',
+    exactLocation: '',
+    invitationMessage: '',
+    additionalNotes: ''
+  });
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log('Event submission:', formData);
+    // Here we'll later add API call to submit the event
+    alert('Event submitted for admin approval!');
+    setIsCreateFormOpen(false);
+    // Reset form
+    setFormData({
+      title: '',
+      description: '',
+      type: '',
+      otherEventDetails: '',
+      date: '',
+      startTime: '',
+      endTime: '',
+      location: '',
+      address: '',
+      organizerName: '',
+      organizerPhone: '',
+      organizerEmail: '',
+      exactLocation: '',
+      invitationMessage: '',
+      additionalNotes: ''
+    });
+  };
+
+  const handleNotificationToggle = (eventId: number) => {
+    const newSubscribed = new Set(subscribedEvents);
+
+    // Add smooth delay before state change
+    setTimeout(() => {
+      if (newSubscribed.has(eventId)) {
+        newSubscribed.delete(eventId);
+        setSubscribedEvents(newSubscribed);
+        toast({
+          title: "🔕 Notification Disabled",
+          description: "You won't receive notifications for this event anymore.",
+          duration: 3000,
+        });
+      } else {
+        newSubscribed.add(eventId);
+        setSubscribedEvents(newSubscribed);
+        toast({
+          title: "🔔 Notification Enabled!",
+          description: "You'll be notified about this event on the day it happens.",
+          duration: 4000,
+        });
+      }
+    }, 150); // Slight delay for smoother transition
+  };
+
+  const handleShowDetails = (event: any) => {
+    setSelectedEvent(event);
+    setIsDetailModalOpen(true);
+  };
+
+  // Sample events data - will be replaced with real data later
+  const upcomingEvents = [
+    {
+      id: 1,
+      title: "Shrimad Bhagwad Katha",
+      description: "7-day spiritual discourse on Krishna's divine teachings by Pandit Raj Kumar Sharma",
+      date: "2024-12-28",
+      time: "6:00 PM - 8:30 PM",
+      location: "Community Hall, Sector 15",
+      city: "Noida",
+      organizer: "Ram Kishan Gupta",
+      type: "bhagwad-katha",
+      invitationMessage: "आप सभी भक्तजनों को हार्दिक निमंत्रण है। श्रीमद भागवत कथा के सप्ताह में भगवान श्री कृष्ण की लीलाओं का श्रवण करें। गीता के ज्ञान से अपने जीवन को धन्य बनाएं। प्रसाद सहित सभी व्यवस्था निःशुल्क।"
+    },
+    {
+      id: 2,
+      title: "Mata ki Bhandara",
+      description: "Free community feast in honor of Durga Ma. All devotees welcome with families",
+      date: "2024-12-30",
+      time: "12:00 PM - 4:00 PM",
+      location: "Durga Mandir",
+      city: "Dwarka, Delhi",
+      organizer: "Mandir Committee",
+      type: "bhandara",
+      invitationMessage: "माता रानी की कृपा से आप सभी को भंडारे में सादर आमंत्रित करते हैं। सभी भक्तजन अपने परिवार के साथ पधारें। पूरी-सब्जी, खीर और प्रसाद का आनंद लें। माता की जय!"
+    },
+    {
+      id: 3,
+      title: "Sankirtan & Satsang",
+      description: "Evening devotional singing with spiritual discussions and prasad distribution",
+      date: "2025-01-02",
+      time: "5:00 PM - 8:00 PM",
+      location: "Radha Krishna Temple",
+      city: "Ghaziabad",
+      organizer: "Bhakti Mandal",
+      type: "kirtan",
+      invitationMessage: "Join us for an evening of divine bliss! Experience the joy of devotional singing and spiritual discussions. All are welcome to participate in kirtan and receive blessed prasad. Come with your families and immerse yourself in the divine love of Radha Krishna."
+    }
+  ];
+
+  const getEventTypeColor = (type: string) => {
+    switch (type) {
+      case 'bhagwad-katha': return 'from-orange-500 to-red-600';
+      case 'bhandara': return 'from-green-500 to-emerald-600';
+      case 'kirtan': return 'from-blue-500 to-indigo-600';
+      case 'satsang': return 'from-purple-500 to-violet-600';
+      default: return 'from-gray-500 to-gray-600';
+    }
+  };
+
+  const getEventTypeIcon = (type: string) => {
+    switch (type) {
+      case 'bhagwad-katha': return 'BK';
+      case 'bhandara': return 'BH';
+      case 'kirtan': return 'KT';
+      case 'satsang': return 'ST';
+      default: return 'EV';
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-orange-50">
+      <Navbar />
+
+      {/* Header Section */}
+      <section className="pt-20 pb-12 bg-gradient-to-r from-blue-100 to-orange-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="space-y-6">
+            <div className="flex justify-center items-center space-x-2 mb-4">
+              <span className="text-3xl">🕉️</span>
+              <Calendar className="w-8 h-8 text-blue-500 animate-pulse" />
+              <span className="text-3xl">📿</span>
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-orange-600 bg-clip-text text-transparent">
+              Spiritual Events
+            </h1>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              Discover and join spiritual gatherings, bhajans, bhandaras, and satsangs
+              organized by devotees in your community.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Create Event CTA */}
+      <section className="py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-gradient-to-r from-blue-600 to-orange-600 rounded-2xl p-6 text-white text-center">
+            <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
+              <div className="space-y-2">
+                <h2 className="text-2xl font-bold">Organize a Spiritual Event</h2>
+                <p className="text-blue-100">Share your bhajan, bhandara, or satsang with the community</p>
+              </div>
+              <button
+                onClick={() => setIsCreateFormOpen(true)}
+                className="bg-white text-blue-600 px-6 py-3 rounded-full font-semibold hover:bg-blue-50 transition-colors flex items-center space-x-2"
+              >
+                <Plus className="w-5 h-5" />
+                <span>Create Event</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Upcoming Events */}
+      <section className="py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h2 className="text-3xl font-bold text-gray-800 mb-2">Upcoming Events</h2>
+              <p className="text-gray-600">Join these beautiful spiritual gatherings</p>
+            </div>
+            <button className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 transition-colors">
+              <Bell className="w-5 h-5" />
+              <span>Notify Me</span>
+            </button>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {upcomingEvents.map((event) => (
+              <Card key={event.id} className="group hover:shadow-2xl transition-all duration-500 transform hover:scale-[1.02] border-0 shadow-lg bg-white rounded-2xl overflow-hidden">
+                <CardContent className="p-0">
+                  {/* Event Type Header */}
+                  <div className={`bg-gradient-to-r ${getEventTypeColor(event.type)} p-4 text-white relative`}>
+                    {/* Verified Badge */}
+                    <div className="absolute top-2 left-2 flex items-center space-x-1 bg-white/20 backdrop-blur-sm rounded-full px-2 py-1">
+                      <CheckCircle className="w-3 h-3 text-white" />
+                      <span className="text-xs font-medium">Verified</span>
+                    </div>
+
+                    <div className="flex items-center justify-center mt-4">
+                      <span className="text-lg font-medium uppercase tracking-wide">
+                        {event.type.replace('-', ' ')}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="p-6 space-y-4">
+                    <div>
+                      <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                        {event.title}
+                      </h3>
+                      <p className="text-gray-600 text-sm leading-relaxed">
+                        {event.description}
+                      </p>
+                    </div>
+
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-2 text-sm text-gray-600">
+                        <Calendar className="w-4 h-4 text-blue-500" />
+                        <span>{new Date(event.date).toLocaleDateString('en-IN', {
+                          weekday: 'long',
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}</span>
+                      </div>
+
+                      <div className="flex items-center space-x-2 text-sm text-gray-600">
+                        <Clock className="w-4 h-4 text-orange-500" />
+                        <span>{event.time}</span>
+                      </div>
+
+                      <div className="flex items-center space-x-2 text-sm text-gray-600">
+                        <MapPin className="w-4 h-4 text-green-500" />
+                        <span>{event.location}, {event.city}</span>
+                      </div>
+
+                      <div className="flex items-center justify-end text-sm">
+                        <span className="text-blue-600 font-medium">by {event.organizer}</span>
+                      </div>
+                    </div>
+
+                    <div className="pt-4 border-t border-gray-100">
+                      <div className="flex space-x-3">
+                        <button
+                          onClick={() => handleNotificationToggle(event.id)}
+                          className={`flex-1 relative overflow-hidden py-3 px-4 rounded-xl transition-all duration-700 ease-in-out text-sm font-medium shadow-md hover:shadow-lg transform ${
+                            subscribedEvents.has(event.id)
+                              ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white'
+                              : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white'
+                          }`}
+                        >
+                          <div className="flex items-center justify-center space-x-2">
+                            {subscribedEvents.has(event.id) ? (
+                              <>
+                                <BellRing className="w-4 h-4" />
+                                <span>Notification On</span>
+                              </>
+                            ) : (
+                              <>
+                                <Bell className="w-4 h-4" />
+                                <span>Notify Me</span>
+                              </>
+                            )}
+                          </div>
+                          {subscribedEvents.has(event.id) && (
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"></div>
+                          )}
+                        </button>
+                        <button
+                          onClick={() => handleShowDetails(event)}
+                          className="px-4 py-3 border border-gray-300 text-gray-600 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 text-sm font-medium shadow-sm hover:shadow-md"
+                        >
+                          Details
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Call to Action */}
+      <section className="py-16 bg-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8">
+          <div className="space-y-4">
+            <h2 className="text-3xl font-bold text-gray-800">
+              Build Spiritual Community
+            </h2>
+            <p className="text-lg text-gray-600 leading-relaxed">
+              Connect with like-minded devotees, share divine experiences, and strengthen
+              our spiritual bonds through meaningful gatherings.
+            </p>
+          </div>
+
+          <div className="bg-gradient-to-r from-blue-100 to-orange-100 rounded-2xl p-8 border border-blue-200">
+            <blockquote className="text-xl md:text-2xl text-gray-700 italic font-medium leading-relaxed">
+              "संगे शक्ति कलयुगे"
+            </blockquote>
+            <p className="text-blue-600 mt-2 text-lg">
+              "In unity lies strength in this age"
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Event Details Modal */}
+      {isDetailModalOpen && selectedEvent && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className={`bg-gradient-to-r ${getEventTypeColor(selectedEvent.type)} p-6 text-white rounded-t-2xl relative`}>
+              <div className="absolute top-2 left-2 flex items-center space-x-1 bg-white/20 backdrop-blur-sm rounded-full px-2 py-1">
+                <CheckCircle className="w-3 h-3 text-white" />
+                <span className="text-xs font-medium">Verified</span>
+              </div>
+
+              <button
+                onClick={() => setIsDetailModalOpen(false)}
+                className="absolute top-4 right-4 text-white hover:bg-white/20 p-2 rounded-full transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+
+              <div className="mt-6">
+                <h2 className="text-2xl font-bold mb-2">{selectedEvent.title}</h2>
+                <span className="text-sm font-medium uppercase tracking-wide bg-white/20 px-3 py-1 rounded-full">
+                  {selectedEvent.type.replace('-', ' ')}
+                </span>
+              </div>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 space-y-6">
+              {/* Event Details */}
+              <div className="space-y-4">
+                <div className="flex items-center space-x-2 text-gray-600">
+                  <Calendar className="w-5 h-5 text-blue-500" />
+                  <span className="font-medium">
+                    {new Date(selectedEvent.date).toLocaleDateString('en-IN', {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}
+                  </span>
+                </div>
+
+                <div className="flex items-center space-x-2 text-gray-600">
+                  <Clock className="w-5 h-5 text-orange-500" />
+                  <span>{selectedEvent.time}</span>
+                </div>
+
+                <div className="flex items-center space-x-2 text-gray-600">
+                  <MapPin className="w-5 h-5 text-green-500" />
+                  <span>{selectedEvent.location}, {selectedEvent.city}</span>
+                </div>
+              </div>
+
+              {/* Description */}
+              <div>
+                <h3 className="font-semibold text-gray-800 mb-2">About This Event</h3>
+                <p className="text-gray-600 leading-relaxed">{selectedEvent.description}</p>
+              </div>
+
+              {/* Invitation Message */}
+              {selectedEvent.invitationMessage && (
+                <div className="bg-gradient-to-r from-blue-50 to-orange-50 rounded-xl p-4 border border-blue-200">
+                  <h3 className="font-semibold text-gray-800 mb-2 flex items-center space-x-2">
+                    <span>💌</span>
+                    <span>Invitation Message</span>
+                  </h3>
+                  <p className="text-gray-700 leading-relaxed font-medium">
+                    {selectedEvent.invitationMessage}
+                  </p>
+                </div>
+              )}
+
+              {/* Organizer */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h3 className="font-semibold text-gray-800 mb-1">Organized by</h3>
+                <p className="text-blue-600 font-medium">{selectedEvent.organizer}</p>
+              </div>
+
+              {/* Action Button */}
+              <div className="pt-4 border-t border-gray-200">
+                <button
+                  onClick={() => handleNotificationToggle(selectedEvent.id)}
+                  className={`w-full relative overflow-hidden py-3 px-4 rounded-xl transition-all duration-700 ease-in-out text-sm font-medium shadow-md hover:shadow-lg transform ${
+                    subscribedEvents.has(selectedEvent.id)
+                      ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white'
+                      : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white'
+                  }`}
+                >
+                  <div className="flex items-center justify-center space-x-2">
+                    {subscribedEvents.has(selectedEvent.id) ? (
+                      <>
+                        <BellRing className="w-4 h-4" />
+                        <span>Notification On</span>
+                      </>
+                    ) : (
+                      <>
+                        <Bell className="w-4 h-4" />
+                        <span>Notify Me</span>
+                      </>
+                    )}
+                  </div>
+                  {subscribedEvents.has(selectedEvent.id) && (
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"></div>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Create Event Modal */}
+      {isCreateFormOpen && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className="bg-gradient-to-r from-blue-600 to-orange-600 p-6 text-white rounded-t-2xl">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h2 className="text-2xl font-bold mb-2">Create Spiritual Event</h2>
+                  <p className="text-blue-100">Share your event with the spiritual community</p>
+                </div>
+                <button
+                  onClick={() => setIsCreateFormOpen(false)}
+                  className="text-white hover:bg-white/20 p-2 rounded-full transition-colors"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+            </div>
+
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="p-6 space-y-6">
+              {/* Event Type */}
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-gray-700">
+                  Event Type *
+                </label>
+                <Select value={formData.type} onValueChange={(value) => handleInputChange('type', value)}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Choose event" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="bhagwad-katha">Bhagwad Katha</SelectItem>
+                    <SelectItem value="bhandara">Bhandara</SelectItem>
+                    <SelectItem value="kirtan">Kirtan</SelectItem>
+                    <SelectItem value="satsang">Satsang</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Conditional "Other" Event Details */}
+              {formData.type === 'other' && (
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-gray-700">
+                    Please specify the type of event *
+                  </label>
+                  <Input
+                    placeholder="e.g., Workshop, Spiritual Retreat, Discourse, etc."
+                    value={formData.otherEventDetails}
+                    onChange={(e) => handleInputChange('otherEventDetails', e.target.value)}
+                    required
+                  />
+                  <p className="text-xs text-gray-500">
+                    Help us understand what kind of spiritual event you're organizing
+                  </p>
+                </div>
+              )}
+
+              {/* Event Title */}
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-gray-700">
+                  Event Title *
+                </label>
+                <Input
+                  placeholder="e.g., Weekly Bhajan Sandhya"
+                  value={formData.title}
+                  onChange={(e) => handleInputChange('title', e.target.value)}
+                  required
+                />
+              </div>
+
+              {/* Description */}
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-gray-700">
+                  Description *
+                </label>
+                <Textarea
+                  placeholder="Describe your event, what attendees can expect..."
+                  value={formData.description}
+                  onChange={(e) => handleInputChange('description', e.target.value)}
+                  rows={3}
+                  required
+                />
+              </div>
+
+              {/* Date and Time */}
+              <div className="grid md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-gray-700 flex items-center space-x-2">
+                    <Calendar className="w-4 h-4" />
+                    <span>Date *</span>
+                  </label>
+                  <Input
+                    type="date"
+                    value={formData.date}
+                    onChange={(e) => handleInputChange('date', e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-gray-700 flex items-center space-x-2">
+                    <Clock className="w-4 h-4" />
+                    <span>Start Time *</span>
+                  </label>
+                  <Input
+                    type="time"
+                    value={formData.startTime}
+                    onChange={(e) => handleInputChange('startTime', e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-gray-700 flex items-center space-x-2">
+                    <Clock className="w-4 h-4" />
+                    <span>End Time</span>
+                  </label>
+                  <Input
+                    type="time"
+                    value={formData.endTime}
+                    onChange={(e) => handleInputChange('endTime', e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* Location */}
+              <div className="space-y-4">
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-gray-700 flex items-center space-x-2">
+                      <MapPin className="w-4 h-4" />
+                      <span>Venue Name *</span>
+                    </label>
+                    <Input
+                      placeholder="e.g., Radha Krishna Temple"
+                      value={formData.location}
+                      onChange={(e) => handleInputChange('location', e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-gray-700 flex items-center space-x-2">
+                      <MapPin className="w-4 h-4" />
+                      <span>City *</span>
+                    </label>
+                    <Input
+                      placeholder="e.g., Delhi, Mumbai, Kolkata"
+                      value={formData.address}
+                      onChange={(e) => handleInputChange('address', e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-gray-700 flex items-center space-x-2">
+                    <MapPin className="w-4 h-4" />
+                    <span>Exact Location *</span>
+                  </label>
+                  <Input
+                    placeholder="Complete address with landmarks (e.g., 123 Main Street, Near XYZ Market, Sector 15)"
+                    value={formData.exactLocation}
+                    onChange={(e) => handleInputChange('exactLocation', e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Organizer Details */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between border-b border-gray-200 pb-2">
+                  <h3 className="text-lg font-semibold text-gray-800">
+                    Contact Information
+                  </h3>
+                  <div className="flex items-center space-x-1 text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
+                    <span>🔒</span>
+                    <span>Private</span>
+                  </div>
+                </div>
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                  <p className="text-sm text-blue-700 leading-relaxed">
+                    <span className="font-semibold">Privacy Protected:</span> Your phone number and email address will only be visible to the admin for event approval and coordination. This information will not be displayed publicly to the community.
+                  </p>
+                </div>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-gray-700 flex items-center space-x-2">
+                      <User className="w-4 h-4" />
+                      <span>Your Name *</span>
+                    </label>
+                    <Input
+                      placeholder="Organizer name"
+                      value={formData.organizerName}
+                      onChange={(e) => handleInputChange('organizerName', e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-gray-700 flex items-center space-x-2">
+                      <Phone className="w-4 h-4" />
+                      <span>Phone Number *</span>
+                    </label>
+                    <div className="flex">
+                      <span className="inline-flex items-center px-3 text-sm text-gray-500 bg-gray-50 border border-r-0 border-gray-300 rounded-l-md">
+                        +91
+                      </span>
+                      <Input
+                        type="tel"
+                        placeholder="XXXXX XXXXX"
+                        value={formData.organizerPhone}
+                        onChange={(e) => {
+                          // Only allow numbers and spaces
+                          const value = e.target.value.replace(/[^\d\s]/g, '');
+                          handleInputChange('organizerPhone', value);
+                        }}
+                        className="rounded-l-none"
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-gray-700 flex items-center space-x-2">
+                    <Mail className="w-4 h-4" />
+                    <span>Email Address *</span>
+                  </label>
+                  <Input
+                    type="email"
+                    placeholder="your.email@example.com"
+                    value={formData.organizerEmail}
+                    onChange={(e) => handleInputChange('organizerEmail', e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Invitation Message */}
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-gray-700">
+                  Invitation Message
+                </label>
+                <Textarea
+                  placeholder="Write a warm invitation message for attendees in Hindi or English... (e.g., आप सभी भक्तजनों को हार्दिक निमंत्रण है...)"
+                  value={formData.invitationMessage}
+                  onChange={(e) => handleInputChange('invitationMessage', e.target.value)}
+                  rows={4}
+                />
+                <p className="text-xs text-gray-500">
+                  This message will be shown when people click "Details" on your event card
+                </p>
+              </div>
+
+              {/* Additional Notes */}
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-gray-700">
+                  Additional Notes
+                </label>
+                <Textarea
+                  placeholder="Any special instructions, requirements, or additional information..."
+                  value={formData.additionalNotes}
+                  onChange={(e) => handleInputChange('additionalNotes', e.target.value)}
+                  rows={2}
+                />
+              </div>
+
+              {/* Submission Notice */}
+              <div className="bg-gradient-to-r from-blue-50 to-orange-50 rounded-lg p-4 border border-blue-200">
+                <p className="text-sm text-gray-700 leading-relaxed">
+                  <span className="font-semibold">Review Process:</span> Your event will be reviewed by our admin team to ensure it aligns with our spiritual community guidelines. You'll receive a confirmation within 6-12 hours.
+                </p>
+              </div>
+
+              {/* Form Actions */}
+              <div className="flex space-x-4 pt-4 border-t border-gray-200">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsCreateFormOpen(false)}
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  className="flex-1 bg-gradient-to-r from-blue-600 to-orange-600 hover:from-blue-700 hover:to-orange-700"
+                >
+                  Submit for Approval
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      <Footer />
+    </div>
+  );
+};
+
+export default Events;

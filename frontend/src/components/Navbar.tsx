@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, Users, Heart, Sparkles, Book, Info, IndianRupee, Calendar, Star, ChevronDown } from 'lucide-react';
+import { Menu, X, Users, Heart, Sparkles, Book, Info, IndianRupee, Calendar, Star, ChevronDown, CalendarDays } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function Navbar() {
@@ -33,6 +33,7 @@ export default function Navbar() {
   const primaryItems = [
     { to: '/daily-guide', label: 'Daily Guide', labelHi: 'दैनिक मार्गदर्शन', icon: Calendar },
     { to: '/horoscope', label: 'Horoscope', labelHi: 'राशिफल', icon: Star },
+    { to: '/events', label: 'Events', labelHi: 'कार्यक्रम', icon: CalendarDays },
     { to: '/saints', label: 'Saints', labelHi: 'संत', icon: Users },
     { to: '/bhajans', label: 'Bhajans', labelHi: 'भजन', icon: Book },
   ];
