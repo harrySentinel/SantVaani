@@ -82,6 +82,7 @@ const corsOptions = {
       'http://127.0.0.1:3001',  // Admin panel ports
       'http://127.0.0.1:3002',
       'http://127.0.0.1:3003',
+      'https://santvaani.vercel.app',  // Production frontend
       process.env.FRONTEND_URL
     ].filter(Boolean);
 
