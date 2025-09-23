@@ -62,7 +62,7 @@ export const getFCMToken = async (): Promise<string | null> => {
 // Send token to backend for scheduling notifications
 const sendTokenToBackend = async (token: string) => {
   try {
-    const response = await fetch('http://localhost:5000/api/fcm/register-token', {
+    const response = await fetch('https://santvaani-backend.onrender.com/api/fcm/register-token', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -372,7 +372,7 @@ const Events = () => {
       }
 
       // Send subscription to backend
-      const response = await fetch('http://localhost:5000/api/notifications/subscribe', {
+      const response = await fetch('https://santvaani-backend.onrender.com/api/notifications/subscribe', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -405,7 +405,7 @@ const Events = () => {
   // Unsubscribe from event notifications
   const unsubscribeFromEvent = async (eventId: number) => {
     try {
-      const response = await fetch('http://localhost:5000/api/notifications/unsubscribe', {
+      const response = await fetch('https://santvaani-backend.onrender.com/api/notifications/unsubscribe', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
