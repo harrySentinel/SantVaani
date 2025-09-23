@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar, MapPin, Users, Clock, Plus, Bell, X, User, Phone, Mail, BellRing, CheckCircle, Shield } from 'lucide-react';
+import { Calendar, MapPin, Users, Clock, Plus, Bell, X, User, Phone, Mail, BellRing, CheckCircle, Shield, Sparkles, Wand2, RefreshCw, Copy, Check } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
@@ -19,6 +19,8 @@ const Events = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [approvedEvents, setApprovedEvents] = useState([]);
   const [loadingEvents, setLoadingEvents] = useState(true);
+  const [isGeneratingAI, setIsGeneratingAI] = useState(false);
+  const [aiSuggestions, setAiSuggestions] = useState([]);
 
   const navigate = useNavigate();
   const { user, loading } = useAuth();
@@ -63,6 +65,128 @@ const Events = () => {
     } finally {
       setLoadingEvents(false);
     }
+  };
+
+  // AI Functions for Invitation Messages
+  const generateAIInvitation = async () => {
+    if (!formData.type || !formData.date || !formData.startTime || !formData.title) {
+      toast({
+        title: "⚠️ Missing Information",
+        description: "Please fill in Event Type, Title, Date, and Start Time to generate AI invitation",
+        duration: 3000,
+      });
+      return;
+    }
+
+    setIsGeneratingAI(true);
+    try {
+      // Simulate AI generation for now - we'll replace this with real AI later
+      const eventContext = {
+        type: formData.type,
+        title: formData.title,
+        date: formData.date,
+        startTime: formData.startTime,
+        endTime: formData.endTime,
+        location: formData.location
+      };
+
+      const suggestions = generateMockAIInvitations(eventContext);
+      setAiSuggestions(suggestions);
+
+      toast({
+        title: "✨ AI Invitations Generated!",
+        description: "Choose from the suggestions below or edit them as needed",
+        duration: 4000,
+      });
+    } catch (error) {
+      console.error('AI generation error:', error);
+      toast({
+        title: "⚠️ AI Generation Failed",
+        description: "Please try again or write manually",
+        duration: 3000,
+      });
+    } finally {
+      setIsGeneratingAI(false);
+    }
+  };
+
+  const enhanceUserMessage = async () => {
+    if (!formData.invitationMessage.trim()) {
+      toast({
+        title: "⚠️ No Message to Enhance",
+        description: "Please write a message first, then click enhance",
+        duration: 3000,
+      });
+      return;
+    }
+
+    setIsGeneratingAI(true);
+    try {
+      // Simulate AI enhancement for now
+      const enhancedMessage = enhanceMockMessage(formData.invitationMessage, formData.type);
+      setAiSuggestions([enhancedMessage]);
+
+      toast({
+        title: "✨ Message Enhanced!",
+        description: "Your message has been enhanced with AI",
+        duration: 4000,
+      });
+    } catch (error) {
+      console.error('AI enhancement error:', error);
+      toast({
+        title: "⚠️ Enhancement Failed",
+        description: "Please try again",
+        duration: 3000,
+      });
+    } finally {
+      setIsGeneratingAI(false);
+    }
+  };
+
+  // Mock AI functions (we'll replace with real AI later)
+  const generateMockAIInvitations = (context) => {
+    const { type, title, date, startTime, endTime, location } = context;
+
+    const templates = {
+      'bhagwad-katha': [
+        `🙏 आप सभी भक्तजनों को हार्दिक निमंत्रण 🙏\n\n${new Date(date).toLocaleDateString('hi-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })} को ${startTime} बजे से "${title}" का शुभारंभ हो रहा है।\n\nश्री कृष्ण की दिव्य लीलाओं का श्रवण करें और जीवन को धन्य बनाएं। गीता के अमृत वचनों से अपने हृदय को पवित्र करें।\n\nस्थान: ${location || 'स्थान शीघ्र घोषित'}\nसमय: ${startTime}${endTime ? ` से ${endTime}` : ''}\n\nप्रसाद सहित सभी व्यवस्था निःशुल्क। परिवार सहित पधारें।\n\nहरे कृष्ण! 🪔✨`,
+
+        `🕉️ श्रीमद भागवत कथा में आपका स्वागत है 🕉️\n\n"${title}" के पावन अवसर पर आप सभी श्रद्धालुओं को सादर आमंत्रित करते हैं।\n\nदिनांक: ${new Date(date).toLocaleDateString('hi-IN')}\nसमय: ${startTime}${endTime ? ` से ${endTime}` : ''}\nस्थान: ${location || 'स्थान की जानकारी शीघ्र'}\n\nभगवान श्री कृष्ण की कृपा से इस आध्यात्मिक यात्रा में सम्मिलित हों। प्रसाद एवं आवास की निःशुल्क व्यवस्था।\n\nआपकी उपस्थिति से कार्यक्रम सफल बनाएं। 🙏`
+      ],
+
+      'bhandara': [
+        `🍽️ माता रानी के भंडारे में आपका स्वागत है 🍽️\n\n${new Date(date).toLocaleDateString('hi-IN', { weekday: 'long', day: 'numeric', month: 'long' })} को "${title}" का आयोजन हो रहा है।\n\nमाता की कृपा से सभी भक्तजनों को भंडारे में सादर आमंत्रित करते हैं। पूरी-सब्जी, खीर और प्रसाद का आनंद लें।\n\nसमय: ${startTime}${endTime ? ` से ${endTime}` : ''}\nस्थान: ${location || 'स्थान की जानकारी शीघ्र'}\n\nसभी भक्तजन अपने परिवार के साथ पधारें। माता की जय! 🚩🙏`,
+
+        `🌺 माता के आशीर्वाद से भंडारा 🌺\n\n"${title}" में आप सभी का हार्दिक स्वागत है।\n\nदिनांक: ${new Date(date).toLocaleDateString('hi-IN')}\nसमय: ${startTime}${endTime ? ` से ${endTime}` : ''}\n\nमाता रानी की कृपा से निःशुल्क भोजन एवं प्रसाद वितरण। सभी श्रद्धालु परिवार सहित पधारें।\n\nजय माता दी! 🕉️✨`
+      ],
+
+      'kirtan': [
+        `🎵 संकीर्तन में आपका स्वागत है 🎵\n\n"${title}" के पावन अवसर पर भजन-कीर्तन का आयोजन।\n\nदिनांक: ${new Date(date).toLocaleDateString('hi-IN')}\nसमय: ${startTime}${endTime ? ` से ${endTime}` : ''}\nस्थान: ${location || 'स्थान शीघ्र घोषित'}\n\nभगवान के नाम के संकीर्तन में सम्मिलित हों। आध्यात्मिक चर्चा एवं प्रसाद वितरण।\n\nसभी भक्तगण परिवार सहित पधारें। हरे कृष्ण! 🪔🙏`,
+
+        `🎶 दिव्य संगीत की शाम 🎶\n\n"${title}" में भाग लेने के लिए आप सभी को आमंत्रित करते हैं।\n\nभजन-कीर्तन, आध्यात्मिक चर्चा और प्रसाद का कार्यक्रम।\n\nदिनांक: ${new Date(date).toLocaleDateString('hi-IN')}\nसमय: ${startTime}${endTime ? ` से ${endTime}` : ''}\n\nराधा कृष्ण के दिव्य प्रेम में डूबकर आनंद की अनुभूति करें। 🕉️✨`
+      ]
+    };
+
+    return templates[type] || [
+      `🙏 "${title}" में आपका स्वागत है 🙏\n\nदिनांक: ${new Date(date).toLocaleDateString('hi-IN')}\nसमय: ${startTime}${endTime ? ` से ${endTime}` : ''}\nस्थान: ${location || 'स्थान की जानकारी शीघ्र'}\n\nआप सभी का हार्दिक स्वागत है। कृपया परिवार सहित पधारें।\n\nधन्यवाद! 🙏`
+    ];
+  };
+
+  const enhanceMockMessage = (message, eventType) => {
+    // Simple enhancement - adds cultural elements and proper formatting
+    const enhanced = `🙏 ${message}\n\nआप सभी श्रद्धालुओं का हार्दिक स्वागत है। कृपया परिवार सहित पधारें और इस पावन अवसर का लाभ उठाएं।\n\nसभी व्यवस्था निःशुल्क। 🕉️✨`;
+
+    return enhanced;
+  };
+
+  const selectAISuggestion = (suggestion) => {
+    handleInputChange('invitationMessage', suggestion);
+    setAiSuggestions([]);
+    toast({
+      title: "✅ Invitation Selected",
+      description: "AI suggestion has been applied. You can edit it further if needed.",
+      duration: 3000,
+    });
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -820,20 +944,136 @@ const Events = () => {
                 </div>
               </div>
 
-              {/* Invitation Message */}
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-gray-700">
-                  Invitation Message
-                </label>
-                <Textarea
-                  placeholder="Write a warm invitation message for attendees in Hindi or English... (e.g., आप सभी भक्तजनों को हार्दिक निमंत्रण है...)"
-                  value={formData.invitationMessage}
-                  onChange={(e) => handleInputChange('invitationMessage', e.target.value)}
-                  rows={4}
-                />
-                <p className="text-xs text-gray-500">
-                  This message will be shown when people click "Details" on your event card
-                </p>
+              {/* AI-Powered Invitation Message */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-semibold text-gray-700">
+                    Invitation Message
+                  </label>
+                  <div className="flex items-center space-x-1">
+                    <Sparkles className="w-4 h-4 text-purple-500" />
+                    <span className="text-xs text-purple-600 font-medium">AI Powered</span>
+                  </div>
+                </div>
+
+                {/* AI Action Buttons */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={generateAIInvitation}
+                    disabled={isGeneratingAI || !formData.type || !formData.title || !formData.date}
+                    className="border-blue-300 text-blue-700 hover:bg-blue-50 hover:border-blue-400 transition-all duration-300 flex items-center justify-center space-x-2 py-3"
+                  >
+                    {isGeneratingAI ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                        <span>Generating...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Wand2 className="w-4 h-4" />
+                        <span>🤖 Generate with AI</span>
+                      </>
+                    )}
+                  </Button>
+
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={enhanceUserMessage}
+                    disabled={isGeneratingAI || !formData.invitationMessage.trim()}
+                    className="border-orange-300 text-orange-700 hover:bg-orange-50 hover:border-orange-400 transition-all duration-300 flex items-center justify-center space-x-2 py-3"
+                  >
+                    {isGeneratingAI ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                        <span>Enhancing...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-4 h-4" />
+                        <span>✨ Enhance my text</span>
+                      </>
+                    )}
+                  </Button>
+                </div>
+
+                {/* AI Suggestions Display */}
+                {aiSuggestions.length > 0 && (
+                  <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl p-4 border border-purple-200">
+                    <div className="flex items-center space-x-2 mb-3">
+                      <Sparkles className="w-5 h-5 text-purple-600" />
+                      <h4 className="font-semibold text-purple-800">AI Generated Suggestions</h4>
+                    </div>
+                    <div className="space-y-3">
+                      {aiSuggestions.map((suggestion, index) => (
+                        <div key={index} className="bg-white rounded-lg p-4 border border-purple-100 hover:shadow-md transition-shadow">
+                          <p className="text-gray-700 leading-relaxed mb-3">{suggestion}</p>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-2">
+                              <button
+                                type="button"
+                                onClick={() => navigator.clipboard.writeText(suggestion)}
+                                className="text-xs text-gray-500 hover:text-gray-700 flex items-center space-x-1"
+                              >
+                                <Copy className="w-3 h-3" />
+                                <span>Copy</span>
+                              </button>
+                            </div>
+                            <Button
+                              type="button"
+                              size="sm"
+                              onClick={() => selectAISuggestion(suggestion)}
+                              className="bg-purple-600 hover:bg-purple-700 text-white flex items-center space-x-1"
+                            >
+                              <Check className="w-3 h-3" />
+                              <span>Use This</span>
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Manual Textarea */}
+                <div className="space-y-2">
+                  <Textarea
+                    placeholder="Write a warm invitation message for attendees in Hindi or English... (e.g., आप सभी भक्तजनों को हार्दिक निमंत्रण है...)"
+                    value={formData.invitationMessage}
+                    onChange={(e) => handleInputChange('invitationMessage', e.target.value)}
+                    rows={4}
+                    className="border-gray-300 focus:border-purple-400 focus:ring-purple-300 transition-colors"
+                  />
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs text-gray-500">
+                      This message will be shown when people click "Details" on your event card
+                    </p>
+                    {formData.invitationMessage && (
+                      <p className="text-xs text-gray-400">
+                        {formData.invitationMessage.length} characters
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Helpful Tips */}
+                <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
+                  <div className="flex items-start space-x-2">
+                    <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center mt-0.5">
+                      <span className="text-blue-600 text-xs">💡</span>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-blue-800">AI Tips:</p>
+                      <ul className="text-xs text-blue-700 space-y-1">
+                        <li>• Fill in Event Type, Title, Date & Time for better AI generation</li>
+                        <li>• AI can generate culturally appropriate Hindi invitations</li>
+                        <li>• Use "Enhance" to improve your existing message</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* Additional Notes */}
