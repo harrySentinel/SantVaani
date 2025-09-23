@@ -1031,6 +1031,194 @@ app.get('/api/fcm/stats', (req, res) => {
 });
 console.log('✅ FCM routes registered successfully');
 
+// Event Notification Subscription Routes
+console.log('📲 Registering notification subscription routes...');
+
+// Subscribe to event notifications
+app.post('/api/notifications/subscribe', async (req, res) => {
+  try {
+    console.log('📲 Event notification subscription request:', req.body);
+
+    const {
+      eventId,
+      eventTitle,
+      eventDate,
+      eventTime,
+      eventLocation,
+      eventCity,
+      eventType,
+      fcmToken,
+      userId,
+      userEmail,
+      timestamp
+    } = req.body;
+
+    // Store subscription in database
+    const { data, error } = await supabase
+      .from('event_subscriptions')
+      .insert([{
+        event_id: eventId,
+        user_id: userId,
+        user_email: userEmail,
+        fcm_token: fcmToken,
+        event_title: eventTitle,
+        event_date: eventDate,
+        event_time: eventTime,
+        event_location: eventLocation,
+        event_city: eventCity,
+        event_type: eventType,
+        subscribed_at: timestamp,
+        is_active: true
+      }])
+      .select();
+
+    if (error) {
+      console.error('❌ Database error:', error);
+      return res.status(500).json({ error: 'Failed to save subscription' });
+    }
+
+    // Send immediate confirmation notification
+    const admin = require('firebase-admin');
+
+    // Create beautiful Hindi confirmation message
+    const confirmationMessages = {
+      'bhagwad-katha': `🕉️ धन्यवाद! आपने "${eventTitle}" के लिए notification चालू की है। श्रीमद भागवत कथा के दिन आपको reminder मिलेगा। 📅 ${eventDate} को ${eventTime} बजे तैयार रहें। जय श्री कृष्ण! 🙏`,
+      'kirtan': `🎵 बहुत अच्छा! "${eventTitle}" कीर्तन के लिए notification सक्रिय हो गई। भजन-कीर्तन के दिन आपको याद दिला देंगे। 📅 ${eventDate} को ${eventTime} बजे। राधे राधे! 🎶`,
+      'bhandara': `🍽️ शुक्रिया! "${eventTitle}" भंडारे के लिए notification लगाई गई है। प्रसाद वितरण के दिन reminder मिलेगा। 📅 ${eventDate} को ${eventTime} बजे। जय माता दी! 🙏`,
+      'satsang': `🧘 उत्तम! "${eventTitle}" सत्संग के लिए notification चालू है। आध्यात्मिक चर्चा के दिन आपको सूचना मिलेगी। 📅 ${eventDate} को ${eventTime} बजे। हरि ॐ! ✨`
+    };
+
+    const confirmationMessage = confirmationMessages[eventType] ||
+      `🔔 Notification चालू हो गई! "${eventTitle}" के लिए ${eventDate} को ${eventTime} बजे reminder मिलेगा। धन्यवाद! 🙏`;
+
+    const notificationPayload = {
+      notification: {
+        title: '✅ Notification चालू हो गई!',
+        body: confirmationMessage,
+        icon: '/favicon.ico'
+      },
+      data: {
+        eventId: eventId.toString(),
+        eventTitle: eventTitle,
+        eventDate: eventDate,
+        type: 'subscription_confirmation'
+      }
+    };
+
+    // Send immediate notification
+    try {
+      await admin.messaging().send({
+        token: fcmToken,
+        ...notificationPayload
+      });
+      console.log('✅ Immediate confirmation notification sent successfully');
+    } catch (notifError) {
+      console.error('❌ Failed to send immediate notification:', notifError);
+    }
+
+    // Schedule day-of-event notification
+    try {
+      await scheduleEventNotification({
+        eventId,
+        eventTitle,
+        eventDate,
+        eventTime,
+        eventLocation,
+        eventCity,
+        eventType,
+        fcmToken,
+        userId
+      });
+      console.log('✅ Day-of-event notification scheduled');
+    } catch (scheduleError) {
+      console.error('❌ Failed to schedule day-of-event notification:', scheduleError);
+    }
+
+    res.json({
+      success: true,
+      message: 'Successfully subscribed to event notifications',
+      subscriptionId: data[0]?.id
+    });
+
+  } catch (error) {
+    console.error('❌ Error in notification subscription:', error);
+    res.status(500).json({
+      error: 'Failed to subscribe to notifications',
+      details: error.message
+    });
+  }
+});
+
+// Unsubscribe from event notifications
+app.post('/api/notifications/unsubscribe', async (req, res) => {
+  try {
+    console.log('📲 Event notification unsubscription request:', req.body);
+
+    const { eventId, userId } = req.body;
+
+    // Remove subscription from database
+    const { error } = await supabase
+      .from('event_subscriptions')
+      .update({ is_active: false })
+      .eq('event_id', eventId)
+      .eq('user_id', userId);
+
+    if (error) {
+      console.error('❌ Database error:', error);
+      return res.status(500).json({ error: 'Failed to remove subscription' });
+    }
+
+    res.json({
+      success: true,
+      message: 'Successfully unsubscribed from event notifications'
+    });
+
+  } catch (error) {
+    console.error('❌ Error in notification unsubscription:', error);
+    res.status(500).json({
+      error: 'Failed to unsubscribe from notifications',
+      details: error.message
+    });
+  }
+});
+
+// Function to schedule day-of-event notification
+async function scheduleEventNotification(eventData) {
+  const { eventId, eventTitle, eventDate, eventTime, eventLocation, eventCity, eventType, fcmToken, userId } = eventData;
+
+  // Calculate notification time (send notification 2 hours before event)
+  const eventDateTime = new Date(`${eventDate} ${eventTime}`);
+  const notificationTime = new Date(eventDateTime.getTime() - (2 * 60 * 60 * 1000)); // 2 hours before
+
+  // Store scheduled notification in database
+  const { error } = await supabase
+    .from('scheduled_notifications')
+    .insert([{
+      event_id: eventId,
+      user_id: userId,
+      fcm_token: fcmToken,
+      event_title: eventTitle,
+      event_date: eventDate,
+      event_time: eventTime,
+      event_location: eventLocation,
+      event_city: eventCity,
+      event_type: eventType,
+      scheduled_for: notificationTime.toISOString(),
+      notification_type: 'event_reminder',
+      is_sent: false,
+      created_at: new Date().toISOString()
+    }]);
+
+  if (error) {
+    console.error('❌ Failed to schedule notification:', error);
+    throw error;
+  }
+
+  console.log(`📅 Notification scheduled for ${notificationTime.toLocaleString()} for event "${eventTitle}"`);
+}
+
+console.log('✅ Notification subscription routes registered successfully');
+
 // Panchang API Routes
 console.log('📅 Registering Panchang routes...');
 app.get('/api/panchang/today', async (req, res) => {
