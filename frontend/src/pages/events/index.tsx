@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { eventsService } from '@/lib/events';
+import { getFCMToken } from '@/lib/firebase';
 
 const Events = () => {
   const [isCreateFormOpen, setIsCreateFormOpen] = useState(false);
@@ -173,10 +174,49 @@ const Events = () => {
   };
 
   const enhanceMockMessage = (message, eventType) => {
-    // Simple enhancement - adds cultural elements and proper formatting
-    const enhanced = `🙏 ${message}\n\nआप सभी श्रद्धालुओं का हार्दिक स्वागत है। कृपया परिवार सहित पधारें और इस पावन अवसर का लाभ उठाएं।\n\nसभी व्यवस्था निःशुल्क। 🕉️✨`;
+    // Convert English/Hinglish to pure Hindi with cultural enhancement
+    const cleanMessage = message.toLowerCase().trim();
 
-    return enhanced;
+    // Translation mapping for common phrases
+    const translations = {
+      'i am inviting you': 'आप सभी को हार्दिक निमंत्रण है',
+      'you are invited': 'आपको सादर आमंत्रित करते हैं',
+      'bhagwad katha': 'श्रीमद भागवत कथा',
+      'organizing by me': 'द्वारा आयोजित',
+      'kirtan': 'कीर्तन',
+      'bhandara': 'भंडारा',
+      'satsang': 'सत्संग',
+      'please come': 'कृपया पधारें',
+      'everyone is welcome': 'सभी का स्वागत है',
+      'with family': 'परिवार सहित',
+      'free food': 'निःशुल्क प्रसाद',
+      'prasad': 'प्रसाद'
+    };
+
+    // Enhanced templates based on event type
+    const enhancedTemplates = {
+      'bhagwad-katha': [
+        `🕉️ श्रीमद भागवत कथा में आप सभी को हार्दिक निमंत्रण है 🕉️\n\nभगवान श्री कृष्ण की दिव्य लीलाओं का श्रवण करें और अपने जीवन को धन्य बनाएं। सप्त दिवसीय कथा में सभी भक्तजन परिवार सहित पधारें।\n\nगीता के ज्ञान से मन को शांति मिले और भक्ति का रस प्राप्त हो।\n\nप्रसाद सहित सभी व्यवस्था निःशुल्क। जय श्री कृष्ण! 🙏✨`,
+
+        `📿 श्रीमद भागवत महापुराण की कथा 📿\n\nआप सभी श्रद्धालुओं को इस पावन अवसर पर सादर आमंत्रित करते हैं। भगवान के चरित्र सुनकर मन में भक्ति भाव जगाएं।\n\nसाधु संतों के सत्संग में बैठकर जीवन की सच्चाई को समझें। परमात्मा के नाम का जप करें और मोक्ष का मार्ग पाएं।\n\nसभी व्यवस्था निःशुल्क। हरि ॐ! 🕉️🌺`
+      ],
+      'kirtan': [
+        `🎵 दिव्य कीर्तन संध्या में आपका स्वागत है 🎵\n\nराधा कृष्ण के भजन-कीर्तन में भाग लेकर मन को आनंद से भर दें। संगीत की मधुर धुन में भगवान के नाम का रस लें।\n\nभक्तों के साथ मिलकर हरि नाम संकीर्तन करें और दिव्य आनंद की अनुभूति करें।\n\nप्रसाद वितरण सहित। राधे राधे! 🎶🙏`,
+
+        `🪔 संकीर्तन एवं सत्संग 🪔\n\nभगवान के नाम की महिमा सुनने और गाने के लिए सभी को आमंत्रित करते हैं। पवित्र वातावरण में बैठकर आत्मा की शुद्धता पाएं।\n\nहरिनाम के जप से जीवन में शांति और प्रेम का संचार होगा।\n\nसभी भक्तजन उत्साह से पधारें। जय गोविंद! 🌸✨`
+      ],
+      'bhandara': [
+        `🍽️ माता के भंडारे में सादर निमंत्रण 🍽️\n\nदेवी माँ की कृपा से आयोजित इस पवित्र भंडारे में सभी श्रद्धालु परिवार सहित पधारें। माता की भक्ति में डूबकर पुण्य कमाएं।\n\nपूरी-सब्जी, खीर और प्रसाद का आनंद लें। माँ का आशीर्वाद पाकर जीवन को धन्य बनाएं।\n\nसेवा-भाव से सभी का स्वागत। जय माता दी! 🙏🌺`,
+
+        `🕯️ निःशुल्क प्रसाद वितरण 🕯️\n\nभगवान की कृपा से आयोजित इस सामुदायिक भोज में सभी भाई-बहन आमंत्रित हैं। एक साथ बैठकर भोजन करने से प्रेम और एकता बढ़ती है।\n\nसादा भोजन और मिठास के साथ आत्मिक संतुष्टि पाएं।\n\nसभी का हार्दिक स्वागत है! 🙏🍃`
+      ]
+    };
+
+    // Get event-specific enhanced version
+    const templates = enhancedTemplates[eventType] || enhancedTemplates['bhagwad-katha'];
+    const randomTemplate = templates[Math.floor(Math.random() * templates.length)];
+
+    return randomTemplate;
   };
 
   const selectAISuggestion = (suggestion) => {
@@ -279,29 +319,111 @@ const Events = () => {
     }
   };
 
-  const handleNotificationToggle = (eventId: number) => {
+  const handleNotificationToggle = async (eventId: number) => {
     const newSubscribed = new Set(subscribedEvents);
+    const event = approvedEvents.find(e => e.id === eventId);
+
+    if (!event) return;
 
     // Add smooth delay before state change
-    setTimeout(() => {
+    setTimeout(async () => {
       if (newSubscribed.has(eventId)) {
+        // Unsubscribe from notifications
         newSubscribed.delete(eventId);
         setSubscribedEvents(newSubscribed);
+
+        // Remove from backend
+        await unsubscribeFromEvent(eventId);
+
         toast({
           title: "🔕 Notification Disabled",
           description: "You won't receive notifications for this event anymore.",
           duration: 3000,
         });
       } else {
+        // Subscribe to notifications
         newSubscribed.add(eventId);
         setSubscribedEvents(newSubscribed);
+
+        // Send to backend and trigger immediate notification
+        await subscribeToEvent(event);
+
         toast({
           title: "🔔 Notification Enabled!",
-          description: "You'll be notified about this event on the day it happens.",
+          description: "You'll receive an immediate confirmation and a reminder on the event day.",
           duration: 4000,
         });
       }
     }, 150); // Slight delay for smoother transition
+  };
+
+  // Subscribe to event notifications
+  const subscribeToEvent = async (event: any) => {
+    try {
+      // Get FCM token
+      const fcmToken = await getFCMToken();
+      if (!fcmToken) {
+        toast({
+          title: "⚠️ Permission Required",
+          description: "Please allow notifications to receive event updates.",
+          duration: 4000,
+        });
+        return;
+      }
+
+      // Send subscription to backend
+      const response = await fetch('http://localhost:5000/api/notifications/subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          eventId: event.id,
+          eventTitle: event.title,
+          eventDate: event.date,
+          eventTime: event.time,
+          eventLocation: event.location,
+          eventCity: event.city,
+          eventType: event.type,
+          fcmToken: fcmToken,
+          userId: user?.id || 'anonymous',
+          userEmail: user?.email || '',
+          timestamp: new Date().toISOString()
+        }),
+      });
+
+      if (response.ok) {
+        console.log('✅ Successfully subscribed to event notifications');
+      } else {
+        console.error('❌ Failed to subscribe to event notifications');
+      }
+    } catch (error) {
+      console.error('❌ Error subscribing to event:', error);
+    }
+  };
+
+  // Unsubscribe from event notifications
+  const unsubscribeFromEvent = async (eventId: number) => {
+    try {
+      const response = await fetch('http://localhost:5000/api/notifications/unsubscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          eventId: eventId,
+          userId: user?.id || 'anonymous',
+        }),
+      });
+
+      if (response.ok) {
+        console.log('✅ Successfully unsubscribed from event notifications');
+      } else {
+        console.error('❌ Failed to unsubscribe from event notifications');
+      }
+    } catch (error) {
+      console.error('❌ Error unsubscribing from event:', error);
+    }
   };
 
   const handleShowDetails = (event: any) => {
