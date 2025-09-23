@@ -16,8 +16,9 @@ if (import.meta.env.DEV) {
 // Database table names
 export const TABLES = {
   SAINTS: 'saints',
-  LIVING_SAINTS: 'living_saints', 
+  LIVING_SAINTS: 'living_saints',
   DIVINE_FORMS: 'divine_forms',
   BHAJANS: 'bhajans',
-  QUOTES: 'quotes'
+  QUOTES: 'quotes',
+  EVENTS: 'events'
 } as const

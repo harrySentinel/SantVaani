@@ -1,12 +1,13 @@
 import { NavLink } from 'react-router-dom'
-import { 
-  LayoutDashboard, 
-  Users, 
-  Heart, 
-  Sparkles, 
-  Music, 
+import {
+  LayoutDashboard,
+  Users,
+  Heart,
+  Sparkles,
+  Music,
   Quote,
   Lightbulb,
+  Calendar,
   Settings,
   X
 } from 'lucide-react'
@@ -64,6 +65,13 @@ const navigation = [
     href: '/spiritual-facts',
     icon: Lightbulb,
     description: 'Interesting spiritual facts for homepage',
+    count: 0
+  },
+  {
+    name: 'Events',
+    href: '/events',
+    icon: Calendar,
+    description: 'Manage community event submissions',
     count: 0
   }
 ]

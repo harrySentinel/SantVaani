@@ -1,4 +1,4 @@
-import { Bell, Search, User, LogOut, Menu } from 'lucide-react'
+import { Bell, Search, User, LogOut, Menu, Shield } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -8,15 +8,31 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { useAdminAuth } from '@/contexts/AdminAuthContext'
+import { toast } from '@/hooks/use-toast'
 
 interface HeaderProps {
   setSidebarOpen: (open: boolean) => void
 }
 
 export default function Header({ setSidebarOpen }: HeaderProps) {
-  const handleLogout = () => {
-    // TODO: Implement logout functionality
-    console.log('Logging out...')
+  const { user, signOut } = useAdminAuth();
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      toast({
+        title: "Logged Out",
+        description: "Successfully logged out of admin panel",
+      });
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast({
+        title: "Logout Error",
+        description: "Failed to logout. Please try again.",
+        variant: "destructive",
+      });
+    }
   }
 
   return (
@@ -64,24 +80,31 @@ export default function Header({ setSidebarOpen }: HeaderProps) {
             {/* User menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <User className="h-5 w-5" />
-                  <span className="sr-only">User menu</span>
+                <Button variant="ghost" size="icon" className="relative">
+                  <div className="w-8 h-8 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center">
+                    <Shield className="h-4 w-4 text-white" />
+                  </div>
+                  <span className="sr-only">Admin menu</span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>Admin Account</DropdownMenuLabel>
+              <DropdownMenuContent align="end" className="w-64">
+                <DropdownMenuLabel>
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium text-gray-900">Admin Account</p>
+                    <p className="text-xs text-gray-500">{user?.email}</p>
+                  </div>
+                </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
-                  <User className="mr-2 h-4 w-4" />
-                  <span>Profile</span>
+                  <Shield className="mr-2 h-4 w-4 text-orange-600" />
+                  <span>Admin Privileges</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <Bell className="mr-2 h-4 w-4" />
-                  <span>Notifications</span>
+                  <span>System Notifications</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout}>
+                <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-600">
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Log out</span>
                 </DropdownMenuItem>
