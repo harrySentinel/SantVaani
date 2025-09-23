@@ -2,14 +2,24 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, Users, Heart, Sparkles, Book, Info, IndianRupee, Calendar, Star, ChevronDown, CalendarDays } from 'lucide-react';
+import { Menu, X, Users, Heart, Sparkles, Book, Info, IndianRupee, Calendar, Star, ChevronDown, CalendarDays, LogIn, UserPlus, User, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/AuthContext';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isMoreOpen, setIsMoreOpen] = useState(false);
   const [language, setLanguage] = useState('EN');
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const { user, loading, signOut } = useAuth();
 
   const toggleLanguage = () => {
     setLanguage(language === 'EN' ? 'HI' : 'EN');
@@ -114,6 +124,62 @@ export default function Navbar() {
                 </div>
               )}
             </div>
+
+            {/* Authentication Buttons */}
+            <div className="flex items-center space-x-2">
+              {loading ? (
+                <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse"></div>
+              ) : user ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="flex items-center space-x-2">
+                      <User className="w-4 h-4" />
+                      <span className="hidden md:inline">{user.user_metadata?.name || 'User'}</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link to="/dashboard" className="flex items-center">
+                        <User className="w-4 h-4 mr-2" />
+                        Dashboard
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={async () => {
+                        try {
+                          await signOut();
+                          window.location.href = '/';
+                        } catch (error) {
+                          console.error('Logout error:', error);
+                        }
+                      }}
+                      className="text-red-600 focus:text-red-600"
+                    >
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Logout
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <div className="flex items-center space-x-2">
+                  <Button asChild variant="ghost" size="sm">
+                    <Link to="/login" className="flex items-center space-x-1">
+                      <LogIn className="w-4 h-4" />
+                      <span>Login</span>
+                    </Link>
+                  </Button>
+                  <Button asChild variant="outline" size="sm" className="border-orange-200 text-orange-600 hover:bg-orange-50">
+                    <Link to="/signup" className="flex items-center space-x-1">
+                      <UserPlus className="w-4 h-4" />
+                      <span>Sign Up</span>
+                    </Link>
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Language Toggle & Mobile Menu Button */}
@@ -161,6 +227,58 @@ export default function Navbar() {
                   </Link>
                 );
               })}
+
+              {/* Mobile Auth Buttons */}
+              <div className="pt-4 border-t border-orange-100 mt-4">
+                {loading ? (
+                  <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse mx-3"></div>
+                ) : user ? (
+                  <div className="space-y-2">
+                    <Link
+                      to="/dashboard"
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-center space-x-2 text-gray-700 hover:text-orange-600 transition-colors duration-200 px-3 py-2 rounded-lg hover:bg-orange-50"
+                    >
+                      <User className="w-4 h-4" />
+                      <span className="font-medium">Dashboard</span>
+                    </Link>
+                    <button
+                      onClick={async () => {
+                        try {
+                          await signOut();
+                          setIsOpen(false);
+                          window.location.href = '/';
+                        } catch (error) {
+                          console.error('Logout error:', error);
+                        }
+                      }}
+                      className="flex items-center space-x-2 text-red-600 hover:text-red-700 transition-colors duration-200 px-3 py-2 rounded-lg hover:bg-red-50 w-full text-left"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      <span className="font-medium">Logout</span>
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <Link
+                      to="/login"
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-center space-x-2 text-gray-700 hover:text-orange-600 transition-colors duration-200 px-3 py-2 rounded-lg hover:bg-orange-50"
+                    >
+                      <LogIn className="w-4 h-4" />
+                      <span className="font-medium">Login</span>
+                    </Link>
+                    <Link
+                      to="/signup"
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-center space-x-2 text-orange-600 hover:text-orange-700 transition-colors duration-200 px-3 py-2 rounded-lg hover:bg-orange-50 border border-orange-200"
+                    >
+                      <UserPlus className="w-4 h-4" />
+                      <span className="font-medium">Sign Up</span>
+                    </Link>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}

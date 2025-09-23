@@ -6,13 +6,22 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar, MapPin, Users, Clock, Plus, Bell, X, User, Phone, Mail, BellRing, CheckCircle, Shield } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { eventsService } from '@/lib/events';
 
 const Events = () => {
   const [isCreateFormOpen, setIsCreateFormOpen] = useState(false);
   const [subscribedEvents, setSubscribedEvents] = useState(new Set());
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [approvedEvents, setApprovedEvents] = useState([]);
+  const [loadingEvents, setLoadingEvents] = useState(true);
+
+  const navigate = useNavigate();
+  const { user, loading } = useAuth();
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
@@ -32,34 +41,118 @@ const Events = () => {
     additionalNotes: ''
   });
 
+  // Load approved events on component mount
+  useEffect(() => {
+    loadApprovedEvents();
+  }, []);
+
+  const loadApprovedEvents = async () => {
+    try {
+      setLoadingEvents(true);
+      console.log('Loading approved events...');
+      const events = await eventsService.getApprovedEvents();
+      console.log('Loaded approved events:', events);
+      setApprovedEvents(events);
+    } catch (error) {
+      console.error('Error loading approved events:', error);
+      toast({
+        title: "⚠️ Error Loading Events",
+        description: "Failed to load events. Showing sample events instead.",
+        duration: 4000,
+      });
+    } finally {
+      setLoadingEvents(false);
+    }
+  };
+
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleCreateEventClick = () => {
+    if (!user) {
+      toast({
+        title: "⚠️ Login Required",
+        description: "Please login to create an event. You'll be redirected to the login page.",
+        duration: 3000,
+      });
+      navigate('/login');
+      return;
+    }
+    setIsCreateFormOpen(true);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Event submission:', formData);
-    // Here we'll later add API call to submit the event
-    alert('Event submitted for admin approval!');
-    setIsCreateFormOpen(false);
-    // Reset form
-    setFormData({
-      title: '',
-      description: '',
-      type: '',
-      otherEventDetails: '',
-      date: '',
-      startTime: '',
-      endTime: '',
-      location: '',
-      address: '',
-      organizerName: '',
-      organizerPhone: '',
-      organizerEmail: '',
-      exactLocation: '',
-      invitationMessage: '',
-      additionalNotes: ''
-    });
+
+    if (!user) {
+      toast({
+        title: "⚠️ Authentication Required",
+        description: "Please login to submit an event",
+        duration: 3000,
+      });
+      return;
+    }
+
+    // Validation
+    if (!formData.title || !formData.description || !formData.date || !formData.startTime || !formData.location) {
+      toast({
+        title: "⚠️ Missing Information",
+        description: "Please fill in all required fields",
+        duration: 3000,
+      });
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      console.log('Event submission:', formData);
+      console.log('Submitting for user ID:', user.id);
+
+      const newEvent = await eventsService.createEvent(formData, user.id);
+      console.log('Event created:', newEvent);
+
+      toast({
+        title: "✅ Event Submitted Successfully!",
+        description: "Your event has been submitted for admin approval. You can track its status in your dashboard.",
+        duration: 5000,
+      });
+
+      setIsCreateFormOpen(false);
+
+      // Reload approved events in case admin approves it quickly
+      loadApprovedEvents();
+
+      // Reset form
+      setFormData({
+        title: '',
+        description: '',
+        type: '',
+        otherEventDetails: '',
+        date: '',
+        startTime: '',
+        endTime: '',
+        location: '',
+        address: '',
+        organizerName: '',
+        organizerPhone: '',
+        organizerEmail: '',
+        exactLocation: '',
+        invitationMessage: '',
+        additionalNotes: ''
+      });
+
+    } catch (error: any) {
+      console.error('Error submitting event:', error);
+      toast({
+        title: "❌ Submission Failed",
+        description: error.message || "Failed to submit event. Please try again.",
+        duration: 4000,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleNotificationToggle = (eventId: number) => {
@@ -186,7 +279,7 @@ const Events = () => {
                 <p className="text-blue-100">Share your bhajan, bhandara, or satsang with the community</p>
               </div>
               <button
-                onClick={() => setIsCreateFormOpen(true)}
+                onClick={handleCreateEventClick}
                 className="bg-white text-blue-600 px-6 py-3 rounded-full font-semibold hover:bg-blue-50 transition-colors flex items-center space-x-2"
               >
                 <Plus className="w-5 h-5" />
@@ -212,7 +305,22 @@ const Events = () => {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {upcomingEvents.map((event) => (
+            {loadingEvents ? (
+              // Loading skeleton
+              Array.from({ length: 3 }).map((_, index) => (
+                <Card key={index} className="animate-pulse">
+                  <CardContent className="p-0">
+                    <div className="h-20 bg-gray-200"></div>
+                    <div className="p-6 space-y-4">
+                      <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                      <div className="h-3 bg-gray-200 rounded w-full"></div>
+                      <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            ) : approvedEvents.length > 0 ? (
+              approvedEvents.map((event) => (
               <Card key={event.id} className="group hover:shadow-2xl transition-all duration-500 transform hover:scale-[1.02] border-0 shadow-lg bg-white rounded-2xl overflow-hidden">
                 <CardContent className="p-0">
                   {/* Event Type Header */}
@@ -304,7 +412,24 @@ const Events = () => {
                   </div>
                 </CardContent>
               </Card>
-            ))}
+              ))
+            ) : (
+              // No approved events
+              <div className="col-span-full text-center py-12">
+                <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-600 mb-2">No Events Available</h3>
+                <p className="text-gray-500 mb-6">No approved events to display at the moment. Check back later!</p>
+                {user && (
+                  <button
+                    onClick={() => setIsCreateFormOpen(true)}
+                    className="bg-gradient-to-r from-blue-600 to-orange-600 text-white px-6 py-3 rounded-xl hover:from-blue-700 hover:to-orange-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                  >
+                    <Plus className="w-5 h-5 inline mr-2" />
+                    Create First Event
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -393,14 +518,14 @@ const Events = () => {
               </div>
 
               {/* Invitation Message */}
-              {selectedEvent.invitationMessage && (
+              {(selectedEvent.invitation_message || selectedEvent.invitationMessage) && (
                 <div className="bg-gradient-to-r from-blue-50 to-orange-50 rounded-xl p-4 border border-blue-200">
                   <h3 className="font-semibold text-gray-800 mb-2 flex items-center space-x-2">
                     <span>💌</span>
                     <span>Invitation Message</span>
                   </h3>
                   <p className="text-gray-700 leading-relaxed font-medium">
-                    {selectedEvent.invitationMessage}
+                    {selectedEvent.invitation_message || selectedEvent.invitationMessage}
                   </p>
                 </div>
               )}
@@ -410,6 +535,22 @@ const Events = () => {
                 <h3 className="font-semibold text-gray-800 mb-1">Organized by</h3>
                 <p className="text-blue-600 font-medium">{selectedEvent.organizer}</p>
               </div>
+
+              {/* Additional Notes */}
+              {selectedEvent.additional_notes && (
+                <div className="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
+                  <h3 className="font-semibold text-gray-800 mb-2">📝 Additional Notes</h3>
+                  <p className="text-gray-700 text-sm">{selectedEvent.additional_notes}</p>
+                </div>
+              )}
+
+              {/* Exact Location */}
+              {selectedEvent.exact_location && (
+                <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+                  <h3 className="font-semibold text-gray-800 mb-2">📍 Exact Location</h3>
+                  <p className="text-gray-700 text-sm">{selectedEvent.exact_location}</p>
+                </div>
+              )}
 
               {/* Action Button */}
               <div className="pt-4 border-t border-gray-200">
