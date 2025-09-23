@@ -9,6 +9,7 @@ import { Suspense, useEffect } from "react";
 import { LoadingPage } from "@/components/ui/loading-spinner";
 import { lazy } from "react";
 import { getFCMToken, onFCMMessage } from "@/lib/firebase";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 // Lazy load pages for better code splitting
 const Index = lazy(() => import("./pages/Index"));
@@ -22,6 +23,9 @@ const Horoscope = lazy(() => import("./pages/horoscope/index"));
 const Events = lazy(() => import("./pages/events/index"));
 const Donation = lazy(() => import("./pages/donation/index"));
 const About = lazy(() => import("./pages/about/index"));
+const Login = lazy(() => import("./pages/auth/login"));
+const Signup = lazy(() => import("./pages/auth/signup"));
+const Dashboard = lazy(() => import("./pages/dashboard/index"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -53,11 +57,12 @@ const App = () => {
 
   return (
     <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
+      <AuthProvider>
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
           <Suspense fallback={<LoadingPage text="Loading SantVaani..." />}>
             <Routes>
               <Route path="/" element={<Index />} />
@@ -71,13 +76,17 @@ const App = () => {
               <Route path="/events" element={<Events />} />
               <Route path="/donation" element={<Donation />} />
               <Route path="/about" element={<About />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/dashboard" element={<Dashboard />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
         </BrowserRouter>
-      </TooltipProvider>
-    </QueryClientProvider>
+          </TooltipProvider>
+        </QueryClientProvider>
+      </AuthProvider>
     </ErrorBoundary>
   );
 };
