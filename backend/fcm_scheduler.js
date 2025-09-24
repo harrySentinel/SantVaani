@@ -1,12 +1,38 @@
 const admin = require('firebase-admin');
 const cron = require('node-cron');
 const path = require('path');
+const fs = require('fs');
 require('dotenv').config();
 const { getTodaysPanchang } = require('./panchang_service');
 
 // Initialize Firebase Admin SDK with secret file
 console.log('🔧 Loading Firebase credentials from secret file...');
-const serviceAccount = require('./firebase-admin-key.json');
+let serviceAccount;
+
+try {
+  const serviceAccountPath = path.join(__dirname, 'firebase-admin-key.json');
+  const serviceAccountData = fs.readFileSync(serviceAccountPath, 'utf8');
+  serviceAccount = JSON.parse(serviceAccountData);
+  console.log('✅ Firebase credentials loaded successfully');
+} catch (error) {
+  console.error('❌ Failed to load Firebase credentials:', error.message);
+  console.log('🔧 Attempting to read file directly...');
+
+  // Debug: Check if file exists and show first 100 chars
+  try {
+    const filePath = path.join(__dirname, 'firebase-admin-key.json');
+    if (fs.existsSync(filePath)) {
+      const content = fs.readFileSync(filePath, 'utf8');
+      console.log('📝 File exists, length:', content.length);
+      console.log('📝 First 100 chars:', content.substring(0, 100));
+      console.log('📝 Last 100 chars:', content.substring(content.length - 100));
+    } else {
+      console.log('❌ File does not exist at:', filePath);
+    }
+  } catch (debugError) {
+    console.error('❌ Debug error:', debugError.message);
+  }
+}
 
 // Initialize Firebase Admin
 admin.initializeApp({
