@@ -3,15 +3,16 @@ const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const axios = require('axios');
 const { createClient } = require('@supabase/supabase-js');
-const { 
-  registerFCMToken, 
-  scheduleNotifications, 
+const admin = require('firebase-admin');
+const {
+  registerFCMToken,
+  scheduleNotifications,
   sendTestNotification,
-  getNotificationStats 
+  getNotificationStats
 } = require('./fcm_scheduler');
-const { 
-  getTodaysPanchang, 
-  fetchRealPanchangData 
+const {
+  getTodaysPanchang,
+  fetchRealPanchangData
 } = require('./panchang_service');
 require('dotenv').config();
 
@@ -1196,7 +1197,9 @@ async function scheduleEventNotification(eventData) {
   const { eventId, eventTitle, eventDate, eventTime, eventLocation, eventCity, eventType, fcmToken, userId } = eventData;
 
   // Calculate notification time (send notification 2 hours before event)
-  const eventDateTime = new Date(`${eventDate} ${eventTime}`);
+  // Handle time format like "10:00 - 19:00" by extracting start time
+  const startTime = eventTime.includes(' - ') ? eventTime.split(' - ')[0] : eventTime;
+  const eventDateTime = new Date(`${eventDate} ${startTime}`);
   const notificationTime = new Date(eventDateTime.getTime() - (2 * 60 * 60 * 1000)); // 2 hours before
 
   // Store scheduled notification in database
