@@ -96,17 +96,7 @@ export const onFCMMessage = (callback: (payload: any) => void) => {
         icon: '/favicon.ico',
         badge: '/favicon.ico',
         tag: 'santvaani-notification',
-        requireInteraction: true,
-        actions: [
-          {
-            action: 'open',
-            title: 'Open App'
-          },
-          {
-            action: 'close',
-            title: 'Dismiss'
-          }
-        ]
+        requireInteraction: true
       });
     }
     
