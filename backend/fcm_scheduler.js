@@ -4,6 +4,26 @@ const path = require('path');
 require('dotenv').config();
 const { getTodaysPanchang } = require('./panchang_service');
 
+// Function to properly format private key with line breaks
+function formatPrivateKey(privateKey) {
+  if (!privateKey) return null;
+
+  // Remove any existing line breaks and extra spaces
+  let cleanKey = privateKey.replace(/\\n/g, '').replace(/\n/g, '').replace(/\r/g, '').trim();
+
+  // Extract just the key content between BEGIN and END
+  const keyMatch = cleanKey.match(/-----BEGIN PRIVATE KEY-----(.*)-----END PRIVATE KEY-----/);
+  if (keyMatch && keyMatch[1]) {
+    const keyContent = keyMatch[1];
+    // Add proper line breaks every 64 characters and format properly
+    const formattedContent = keyContent.match(/.{1,64}/g)?.join('\n') || keyContent;
+    return `-----BEGIN PRIVATE KEY-----\n${formattedContent}\n-----END PRIVATE KEY-----`;
+  }
+
+  // If no match found, return the original key (fallback)
+  return cleanKey.replace(/\\n/g, '\n');
+}
+
 // Initialize Firebase Admin SDK with environment variables (secure!)
 console.log('🔧 Loading Firebase credentials from environment variables...');
 console.log('📋 Project ID:', process.env.FIREBASE_PROJECT_ID ? 'Found' : 'Missing');
@@ -14,7 +34,7 @@ const serviceAccount = {
   type: "service_account",
   project_id: process.env.FIREBASE_PROJECT_ID,
   private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
-  private_key: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n').replace(/-----BEGIN PRIVATE KEY-----([^-]+)-----END PRIVATE KEY-----/, '-----BEGIN PRIVATE KEY-----\n$1\n-----END PRIVATE KEY-----'),
+  private_key: formatPrivateKey(process.env.FIREBASE_PRIVATE_KEY),
   client_email: process.env.FIREBASE_CLIENT_EMAIL,
   client_id: process.env.FIREBASE_CLIENT_ID,
   auth_uri: "https://accounts.google.com/o/oauth2/auth",
