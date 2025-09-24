@@ -1,15 +1,33 @@
 const admin = require('firebase-admin');
 const cron = require('node-cron');
 const path = require('path');
+require('dotenv').config();
 const { getTodaysPanchang } = require('./panchang_service');
 
-// Initialize Firebase Admin SDK with service account
-const serviceAccount = require('./firebase-admin-key.json');
+// Initialize Firebase Admin SDK with environment variables (secure!)
+console.log('🔧 Loading Firebase credentials from environment variables...');
+console.log('📋 Project ID:', process.env.FIREBASE_PROJECT_ID ? 'Found' : 'Missing');
+console.log('🔑 Private Key:', process.env.FIREBASE_PRIVATE_KEY ? 'Found' : 'Missing');
+console.log('📧 Client Email:', process.env.FIREBASE_CLIENT_EMAIL ? 'Found' : 'Missing');
+
+const serviceAccount = {
+  type: "service_account",
+  project_id: process.env.FIREBASE_PROJECT_ID,
+  private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
+  private_key: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n').replace(/-----BEGIN PRIVATE KEY-----([^-]+)-----END PRIVATE KEY-----/, '-----BEGIN PRIVATE KEY-----\n$1\n-----END PRIVATE KEY-----'),
+  client_email: process.env.FIREBASE_CLIENT_EMAIL,
+  client_id: process.env.FIREBASE_CLIENT_ID,
+  auth_uri: "https://accounts.google.com/o/oauth2/auth",
+  token_uri: "https://oauth2.googleapis.com/token",
+  auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
+  client_x509_cert_url: `https://www.googleapis.com/robot/v1/metadata/x509/${encodeURIComponent(process.env.FIREBASE_CLIENT_EMAIL)}`,
+  universe_domain: "googleapis.com"
+};
 
 // Initialize Firebase Admin
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  projectId: 'santvaani-production'
+  projectId: process.env.FIREBASE_PROJECT_ID || 'santvaani-production'
 });
 
 console.log('🔥 Firebase Admin SDK initialized successfully!');
