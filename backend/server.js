@@ -1078,9 +1078,6 @@ app.post('/api/notifications/subscribe', async (req, res) => {
     }
 
     // Send immediate confirmation notification
-    const admin = require('firebase-admin');
-
-    // Create beautiful Hindi confirmation message
     const confirmationMessages = {
       'bhagwad-katha': `🕉️ धन्यवाद! आपने "${eventTitle}" के लिए notification चालू की है। श्रीमद भागवत कथा के दिन आपको reminder मिलेगा। 📅 ${eventDate} को ${eventTime} बजे तैयार रहें। जय श्री कृष्ण! 🙏`,
       'kirtan': `🎵 बहुत अच्छा! "${eventTitle}" कीर्तन के लिए notification सक्रिय हो गई। भजन-कीर्तन के दिन आपको याद दिला देंगे। 📅 ${eventDate} को ${eventTime} बजे। राधे राधे! 🎶`,
@@ -1089,31 +1086,43 @@ app.post('/api/notifications/subscribe', async (req, res) => {
     };
 
     const confirmationMessage = confirmationMessages[eventType] ||
-      `🔔 Notification चालू हो गई! "${eventTitle}" के लिए ${eventDate} को ${eventTime} बजे reminder मिलेगा। धन्यवाद! 🙏`;
+      `🔔 Thank you! You will be notified about "${eventTitle}" on ${eventDate} at ${eventTime}. 🙏`;
 
-    const notificationPayload = {
-      notification: {
-        title: '✅ Notification चालू हो गई!',
-        body: confirmationMessage,
-        icon: '/favicon.ico'
-      },
-      data: {
-        eventId: eventId.toString(),
-        eventTitle: eventTitle,
-        eventDate: eventDate,
-        type: 'subscription_confirmation'
-      }
-    };
-
-    // Send immediate notification
+    // Send immediate confirmation notification using Firebase Admin
     try {
       await admin.messaging().send({
         token: fcmToken,
-        ...notificationPayload
+        notification: {
+          title: '🔔 SantVaani Notification Active!',
+          body: confirmationMessage
+        },
+        data: {
+          type: 'event_subscription_confirmation',
+          eventId: eventId.toString(),
+          eventTitle: eventTitle,
+          eventDate: eventDate,
+          eventTime: eventTime
+        },
+        android: {
+          priority: 'high',
+          notification: {
+            sound: 'default',
+            priority: 'high'
+          }
+        },
+        apns: {
+          payload: {
+            aps: {
+              sound: 'default'
+            }
+          }
+        }
       });
+
       console.log('✅ Immediate confirmation notification sent successfully');
-    } catch (notifError) {
-      console.error('❌ Failed to send immediate notification:', notifError);
+    } catch (notificationError) {
+      console.error('❌ Error sending immediate notification:', notificationError);
+      // Don't fail the whole request if notification fails
     }
 
     // Schedule day-of-event notification
