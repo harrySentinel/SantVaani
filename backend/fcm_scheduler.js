@@ -4,45 +4,9 @@ const path = require('path');
 require('dotenv').config();
 const { getTodaysPanchang } = require('./panchang_service');
 
-// Function to properly format private key with line breaks
-function formatPrivateKey(privateKey) {
-  if (!privateKey) return null;
-
-  // Remove any existing line breaks and extra spaces
-  let cleanKey = privateKey.replace(/\\n/g, '').replace(/\n/g, '').replace(/\r/g, '').trim();
-
-  // Extract just the key content between BEGIN and END
-  const keyMatch = cleanKey.match(/-----BEGIN PRIVATE KEY-----(.*)-----END PRIVATE KEY-----/);
-  if (keyMatch && keyMatch[1]) {
-    const keyContent = keyMatch[1];
-    // Add proper line breaks every 64 characters and format properly
-    const formattedContent = keyContent.match(/.{1,64}/g)?.join('\n') || keyContent;
-    return `-----BEGIN PRIVATE KEY-----\n${formattedContent}\n-----END PRIVATE KEY-----`;
-  }
-
-  // If no match found, return the original key (fallback)
-  return cleanKey.replace(/\\n/g, '\n');
-}
-
-// Initialize Firebase Admin SDK with environment variables (secure!)
-console.log('🔧 Loading Firebase credentials from environment variables...');
-console.log('📋 Project ID:', process.env.FIREBASE_PROJECT_ID ? 'Found' : 'Missing');
-console.log('🔑 Private Key:', process.env.FIREBASE_PRIVATE_KEY ? 'Found' : 'Missing');
-console.log('📧 Client Email:', process.env.FIREBASE_CLIENT_EMAIL ? 'Found' : 'Missing');
-
-const serviceAccount = {
-  type: "service_account",
-  project_id: process.env.FIREBASE_PROJECT_ID,
-  private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
-  private_key: formatPrivateKey(process.env.FIREBASE_PRIVATE_KEY),
-  client_email: process.env.FIREBASE_CLIENT_EMAIL,
-  client_id: process.env.FIREBASE_CLIENT_ID,
-  auth_uri: "https://accounts.google.com/o/oauth2/auth",
-  token_uri: "https://oauth2.googleapis.com/token",
-  auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
-  client_x509_cert_url: `https://www.googleapis.com/robot/v1/metadata/x509/${encodeURIComponent(process.env.FIREBASE_CLIENT_EMAIL)}`,
-  universe_domain: "googleapis.com"
-};
+// Initialize Firebase Admin SDK with secret file
+console.log('🔧 Loading Firebase credentials from secret file...');
+const serviceAccount = require('./firebase-admin-key.json');
 
 // Initialize Firebase Admin
 admin.initializeApp({
