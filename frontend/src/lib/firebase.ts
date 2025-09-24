@@ -27,23 +27,23 @@ export const messaging = getMessaging(app);
 const VAPID_KEY = 'BOHsxh4_Bh_ZN2_AoI756MFJ17huLW1nb96HVd624K9qnmnie2GMdgr9QO3rHmx_Q_QTtzTKcXfalx0naQJ1z8o';
 
 // Production FCM Token Management
-export const getFCMToken = async (): Promise<string | null> => {
+export const getFCMToken = async (userId?: string): Promise<string | null> => {
   try {
     const permission = await Notification.requestPermission();
-    
+
     if (permission === 'granted') {
       const currentToken = await getToken(messaging, {
         vapidKey: VAPID_KEY
       });
-      
+
       if (currentToken) {
         console.log('🔥 FCM Token Generated:', currentToken);
         // Store token for backend use
         localStorage.setItem('fcm-token', currentToken);
-        
-        // Send to backend for database storage
-        await sendTokenToBackend(currentToken);
-        
+
+        // Send to backend for database storage with user ID
+        await sendTokenToBackend(currentToken, userId);
+
         return currentToken;
       } else {
         console.log('❌ No FCM token available');
@@ -60,20 +60,20 @@ export const getFCMToken = async (): Promise<string | null> => {
 };
 
 // Send token to backend for scheduling notifications
-const sendTokenToBackend = async (token: string) => {
+const sendTokenToBackend = async (token: string, userId?: string) => {
   try {
     const response = await fetch('https://santvaani-backend.onrender.com/api/fcm/register-token', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ 
+      body: JSON.stringify({
         token,
-        userId: 'user-' + Date.now(), // Simple user identification
+        userId: userId || 'anonymous-' + Date.now(),
         timestamp: new Date().toISOString()
       }),
     });
-    
+
     if (response.ok) {
       console.log('✅ Token registered with backend');
     } else {
