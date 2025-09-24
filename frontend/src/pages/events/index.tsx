@@ -49,6 +49,17 @@ const Events = () => {
     loadApprovedEvents();
   }, []);
 
+  // Load user's subscribed events when user changes or component mounts
+  useEffect(() => {
+    if (user) {
+      const userSubscriptions = JSON.parse(localStorage.getItem(`event_subscriptions_${user.id}`) || '[]');
+      setSubscribedEvents(new Set(userSubscriptions));
+    } else {
+      // Clear subscriptions when user logs out
+      setSubscribedEvents(new Set());
+    }
+  }, [user]);
+
   const loadApprovedEvents = async () => {
     try {
       setLoadingEvents(true);
@@ -320,6 +331,17 @@ const Events = () => {
   };
 
   const handleNotificationToggle = async (eventId: number) => {
+    // Check if user is logged in
+    if (!user) {
+      toast({
+        title: "⚠️ Login Required",
+        description: "Please login to subscribe to event notifications. You'll be redirected to the login page.",
+        duration: 4000,
+      });
+      navigate('/login');
+      return;
+    }
+
     const newSubscribed = new Set(subscribedEvents);
     const event = approvedEvents.find(e => e.id === eventId);
 
@@ -331,6 +353,11 @@ const Events = () => {
         // Unsubscribe from notifications
         newSubscribed.delete(eventId);
         setSubscribedEvents(newSubscribed);
+
+        // Save to localStorage for persistence
+        const userSubscriptions = JSON.parse(localStorage.getItem(`event_subscriptions_${user.id}`) || '[]');
+        const updatedSubscriptions = userSubscriptions.filter((id: number) => id !== eventId);
+        localStorage.setItem(`event_subscriptions_${user.id}`, JSON.stringify(updatedSubscriptions));
 
         // Remove from backend
         await unsubscribeFromEvent(eventId);
@@ -344,6 +371,11 @@ const Events = () => {
         // Subscribe to notifications
         newSubscribed.add(eventId);
         setSubscribedEvents(newSubscribed);
+
+        // Save to localStorage for persistence
+        const userSubscriptions = JSON.parse(localStorage.getItem(`event_subscriptions_${user.id}`) || '[]');
+        userSubscriptions.push(eventId);
+        localStorage.setItem(`event_subscriptions_${user.id}`, JSON.stringify(userSubscriptions));
 
         // Send to backend and trigger immediate notification
         await subscribeToEvent(event);
@@ -360,8 +392,8 @@ const Events = () => {
   // Subscribe to event notifications
   const subscribeToEvent = async (event: any) => {
     try {
-      // Get FCM token
-      const fcmToken = await getFCMToken();
+      // Get FCM token with user ID for better tracking
+      const fcmToken = await getFCMToken(user?.id);
       if (!fcmToken) {
         toast({
           title: "⚠️ Permission Required",
@@ -381,9 +413,9 @@ const Events = () => {
           eventId: event.id,
           eventTitle: event.title,
           eventDate: event.date,
-          eventTime: event.time,
+          eventTime: event.time || event.start_time,
           eventLocation: event.location,
-          eventCity: event.city,
+          eventCity: event.city || event.address,
           eventType: event.type,
           fcmToken: fcmToken,
           userId: user?.id || 'anonymous',
@@ -393,9 +425,12 @@ const Events = () => {
       });
 
       if (response.ok) {
-        console.log('✅ Successfully subscribed to event notifications');
+        const result = await response.json();
+        console.log('✅ Successfully subscribed to event notifications:', result);
       } else {
-        console.error('❌ Failed to subscribe to event notifications');
+        const errorData = await response.json().catch(() => ({}));
+        console.error('❌ Failed to subscribe to event notifications:', errorData);
+        throw new Error(errorData.message || 'Failed to subscribe to notifications');
       }
     } catch (error) {
       console.error('❌ Error subscribing to event:', error);
@@ -417,12 +452,16 @@ const Events = () => {
       });
 
       if (response.ok) {
-        console.log('✅ Successfully unsubscribed from event notifications');
+        const result = await response.json();
+        console.log('✅ Successfully unsubscribed from event notifications:', result);
       } else {
-        console.error('❌ Failed to unsubscribe from event notifications');
+        const errorData = await response.json().catch(() => ({}));
+        console.error('❌ Failed to unsubscribe from event notifications:', errorData);
+        throw new Error(errorData.message || 'Failed to unsubscribe from notifications');
       }
     } catch (error) {
       console.error('❌ Error unsubscribing from event:', error);
+      // Don't throw here as it's called in the success path, just log
     }
   };
 
@@ -627,7 +666,9 @@ const Events = () => {
                           className={`flex-1 relative overflow-hidden py-3 px-4 rounded-xl transition-all duration-700 ease-in-out text-sm font-medium shadow-md hover:shadow-lg transform ${
                             subscribedEvents.has(event.id)
                               ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white'
-                              : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white'
+                              : user
+                                ? 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white'
+                                : 'bg-gradient-to-r from-gray-400 to-gray-500 hover:from-orange-500 hover:to-orange-600 text-white'
                           }`}
                         >
                           <div className="flex items-center justify-center space-x-2">
@@ -638,8 +679,17 @@ const Events = () => {
                               </>
                             ) : (
                               <>
-                                <Bell className="w-4 h-4" />
-                                <span>Notify Me</span>
+                                {!user ? (
+                                  <>
+                                    <Shield className="w-4 h-4" />
+                                    <span>Login to Notify</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Bell className="w-4 h-4" />
+                                    <span>Notify Me</span>
+                                  </>
+                                )}
                               </>
                             )}
                           </div>
@@ -805,7 +855,9 @@ const Events = () => {
                   className={`w-full relative overflow-hidden py-3 px-4 rounded-xl transition-all duration-700 ease-in-out text-sm font-medium shadow-md hover:shadow-lg transform ${
                     subscribedEvents.has(selectedEvent.id)
                       ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white'
-                      : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white'
+                      : user
+                        ? 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white'
+                        : 'bg-gradient-to-r from-gray-400 to-gray-500 hover:from-orange-500 hover:to-orange-600 text-white'
                   }`}
                 >
                   <div className="flex items-center justify-center space-x-2">
@@ -816,8 +868,17 @@ const Events = () => {
                       </>
                     ) : (
                       <>
-                        <Bell className="w-4 h-4" />
-                        <span>Notify Me</span>
+                        {!user ? (
+                          <>
+                            <Shield className="w-4 h-4" />
+                            <span>Login to Notify</span>
+                          </>
+                        ) : (
+                          <>
+                            <Bell className="w-4 h-4" />
+                            <span>Notify Me</span>
+                          </>
+                        )}
                       </>
                     )}
                   </div>
