@@ -5,39 +5,13 @@ const fs = require('fs');
 require('dotenv').config();
 const { getTodaysPanchang } = require('./panchang_service');
 
-// Initialize Firebase Admin SDK with secret file
-console.log('🔧 Loading Firebase credentials from secret file...');
-let serviceAccount;
-
-try {
-  const serviceAccountPath = path.join(__dirname, 'firebase-admin-key.json');
-  const serviceAccountData = fs.readFileSync(serviceAccountPath, 'utf8');
-  serviceAccount = JSON.parse(serviceAccountData);
-  console.log('✅ Firebase credentials loaded successfully');
-} catch (error) {
-  console.error('❌ Failed to load Firebase credentials:', error.message);
-  console.log('🔧 Attempting to read file directly...');
-
-  // Debug: Check if file exists and show first 100 chars
-  try {
-    const filePath = path.join(__dirname, 'firebase-admin-key.json');
-    if (fs.existsSync(filePath)) {
-      const content = fs.readFileSync(filePath, 'utf8');
-      console.log('📝 File exists, length:', content.length);
-      console.log('📝 First 100 chars:', content.substring(0, 100));
-      console.log('📝 Last 100 chars:', content.substring(content.length - 100));
-    } else {
-      console.log('❌ File does not exist at:', filePath);
-    }
-  } catch (debugError) {
-    console.error('❌ Debug error:', debugError.message);
-  }
-}
+// Initialize Firebase Admin SDK with service account
+const serviceAccount = require('./firebase-admin-key.json');
 
 // Initialize Firebase Admin
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  projectId: process.env.FIREBASE_PROJECT_ID || 'santvaani-production'
+  projectId: 'santvaani-production'
 });
 
 console.log('🔥 Firebase Admin SDK initialized successfully!');
@@ -48,17 +22,17 @@ const fcmTokens = new Set();
 // API endpoint to register FCM tokens
 const registerFCMToken = (req, res) => {
   const { token, userId, timestamp } = req.body;
-  
+
   if (!token) {
     return res.status(400).json({ error: 'FCM token is required' });
   }
-  
+
   fcmTokens.add(token);
   console.log(`✅ FCM Token registered: ${token.substring(0, 20)}...`);
   console.log(`📊 Total registered tokens: ${fcmTokens.size}`);
-  
-  res.json({ 
-    success: true, 
+
+  res.json({
+    success: true,
     message: 'FCM token registered successfully',
     totalTokens: fcmTokens.size
   });
@@ -72,12 +46,12 @@ const sendNotificationToAll = async (title, body, data = {}) => {
   }
 
   const tokensArray = Array.from(fcmTokens);
-  
+
   // Send real FCM notifications using Firebase Admin SDK
   console.log(`🔥 Sending FCM notification to ${tokensArray.length} devices`);
   console.log(`📱 Title: ${title}`);
   console.log(`📝 Body: ${body}`);
-  
+
   const message = {
     notification: {
       title,
@@ -94,7 +68,7 @@ const sendNotificationToAll = async (title, body, data = {}) => {
     const response = await admin.messaging().sendMulticast(message);
     console.log(`✅ Successfully sent: ${response.successCount}`);
     console.log(`❌ Failed to send: ${response.failureCount}`);
-    
+
     // Remove invalid tokens
     response.responses.forEach((resp, idx) => {
       if (!resp.success && resp.error?.code === 'messaging/registration-token-not-registered') {
@@ -102,9 +76,9 @@ const sendNotificationToAll = async (title, body, data = {}) => {
         fcmTokens.delete(tokensArray[idx]);
       }
     });
-    
-    return { 
-      success: true, 
+
+    return {
+      success: true,
       successCount: response.successCount,
       failureCount: response.failureCount
     };
@@ -119,16 +93,16 @@ const scheduleNotifications = () => {
   // Morning blessing at 6:00 AM with dynamic Panchang
   cron.schedule('0 6 * * *', async () => {
     console.log('🌅 Sending morning blessing notification...');
-    
+
     try {
       const panchangData = await getTodaysPanchang();
       const tithi = panchangData.tithi.english || panchangData.tithi.name;
       const isAuspicious = panchangData.isAuspiciousDay;
-      
+
       const title = isAuspicious ? '🌅 शुभ प्रभात - Auspicious Morning' : '🌅 Good Morning Blessing';
       const body = `Today is ${tithi}. ${panchangData.specialMessage}`;
-      
-      await sendNotificationToAll(title, body, { 
+
+      await sendNotificationToAll(title, body, {
         url: '/daily-guide',
         type: 'morning-blessing',
         time: 'morning',
@@ -141,7 +115,7 @@ const scheduleNotifications = () => {
       await sendNotificationToAll(
         '🌅 Good Morning Blessing',
         'Start your day with divine blessings. Check today\'s spiritual guidance.',
-        { 
+        {
           url: '/daily-guide',
           type: 'morning-blessing',
           time: 'morning'
@@ -158,7 +132,7 @@ const scheduleNotifications = () => {
     await sendNotificationToAll(
       '🌇 Evening Prayer Time',
       'Join us for evening prayers and spiritual reflection.',
-      { 
+      {
         url: '/daily-guide',
         type: 'evening-prayer',
         time: 'evening'
@@ -168,22 +142,22 @@ const scheduleNotifications = () => {
     timezone: "Asia/Kolkata"
   });
 
-  // Dynamic festival notifications 
+  // Dynamic festival notifications
   cron.schedule('0 9 * * 1', async () => { // Every Monday at 9 AM
     console.log('🎉 Checking for upcoming festivals...');
-    
+
     try {
       const panchangData = await getTodaysPanchang();
       const upcomingFestivals = panchangData.festivals.filter(f => f.days <= 3 && f.days > 0);
-      
+
       if (upcomingFestivals.length > 0) {
         const festival = upcomingFestivals[0];
         const daysText = festival.days === 1 ? 'tomorrow' : `in ${festival.days} days`;
-        
+
         await sendNotificationToAll(
           `🎉 ${festival.name} ${daysText}`,
           `Prepare for the sacred festival of ${festival.name}. Get ready for divine celebrations!`,
-          { 
+          {
             url: '/daily-guide',
             type: 'festival-alert',
             time: 'weekly',
@@ -196,7 +170,7 @@ const scheduleNotifications = () => {
         await sendNotificationToAll(
           '🕉️ Weekly Spiritual Wisdom',
           'Discover new teachings and divine wisdom for the week ahead.',
-          { 
+          {
             url: '/saints',
             type: 'weekly-wisdom',
             time: 'weekly'
@@ -209,7 +183,7 @@ const scheduleNotifications = () => {
       await sendNotificationToAll(
         '🕉️ Weekly Spiritual Wisdom',
         'Discover new teachings and divine wisdom for the week ahead.',
-        { 
+        {
           url: '/saints',
           type: 'weekly-wisdom',
           time: 'weekly'
@@ -223,24 +197,24 @@ const scheduleNotifications = () => {
   console.log('📅 FCM notification scheduler initialized');
   console.log('⏰ Scheduled notifications:');
   console.log('   • Morning Blessing: 6:00 AM IST');
-  console.log('   • Evening Prayer: 6:00 PM IST');  
+  console.log('   • Evening Prayer: 6:00 PM IST');
   console.log('   • Weekly Wisdom: Monday 9:00 AM IST');
 };
 
 // Manual test notification endpoint
 const sendTestNotification = async (req, res) => {
   const { title, body, url } = req.body;
-  
+
   const result = await sendNotificationToAll(
     title || '🧪 Test Notification',
     body || 'This is a test notification from SantVaani backend.',
-    { 
+    {
       url: url || '/daily-guide',
       type: 'test',
       timestamp: new Date().toISOString()
     }
   );
-  
+
   res.json(result);
 };
 
@@ -248,7 +222,7 @@ const sendTestNotification = async (req, res) => {
 const getNotificationStats = (req, res) => {
   res.json({
     totalRegisteredTokens: fcmTokens.size,
-    registeredTokens: Array.from(fcmTokens).map(token => 
+    registeredTokens: Array.from(fcmTokens).map(token =>
       token.substring(0, 20) + '...'
     ),
     scheduledNotifications: [
