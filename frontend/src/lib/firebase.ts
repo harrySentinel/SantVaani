@@ -62,7 +62,8 @@ export const getFCMToken = async (userId?: string): Promise<string | null> => {
 // Send token to backend for scheduling notifications
 const sendTokenToBackend = async (token: string, userId?: string) => {
   try {
-    const response = await fetch('https://santvaani-backend.onrender.com/api/fcm/register-token', {
+    const backendUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:5000' : 'https://santvaani-backend.onrender.com';
+    const response = await fetch(`${backendUrl}/api/fcm/register-token`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -91,13 +92,36 @@ export const onFCMMessage = (callback: (payload: any) => void) => {
     
     // Show browser notification even in foreground
     if (payload.notification) {
-      new Notification(payload.notification.title || 'SantVaani', {
-        body: payload.notification.body,
-        icon: '/favicon.ico',
-        badge: '/favicon.ico',
-        tag: 'santvaani-notification',
-        requireInteraction: true
-      });
+      console.log('📱 Creating browser notification:', payload.notification);
+      try {
+        const notification = new Notification(payload.notification.title || 'SantVaani', {
+          body: payload.notification.body,
+          icon: '/favicon.ico',
+          badge: '/favicon.ico',
+          tag: 'santvaani-notification',
+          requireInteraction: true
+        });
+
+        notification.onclick = function(event) {
+          console.log('📱 Notification clicked!');
+          window.focus();
+          event.target.close();
+        };
+
+        notification.onshow = function() {
+          console.log('📱 Notification shown!');
+        };
+
+        notification.onclose = function() {
+          console.log('📱 Notification closed!');
+        };
+
+        console.log('📱 Browser notification created successfully:', notification);
+      } catch (error) {
+        console.error('📱 Error creating browser notification:', error);
+      }
+    } else {
+      console.log('📱 No notification payload found:', payload);
     }
     
     callback(payload);

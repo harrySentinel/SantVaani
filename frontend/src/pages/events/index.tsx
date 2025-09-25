@@ -14,6 +14,8 @@ import { eventsService } from '@/lib/events';
 import { getFCMToken } from '@/lib/firebase';
 
 const Events = () => {
+  console.log('🎯 EVENTS PAGE LOADED - NEW VERSION ACTIVE!');
+
   const [isCreateFormOpen, setIsCreateFormOpen] = useState(false);
   const [subscribedEvents, setSubscribedEvents] = useState(new Set());
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -330,7 +332,9 @@ const Events = () => {
     }
   };
 
-  const handleNotificationToggle = async (eventId: number) => {
+  const handleNotificationToggle = async (eventId: string | number) => {
+    console.log('🚨 BUTTON CLICKED! Event ID:', eventId, typeof eventId);
+
     // Check if user is logged in
     if (!user) {
       toast({
@@ -378,7 +382,9 @@ const Events = () => {
         localStorage.setItem(`event_subscriptions_${user.id}`, JSON.stringify(userSubscriptions));
 
         // Send to backend and trigger immediate notification
+        console.log('🔔 About to call subscribeToEvent with:', event);
         await subscribeToEvent(event);
+        console.log('🔔 subscribeToEvent completed');
 
         toast({
           title: "🔔 Notification Enabled!",
@@ -392,8 +398,13 @@ const Events = () => {
   // Subscribe to event notifications
   const subscribeToEvent = async (event: any) => {
     try {
+      console.log('🔔 subscribeToEvent: Starting...');
+
       // Get FCM token with user ID for better tracking
+      console.log('🔔 subscribeToEvent: Getting FCM token...');
       const fcmToken = await getFCMToken(user?.id);
+      console.log('🔔 subscribeToEvent: FCM token result:', fcmToken ? 'RECEIVED' : 'NULL');
+
       if (!fcmToken) {
         toast({
           title: "⚠️ Permission Required",
@@ -439,7 +450,7 @@ const Events = () => {
   };
 
   // Unsubscribe from event notifications
-  const unsubscribeFromEvent = async (eventId: number) => {
+  const unsubscribeFromEvent = async (eventId: string | number) => {
     try {
       const backendUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:5000' : 'https://santvaani-backend.onrender.com';
       const response = await fetch(`${backendUrl}/api/notifications/unsubscribe`, {
