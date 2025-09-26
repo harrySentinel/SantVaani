@@ -1393,6 +1393,105 @@ async function initializeServer() {
   }
 }
 
+// User Profile API endpoints
+app.get('/api/user/profile/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Query user profile from database
+    const { data: profile, error } = await supabase
+      .from('user_profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+
+    if (error && error.code !== 'PGRST116') { // PGRST116 is "not found"
+      console.error('Error fetching user profile:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to fetch user profile'
+      });
+    }
+
+    // If no profile exists, create one (first login)
+    if (!profile) {
+      const { data: newProfile, error: createError } = await supabase
+        .from('user_profiles')
+        .insert({
+          id: userId,
+          first_login_at: new Date().toISOString(),
+          welcome_letter_downloaded: false
+        })
+        .select()
+        .single();
+
+      if (createError) {
+        console.error('Error creating user profile:', createError);
+        return res.status(500).json({
+          success: false,
+          error: 'Failed to create user profile'
+        });
+      }
+
+      return res.json({
+        success: true,
+        profile: newProfile,
+        isFirstLogin: true
+      });
+    }
+
+    res.json({
+      success: true,
+      profile,
+      isFirstLogin: false
+    });
+  } catch (error) {
+    console.error('Error in user profile endpoint:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+});
+
+app.post('/api/user/profile/:userId/welcome-letter', async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Update welcome letter status
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .update({
+        welcome_letter_downloaded: true,
+        welcome_letter_generated_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', userId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating welcome letter status:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to update welcome letter status'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Welcome letter status updated successfully',
+      profile: data
+    });
+  } catch (error) {
+    console.error('Error in welcome letter update endpoint:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+});
+
 
 // Initialize on startup
 initializeServer();
