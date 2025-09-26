@@ -22,10 +22,13 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
   onDownloadComplete
 }) => {
   const letterRef = useRef<HTMLDivElement>(null);
+  const mobileLetterRef = useRef<HTMLDivElement>(null);
   const [isExpanded, setIsExpanded] = useState(false);
 
   const downloadAsPDF = async () => {
-    if (!letterRef.current) return;
+    // Always use desktop version for PDF, regardless of device
+    const targetElement = letterRef.current;
+    if (!targetElement) return;
 
     try {
       toast({
@@ -41,8 +44,20 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
         await new Promise(resolve => setTimeout(resolve, 100)); // Wait for expansion
       }
 
-      // Create canvas from the letter element with better sizing
-      const canvas = await html2canvas(letterRef.current, {
+      // Temporarily show desktop version on mobile for PDF generation
+      const isMobile = window.innerWidth < 768;
+      if (isMobile) {
+        const desktopElement = document.querySelector('.desktop-letter') as HTMLElement;
+        const mobileElement = document.querySelector('.mobile-letter') as HTMLElement;
+        if (desktopElement && mobileElement) {
+          desktopElement.style.display = 'block';
+          mobileElement.style.display = 'none';
+          await new Promise(resolve => setTimeout(resolve, 100)); // Wait for display change
+        }
+      }
+
+      // Create canvas from the desktop letter element
+      const canvas = await html2canvas(targetElement, {
         scale: 2,
         backgroundColor: '#ffffff',
         useCORS: true,
@@ -91,9 +106,19 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
       // Add image to PDF with calculated dimensions
       pdf.addImage(imgData, 'PNG', xOffset, yOffset, finalWidth, finalHeight);
 
-      // Restore original expand state
+      // Restore original expand state and mobile layout
       if (!wasExpanded) {
         setIsExpanded(false);
+      }
+
+      // Restore mobile layout if needed
+      if (isMobile) {
+        const desktopElement = document.querySelector('.desktop-letter') as HTMLElement;
+        const mobileElement = document.querySelector('.mobile-letter') as HTMLElement;
+        if (desktopElement && mobileElement) {
+          desktopElement.style.display = '';
+          mobileElement.style.display = '';
+        }
       }
 
       // Save the PDF
@@ -178,13 +203,13 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
         )}
       </div>
 
-      {/* Welcome Letter */}
-      <div className={`transition-all duration-500 ${isExpanded ? 'opacity-100 max-h-none' : 'opacity-75 max-h-80 md:max-h-96 overflow-hidden'}`}>
+      {/* Desktop Welcome Letter */}
+      <div className={`desktop-letter hidden md:block transition-all duration-500 ${isExpanded ? 'opacity-100 max-h-none' : 'opacity-75 max-h-96 overflow-hidden'}`}>
         <Card className="shadow-2xl border-0 overflow-hidden">
           <CardContent className="p-0">
             <div
               ref={letterRef}
-              className="relative bg-gradient-to-br from-orange-50 via-white to-red-50 p-3 md:p-6 w-full min-h-[600px] md:min-h-[800px] md:aspect-[210/297]"
+              className="relative bg-gradient-to-br from-orange-50 via-white to-red-50 p-6 w-full min-h-[800px] aspect-[210/297]"
               style={{
                 width: '100%',
                 maxWidth: '100%'
@@ -330,6 +355,99 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
         </div>
       )}
     </div>
+
+      {/* Mobile Welcome Letter */}
+      <div className={`mobile-letter md:hidden transition-all duration-500 ${isExpanded ? 'opacity-100 max-h-none' : 'opacity-75 max-h-64 overflow-hidden'}`}>
+        <Card className="shadow-xl border-0 overflow-hidden">
+          <CardContent className="p-0">
+            <div className="relative bg-gradient-to-br from-orange-50 via-white to-red-50 p-4 w-full">
+
+              {/* Header */}
+              <div className="text-center mb-4">
+                <h1 className="text-lg font-bold text-orange-700 mb-1">
+                  SantVaani Digital Ashram
+                </h1>
+                <p className="text-sm text-gray-600 font-medium">Divine Welcome Letter</p>
+              </div>
+
+              {/* Heart Icon */}
+              <div className="flex justify-center mb-4">
+                <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center shadow-lg">
+                  <Heart className="w-8 h-8 text-white" />
+                </div>
+              </div>
+
+              {/* Compact Welcome */}
+              <div className="text-center space-y-3">
+                <h2 className="text-xl font-bold text-orange-700">
+                  Dear {userName} 💫
+                </h2>
+                <p className="text-lg text-gray-700 font-medium">
+                  Welcome to the SantVaani Family!
+                </p>
+
+                <p className="text-sm text-gray-700 leading-relaxed px-2">
+                  From the bottom of our hearts, we want you to know how blessed we feel to have you join our spiritual community. You are not just a member - you are family.
+                </p>
+
+                <div className="bg-gradient-to-r from-orange-100 to-red-100 p-4 rounded-2xl mx-2">
+                  <p className="text-base font-semibold text-orange-800 italic mb-2">
+                    "Your presence lights up our digital ashram"
+                  </p>
+                  <p className="text-xs text-gray-700">
+                    Thank you for choosing to grow with us.
+                  </p>
+                </div>
+
+                <p className="text-sm text-orange-700 font-semibold px-2">
+                  May your journey with us be filled with endless blessings and profound peace.
+                </p>
+
+                <p className="text-lg font-bold text-orange-700 mt-4">
+                  Welcome Home, Beautiful Soul! 🌸
+                </p>
+                <p className="text-sm text-gray-600">
+                  With infinite love - The SantVaani Family ❤️
+                </p>
+              </div>
+
+              {/* Mobile Footer */}
+              <div className="mt-4 pt-3 border-t border-orange-300 text-center">
+                <p className="text-xs text-gray-600">
+                  <strong>Member Since:</strong> {formatDate(joinDate)}
+                </p>
+                <p className="text-xs text-gray-500 mt-2">
+                  Created with love on {new Date().toLocaleDateString('en-IN', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric'
+                  })}
+                </p>
+              </div>
+
+              {/* Fade overlay when collapsed */}
+              {!isExpanded && (
+                <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white via-white/90 to-transparent pointer-events-none"></div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Mobile expand hint when collapsed */}
+        {!isExpanded && (
+          <div className="text-center mt-3">
+            <Button
+              onClick={() => setIsExpanded(true)}
+              variant="ghost"
+              className="text-orange-600 hover:text-orange-700 text-xs animate-pulse"
+            >
+              <ChevronDown className="w-3 h-3 mr-1" />
+              Tap to read complete message
+              <ChevronDown className="w-3 h-3 ml-1" />
+            </Button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
