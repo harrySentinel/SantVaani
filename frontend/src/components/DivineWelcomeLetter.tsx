@@ -184,12 +184,11 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
           <CardContent className="p-0">
             <div
               ref={letterRef}
-              className="relative bg-gradient-to-br from-orange-50 via-white to-red-50 p-4 md:p-8 lg:p-12 w-full max-w-full"
+              className="relative bg-gradient-to-br from-orange-50 via-white to-red-50 p-4 md:p-6 w-full"
               style={{
                 minHeight: isExpanded ? 'auto' : '300px',
-                '@media (min-width: 768px)': {
-                  minHeight: isExpanded ? '1000px' : '400px'
-                }
+                aspectRatio: '210/297', // A4 aspect ratio
+                maxWidth: '100%'
               }}
             >
             {/* Decorative Elements */}
@@ -209,85 +208,97 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
             </div>
 
             {/* Header */}
-            <div className="text-center mb-6 md:mb-12">
-              <div className="mb-4 md:mb-6">
-                <div className="w-16 h-16 md:w-24 md:h-24 mx-auto bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center mb-3 md:mb-4 shadow-lg">
-                  <Heart className="w-8 h-8 md:w-12 md:h-12 text-white" />
+            <div className="text-center mb-4">
+              <div className="flex items-center justify-center mb-3">
+                <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center mr-3 shadow-lg">
+                  <Heart className="w-6 h-6 text-white" />
                 </div>
-                <h1 className="text-3xl md:text-5xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent mb-1 md:mb-2">
-                  SantVaani
-                </h1>
-                <p className="text-lg md:text-xl text-gray-600 italic">Digital Ashram</p>
-              </div>
-
-              <div className="border-t-2 border-b-2 border-orange-300 py-3 md:py-4 mx-4 md:mx-8">
-                <h2 className="text-xl md:text-3xl font-semibold text-gray-800">
-                  Divine Welcome Letter
-                </h2>
+                <div>
+                  <h1 className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+                    SantVaani Digital Ashram
+                  </h1>
+                  <p className="text-sm text-gray-600">Divine Welcome Letter</p>
+                </div>
               </div>
             </div>
 
-            {/* Welcome Message */}
-            <div className="space-y-4 md:space-y-8 text-gray-700 leading-relaxed">
-              <div className="text-center">
-                <p className="text-xl md:text-2xl font-semibold text-orange-700 mb-3 md:mb-4">
+            {/* Main Content - Beautiful Welcome Card */}
+            <div className="space-y-4 text-gray-700">
+
+              {/* Personal Greeting */}
+              <div className="text-center bg-gradient-to-r from-orange-50 to-red-50 p-4 rounded-lg border border-orange-200">
+                <h2 className="text-2xl font-bold text-orange-700 mb-2">
                   Namaste, {userName}! 🙏
+                </h2>
+                <p className="text-lg text-gray-600 font-medium">
+                  We are incredibly grateful that you have chosen to be part of our spiritual community
                 </p>
               </div>
 
-              <div className="bg-gradient-to-r from-orange-100 to-red-100 p-4 md:p-6 rounded-lg border-l-4 border-orange-500">
-                <p className="text-base md:text-lg font-medium text-center text-gray-800 italic">
-                  "जो व्यक्ति अध्यात्मिक पथ पर चलता है, वह सदा आनंद में रहता है।"
-                </p>
-                <p className="text-xs md:text-sm text-center text-gray-600 mt-2">
-                  "One who walks on the spiritual path always remains in bliss."
-                </p>
-              </div>
+              {/* Gratitude Message */}
+              <div className="bg-gradient-to-br from-orange-100 via-white to-red-100 p-5 rounded-xl border-2 border-orange-300 shadow-inner">
+                <div className="text-center mb-4">
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-full mb-3">
+                    <Heart className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-orange-800 mb-2">
+                    Welcome to the SantVaani Family!
+                  </h3>
+                </div>
 
-              <div className="space-y-3 md:space-y-4 text-base md:text-lg">
-                <p>
-                  With immense joy and divine blessings, we welcome you to the
-                  <span className="font-semibold text-orange-700"> SantVaani Digital Ashram </span>
-                  family! Your spiritual journey begins today.
-                </p>
-
-                <p>
-                  Like a lotus that blooms pure and beautiful, may you discover the divine light within yourself. Our digital ashram connects ancient wisdom with modern technology for your spiritual growth.
+                <p className="text-center text-gray-700 leading-relaxed mb-4">
+                  Your presence brings divine light to our community. Together, we embark on a beautiful journey of
+                  spiritual growth, ancient wisdom, and inner peace. Every soul that joins us makes our ashram more blessed.
                 </p>
 
-                <div className="bg-white p-4 md:p-5 rounded-lg shadow-inner border border-orange-200">
-                  <p className="text-center font-medium text-gray-700 mb-3">Here at SantVaani, you will discover:</p>
-                  <div className="space-y-2">
-                    <div className="flex items-start">
-                      <Star className="w-4 h-4 text-orange-500 mt-1 mr-3 flex-shrink-0" />
-                      <span className="text-sm md:text-base"><strong>Sacred Events & Kirtans</strong> - Join divine celebrations and spiritual gatherings</span>
-                    </div>
-                    <div className="flex items-start">
-                      <Star className="w-4 h-4 text-orange-500 mt-1 mr-3 flex-shrink-0" />
-                      <span className="text-sm md:text-base"><strong>Ancient Wisdom & Bhajans</strong> - Access scriptures and spiritual teachings</span>
-                    </div>
-                    <div className="flex items-start">
-                      <Star className="w-4 h-4 text-orange-500 mt-1 mr-3 flex-shrink-0" />
-                      <span className="text-sm md:text-base"><strong>Spiritual Community</strong> - Connect with fellow seekers on the divine path</span>
-                    </div>
-                    <div className="flex items-start">
-                      <Star className="w-4 h-4 text-orange-500 mt-1 mr-3 flex-shrink-0" />
-                      <span className="text-sm md:text-base"><strong>Personal Growth Tools</strong> - Guidance for your spiritual transformation</span>
-                    </div>
+                {/* Sacred Quote */}
+                <div className="bg-white p-4 rounded-lg border-l-4 border-orange-500 mb-4">
+                  <p className="text-center font-semibold text-orange-800 italic">
+                    "आत्मदीपो भव - Be your own light"
+                  </p>
+                  <p className="text-center text-gray-600 text-sm mt-1">
+                    - Buddha's final words
+                  </p>
+                </div>
+
+                {/* What We Offer */}
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  <div className="bg-white p-3 rounded-lg text-center shadow-sm">
+                    <Star className="w-6 h-6 text-orange-500 mx-auto mb-1" />
+                    <p className="text-sm font-medium text-gray-700">Sacred Events</p>
+                  </div>
+                  <div className="bg-white p-3 rounded-lg text-center shadow-sm">
+                    <Sparkles className="w-6 h-6 text-orange-500 mx-auto mb-1" />
+                    <p className="text-sm font-medium text-gray-700">Divine Wisdom</p>
+                  </div>
+                  <div className="bg-white p-3 rounded-lg text-center shadow-sm">
+                    <Heart className="w-6 h-6 text-orange-500 mx-auto mb-1" />
+                    <p className="text-sm font-medium text-gray-700">Spiritual Community</p>
+                  </div>
+                  <div className="bg-white p-3 rounded-lg text-center shadow-sm">
+                    <Star className="w-6 h-6 text-orange-500 mx-auto mb-1" />
+                    <p className="text-sm font-medium text-gray-700">Personal Growth</p>
                   </div>
                 </div>
 
-                <div className="text-center bg-gradient-to-r from-orange-100 to-red-100 p-3 md:p-4 rounded-lg">
-                  <p className="text-base md:text-lg font-semibold text-orange-800 mb-1">
-                    "सर्वे भवन्तु सुखिनः सर्वे सन्तु निरामयाः।"
+                {/* Blessing */}
+                <div className="text-center bg-gradient-to-r from-orange-200 to-red-200 p-4 rounded-lg">
+                  <p className="font-semibold text-orange-900 mb-1">
+                    "सर्वे भवन्तु सुखिनः सर्वे सन्तु निरामयाः"
                   </p>
-                  <p className="text-gray-700 text-sm">
-                    "May all beings be happy and free from disease."
+                  <p className="text-sm text-gray-700">
+                    May all beings be happy and free from suffering
                   </p>
                 </div>
+              </div>
 
-                <p className="text-center text-base md:text-lg font-medium">
-                  Welcome to your spiritual home. Welcome to SantVaani! 🌟
+              {/* Closing */}
+              <div className="text-center">
+                <p className="text-lg font-semibold text-orange-700">
+                  🌟 Your spiritual journey begins now 🌟
+                </p>
+                <p className="text-gray-600 mt-1">
+                  Welcome home, divine soul!
                 </p>
               </div>
             </div>
