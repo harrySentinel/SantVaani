@@ -75,7 +75,12 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
       const contentWidth = pageWidth - (margins * 2);
       const contentHeight = pageHeight - (margins * 2);
 
-      // Calculate aspect ratios
+      // Validate canvas dimensions
+      if (!canvas.width || !canvas.height || canvas.width <= 0 || canvas.height <= 0) {
+        throw new Error('Invalid canvas dimensions');
+      }
+
+      // Calculate aspect ratios with safety checks
       const canvasAspectRatio = canvas.width / canvas.height;
       const contentAspectRatio = contentWidth / contentHeight;
 
@@ -94,6 +99,12 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
         xOffset = margins + (contentWidth - finalWidth) / 2;
         yOffset = margins;
       }
+
+      // Ensure coordinates are valid numbers with fallbacks
+      if (!isFinite(finalWidth) || finalWidth <= 0) finalWidth = contentWidth;
+      if (!isFinite(finalHeight) || finalHeight <= 0) finalHeight = contentHeight;
+      if (!isFinite(xOffset) || xOffset < 0) xOffset = margins;
+      if (!isFinite(yOffset) || yOffset < 0) yOffset = margins;
 
       // Add image to PDF with calculated dimensions
       pdf.addImage(imgData, 'PNG', xOffset, yOffset, finalWidth, finalHeight);
@@ -447,7 +458,7 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
       <div style={{ display: 'none' }}>
         <div
           ref={pdfLetterRef}
-          className="relative bg-gradient-to-br from-orange-50 via-white to-red-50 p-6 w-full"
+          className="relative bg-white p-6 w-full"
           style={{
             width: '794px', // A4 width at 96 DPI
             aspectRatio: '210/297',
@@ -482,7 +493,7 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
           <div className="flex-1 flex flex-col justify-center text-center space-y-8 px-4">
             {/* Heart Icon */}
             <div className="flex justify-center">
-              <div className="w-24 h-24 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center shadow-2xl">
+              <div className="w-24 h-24 bg-orange-500 rounded-full flex items-center justify-center shadow-2xl">
                 <Heart className="w-12 h-12 text-white" />
               </div>
             </div>
@@ -507,7 +518,7 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
                 You are not just a member - you are family. Together, we will walk the beautiful path of spirituality, sharing moments of divine connection, ancient wisdom, and inner peace.
               </p>
 
-              <div className="bg-gradient-to-r from-orange-100 to-red-100 p-8 rounded-3xl">
+              <div className="bg-orange-100 p-8 rounded-3xl">
                 <p className="text-2xl font-semibold text-orange-800 italic mb-4">
                   "Your presence lights up our digital ashram"
                 </p>
