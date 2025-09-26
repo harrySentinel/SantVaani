@@ -16,15 +16,20 @@ import {
   User,
   LogOut,
   Eye,
-  Loader2
+  Loader2,
+  Gift,
+  Download
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { eventsService, Event } from '@/lib/events';
+import DivineWelcomeLetter from '@/components/DivineWelcomeLetter';
 
 const Dashboard = () => {
   const [userEvents, setUserEvents] = useState<Event[]>([]);
   const [isLoadingEvents, setIsLoadingEvents] = useState(true);
+  const [showWelcomeLetter, setShowWelcomeLetter] = useState(false);
+  const [userProfile, setUserProfile] = useState<any>(null);
   const navigate = useNavigate();
   const { user, loading, signOut } = useAuth();
 
@@ -43,6 +48,7 @@ const Dashboard = () => {
     // Load user's events from database
     if (user) {
       loadUserEvents();
+      loadUserProfile();
     }
   }, [user, loading, navigate]);
 
@@ -64,6 +70,52 @@ const Dashboard = () => {
       });
     } finally {
       setIsLoadingEvents(false);
+    }
+  };
+
+  const loadUserProfile = async () => {
+    if (!user) return;
+
+    try {
+      const backendUrl = import.meta.env.MODE === 'development'
+        ? 'http://localhost:5000'
+        : import.meta.env.VITE_BACKEND_URL || 'https://santvaani-backend.onrender.com';
+
+      const response = await fetch(`${backendUrl}/api/user/profile/${user.id}`);
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      if (data.success) {
+        setUserProfile(data.profile);
+
+        // Show welcome letter for new users or those who haven't downloaded it
+        if (!data.profile.welcome_letter_downloaded) {
+          setShowWelcomeLetter(true);
+        }
+
+        // Show special welcome message for first-time users
+        if (data.isFirstLogin) {
+          toast({
+            title: "🙏 Welcome to SantVaani!",
+            description: "Your divine journey begins today. Check out your special welcome gift below!",
+            duration: 6000,
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error loading user profile:', error);
+      // Fallback for development/testing
+      const fallbackProfile = {
+        welcome_letter_downloaded: false,
+        first_login_at: user.created_at,
+        total_events_created: userEvents.length
+      };
+      setUserProfile(fallbackProfile);
+      setShowWelcomeLetter(true);
     }
   };
 
@@ -218,6 +270,55 @@ const Dashboard = () => {
           </div>
         </div>
       </section>
+
+      {/* Divine Welcome Letter Section */}
+      {showWelcomeLetter && user && (
+        <section className="py-8">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="bg-gradient-to-r from-orange-600 to-red-600 rounded-2xl p-6 text-white text-center mb-6">
+              <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-center md:justify-start space-x-3">
+                    <Gift className="w-8 h-8" />
+                    <h2 className="text-2xl font-bold">Welcome Gift for You!</h2>
+                  </div>
+                  <p className="text-orange-100">
+                    Download your personalized divine welcome letter as a beautiful PDF
+                  </p>
+                </div>
+                <Button
+                  onClick={() => {
+                    const letterElement = document.querySelector('[data-welcome-letter]');
+                    letterElement?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="bg-white text-orange-600 hover:bg-orange-50 transition-colors flex items-center space-x-2"
+                >
+                  <Eye className="w-5 h-5" />
+                  <span>View Letter</span>
+                </Button>
+              </div>
+            </div>
+
+            <div data-welcome-letter>
+              <DivineWelcomeLetter
+                userName={user.user_metadata?.name || user.email?.split('@')[0] || 'Divine Soul'}
+                userEmail={user.email || ''}
+                joinDate={user.created_at || new Date().toISOString()}
+                userId={user.id}
+                onDownloadComplete={() => {
+                  // Hide the welcome letter section after download
+                  setShowWelcomeLetter(false);
+                  toast({
+                    title: "🎉 Welcome Gift Saved!",
+                    description: "Your divine welcome letter is now in your downloads. You can always access it from your profile.",
+                    duration: 5000,
+                  });
+                }}
+              />
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Create New Event CTA */}
       <section className="py-6">
