@@ -44,15 +44,23 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
         await new Promise(resolve => setTimeout(resolve, 100)); // Wait for expansion
       }
 
-      // Temporarily show desktop version on mobile for PDF generation
+      // Force desktop layout for PDF generation on mobile
       const isMobile = window.innerWidth < 768;
+      let desktopElement: HTMLElement | null = null;
+      let mobileElement: HTMLElement | null = null;
+
       if (isMobile) {
-        const desktopElement = document.querySelector('.desktop-letter') as HTMLElement;
-        const mobileElement = document.querySelector('.mobile-letter') as HTMLElement;
+        desktopElement = document.querySelector('.desktop-letter') as HTMLElement;
+        mobileElement = document.querySelector('.mobile-letter') as HTMLElement;
+
         if (desktopElement && mobileElement) {
-          desktopElement.style.display = 'block';
-          mobileElement.style.display = 'none';
-          await new Promise(resolve => setTimeout(resolve, 100)); // Wait for display change
+          // Force desktop layout to be visible and mobile hidden
+          desktopElement.classList.remove('hidden', 'md:block');
+          desktopElement.classList.add('block');
+          mobileElement.classList.add('hidden');
+
+          // Wait for layout changes to apply
+          await new Promise(resolve => setTimeout(resolve, 200));
         }
       }
 
@@ -112,13 +120,10 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
       }
 
       // Restore mobile layout if needed
-      if (isMobile) {
-        const desktopElement = document.querySelector('.desktop-letter') as HTMLElement;
-        const mobileElement = document.querySelector('.mobile-letter') as HTMLElement;
-        if (desktopElement && mobileElement) {
-          desktopElement.style.display = '';
-          mobileElement.style.display = '';
-        }
+      if (isMobile && desktopElement && mobileElement) {
+        desktopElement.classList.add('hidden', 'md:block');
+        desktopElement.classList.remove('block');
+        mobileElement.classList.remove('hidden');
       }
 
       // Save the PDF
@@ -155,6 +160,14 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
       });
     } catch (error) {
       console.error('Error generating PDF:', error);
+
+      // Restore layout even if PDF generation fails
+      if (isMobile && desktopElement && mobileElement) {
+        desktopElement.classList.add('hidden', 'md:block');
+        desktopElement.classList.remove('block');
+        mobileElement.classList.remove('hidden');
+      }
+
       toast({
         title: "⚠️ Download Error",
         description: "Failed to generate PDF. Please try again.",
