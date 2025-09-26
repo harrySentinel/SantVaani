@@ -40,18 +40,23 @@ const ChatBot: React.FC<ChatBotProps> = ({
 
   // 🔥 BACKEND CONFIGURATION - FIXED for Vite
   const getBackendUrl = () => {
-    // For Vite, use VITE_ prefix for environment variables
-    if (import.meta.env.VITE_BACKEND_URL) {
-      return import.meta.env.VITE_BACKEND_URL;
+    // For development, always use localhost
+    if (import.meta.env.MODE === 'development') {
+      return 'http://localhost:5000';
     }
-    
-    // Default to localhost for development
-    return import.meta.env.MODE === 'production' 
-      ? 'https://your-backend-domain.com' // Replace with your production backend URL
-      : 'http://localhost:5000';
+
+    // For production, use environment variable or fallback
+    return import.meta.env.VITE_BACKEND_URL || 'https://santvaani-backend.onrender.com';
   };
   
   const BACKEND_URL = getBackendUrl();
+
+  // Debug environment variables
+  console.log('🔧 Environment Debug:', {
+    mode: import.meta.env.MODE,
+    vite_backend_url: import.meta.env.VITE_BACKEND_URL,
+    final_backend_url: BACKEND_URL
+  });
 
   // Smooth scrolling to bottom
   const scrollToBottom = useCallback(() => {
