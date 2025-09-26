@@ -222,83 +222,50 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
               </div>
             </div>
 
-            {/* Main Content - Beautiful Welcome Card */}
-            <div className="space-y-4 text-gray-700">
+            {/* Main Content - Simple Beautiful Welcome */}
+            <div className="flex-1 flex flex-col justify-center space-y-6">
 
-              {/* Personal Greeting */}
-              <div className="text-center bg-gradient-to-r from-orange-50 to-red-50 p-4 rounded-lg border border-orange-200">
-                <h2 className="text-2xl font-bold text-orange-700 mb-2">
-                  Namaste, {userName}! 🙏
-                </h2>
-                <p className="text-lg text-gray-600 font-medium">
-                  We are incredibly grateful that you have chosen to be part of our spiritual community
-                </p>
-              </div>
-
-              {/* Gratitude Message */}
-              <div className="bg-gradient-to-br from-orange-100 via-white to-red-100 p-5 rounded-xl border-2 border-orange-300 shadow-inner">
-                <div className="text-center mb-4">
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-full mb-3">
-                    <Heart className="w-8 h-8 text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold text-orange-800 mb-2">
-                    Welcome to the SantVaani Family!
-                  </h3>
-                </div>
-
-                <p className="text-center text-gray-700 leading-relaxed mb-4">
-                  Your presence brings divine light to our community. Together, we embark on a beautiful journey of
-                  spiritual growth, ancient wisdom, and inner peace. Every soul that joins us makes our ashram more blessed.
-                </p>
-
-                {/* Sacred Quote */}
-                <div className="bg-white p-4 rounded-lg border-l-4 border-orange-500 mb-4">
-                  <p className="text-center font-semibold text-orange-800 italic">
-                    "आत्मदीपो भव - Be your own light"
-                  </p>
-                  <p className="text-center text-gray-600 text-sm mt-1">
-                    - Buddha's final words
-                  </p>
-                </div>
-
-                {/* What We Offer */}
-                <div className="grid grid-cols-2 gap-3 mb-4">
-                  <div className="bg-white p-3 rounded-lg text-center shadow-sm">
-                    <Star className="w-6 h-6 text-orange-500 mx-auto mb-1" />
-                    <p className="text-sm font-medium text-gray-700">Sacred Events</p>
-                  </div>
-                  <div className="bg-white p-3 rounded-lg text-center shadow-sm">
-                    <Sparkles className="w-6 h-6 text-orange-500 mx-auto mb-1" />
-                    <p className="text-sm font-medium text-gray-700">Divine Wisdom</p>
-                  </div>
-                  <div className="bg-white p-3 rounded-lg text-center shadow-sm">
-                    <Heart className="w-6 h-6 text-orange-500 mx-auto mb-1" />
-                    <p className="text-sm font-medium text-gray-700">Spiritual Community</p>
-                  </div>
-                  <div className="bg-white p-3 rounded-lg text-center shadow-sm">
-                    <Star className="w-6 h-6 text-orange-500 mx-auto mb-1" />
-                    <p className="text-sm font-medium text-gray-700">Personal Growth</p>
-                  </div>
-                </div>
-
-                {/* Blessing */}
-                <div className="text-center bg-gradient-to-r from-orange-200 to-red-200 p-4 rounded-lg">
-                  <p className="font-semibold text-orange-900 mb-1">
-                    "सर्वे भवन्तु सुखिनः सर्वे सन्तु निरामयाः"
-                  </p>
-                  <p className="text-sm text-gray-700">
-                    May all beings be happy and free from suffering
-                  </p>
-                </div>
-              </div>
-
-              {/* Closing */}
+              {/* Main Welcome */}
               <div className="text-center">
-                <p className="text-lg font-semibold text-orange-700">
-                  🌟 Your spiritual journey begins now 🌟
+                <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-orange-500 to-red-500 rounded-full mb-4 shadow-lg">
+                  <Heart className="w-10 h-10 text-white" />
+                </div>
+                <h2 className="text-3xl font-bold text-orange-700 mb-3">
+                  Welcome, {userName}! 🙏
+                </h2>
+                <p className="text-xl text-gray-700 font-medium leading-relaxed">
+                  We are incredibly grateful that you have chosen to be part of the
+                  <span className="font-bold text-orange-600"> SantVaani </span>spiritual community
                 </p>
-                <p className="text-gray-600 mt-1">
-                  Welcome home, divine soul!
+              </div>
+
+              {/* Gratitude Box */}
+              <div className="bg-gradient-to-br from-orange-100 via-white to-red-100 p-8 rounded-2xl border-2 border-orange-300 shadow-lg">
+                <div className="text-center space-y-4">
+                  <h3 className="text-2xl font-bold text-orange-800">
+                    🌟 You Are Now Part of Our Divine Family! 🌟
+                  </h3>
+                  <p className="text-lg text-gray-700 leading-relaxed max-w-2xl mx-auto">
+                    Your presence brings light and joy to our ashram. Together, we'll explore ancient wisdom,
+                    celebrate sacred traditions, and grow spiritually as one community.
+                  </p>
+
+                  {/* Simple blessing */}
+                  <div className="bg-white p-6 rounded-xl border border-orange-200 mt-6">
+                    <p className="text-lg font-semibold text-orange-800 italic">
+                      "May your journey be filled with peace, wisdom, and divine blessings"
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Simple Closing */}
+              <div className="text-center">
+                <p className="text-2xl font-bold text-orange-700">
+                  Welcome Home! ✨
+                </p>
+                <p className="text-gray-600 text-lg mt-2">
+                  With love and gratitude - The SantVaani Team
                 </p>
               </div>
             </div>
