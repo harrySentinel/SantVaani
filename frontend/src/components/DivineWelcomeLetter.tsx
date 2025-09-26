@@ -63,8 +63,8 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
       const pageWidth = 210;
       const pageHeight = 297;
 
-      // Use almost full page with small margins
-      const margins = 15; // 15mm margins on all sides
+      // Use full page with minimal margins
+      const margins = 5; // 5mm margins on all sides
       const contentWidth = pageWidth - (margins * 2);
       const contentHeight = pageHeight - (margins * 2);
 
@@ -184,10 +184,10 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
           <CardContent className="p-0">
             <div
               ref={letterRef}
-              className="relative bg-gradient-to-br from-orange-50 via-white to-red-50 p-4 md:p-6 w-full"
+              className="relative bg-gradient-to-br from-orange-50 via-white to-red-50 p-6 w-full min-h-[800px]"
               style={{
-                minHeight: isExpanded ? 'auto' : '300px',
                 aspectRatio: '210/297', // A4 aspect ratio
+                width: '100%',
                 maxWidth: '100%'
               }}
             >
@@ -208,64 +208,67 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
             </div>
 
             {/* Header */}
-            <div className="text-center mb-4">
-              <div className="flex items-center justify-center mb-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center mr-3 shadow-lg">
-                  <Heart className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-                    SantVaani Digital Ashram
-                  </h1>
-                  <p className="text-sm text-gray-600">Divine Welcome Letter</p>
-                </div>
-              </div>
+            <div className="text-center mb-6">
+              <h1 className="text-3xl font-bold text-orange-700 mb-2">
+                SantVaani Digital Ashram
+              </h1>
+              <p className="text-lg text-gray-600 font-medium">Divine Welcome Letter</p>
             </div>
 
-            {/* Main Content - Simple Beautiful Welcome */}
-            <div className="flex-1 flex flex-col justify-center space-y-6">
+            {/* Main Content - Heartfelt Welcome Message */}
+            <div className="flex-1 flex flex-col justify-center text-center space-y-8 px-4">
 
-              {/* Main Welcome */}
-              <div className="text-center">
-                <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-orange-500 to-red-500 rounded-full mb-4 shadow-lg">
-                  <Heart className="w-10 h-10 text-white" />
+              {/* Beautiful Heart Icon */}
+              <div className="flex justify-center">
+                <div className="w-24 h-24 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center shadow-2xl">
+                  <Heart className="w-12 h-12 text-white" />
                 </div>
-                <h2 className="text-3xl font-bold text-orange-700 mb-3">
-                  Welcome, {userName}! 🙏
+              </div>
+
+              {/* Personal Welcome */}
+              <div className="space-y-4">
+                <h2 className="text-4xl font-bold text-orange-700">
+                  Dear {userName} 💫
                 </h2>
-                <p className="text-xl text-gray-700 font-medium leading-relaxed">
-                  We are incredibly grateful that you have chosen to be part of the
-                  <span className="font-bold text-orange-600"> SantVaani </span>spiritual community
+                <p className="text-2xl text-gray-700 font-medium leading-relaxed">
+                  Welcome to the SantVaani Family!
                 </p>
               </div>
 
-              {/* Gratitude Box */}
-              <div className="bg-gradient-to-br from-orange-100 via-white to-red-100 p-8 rounded-2xl border-2 border-orange-300 shadow-lg">
-                <div className="text-center space-y-4">
-                  <h3 className="text-2xl font-bold text-orange-800">
-                    🌟 You Are Now Part of Our Divine Family! 🌟
-                  </h3>
-                  <p className="text-lg text-gray-700 leading-relaxed max-w-2xl mx-auto">
-                    Your presence brings light and joy to our ashram. Together, we'll explore ancient wisdom,
-                    celebrate sacred traditions, and grow spiritually as one community.
+              {/* Heartfelt Message */}
+              <div className="space-y-6 max-w-4xl mx-auto">
+                <p className="text-xl text-gray-700 leading-relaxed">
+                  From the bottom of our hearts, we want you to know how blessed we feel to have you join our spiritual community. Your decision to be part of SantVaani fills us with immense joy and gratitude.
+                </p>
+
+                <p className="text-xl text-gray-700 leading-relaxed">
+                  You are not just a member - you are family. Together, we will walk the beautiful path of spirituality, sharing moments of divine connection, ancient wisdom, and inner peace.
+                </p>
+
+                <div className="bg-gradient-to-r from-orange-100 to-red-100 p-8 rounded-3xl">
+                  <p className="text-2xl font-semibold text-orange-800 italic mb-4">
+                    "Your presence lights up our digital ashram"
                   </p>
-
-                  {/* Simple blessing */}
-                  <div className="bg-white p-6 rounded-xl border border-orange-200 mt-6">
-                    <p className="text-lg font-semibold text-orange-800 italic">
-                      "May your journey be filled with peace, wisdom, and divine blessings"
-                    </p>
-                  </div>
+                  <p className="text-lg text-gray-700">
+                    Every soul that joins us makes our community more vibrant, more loving, and more divine. Thank you for choosing to grow with us.
+                  </p>
                 </div>
+
+                <p className="text-xl text-orange-700 font-semibold">
+                  May your journey with us be filled with endless blessings, profound peace, and beautiful discoveries about yourself and the divine within.
+                </p>
               </div>
 
-              {/* Simple Closing */}
-              <div className="text-center">
-                <p className="text-2xl font-bold text-orange-700">
-                  Welcome Home! ✨
+              {/* Warm Closing */}
+              <div className="space-y-3">
+                <p className="text-3xl font-bold text-orange-700">
+                  Welcome Home, Beautiful Soul! 🌸
                 </p>
-                <p className="text-gray-600 text-lg mt-2">
-                  With love and gratitude - The SantVaani Team
+                <p className="text-xl text-gray-600">
+                  With infinite love and warmest wishes
+                </p>
+                <p className="text-lg text-orange-600 font-semibold">
+                  The SantVaani Family ❤️
                 </p>
               </div>
             </div>
@@ -291,7 +294,7 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
                 </div>
               </div>
 
-              <div className="text-center mt-4 md:mt-8">
+              <div className="text-center mt-4 md:mt-6 mb-8 md:mb-10">
                 <p className="text-xs md:text-sm text-gray-500">
                   This divine welcome letter was created with love on {new Date().toLocaleDateString('en-IN', {
                     year: 'numeric',
