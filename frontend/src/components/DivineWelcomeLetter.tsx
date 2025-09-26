@@ -41,15 +41,13 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
         await new Promise(resolve => setTimeout(resolve, 100)); // Wait for expansion
       }
 
-      // Create canvas from the letter element
+      // Create canvas from the letter element with better sizing
       const canvas = await html2canvas(letterRef.current, {
-        scale: 1.5,
+        scale: 2,
         backgroundColor: '#ffffff',
         useCORS: true,
         allowTaint: true,
-        logging: false,
-        width: 800,
-        height: 600 // Reduced height for better fit
+        logging: false
       });
 
       // Create PDF
@@ -60,25 +58,38 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
       });
 
       const imgData = canvas.toDataURL('image/png');
-      const imgWidth = 190; // Slightly smaller than A4 width for margins
-      const pageHeight = 277; // A4 height with margins
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-      // Center the image on the page
-      const xOffset = (210 - imgWidth) / 2; // Center horizontally
-      const yOffset = 10; // Small top margin
+      // A4 dimensions in mm
+      const pageWidth = 210;
+      const pageHeight = 297;
 
-      // Add image to PDF (single page, fit to page)
-      if (imgHeight <= pageHeight) {
-        // Fits on one page
-        pdf.addImage(imgData, 'PNG', xOffset, yOffset, imgWidth, imgHeight);
+      // Use almost full page with small margins
+      const margins = 15; // 15mm margins on all sides
+      const contentWidth = pageWidth - (margins * 2);
+      const contentHeight = pageHeight - (margins * 2);
+
+      // Calculate aspect ratios
+      const canvasAspectRatio = canvas.width / canvas.height;
+      const contentAspectRatio = contentWidth / contentHeight;
+
+      let finalWidth, finalHeight, xOffset, yOffset;
+
+      if (canvasAspectRatio > contentAspectRatio) {
+        // Canvas is wider - fit to width
+        finalWidth = contentWidth;
+        finalHeight = contentWidth / canvasAspectRatio;
+        xOffset = margins;
+        yOffset = margins + (contentHeight - finalHeight) / 2;
       } else {
-        // Scale down to fit on one page
-        const scaledHeight = pageHeight - 20; // Leave margins
-        const scaledWidth = (canvas.width * scaledHeight) / canvas.height;
-        const scaledXOffset = (210 - scaledWidth) / 2;
-        pdf.addImage(imgData, 'PNG', scaledXOffset, yOffset, scaledWidth, scaledHeight);
+        // Canvas is taller - fit to height
+        finalHeight = contentHeight;
+        finalWidth = contentHeight * canvasAspectRatio;
+        xOffset = margins + (contentWidth - finalWidth) / 2;
+        yOffset = margins;
       }
+
+      // Add image to PDF with calculated dimensions
+      pdf.addImage(imgData, 'PNG', xOffset, yOffset, finalWidth, finalHeight);
 
       // Restore original expand state
       if (!wasExpanded) {
