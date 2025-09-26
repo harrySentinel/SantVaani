@@ -22,12 +22,12 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
   onDownloadComplete
 }) => {
   const letterRef = useRef<HTMLDivElement>(null);
-  const mobileLetterRef = useRef<HTMLDivElement>(null);
+  const pdfLetterRef = useRef<HTMLDivElement>(null);
   const [isExpanded, setIsExpanded] = useState(false);
 
   const downloadAsPDF = async () => {
-    // Always use desktop version for PDF, regardless of device
-    const targetElement = letterRef.current;
+    // Always use the hidden PDF version for generation
+    const targetElement = pdfLetterRef.current;
     if (!targetElement) return;
 
     try {
@@ -37,34 +37,18 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
         duration: 3000,
       });
 
-      // Temporarily expand the letter for PDF generation
-      const wasExpanded = isExpanded;
-      if (!isExpanded) {
-        setIsExpanded(true);
-        await new Promise(resolve => setTimeout(resolve, 100)); // Wait for expansion
-      }
+      // Temporarily show the PDF version for generation
+      targetElement.style.display = 'block';
+      targetElement.style.position = 'fixed';
+      targetElement.style.top = '-9999px';
+      targetElement.style.left = '-9999px';
+      targetElement.style.width = '794px'; // A4 width at 96 DPI
+      targetElement.style.zIndex = '-1';
 
-      // Force desktop layout for PDF generation on mobile
-      const isMobile = window.innerWidth < 768;
-      let desktopElement: HTMLElement | null = null;
-      let mobileElement: HTMLElement | null = null;
+      // Wait for rendering
+      await new Promise(resolve => setTimeout(resolve, 300));
 
-      if (isMobile) {
-        desktopElement = document.querySelector('.desktop-letter') as HTMLElement;
-        mobileElement = document.querySelector('.mobile-letter') as HTMLElement;
-
-        if (desktopElement && mobileElement) {
-          // Force desktop layout to be visible and mobile hidden
-          desktopElement.classList.remove('hidden', 'md:block');
-          desktopElement.classList.add('block');
-          mobileElement.classList.add('hidden');
-
-          // Wait for layout changes to apply
-          await new Promise(resolve => setTimeout(resolve, 200));
-        }
-      }
-
-      // Create canvas from the desktop letter element
+      // Create canvas from the PDF letter element
       const canvas = await html2canvas(targetElement, {
         scale: 2,
         backgroundColor: '#ffffff',
@@ -114,17 +98,13 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
       // Add image to PDF with calculated dimensions
       pdf.addImage(imgData, 'PNG', xOffset, yOffset, finalWidth, finalHeight);
 
-      // Restore original expand state and mobile layout
-      if (!wasExpanded) {
-        setIsExpanded(false);
-      }
-
-      // Restore mobile layout if needed
-      if (isMobile && desktopElement && mobileElement) {
-        desktopElement.classList.add('hidden', 'md:block');
-        desktopElement.classList.remove('block');
-        mobileElement.classList.remove('hidden');
-      }
+      // Hide PDF version after generation
+      targetElement.style.display = 'none';
+      targetElement.style.position = '';
+      targetElement.style.top = '';
+      targetElement.style.left = '';
+      targetElement.style.width = '';
+      targetElement.style.zIndex = '';
 
       // Save the PDF
       const fileName = `SantVaani_Welcome_${userName.replace(/\s+/g, '_')}_${new Date().getTime()}.pdf`;
@@ -161,12 +141,13 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
     } catch (error) {
       console.error('Error generating PDF:', error);
 
-      // Restore layout even if PDF generation fails
-      if (isMobile && desktopElement && mobileElement) {
-        desktopElement.classList.add('hidden', 'md:block');
-        desktopElement.classList.remove('block');
-        mobileElement.classList.remove('hidden');
-      }
+      // Hide PDF version even if generation fails
+      targetElement.style.display = 'none';
+      targetElement.style.position = '';
+      targetElement.style.top = '';
+      targetElement.style.left = '';
+      targetElement.style.width = '';
+      targetElement.style.zIndex = '';
 
       toast({
         title: "⚠️ Download Error",
@@ -460,6 +441,135 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
             </Button>
           </div>
         )}
+      </div>
+
+      {/* Hidden PDF Version - Always full desktop layout at A4 width */}
+      <div style={{ display: 'none' }}>
+        <div
+          ref={pdfLetterRef}
+          className="relative bg-gradient-to-br from-orange-50 via-white to-red-50 p-6 w-full"
+          style={{
+            width: '794px', // A4 width at 96 DPI
+            aspectRatio: '210/297',
+            minHeight: '1123px' // A4 height at 96 DPI
+          }}
+        >
+          {/* Decorative Elements */}
+          <div className="absolute top-0 left-0 w-full h-full opacity-5">
+            <div className="absolute top-8 left-8">
+              <Star className="w-16 h-16 text-orange-500" />
+            </div>
+            <div className="absolute top-8 right-8">
+              <Sparkles className="w-16 h-16 text-red-500" />
+            </div>
+            <div className="absolute bottom-8 left-8">
+              <Heart className="w-16 h-16 text-orange-500" />
+            </div>
+            <div className="absolute bottom-8 right-8">
+              <Star className="w-16 h-16 text-red-500" />
+            </div>
+          </div>
+
+          {/* Header */}
+          <div className="text-center mb-6">
+            <h1 className="text-3xl font-bold text-orange-700 mb-2">
+              SantVaani Digital Ashram
+            </h1>
+            <p className="text-lg text-gray-600 font-medium">Divine Welcome Letter</p>
+          </div>
+
+          {/* Main Content */}
+          <div className="flex-1 flex flex-col justify-center text-center space-y-8 px-4">
+            {/* Heart Icon */}
+            <div className="flex justify-center">
+              <div className="w-24 h-24 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center shadow-2xl">
+                <Heart className="w-12 h-12 text-white" />
+              </div>
+            </div>
+
+            {/* Personal Welcome */}
+            <div className="space-y-4">
+              <h2 className="text-4xl font-bold text-orange-700">
+                Dear {userName} 💫
+              </h2>
+              <p className="text-2xl text-gray-700 font-medium leading-relaxed">
+                Welcome to the SantVaani Family!
+              </p>
+            </div>
+
+            {/* Heartfelt Message */}
+            <div className="space-y-6 max-w-4xl mx-auto">
+              <p className="text-xl text-gray-700 leading-relaxed">
+                From the bottom of our hearts, we want you to know how blessed we feel to have you join our spiritual community. Your decision to be part of SantVaani fills us with immense joy and gratitude.
+              </p>
+
+              <p className="text-xl text-gray-700 leading-relaxed">
+                You are not just a member - you are family. Together, we will walk the beautiful path of spirituality, sharing moments of divine connection, ancient wisdom, and inner peace.
+              </p>
+
+              <div className="bg-gradient-to-r from-orange-100 to-red-100 p-8 rounded-3xl">
+                <p className="text-2xl font-semibold text-orange-800 italic mb-4">
+                  "Your presence lights up our digital ashram"
+                </p>
+                <p className="text-lg text-gray-700">
+                  Every soul that joins us makes our community more vibrant, more loving, and more divine. Thank you for choosing to grow with us.
+                </p>
+              </div>
+
+              <p className="text-xl text-orange-700 font-semibold">
+                May your journey with us be filled with endless blessings, profound peace, and beautiful discoveries about yourself and the divine within.
+              </p>
+            </div>
+
+            {/* Warm Closing */}
+            <div className="space-y-3">
+              <p className="text-3xl font-bold text-orange-700">
+                Welcome Home, Beautiful Soul! 🌸
+              </p>
+              <p className="text-xl text-gray-600">
+                With infinite love and warmest wishes
+              </p>
+              <p className="text-lg text-orange-600 font-semibold">
+                The SantVaani Family ❤️
+              </p>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="mt-12 pt-8 border-t-2 border-orange-300">
+            <div className="flex flex-row justify-between items-center">
+              <div className="text-left">
+                <p className="text-gray-600 text-base">
+                  <strong>Member Since:</strong> {formatDate(joinDate)}
+                </p>
+                <p className="text-gray-600 text-base break-all">
+                  <strong>Email:</strong> {userEmail}
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="text-gray-700 font-semibold text-base">With Divine Blessings,</p>
+                <p className="text-orange-700 font-bold text-xl mt-2">SantVaani Team</p>
+                <div className="flex items-center justify-end mt-2">
+                  <Heart className="w-5 h-5 text-red-500 mr-1" />
+                  <span className="text-gray-600 text-sm">Digital Ashram</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="text-center mt-8 mb-10">
+              <p className="text-sm text-gray-500">
+                This divine welcome letter was created with love on {new Date().toLocaleDateString('en-IN', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })}
+              </p>
+            </div>
+          </div>
+
+          {/* Decorative Border */}
+          <div className="absolute inset-4 border-4 border-orange-200 rounded-lg pointer-events-none opacity-30"></div>
+        </div>
       </div>
     </div>
   );
