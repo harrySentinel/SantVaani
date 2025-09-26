@@ -51,12 +51,6 @@ const ChatBot: React.FC<ChatBotProps> = ({
   
   const BACKEND_URL = getBackendUrl();
 
-  // Debug environment variables
-  console.log('🔧 Environment Debug:', {
-    mode: import.meta.env.MODE,
-    vite_backend_url: import.meta.env.VITE_BACKEND_URL,
-    final_backend_url: BACKEND_URL
-  });
 
   // Smooth scrolling to bottom
   const scrollToBottom = useCallback(() => {

@@ -14,7 +14,6 @@ import { eventsService } from '@/lib/events';
 import { getFCMToken } from '@/lib/firebase';
 
 const Events = () => {
-  console.log('🎯 EVENTS PAGE LOADED - NEW VERSION ACTIVE!');
 
   const [isCreateFormOpen, setIsCreateFormOpen] = useState(false);
   const [subscribedEvents, setSubscribedEvents] = useState(new Set());
@@ -398,12 +397,8 @@ const Events = () => {
   // Subscribe to event notifications
   const subscribeToEvent = async (event: any) => {
     try {
-      console.log('🔔 subscribeToEvent: Starting...');
-
       // Get FCM token with user ID for better tracking
-      console.log('🔔 subscribeToEvent: Getting FCM token...');
       const fcmToken = await getFCMToken(user?.id);
-      console.log('🔔 subscribeToEvent: FCM token result:', fcmToken ? 'RECEIVED' : 'NULL');
 
       if (!fcmToken) {
         toast({
