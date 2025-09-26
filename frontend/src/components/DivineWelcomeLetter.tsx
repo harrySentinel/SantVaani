@@ -184,9 +184,8 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
           <CardContent className="p-0">
             <div
               ref={letterRef}
-              className="relative bg-gradient-to-br from-orange-50 via-white to-red-50 p-6 w-full min-h-[800px]"
+              className="relative bg-gradient-to-br from-orange-50 via-white to-red-50 p-3 md:p-6 w-full min-h-[600px] md:min-h-[800px] md:aspect-[210/297]"
               style={{
-                aspectRatio: '210/297', // A4 aspect ratio
                 width: '100%',
                 maxWidth: '100%'
               }}
@@ -227,47 +226,47 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
 
               {/* Personal Welcome */}
               <div className="space-y-4">
-                <h2 className="text-4xl font-bold text-orange-700">
+                <h2 className="text-2xl md:text-4xl font-bold text-orange-700">
                   Dear {userName} 💫
                 </h2>
-                <p className="text-2xl text-gray-700 font-medium leading-relaxed">
+                <p className="text-lg md:text-2xl text-gray-700 font-medium leading-relaxed">
                   Welcome to the SantVaani Family!
                 </p>
               </div>
 
               {/* Heartfelt Message */}
-              <div className="space-y-6 max-w-4xl mx-auto">
-                <p className="text-xl text-gray-700 leading-relaxed">
+              <div className="space-y-4 md:space-y-6 max-w-4xl mx-auto px-2 md:px-0">
+                <p className="text-base md:text-xl text-gray-700 leading-relaxed">
                   From the bottom of our hearts, we want you to know how blessed we feel to have you join our spiritual community. Your decision to be part of SantVaani fills us with immense joy and gratitude.
                 </p>
 
-                <p className="text-xl text-gray-700 leading-relaxed">
+                <p className="text-base md:text-xl text-gray-700 leading-relaxed">
                   You are not just a member - you are family. Together, we will walk the beautiful path of spirituality, sharing moments of divine connection, ancient wisdom, and inner peace.
                 </p>
 
-                <div className="bg-gradient-to-r from-orange-100 to-red-100 p-8 rounded-3xl">
-                  <p className="text-2xl font-semibold text-orange-800 italic mb-4">
+                <div className="bg-gradient-to-r from-orange-100 to-red-100 p-4 md:p-8 rounded-3xl mx-2 md:mx-0">
+                  <p className="text-lg md:text-2xl font-semibold text-orange-800 italic mb-2 md:mb-4">
                     "Your presence lights up our digital ashram"
                   </p>
-                  <p className="text-lg text-gray-700">
+                  <p className="text-sm md:text-lg text-gray-700">
                     Every soul that joins us makes our community more vibrant, more loving, and more divine. Thank you for choosing to grow with us.
                   </p>
                 </div>
 
-                <p className="text-xl text-orange-700 font-semibold">
+                <p className="text-base md:text-xl text-orange-700 font-semibold">
                   May your journey with us be filled with endless blessings, profound peace, and beautiful discoveries about yourself and the divine within.
                 </p>
               </div>
 
               {/* Warm Closing */}
               <div className="space-y-3">
-                <p className="text-3xl font-bold text-orange-700">
+                <p className="text-xl md:text-3xl font-bold text-orange-700">
                   Welcome Home, Beautiful Soul! 🌸
                 </p>
-                <p className="text-xl text-gray-600">
+                <p className="text-base md:text-xl text-gray-600">
                   With infinite love and warmest wishes
                 </p>
-                <p className="text-lg text-orange-600 font-semibold">
+                <p className="text-sm md:text-lg text-orange-600 font-semibold">
                   The SantVaani Family ❤️
                 </p>
               </div>
