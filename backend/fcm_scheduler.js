@@ -2,6 +2,7 @@ const admin = require('firebase-admin');
 const cron = require('node-cron');
 const path = require('path');
 const fs = require('fs');
+const { createClient } = require('@supabase/supabase-js');
 require('dotenv').config();
 const { getTodaysPanchang } = require('./panchang_service');
 
@@ -68,66 +69,135 @@ admin.initializeApp({
 
 console.log('🔥 Firebase Admin SDK initialized successfully!');
 
-// In-memory storage for FCM tokens (use database in production)
-const fcmTokens = new Set();
+// Initialize Supabase client for FCM token storage
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
+console.log('🗄️ Supabase client initialized for FCM token storage');
 
-// API endpoint to register FCM tokens
-const registerFCMToken = (req, res) => {
+// API endpoint to register FCM tokens (now uses database)
+const registerFCMToken = async (req, res) => {
   const { token, userId, timestamp } = req.body;
 
   if (!token) {
     return res.status(400).json({ error: 'FCM token is required' });
   }
 
-  fcmTokens.add(token);
-  console.log(`✅ FCM Token registered: ${token.substring(0, 20)}...`);
-  console.log(`📊 Total registered tokens: ${fcmTokens.size}`);
+  try {
+    // Handle user_id: use actual UUID or null for anonymous users
+    let validUserId = null;
+    if (userId && userId !== 'anonymous' && !userId.startsWith('anonymous-')) {
+      validUserId = userId;
+    }
 
-  res.json({
-    success: true,
-    message: 'FCM token registered successfully',
-    totalTokens: fcmTokens.size
-  });
+    // Insert or update FCM token in database
+    const { data, error } = await supabase
+      .from('fcm_tokens')
+      .upsert({
+        user_id: validUserId,
+        token: token,
+        device_info: {
+          userAgent: req.headers['user-agent'] || '',
+          timestamp: timestamp || new Date().toISOString()
+        },
+        is_active: true
+      }, {
+        onConflict: 'token'
+      })
+      .select();
+
+    if (error) {
+      console.error('❌ Error saving FCM token to database:', error);
+      return res.status(500).json({ error: 'Failed to register FCM token' });
+    }
+
+    console.log(`✅ FCM Token registered in database: ${token.substring(0, 20)}...`);
+
+    // Get total count of active tokens
+    const { count } = await supabase
+      .from('fcm_tokens')
+      .select('*', { count: 'exact', head: true })
+      .eq('is_active', true);
+
+    console.log(`📊 Total registered tokens in database: ${count}`);
+
+    res.json({
+      success: true,
+      message: 'FCM token registered successfully in database',
+      totalTokens: count,
+      tokenId: data[0]?.id
+    });
+  } catch (error) {
+    console.error('❌ Error in registerFCMToken:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 };
 
-// Send notification to all registered tokens
+// Send notification to all registered tokens (now uses database)
 const sendNotificationToAll = async (title, body, data = {}) => {
-  if (fcmTokens.size === 0) {
-    console.log('❌ No FCM tokens registered');
-    return { success: false, error: 'No tokens registered' };
-  }
-
-  const tokensArray = Array.from(fcmTokens);
-
-  // Send real FCM notifications using Firebase Admin SDK
-  console.log(`🔥 Sending FCM notification to ${tokensArray.length} devices`);
-  console.log(`📱 Title: ${title}`);
-  console.log(`📝 Body: ${body}`);
-
-  const message = {
-    notification: {
-      title,
-      body,
-    },
-    data: {
-      ...data,
-      timestamp: new Date().toISOString()
-    },
-    tokens: tokensArray,
-  };
-
   try {
+    // Fetch all active FCM tokens from database
+    const { data: tokenRecords, error } = await supabase
+      .from('fcm_tokens')
+      .select('token, id')
+      .eq('is_active', true);
+
+    if (error) {
+      console.error('❌ Error fetching FCM tokens from database:', error);
+      return { success: false, error: 'Failed to fetch tokens' };
+    }
+
+    if (!tokenRecords || tokenRecords.length === 0) {
+      console.log('❌ No active FCM tokens found in database');
+      return { success: false, error: 'No tokens registered' };
+    }
+
+    const tokensArray = tokenRecords.map(record => record.token);
+
+    // Send real FCM notifications using Firebase Admin SDK
+    console.log(`🔥 Sending FCM notification to ${tokensArray.length} devices from database`);
+    console.log(`📱 Title: ${title}`);
+    console.log(`📝 Body: ${body}`);
+
+    const message = {
+      notification: {
+        title,
+        body,
+      },
+      data: {
+        ...data,
+        timestamp: new Date().toISOString()
+      },
+      tokens: tokensArray,
+    };
+
     const response = await admin.messaging().sendMulticast(message);
     console.log(`✅ Successfully sent: ${response.successCount}`);
     console.log(`❌ Failed to send: ${response.failureCount}`);
 
-    // Remove invalid tokens
+    // Remove invalid tokens from database
+    const invalidTokens = [];
     response.responses.forEach((resp, idx) => {
       if (!resp.success && resp.error?.code === 'messaging/registration-token-not-registered') {
-        console.log(`🗑️ Removing invalid token: ${tokensArray[idx].substring(0, 20)}...`);
-        fcmTokens.delete(tokensArray[idx]);
+        console.log(`🗑️ Marking invalid token as inactive: ${tokensArray[idx].substring(0, 20)}...`);
+        invalidTokens.push(tokensArray[idx]);
       }
     });
+
+    // Mark invalid tokens as inactive in database
+    if (invalidTokens.length > 0) {
+      const { error: updateError } = await supabase
+        .from('fcm_tokens')
+        .update({ is_active: false })
+        .in('token', invalidTokens);
+
+      if (updateError) {
+        console.error('❌ Error updating invalid tokens:', updateError);
+      } else {
+        console.log(`✅ Marked ${invalidTokens.length} invalid tokens as inactive`);
+      }
+    }
 
     return {
       success: true,
@@ -270,19 +340,38 @@ const sendTestNotification = async (req, res) => {
   res.json(result);
 };
 
-// Get notification stats
-const getNotificationStats = (req, res) => {
-  res.json({
-    totalRegisteredTokens: fcmTokens.size,
-    registeredTokens: Array.from(fcmTokens).map(token =>
-      token.substring(0, 20) + '...'
-    ),
-    scheduledNotifications: [
-      { time: '6:00 AM IST', type: 'Morning Blessing', frequency: 'Daily' },
-      { time: '6:00 PM IST', type: 'Evening Prayer', frequency: 'Daily' },
-      { time: '9:00 AM IST Monday', type: 'Weekly Wisdom', frequency: 'Weekly' }
-    ]
-  });
+// Get notification stats (now uses database)
+const getNotificationStats = async (req, res) => {
+  try {
+    // Get total count of active tokens
+    const { count: totalTokens } = await supabase
+      .from('fcm_tokens')
+      .select('*', { count: 'exact', head: true })
+      .eq('is_active', true);
+
+    // Get sample of tokens for display (first 10)
+    const { data: sampleTokens } = await supabase
+      .from('fcm_tokens')
+      .select('token, created_at')
+      .eq('is_active', true)
+      .limit(10);
+
+    res.json({
+      totalRegisteredTokens: totalTokens,
+      registeredTokens: sampleTokens?.map(record =>
+        record.token.substring(0, 20) + '...'
+      ) || [],
+      scheduledNotifications: [
+        { time: '6:00 AM IST', type: 'Morning Blessing', frequency: 'Daily' },
+        { time: '6:00 PM IST', type: 'Evening Prayer', frequency: 'Daily' },
+        { time: '9:00 AM IST Monday', type: 'Weekly Wisdom', frequency: 'Weekly' }
+      ],
+      storageType: 'database'
+    });
+  } catch (error) {
+    console.error('❌ Error getting notification stats:', error);
+    res.status(500).json({ error: 'Failed to get notification stats' });
+  }
 };
 
 module.exports = {

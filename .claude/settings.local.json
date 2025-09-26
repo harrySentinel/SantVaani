@@ -10,7 +10,15 @@
       "WebFetch(domain:freeastrologyapi.com)",
       "WebFetch(domain:panchang.click)",
       "WebFetch(domain:astrologyapi.com)",
-      "WebFetch(domain:www.drikpanchang.com)"
+      "WebFetch(domain:www.drikpanchang.com)",
+      "Bash(npm run dev:*)",
+      "Bash(tasklist)",
+      "Bash(findstr:*)",
+      "Bash(netstat:*)",
+      "Bash(cloc:*)",
+      "Bash(tree:*)",
+      "Bash(tasklist:*)",
+      "Bash(taskkill:*)"
     ],
     "deny": [],
     "ask": []
