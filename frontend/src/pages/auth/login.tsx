@@ -268,11 +268,6 @@ const Login = () => {
                 </Link>
               </p>
 
-              <div className="pt-4 border-t border-gray-200">
-                <p className="text-xs text-gray-500">
-                  Demo: Use any email (admin@test.com for admin access)
-                </p>
-              </div>
             </div>
           </CardContent>
         </Card>
