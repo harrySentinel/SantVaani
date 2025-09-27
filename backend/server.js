@@ -770,7 +770,7 @@ Make it clear and meaningful in Hindi.`;
 // EXISTING ROUTES BELOW
 // ===================================
 
-// Health check endpoint - trigger redeploy
+// Health check endpoint - trigger redeploy v2
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'OK',
