@@ -61,6 +61,30 @@ const Events = () => {
     }
   }, [user]);
 
+  // Auto-populate organizer details when form opens and user is logged in
+  useEffect(() => {
+    if (isCreateFormOpen && user && !formData.organizerName && !formData.organizerEmail) {
+      const userName = user.user_metadata?.name || user.user_metadata?.full_name || '';
+      const userEmail = user.email || '';
+      const userPhone = user.user_metadata?.phone || '';
+
+      setFormData(prev => ({
+        ...prev,
+        organizerName: userName,
+        organizerEmail: userEmail,
+        organizerPhone: userPhone
+      }));
+
+      if (userName || userEmail) {
+        toast({
+          title: "✅ Details Auto-filled",
+          description: "Your name and email have been automatically filled from your profile",
+          duration: 3000,
+        });
+      }
+    }
+  }, [isCreateFormOpen, user]);
+
   const loadApprovedEvents = async () => {
     try {
       setLoadingEvents(true);
