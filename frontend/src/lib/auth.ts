@@ -70,6 +70,22 @@ export const authService = {
     }
   },
 
+  // Sign in with Google OAuth
+  async signInWithGoogle() {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/dashboard`
+      }
+    });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return data;
+  },
+
   // Get current user
   async getCurrentUser() {
     const { data: { user }, error } = await supabase.auth.getUser();
