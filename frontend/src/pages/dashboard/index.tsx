@@ -49,6 +49,10 @@ const Dashboard = () => {
     if (user) {
       loadUserEvents();
       loadUserProfile();
+
+      // Always show welcome letter initially (robust fallback)
+      // This ensures it shows even if backend APIs are down
+      setShowWelcomeLetter(true);
     }
   }, [user, loading, navigate]);
 
