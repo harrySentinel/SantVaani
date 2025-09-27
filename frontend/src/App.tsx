@@ -25,6 +25,7 @@ const Donation = lazy(() => import("./pages/donation/index"));
 const About = lazy(() => import("./pages/about/index"));
 const Login = lazy(() => import("./pages/auth/login"));
 const Signup = lazy(() => import("./pages/auth/signup"));
+const ResetPassword = lazy(() => import("./pages/auth/reset-password"));
 const Dashboard = lazy(() => import("./pages/dashboard/index"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -78,6 +79,7 @@ const App = () => {
               <Route path="/about" element={<About />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/dashboard" element={<Dashboard />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

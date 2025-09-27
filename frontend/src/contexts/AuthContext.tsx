@@ -10,6 +10,7 @@ interface AuthContextType {
   signUp: (data: { email: string; password: string; name: string; phone?: string }) => Promise<any>;
   signIn: (data: { email: string; password: string }) => Promise<any>;
   signInWithGoogle: () => Promise<any>;
+  resetPassword: (email: string) => Promise<any>;
   signOut: () => Promise<void>;
 }
 
@@ -89,6 +90,18 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
+  const resetPassword = async (email: string) => {
+    setLoading(true);
+    try {
+      const result = await authService.resetPassword(email);
+      return result;
+    } catch (error) {
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const signOut = async () => {
     setLoading(true);
     try {
@@ -111,6 +124,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     signUp,
     signIn,
     signInWithGoogle,
+    resetPassword,
     signOut
   };
 
