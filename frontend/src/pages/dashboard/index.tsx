@@ -108,7 +108,7 @@ const Dashboard = () => {
       }
     } catch (error) {
       console.error('Error loading user profile:', error);
-      // Fallback for development/testing
+      // Fallback: Show welcome letter for testing
       const fallbackProfile = {
         welcome_letter_downloaded: false,
         first_login_at: user.created_at,
@@ -116,6 +116,13 @@ const Dashboard = () => {
       };
       setUserProfile(fallbackProfile);
       setShowWelcomeLetter(true);
+
+      // Show welcome toast
+      toast({
+        title: "🙏 Welcome to SantVaani!",
+        description: "Check out your special divine welcome letter below!",
+        duration: 6000,
+      });
     }
   };
 

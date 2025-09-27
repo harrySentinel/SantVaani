@@ -38,15 +38,21 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
       });
 
       // Temporarily show the PDF version for generation
+      const parentElement = targetElement.parentElement!;
+      parentElement.style.display = 'block';
+      parentElement.style.position = 'fixed';
+      parentElement.style.top = '-9999px';
+      parentElement.style.left = '-9999px';
+      parentElement.style.width = '794px'; // A4 width at 96 DPI
+      parentElement.style.height = '1123px'; // A4 height at 96 DPI
+      parentElement.style.zIndex = '-1';
+
       targetElement.style.display = 'block';
-      targetElement.style.position = 'fixed';
-      targetElement.style.top = '-9999px';
-      targetElement.style.left = '-9999px';
-      targetElement.style.width = '794px'; // A4 width at 96 DPI
-      targetElement.style.zIndex = '-1';
+      targetElement.style.width = '794px';
+      targetElement.style.height = '1123px';
 
       // Wait for rendering
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise(resolve => setTimeout(resolve, 500));
 
       // Create canvas from the PDF letter element
       const canvas = await html2canvas(targetElement, {
@@ -110,12 +116,17 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
       pdf.addImage(imgData, 'PNG', xOffset, yOffset, finalWidth, finalHeight);
 
       // Hide PDF version after generation
-      targetElement.style.display = 'none';
-      targetElement.style.position = '';
-      targetElement.style.top = '';
-      targetElement.style.left = '';
+      parentElement.style.display = 'none';
+      parentElement.style.position = '';
+      parentElement.style.top = '';
+      parentElement.style.left = '';
+      parentElement.style.width = '';
+      parentElement.style.height = '';
+      parentElement.style.zIndex = '';
+
+      targetElement.style.display = '';
       targetElement.style.width = '';
-      targetElement.style.zIndex = '';
+      targetElement.style.height = '';
 
       // Save the PDF
       const fileName = `SantVaani_Welcome_${userName.replace(/\s+/g, '_')}_${new Date().getTime()}.pdf`;
@@ -153,12 +164,18 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
       console.error('Error generating PDF:', error);
 
       // Hide PDF version even if generation fails
-      targetElement.style.display = 'none';
-      targetElement.style.position = '';
-      targetElement.style.top = '';
-      targetElement.style.left = '';
+      const parentElement = targetElement.parentElement!;
+      parentElement.style.display = 'none';
+      parentElement.style.position = '';
+      parentElement.style.top = '';
+      parentElement.style.left = '';
+      parentElement.style.width = '';
+      parentElement.style.height = '';
+      parentElement.style.zIndex = '';
+
+      targetElement.style.display = '';
       targetElement.style.width = '';
-      targetElement.style.zIndex = '';
+      targetElement.style.height = '';
 
       toast({
         title: "⚠️ Download Error",
