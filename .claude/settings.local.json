@@ -18,7 +18,8 @@
       "Bash(cloc:*)",
       "Bash(tree:*)",
       "Bash(tasklist:*)",
-      "Bash(taskkill:*)"
+      "Bash(taskkill:*)",
+      "WebFetch(domain:santvaani-backend.onrender.com)"
     ],
     "deny": [],
     "ask": []

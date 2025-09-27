@@ -9,6 +9,7 @@ interface AuthContextType {
   isAdmin: boolean;
   signUp: (data: { email: string; password: string; name: string; phone?: string }) => Promise<any>;
   signIn: (data: { email: string; password: string }) => Promise<any>;
+  signInWithGoogle: () => Promise<any>;
   signOut: () => Promise<void>;
 }
 
@@ -76,6 +77,18 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
+  const signInWithGoogle = async () => {
+    setLoading(true);
+    try {
+      const result = await authService.signInWithGoogle();
+      return result;
+    } catch (error) {
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const signOut = async () => {
     setLoading(true);
     try {
@@ -97,6 +110,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     isAdmin,
     signUp,
     signIn,
+    signInWithGoogle,
     signOut
   };
 
