@@ -34,19 +34,19 @@ const SpiritualFactBox = () => {
             id: '1',
             text: "In the Ramayana, Hanuman's heart contains an image of Rama and Sita, discovered when his chest was opened by the gods to verify his devotion.",
             category: "Ramayana",
-            icon: "🏹"
+            icon: ""
           },
           {
-            id: '2', 
+            id: '2',
             text: "The Mahabharata mentions that Krishna lifted Govardhan hill for 7 days straight, protecting the villagers from Indra's torrential rains.",
             category: "Mahabharata",
-            icon: "⚔️"
+            icon: ""
           },
           {
             id: '3',
             text: "Lord Ganesha wrote the entire Mahabharata as Sage Vyasa dictated it, breaking his tusk to use as a pen when his original one broke.",
             category: "Hindu Deities",
-            icon: "🕉️"
+            icon: ""
           }
         ]);
       } else {
@@ -128,9 +128,7 @@ const SpiritualFactBox = () => {
                 Did You Know?
               </h3>
               <div className="flex items-center justify-center space-x-2 mb-4">
-                <span className="text-3xl animate-pulse">{currentFact.icon}</span>
                 <span className="text-orange-600 font-semibold text-lg">{currentFact.category}</span>
-                <span className="text-3xl animate-pulse">{currentFact.icon}</span>
               </div>
               
               {/* Decorative line */}
