@@ -234,7 +234,7 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
           <CardContent className="p-0">
             <div
               ref={letterRef}
-              className="relative bg-gradient-to-br from-orange-50 via-white to-red-50 p-6 w-full min-h-[800px] aspect-[210/297]"
+              className="relative bg-gradient-to-br from-orange-50 via-white to-red-50 p-8 w-full min-h-[700px] aspect-[210/297]"
               style={{
                 width: '100%',
                 maxWidth: '100%'
@@ -322,37 +322,6 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
               </div>
             </div>
 
-            {/* Footer */}
-            <div className="mt-6 md:mt-12 pt-4 md:pt-8 border-t-2 border-orange-300">
-              <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-                <div className="text-center md:text-left">
-                  <p className="text-gray-600 text-sm md:text-base">
-                    <strong>Member Since:</strong> {formatDate(joinDate)}
-                  </p>
-                  <p className="text-gray-600 text-sm md:text-base break-all">
-                    <strong>Email:</strong> {userEmail}
-                  </p>
-                </div>
-                <div className="text-center md:text-right">
-                  <p className="text-gray-700 font-semibold text-sm md:text-base">With Divine Blessings,</p>
-                  <p className="text-orange-700 font-bold text-lg md:text-xl mt-1 md:mt-2">SantVaani Team</p>
-                  <div className="flex items-center justify-center md:justify-end mt-2">
-                    <Heart className="w-4 h-4 md:w-5 md:h-5 text-red-500 mr-1" />
-                    <span className="text-gray-600 text-xs md:text-sm">Digital Ashram</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="text-center mt-4 md:mt-6 mb-8 md:mb-10">
-                <p className="text-xs md:text-sm text-gray-500">
-                  This divine welcome letter was created with love on {new Date().toLocaleDateString('en-IN', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  })}
-                </p>
-              </div>
-            </div>
 
             {/* Decorative Border */}
             <div className="absolute inset-4 border-4 border-orange-200 rounded-lg pointer-events-none opacity-30"></div>
@@ -385,7 +354,7 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
       <div className={`mobile-letter md:hidden transition-all duration-500 ${isExpanded ? 'opacity-100 max-h-none' : 'opacity-75 max-h-64 overflow-hidden'}`}>
         <Card className="shadow-xl border-0 overflow-hidden">
           <CardContent className="p-0">
-            <div className="relative bg-gradient-to-br from-orange-50 via-white to-red-50 p-4 w-full">
+            <div className="relative bg-gradient-to-br from-orange-50 via-white to-red-50 p-6 w-full">
 
               {/* Header */}
               <div className="text-center mb-4">
@@ -436,19 +405,6 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
                 </p>
               </div>
 
-              {/* Mobile Footer */}
-              <div className="mt-4 pt-3 border-t border-orange-300 text-center">
-                <p className="text-xs text-gray-600">
-                  <strong>Member Since:</strong> {formatDate(joinDate)}
-                </p>
-                <p className="text-xs text-gray-500 mt-2">
-                  Created with love on {new Date().toLocaleDateString('en-IN', {
-                    day: 'numeric',
-                    month: 'short',
-                    year: 'numeric'
-                  })}
-                </p>
-              </div>
 
               {/* Fade overlay when collapsed */}
               {!isExpanded && (
@@ -478,11 +434,11 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
       <div style={{ display: 'none' }}>
         <div
           ref={pdfLetterRef}
-          className="relative bg-white p-6 w-full"
+          className="relative bg-white p-8 w-full"
           style={{
             width: '794px', // A4 width at 96 DPI
-            minHeight: '1200px', // Increased height to prevent cut-off
-            paddingBottom: '60px' // Extra padding at bottom
+            minHeight: '1000px', // Adjusted height since content is shorter
+            paddingBottom: '40px' // Reduced padding since no footer
           }}
         >
           {/* Decorative Elements */}
@@ -510,7 +466,7 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
           </div>
 
           {/* Main Content */}
-          <div className="flex-1 flex flex-col justify-center text-center space-y-8 px-4">
+          <div className="flex-1 flex flex-col justify-center text-center space-y-10 px-8">
             {/* Heart Icon */}
             <div className="flex justify-center">
               <div className="w-24 h-24 bg-orange-500 rounded-full flex items-center justify-center shadow-2xl">
@@ -566,37 +522,6 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
             </div>
           </div>
 
-          {/* Footer */}
-          <div className="mt-12 pt-8 border-t-2 border-orange-300">
-            <div className="flex flex-row justify-between items-center">
-              <div className="text-left">
-                <p className="text-gray-600 text-base">
-                  <strong>Member Since:</strong> {formatDate(joinDate)}
-                </p>
-                <p className="text-gray-600 text-base break-all">
-                  <strong>Email:</strong> {userEmail}
-                </p>
-              </div>
-              <div className="text-right">
-                <p className="text-gray-700 font-semibold text-base">With Divine Blessings,</p>
-                <p className="text-orange-700 font-bold text-xl mt-2">SantVaani Team</p>
-                <div className="flex items-center justify-end mt-2">
-                  <Heart className="w-5 h-5 text-red-500 mr-1" />
-                  <span className="text-gray-600 text-sm">Digital Ashram</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="text-center mt-8 mb-10">
-              <p className="text-sm text-gray-500">
-                This divine welcome letter was created with love on {new Date().toLocaleDateString('en-IN', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                })}
-              </p>
-            </div>
-          </div>
 
           {/* Decorative Border */}
           <div className="absolute inset-4 border-4 border-orange-200 rounded-lg pointer-events-none opacity-30"></div>
