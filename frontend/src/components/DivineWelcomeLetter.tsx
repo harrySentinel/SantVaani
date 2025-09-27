@@ -44,15 +44,16 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
       parentElement.style.top = '-9999px';
       parentElement.style.left = '-9999px';
       parentElement.style.width = '794px'; // A4 width at 96 DPI
-      parentElement.style.height = '1123px'; // A4 height at 96 DPI
+      parentElement.style.height = 'auto'; // Let content determine height
       parentElement.style.zIndex = '-1';
 
       targetElement.style.display = 'block';
       targetElement.style.width = '794px';
-      targetElement.style.height = '1123px';
+      targetElement.style.height = 'auto'; // Let content determine height
+      targetElement.style.minHeight = '1123px'; // Minimum A4 height
 
-      // Wait for rendering
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Wait for rendering and layout
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
       // Create canvas from the PDF letter element
       const canvas = await html2canvas(targetElement, {
@@ -60,7 +61,9 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
         backgroundColor: '#ffffff',
         useCORS: true,
         allowTaint: true,
-        logging: false
+        logging: false,
+        height: targetElement.scrollHeight, // Capture full scrollable height
+        windowHeight: targetElement.scrollHeight
       });
 
       // Create PDF
@@ -471,15 +474,15 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
         )}
       </div>
 
-      {/* Hidden PDF Version - Always full desktop layout at A4 width */}
+      {/* Hidden PDF Version - Always uses desktop layout at A4 width for consistent format across all devices */}
       <div style={{ display: 'none' }}>
         <div
           ref={pdfLetterRef}
           className="relative bg-white p-6 w-full"
           style={{
             width: '794px', // A4 width at 96 DPI
-            aspectRatio: '210/297',
-            minHeight: '1123px' // A4 height at 96 DPI
+            minHeight: '1200px', // Increased height to prevent cut-off
+            paddingBottom: '60px' // Extra padding at bottom
           }}
         >
           {/* Decorative Elements */}
