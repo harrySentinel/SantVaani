@@ -8,6 +8,7 @@ import {
   Quote,
   Lightbulb,
   Calendar,
+  Bell,
   Settings,
   X
 } from 'lucide-react'
@@ -72,6 +73,13 @@ const navigation = [
     href: '/events',
     icon: Calendar,
     description: 'Manage community event submissions',
+    count: 0
+  },
+  {
+    name: 'Notice Board',
+    href: '/notices',
+    icon: Bell,
+    description: 'Manage daily quotes and announcements',
     count: 0
   }
 ]
