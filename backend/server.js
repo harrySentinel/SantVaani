@@ -1362,6 +1362,301 @@ app.get('/api/daily-guide/complete', async (req, res) => {
 
 console.log('✅ Panchang routes registered successfully');
 
+// ===================================
+// NOTICE BOARD API ROUTES
+// ===================================
+console.log('🔔 Registering Notice Board routes...');
+
+// Test route
+app.get('/api/test-notice', (req, res) => {
+  res.json({ message: 'Notice routes are working!' });
+});
+
+// Get active notice for frontend
+app.get('/api/notice/active', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('notices')
+      .select('*')
+      .eq('is_active', true)
+      .gte('expires_at', new Date().toISOString())
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single();
+
+    if (error && error.code !== 'PGRST116') {
+      console.error('Error fetching active notice:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to fetch active notice'
+      });
+    }
+
+    res.json({
+      success: true,
+      notice: data || null
+    });
+  } catch (error) {
+    console.error('Error in active notice endpoint:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+});
+
+// Get all notices for admin (with pagination)
+app.get('/api/notices', async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    const { data, error, count } = await supabase
+      .from('notices')
+      .select('*', { count: 'exact' })
+      .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1);
+
+    if (error) {
+      console.error('Error fetching notices:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to fetch notices'
+      });
+    }
+
+    res.json({
+      success: true,
+      notices: data,
+      pagination: {
+        page,
+        limit,
+        total: count,
+        totalPages: Math.ceil(count / limit)
+      }
+    });
+  } catch (error) {
+    console.error('Error in notices endpoint:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+});
+
+// Create new notice
+app.post('/api/notices', async (req, res) => {
+  try {
+    const {
+      title,
+      message,
+      message_hi,
+      type = 'announcement',
+      is_active = true,
+      expires_at
+    } = req.body;
+
+    if (!title || !message) {
+      return res.status(400).json({
+        success: false,
+        error: 'Title and message are required'
+      });
+    }
+
+    // If setting this notice as active, deactivate all other notices
+    if (is_active) {
+      await supabase
+        .from('notices')
+        .update({ is_active: false })
+        .neq('id', '00000000-0000-0000-0000-000000000000'); // Dummy condition to update all
+    }
+
+    const { data, error } = await supabase
+      .from('notices')
+      .insert({
+        title,
+        message,
+        message_hi,
+        type,
+        is_active,
+        expires_at: expires_at || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // Default 7 days
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating notice:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to create notice'
+      });
+    }
+
+    res.status(201).json({
+      success: true,
+      notice: data
+    });
+  } catch (error) {
+    console.error('Error in create notice endpoint:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+});
+
+// Update notice
+app.put('/api/notices/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      title,
+      message,
+      message_hi,
+      type,
+      is_active,
+      expires_at
+    } = req.body;
+
+    // If setting this notice as active, deactivate all other notices
+    if (is_active) {
+      await supabase
+        .from('notices')
+        .update({ is_active: false })
+        .neq('id', id);
+    }
+
+    const { data, error } = await supabase
+      .from('notices')
+      .update({
+        title,
+        message,
+        message_hi,
+        type,
+        is_active,
+        expires_at,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating notice:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to update notice'
+      });
+    }
+
+    res.json({
+      success: true,
+      notice: data
+    });
+  } catch (error) {
+    console.error('Error in update notice endpoint:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+});
+
+// Delete notice
+app.delete('/api/notices/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const { error } = await supabase
+      .from('notices')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error deleting notice:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to delete notice'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Notice deleted successfully'
+    });
+  } catch (error) {
+    console.error('Error in delete notice endpoint:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+});
+
+// Toggle notice active status
+app.patch('/api/notices/:id/toggle', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // First get the current notice
+    const { data: currentNotice, error: fetchError } = await supabase
+      .from('notices')
+      .select('is_active')
+      .eq('id', id)
+      .single();
+
+    if (fetchError) {
+      console.error('Error fetching notice:', fetchError);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to fetch notice'
+      });
+    }
+
+    const newActiveStatus = !currentNotice.is_active;
+
+    // If activating this notice, deactivate all others
+    if (newActiveStatus) {
+      await supabase
+        .from('notices')
+        .update({ is_active: false })
+        .neq('id', id);
+    }
+
+    const { data, error } = await supabase
+      .from('notices')
+      .update({
+        is_active: newActiveStatus,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error toggling notice status:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to toggle notice status'
+      });
+    }
+
+    res.json({
+      success: true,
+      notice: data
+    });
+  } catch (error) {
+    console.error('Error in toggle notice endpoint:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+});
+
+console.log('✅ Notice Board routes registered successfully');
+
 // 404 handler (MUST be last)
 app.use((req, res) => {
   res.status(404).json({
@@ -1494,7 +1789,6 @@ app.post('/api/user/profile/:userId/welcome-letter', async (req, res) => {
     });
   }
 });
-
 
 // Initialize on startup
 initializeServer();
