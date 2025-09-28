@@ -98,13 +98,7 @@ const NoticeBoard: React.FC = () => {
   };
 
   const getTypeIcon = (type: string) => {
-    switch (type) {
-      case 'festival': return '🎉';
-      case 'announcement': return '📢';
-      case 'greeting': return '🙏';
-      case 'update': return '🔔';
-      default: return '📢';
-    }
+    return '📢';
   };
 
   if (!currentNotice || !isVisible) {
