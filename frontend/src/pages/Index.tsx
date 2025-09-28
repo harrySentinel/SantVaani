@@ -9,6 +9,7 @@ import { Users, Heart, Sparkles, Book, ArrowDown, Video, MessageSquare, Star } f
 import VisitorCounter from '@/components/VisitorCounter';
 import SpiritualFactBox from '@/components/SpiritualFactBox';
 import FeedbackForm from '@/components/FeedbackForm';
+import NoticeBoard from '@/components/NoticeBoard';
 
 // Lazy load ChatBot for better performance
 const ChatBot = lazy(() => import('@/components/chatBot'));
@@ -67,6 +68,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
+      <NoticeBoard />
 
 
        {/* Beta Banner - Option 1: Top of page */}
