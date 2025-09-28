@@ -11,6 +11,7 @@ import BhajansPage from '@/pages/Bhajans'
 import QuotesPage from '@/pages/Quotes'
 import SpiritualFactsPage from '@/pages/SpiritualFacts'
 import EventsPage from '@/pages/Events'
+import NoticesPage from '@/pages/Notices'
 
 // All content management pages are now complete
 
@@ -49,6 +50,9 @@ function App() {
 
               {/* Events Management */}
               <Route path="events" element={<EventsPage />} />
+
+              {/* Notice Board Management */}
+              <Route path="notices" element={<NoticesPage />} />
 
               {/* 404 fallback */}
               <Route path="*" element={<Navigate to="/dashboard" replace />} />

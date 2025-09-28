@@ -20,5 +20,6 @@ export const TABLES = {
   DIVINE_FORMS: 'divine_forms',
   BHAJANS: 'bhajans',
   QUOTES: 'quotes',
-  EVENTS: 'events'
+  EVENTS: 'events',
+  NOTICES: 'notices'
 } as const
