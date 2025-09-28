@@ -14,8 +14,8 @@ const LiveBhajan = () => {
   const [connectionStatus, setConnectionStatus] = useState('connected');
 
   // API base URL - adjust this according to your backend deployment
-  const API_BASE_URL = process.env.NODE_ENV === 'production' 
-    ? 'https://your-backend-url.com/api' 
+  const API_BASE_URL = process.env.NODE_ENV === 'production'
+    ? `${import.meta.env.VITE_BACKEND_URL}/api`
     : 'http://localhost:5000/api';
 
   // Fetch bhajan data from backend
