@@ -72,6 +72,7 @@ const corsOptions = {
       'http://localhost:3000',
       'http://localhost:8080',
       'http://localhost:8081',  // Your frontend port
+      'http://localhost:8082',  // Your frontend port
       'http://localhost:5173',
       'http://localhost:3001',  // Admin panel ports
       'http://localhost:3002',
@@ -79,6 +80,7 @@ const corsOptions = {
       'http://127.0.0.1:3000',
       'http://127.0.0.1:8080',
       'http://127.0.0.1:8081',  // Your frontend port
+      'http://127.0.0.1:8082',  // Your frontend port
       'http://127.0.0.1:5173',
       'http://127.0.0.1:3001',  // Admin panel ports
       'http://127.0.0.1:3002',
@@ -378,6 +380,7 @@ async function fetchBhajanData() {
   try {
     console.log('🚀 Starting bhajan data fetch...');
     
+    // Fetch live and recent bhajans with new YouTube API key
     const [liveBhajans, recentBhajans] = await Promise.all([
       fetchLiveBhajans(),
       fetchRecentBhajans()
