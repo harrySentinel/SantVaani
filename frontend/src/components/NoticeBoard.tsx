@@ -22,7 +22,7 @@ const NoticeBoard: React.FC = () => {
   useEffect(() => {
     const fetchActiveNotice = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/notice/active`);
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'}/api/notice/active`);
         const data = await response.json();
 
         if (data.success && data.notice) {
