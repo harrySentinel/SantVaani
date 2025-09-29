@@ -156,7 +156,7 @@ export default function NoticeForm({ notice, isOpen, onClose, onSave }: NoticeFo
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto mx-4 sm:mx-0">
         <DialogHeader>
           <DialogTitle>{notice ? 'Edit Notice' : 'Create New Notice'}</DialogTitle>
           <DialogDescription>
@@ -164,8 +164,8 @@ export default function NoticeForm({ notice, isOpen, onClose, onSave }: NoticeFo
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="title">Title *</Label>
               <Input
@@ -215,7 +215,7 @@ export default function NoticeForm({ notice, isOpen, onClose, onSave }: NoticeFo
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="expires_at">Expires On</Label>
               <Input
@@ -227,7 +227,7 @@ export default function NoticeForm({ notice, isOpen, onClose, onSave }: NoticeFo
               />
             </div>
 
-            <div className="flex items-center space-x-3 pt-6">
+            <div className="flex items-center space-x-3 pt-4 sm:pt-6">
               <Switch
                 id="is_active"
                 checked={formData.is_active}

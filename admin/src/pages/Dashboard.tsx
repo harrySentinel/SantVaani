@@ -74,20 +74,20 @@ export default function Dashboard() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600 mt-1">Welcome to SantVaani Admin Panel</p>
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Dashboard</h1>
+        <p className="text-sm sm:text-base text-gray-600 mt-1">Welcome to SantVaani Admin Panel</p>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+      <div className="grid grid-cols-1 gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         {stats.map((stat) => (
           <div
             key={stat.name}
             onClick={() => handleQuickAction(stat.route)}
-            className="bg-white overflow-hidden shadow rounded-lg border border-gray-200 cursor-pointer hover:shadow-lg hover:border-gray-300 transition-all duration-200"
+            className="bg-white overflow-hidden shadow rounded-lg border border-gray-200 cursor-pointer hover:shadow-lg hover:border-gray-300 transition-all duration-200 touch-manipulation"
           >
-            <div className="p-6">
+            <div className="p-4 sm:p-6">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
                   <div className={`${stat.color} p-3 rounded-lg`}>
@@ -99,7 +99,7 @@ export default function Dashboard() {
                     <dt className="text-sm font-medium text-gray-500 truncate">
                       {stat.name}
                     </dt>
-                    <dd className="text-2xl font-semibold text-gray-900">
+                    <dd className="text-xl sm:text-2xl font-semibold text-gray-900">
                       {stat.value}
                     </dd>
                   </dl>

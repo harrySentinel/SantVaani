@@ -1,0 +1,295 @@
+/* Mobile-specific optimizations for SantVaani Admin Panel */
+
+/* Touch-friendly interactions */
+.touch-manipulation {
+  touch-action: manipulation;
+}
+
+/* Improve tap targets on mobile */
+@media (max-width: 768px) {
+  /* Ensure minimum tap target size of 44px */
+  button,
+  .button,
+  [role="button"],
+  input[type="checkbox"],
+  input[type="radio"],
+  select {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Larger touch targets for form controls */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="search"],
+  input[type="date"],
+  textarea,
+  select {
+    min-height: 44px;
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+
+  /* Improve spacing for mobile */
+  .mobile-spacing {
+    padding: 1rem 0.75rem;
+  }
+
+  /* Better modal sizing on mobile */
+  .modal-mobile {
+    margin: 0.5rem;
+    max-height: calc(100vh - 1rem);
+    width: calc(100vw - 1rem);
+  }
+
+  /* Scrollable content areas */
+  .mobile-scroll {
+    -webkit-overflow-scrolling: touch;
+    overflow-scrolling: touch;
+  }
+
+  /* Hide desktop-only elements */
+  .desktop-only {
+    display: none !important;
+  }
+
+  /* Show mobile-only elements */
+  .mobile-only {
+    display: block !important;
+  }
+
+  /* Better typography on mobile */
+  .mobile-text {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .mobile-heading {
+    font-size: 18px;
+    line-height: 1.4;
+  }
+
+  /* Improved form layouts */
+  .mobile-form-group {
+    margin-bottom: 1rem;
+  }
+
+  .mobile-form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  /* Better button layouts */
+  .mobile-button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .mobile-button-group button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Improved table alternatives */
+  .mobile-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  }
+
+  .mobile-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+  }
+
+  .mobile-card-title {
+    font-weight: 600;
+    color: #1f2937;
+    font-size: 16px;
+  }
+
+  .mobile-card-subtitle {
+    color: #6b7280;
+    font-size: 14px;
+    margin-top: 0.25rem;
+  }
+
+  .mobile-card-body {
+    space-y: 0.5rem;
+  }
+
+  .mobile-card-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid #f3f4f6;
+  }
+
+  /* Loading states */
+  .mobile-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
+  }
+
+  .mobile-loading-spinner {
+    width: 2rem;
+    height: 2rem;
+    border: 2px solid #f3f4f6;
+    border-top-color: #3b82f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* Better focus states for accessibility */
+  .mobile-focus:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+  }
+
+  /* Sticky headers */
+  .mobile-sticky-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: white;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  /* Better spacing for lists */
+  .mobile-list-item {
+    padding: 0.75rem;
+    border-bottom: 1px solid #f3f4f6;
+  }
+
+  .mobile-list-item:last-child {
+    border-bottom: none;
+  }
+
+  /* Improved search bars */
+  .mobile-search {
+    position: relative;
+  }
+
+  .mobile-search input {
+    padding-left: 2.5rem;
+    width: 100%;
+  }
+
+  .mobile-search-icon {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6b7280;
+  }
+
+  /* Better error states */
+  .mobile-error {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #dc2626;
+    padding: 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 14px;
+  }
+
+  /* Success states */
+  .mobile-success {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #16a34a;
+    padding: 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 14px;
+  }
+
+  /* Warning states */
+  .mobile-warning {
+    background: #fffbeb;
+    border: 1px solid #fed7aa;
+    color: #d97706;
+    padding: 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 14px;
+  }
+}
+
+/* Tablet optimizations */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .tablet-optimized {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .tablet-form-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .high-dpi-optimized {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* Dark mode considerations for mobile */
+@media (prefers-color-scheme: dark) {
+  .mobile-card {
+    background: #1f2937;
+    border-color: #374151;
+    color: #f9fafb;
+  }
+
+  .mobile-card-title {
+    color: #f9fafb;
+  }
+
+  .mobile-card-subtitle {
+    color: #d1d5db;
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Print styles for mobile */
+@media print {
+  .mobile-no-print {
+    display: none !important;
+  }
+
+  .mobile-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
