@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import Navbar from '@/components/Navbar';
+import { useLanguage } from '@/contexts/LanguageContext';
 import Footer from '@/components/Footer';
 import LivingSaintModal from '@/components/LivingSaintModal';
 import LivingSaintShareButton from '@/components/LivingSaintShareButton';
@@ -12,6 +13,7 @@ import { usePagination } from '@/hooks/usePagination';
 import BeautifulPagination from '@/components/BeautifulPagination';
 
 const LivingSaints = () => {
+  const { t, language } = useLanguage();
   const [selectedSaint, setSelectedSaint] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [livingSaints, setLivingSaints] = useState([]);
@@ -154,7 +156,7 @@ const LivingSaints = () => {
         <div className="flex items-center justify-center min-h-screen">
           <div className="flex flex-col items-center space-y-4">
             <Loader2 className="w-8 h-8 animate-spin text-red-600" />
-            <p className="text-gray-600">Loading living saints...</p>
+            <p className="text-gray-600">{t('livingsaints.loading')}</p>
           </div>
         </div>
         <Footer />
@@ -170,13 +172,13 @@ const LivingSaints = () => {
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center space-y-4">
             <div className="text-red-600 text-6xl">⚠️</div>
-            <h2 className="text-2xl font-bold text-gray-800">Something went wrong</h2>
+            <h2 className="text-2xl font-bold text-gray-800">{t('livingsaints.error.title')}</h2>
             <p className="text-gray-600 max-w-md">{error}</p>
             <button 
               onClick={() => window.location.reload()} 
               className="px-6 py-3 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
             >
-              Try Again
+              {t('livingsaints.error.retry')}
             </button>
           </div>
         </div>
@@ -193,19 +195,18 @@ const LivingSaints = () => {
       <section className="pt-20 pb-12 bg-gradient-to-r from-red-100 to-orange-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="space-y-4">
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
-              Living Saints
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent pt-2">
+              {t('livingsaints.title')}
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Connect with contemporary spiritual masters who continue to illuminate the path of devotion, 
-              spreading divine wisdom and compassion in our modern world.
+              {t('livingsaints.subtitle')}
             </p>
             <div className="flex justify-center">
               <Badge variant="secondary" className="bg-red-100 text-red-700 px-4 py-2">
                 {searchQuery 
                   ? `${pagination.totalItems} of ${livingSaints.length}` 
                   : `${livingSaints.length}`
-                } Contemporary Guides
+                } {t('livingsaints.guides.count')}
                 {pagination.totalPages > 1 && ` • Page ${pagination.currentPage} of ${pagination.totalPages}`}
               </Badge>
             </div>
@@ -222,7 +223,7 @@ const LivingSaints = () => {
             </div>
             <Input
               type="text"
-              placeholder="खोजें: समसाधि, शिवानंद आश्रम, योग... (Search by name, organization, location, teachings)"
+              placeholder={language === 'EN' ? 'खोजें: समसाधि, शिवानंद आश्रम, योग... (' + t('livingsaints.search.placeholder') + ')' : t('livingsaints.search.placeholder')}
               value={searchQuery}
               onChange={handleSearch}
               className="block w-full pl-10 pr-3 py-3 border-2 border-red-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 text-gray-900 placeholder-gray-500 bg-white/90 backdrop-blur-sm"
@@ -232,7 +233,7 @@ const LivingSaints = () => {
                 onClick={() => setSearchQuery('')}
                 className="absolute inset-y-0 right-0 pr-3 flex items-center"
               >
-                <span className="text-gray-400 hover:text-gray-600 text-sm">Clear</span>
+                <span className="text-gray-400 hover:text-gray-600 text-sm">{t('livingsaints.search.clear')}</span>
               </button>
             )}
           </div>
