@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { useLanguage } from '@/contexts/LanguageContext';
 import BhajanModal from '@/components/BhajanModal';
 import BhajanShareButton from '@/components/BhajanShareButton';
 import { Card, CardContent } from '@/components/ui/card';
@@ -35,6 +36,7 @@ interface QuoteItem {
 }
 
 const Bhajans = () => {
+  const { t, language } = useLanguage();
   const [selectedBhajan, setSelectedBhajan] = useState<Bhajan | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [bhajans, setBhajans] = useState<Bhajan[]>([]);
@@ -173,7 +175,7 @@ const Bhajans = () => {
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center space-y-4">
             <Loader2 className="w-12 h-12 animate-spin text-green-600 mx-auto" />
-            <p className="text-lg text-gray-600">Loading sacred content...</p>
+            <p className="text-lg text-gray-600">{t('bhajans.loading')}</p>
           </div>
         </div>
         <Footer />
@@ -217,23 +219,22 @@ const Bhajans = () => {
               <span className="text-3xl">🎵</span>
               <Quote className="w-8 h-8 text-orange-500 animate-pulse" />
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-green-600 to-orange-600 bg-clip-text text-transparent">
-              Bhajans & Quotes
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-green-600 to-orange-600 bg-clip-text text-transparent pt-2">
+              {t('bhajans.title')}
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Immerse yourself in sacred melodies and profound wisdom through our collection of 
-              devotional songs and inspiring spiritual quotes from the great masters.
+              {t('bhajans.subtitle')}
             </p>
             <div className="flex justify-center space-x-4">
               <Badge variant="secondary" className="bg-green-100 text-green-700 px-4 py-2">
                 {searchQuery 
                   ? `${bhajanPagination.totalItems} of ${bhajans.length}` 
                   : `${bhajans.length}`
-                } Sacred Songs
+                } {t('bhajans.songs.count')}
                 {bhajanPagination.totalPages > 1 && ` • Page ${bhajanPagination.currentPage} of ${bhajanPagination.totalPages}`}
               </Badge>
               <Badge variant="secondary" className="bg-orange-100 text-orange-700 px-4 py-2">
-                {quotes.length} Divine Quotes
+                {quotes.length} {t('bhajans.quotes.count')}
                 {quotesPagination.totalPages > 1 && ` • Page ${quotesPagination.currentPage} of ${quotesPagination.totalPages}`}
               </Badge>
             </div>
@@ -248,21 +249,20 @@ const Bhajans = () => {
             <TabsList className="grid grid-cols-2 w-full max-w-md mx-auto">
               <TabsTrigger value="bhajans" className="flex items-center space-x-2">
                 <Music className="w-4 h-4" />
-                <span>Bhajans</span>
+                <span>{t('bhajans.tab.bhajans')}</span>
               </TabsTrigger>
               <TabsTrigger value="quotes" className="flex items-center space-x-2">
                 <Quote className="w-4 h-4" />
-                <span>Quotes</span>
+                <span>{t('bhajans.tab.quotes')}</span>
               </TabsTrigger>
             </TabsList>
 
             {/* Bhajans Tab */}
             <TabsContent value="bhajans" className="space-y-8">
               <div className="text-center space-y-4">
-                <h2 className="text-3xl font-bold text-gray-800">Sacred Bhajans</h2>
+                <h2 className="text-3xl font-bold text-gray-800">{t('bhajans.section.title')}</h2>
                 <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                  Devotional songs that have echoed through temples and hearts for centuries, 
-                  carrying the divine vibrations of love and surrender.
+                  {t('bhajans.section.subtitle')}
                 </p>
               </div>
 
@@ -274,7 +274,7 @@ const Bhajans = () => {
                   </div>
                   <Input
                     type="text"
-                    placeholder="खोजें: हनुमान चालीसा, राम भजन, कृष्ण... (Search by title, author, category, lyrics)"
+                    placeholder={language === 'EN' ? 'खोजें: हनुमान चालीसा, राम भजन, कृष्ण... (' + t('bhajans.search.placeholder') + ')' : t('bhajans.search.placeholder')}
                     value={searchQuery}
                     onChange={handleSearch}
                     className="block w-full pl-10 pr-3 py-3 border-2 border-green-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900 placeholder-gray-500 bg-white/90 backdrop-blur-sm"
@@ -284,17 +284,17 @@ const Bhajans = () => {
                       onClick={() => setSearchQuery('')}
                       className="absolute inset-y-0 right-0 pr-3 flex items-center"
                     >
-                      <span className="text-gray-400 hover:text-gray-600 text-sm">Clear</span>
+                      <span className="text-gray-400 hover:text-gray-600 text-sm">{t('bhajans.search.clear')}</span>
                     </button>
                   )}
                 </div>
                 {searchQuery && (
                   <p className="mt-2 text-sm text-gray-600 text-center">
-                    {bhajanPagination.totalItems === 0 
-                      ? `No bhajans found for "${searchQuery}"`
-                      : `Found ${bhajanPagination.totalItems} bhajan${bhajanPagination.totalItems !== 1 ? 's' : ''} matching "${searchQuery}"`
+                    {bhajanPagination.totalItems === 0
+                      ? `${t('bhajans.search.no.results')} "${searchQuery}"`
+                      : `${t('bhajans.search.results')} ${bhajanPagination.totalItems} bhajan${bhajanPagination.totalItems !== 1 ? 's' : ''} matching "${searchQuery}"`
                     }
-                    {bhajanPagination.totalPages > 1 && ` • Showing ${bhajanPagination.startIndex}-${bhajanPagination.endIndex}`}
+                    {bhajanPagination.totalPages > 1 && ` • ${t('bhajans.search.showing')} ${bhajanPagination.startIndex}-${bhajanPagination.endIndex}`}
                   </p>
                 )}
               </div>
@@ -414,18 +414,17 @@ const Bhajans = () => {
             {/* Quotes Tab */}
             <TabsContent value="quotes" className="space-y-8">
               <div className="text-center space-y-4">
-                <h2 className="text-3xl font-bold text-gray-800">Divine Wisdom</h2>
+                <h2 className="text-3xl font-bold text-gray-800">{t('bhajans.quotes.section.title')}</h2>
                 <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                  Timeless words of wisdom from enlightened masters, scriptures, and saints 
-                  that illuminate the path to spiritual awakening.
+                  {t('bhajans.quotes.section.subtitle')}
                 </p>
               </div>
 
               {quotes.length === 0 ? (
                 <div className="text-center py-12">
                   <Quote className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500 text-lg">No quotes available yet</p>
-                  <p className="text-gray-400 text-sm">Check back soon for divine wisdom</p>
+                  <p className="text-gray-500 text-lg">{language === 'EN' ? 'No quotes available yet' : 'अभी तक कोई उद्धरण उपलब्ध नहीं'}</p>
+                  <p className="text-gray-400 text-sm">{language === 'EN' ? 'Check back soon for divine wisdom' : 'दिव्य ज्ञान के लिए जल्द ही वापस देखें'}</p>
                 </div>
               ) : (
                 <div id="quotes-grid" className="space-y-8">
