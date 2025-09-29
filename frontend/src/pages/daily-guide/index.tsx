@@ -72,7 +72,7 @@ const DailyGuide = () => {
           >
             <div className="flex items-center justify-center mb-4">
               <Sparkles className="w-8 h-8 text-orange-500 mr-2" />
-              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-orange-500 to-red-600 bg-clip-text text-transparent">
+              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-orange-500 to-red-600 bg-clip-text text-transparent pt-2">
                 {t('dailyguide.title')}
               </h1>
               <Sparkles className="w-8 h-8 text-orange-500 ml-2" />
@@ -359,7 +359,7 @@ const DailyGuide = () => {
                 <div className="space-y-4">
                   <div className="flex items-center justify-center space-x-2">
                     <Sparkles className="w-8 h-8 text-purple-500" />
-                    <h3 className="text-2xl font-bold text-gray-800">{t('dailyguide.horoscope.title')}</h3>
+                    <h3 className="text-2xl font-bold text-gray-800 pt-1">{t('dailyguide.horoscope.title')}</h3>
                     <Sparkles className="w-8 h-8 text-purple-500" />
                   </div>
                   <p className="text-lg text-gray-600 max-w-2xl mx-auto">

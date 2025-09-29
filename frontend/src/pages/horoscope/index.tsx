@@ -245,7 +245,7 @@ const HoroscopePage = () => {
           >
             <div className="flex items-center justify-center mb-4">
               <Sparkles className="w-8 h-8 text-orange-500 mr-3" />
-              <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-orange-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
+              <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-orange-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent pt-2">
                 {t('horoscope.title')}
               </h1>
               <Sparkles className="w-8 h-8 text-purple-500 ml-3" />
