@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { Menu, X, Users, Heart, Sparkles, Book, Info, IndianRupee, Calendar, Star, ChevronDown, CalendarDays, LogIn, UserPlus, User, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,13 +18,9 @@ import {
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isMoreOpen, setIsMoreOpen] = useState(false);
-  const [language, setLanguage] = useState('EN');
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { user, loading, signOut } = useAuth();
-
-  const toggleLanguage = () => {
-    setLanguage(language === 'EN' ? 'HI' : 'EN');
-  };
+  const { language, toggleLanguage } = useLanguage();
 
   // Close dropdown when clicking outside
   useEffect(() => {

@@ -10,6 +10,7 @@ import { LoadingPage } from "@/components/ui/loading-spinner";
 import { lazy } from "react";
 import { getFCMToken, onFCMMessage } from "@/lib/firebase";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { LanguageProvider } from "@/contexts/LanguageContext";
 
 // Lazy load pages for better code splitting
 const Index = lazy(() => import("./pages/Index"));
@@ -58,12 +59,13 @@ const App = () => {
 
   return (
     <ErrorBoundary>
-      <AuthProvider>
-        <QueryClientProvider client={queryClient}>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
+      <LanguageProvider>
+        <AuthProvider>
+          <QueryClientProvider client={queryClient}>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
           <Suspense fallback={<LoadingPage text="Loading SantVaani..." />}>
             <Routes>
               <Route path="/" element={<Index />} />
@@ -85,10 +87,11 @@ const App = () => {
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
-        </BrowserRouter>
-          </TooltipProvider>
-        </QueryClientProvider>
-      </AuthProvider>
+          </BrowserRouter>
+            </TooltipProvider>
+          </QueryClientProvider>
+        </AuthProvider>
+      </LanguageProvider>
     </ErrorBoundary>
   );
 };

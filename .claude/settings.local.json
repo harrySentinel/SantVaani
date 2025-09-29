@@ -19,7 +19,8 @@
       "Bash(tree:*)",
       "Bash(tasklist:*)",
       "Bash(taskkill:*)",
-      "WebFetch(domain:santvaani-backend.onrender.com)"
+      "WebFetch(domain:santvaani-backend.onrender.com)",
+      "Bash(node server.js)"
     ],
     "deny": [],
     "ask": []
