@@ -26,8 +26,10 @@ import {
 import { usePanchang } from '@/hooks/usePanchang';
 import { useSpiritualContent } from '@/hooks/useSpiritualContent';
 import { useNotifications } from '@/hooks/useNotifications';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const DailyGuide = () => {
+  const { t, language } = useLanguage();
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [selectedReminders, setSelectedReminders] = useState({
     morning: true,
@@ -71,16 +73,18 @@ const DailyGuide = () => {
             <div className="flex items-center justify-center mb-4">
               <Sparkles className="w-8 h-8 text-orange-500 mr-2" />
               <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-orange-500 to-red-600 bg-clip-text text-transparent">
-                Daily Spiritual Guide
+                {t('dailyguide.title')}
               </h1>
               <Sparkles className="w-8 h-8 text-orange-500 ml-2" />
             </div>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Your personal companion for daily spiritual practice, Hindu calendar, and divine guidance
+              {t('dailyguide.subtitle')}
             </p>
-            <p className="text-lg text-orange-600 mt-2 font-medium">
-              आपका दैनिक आध्यात्मिक मार्गदर्शक
-            </p>
+            {language === 'EN' && (
+              <p className="text-lg text-orange-600 mt-2 font-medium">
+                आपका दैनिक आध्यात्मिक मार्गदर्शक
+              </p>
+            )}
           </motion.div>
 
           {/* Notification Settings Card */}
@@ -94,28 +98,28 @@ const DailyGuide = () => {
               <CardHeader className="text-center pb-4">
                 <div className="flex items-center justify-center mb-2">
                   <Bell className="w-6 h-6 text-orange-500 mr-2" />
-                  <CardTitle className="text-2xl text-gray-800">Daily Blessings Notifications</CardTitle>
+                  <CardTitle className="text-2xl text-gray-800">{t('dailyguide.notifications.title')}</CardTitle>
                 </div>
-                <p className="text-gray-600">Get reminded for morning prayers, evening aarti, and festivals</p>
+                <p className="text-gray-600">{t('dailyguide.notifications.subtitle')}</p>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="flex items-center justify-center space-x-4">
-                  <span className="text-gray-700">Disable Notifications</span>
+                  <span className="text-gray-700">{t('dailyguide.notifications.disable')}</span>
                   <Switch
                     checked={notificationsEnabled}
                     onCheckedChange={handleNotificationToggle}
                     className="data-[state=checked]:bg-orange-500"
                   />
-                  <span className="text-gray-700">Enable Notifications</span>
+                  <span className="text-gray-700">{t('dailyguide.notifications.enable')}</span>
                 </div>
                 
                 {notificationsEnabled && (
                   <div className="grid md:grid-cols-2 gap-4 pt-4 border-t border-orange-100">
                     {[
-                      { key: 'morning', label: 'Morning Prayers', time: '6:00 AM' },
-                      { key: 'evening', label: 'Evening Aarti', time: '6:00 PM' },
-                      { key: 'festivals', label: 'Festival Reminders', time: 'As needed' },
-                      { key: 'ekadashi', label: 'Ekadashi Alerts', time: 'Monthly' }
+                      { key: 'morning', label: t('dailyguide.notifications.morning'), time: '6:00 AM' },
+                      { key: 'evening', label: t('dailyguide.notifications.evening'), time: '6:00 PM' },
+                      { key: 'festivals', label: t('dailyguide.notifications.festivals'), time: language === 'EN' ? 'As needed' : 'आवश्यकतानुसार' },
+                      { key: 'ekadashi', label: t('dailyguide.notifications.ekadashi'), time: language === 'EN' ? 'Monthly' : 'मासिक' }
                     ].map((reminder) => (
                       <div key={reminder.key} className="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
                         <div>
@@ -149,8 +153,8 @@ const DailyGuide = () => {
                 <CardHeader>
                   <div className="flex items-center space-x-2">
                     <Calendar className="w-6 h-6 text-orange-500" />
-                    <CardTitle className="text-xl text-gray-800">Today's Panchang</CardTitle>
-                    <Badge variant="secondary" className="bg-orange-100 text-orange-700">Live</Badge>
+                    <CardTitle className="text-xl text-gray-800">{t('dailyguide.panchang.title')}</CardTitle>
+                    <Badge variant="secondary" className="bg-orange-100 text-orange-700">{t('dailyguide.panchang.live')}</Badge>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -178,48 +182,48 @@ const DailyGuide = () => {
                       {/* Panchang Elements Grid */}
                       <div className="grid md:grid-cols-2 gap-4">
                         {[
-                          { 
-                            label: 'Tithi', 
-                            labelHi: 'तिथि', 
+                          {
+                            label: t('dailyguide.panchang.tithi'),
+                            labelHi: 'तिथि',
                             value: todaysContent?.specialDay?.name || 'Shukla Tritiya',
-                            icon: Moon 
+                            icon: Moon
                           },
-                          { 
-                            label: 'Sunrise', 
-                            labelHi: 'सूर्योदय', 
-                            value: '6:15 AM', 
-                            icon: Sunrise 
+                          {
+                            label: t('dailyguide.panchang.sunrise'),
+                            labelHi: 'सूर्योदय',
+                            value: '6:15 AM',
+                            icon: Sunrise
                           },
-                          { 
-                            label: 'Sunset', 
-                            labelHi: 'सूर्यास्त', 
-                            value: '6:45 PM', 
-                            icon: Sunset 
+                          {
+                            label: t('dailyguide.panchang.sunset'),
+                            labelHi: 'सूर्यास्त',
+                            value: '6:45 PM',
+                            icon: Sunset
                           },
-                          { 
-                            label: 'Nakshatra', 
-                            labelHi: 'नक्षत्र', 
-                            value: 'Rohini', 
-                            icon: Star 
+                          {
+                            label: t('dailyguide.panchang.nakshatra'),
+                            labelHi: 'नक्षत्र',
+                            value: 'Rohini',
+                            icon: Star
                           },
-                          { 
-                            label: 'Muhurat', 
-                            labelHi: 'मुहूर्त', 
-                            value: '8:30-9:15 AM', 
-                            icon: Clock 
+                          {
+                            label: t('dailyguide.panchang.muhurat'),
+                            labelHi: 'मुहूर्त',
+                            value: '8:30-9:15 AM',
+                            icon: Clock
                           },
-                          { 
-                            label: 'Moon Phase', 
-                            labelHi: 'चंद्र स्थिति', 
-                            value: 'Waxing', 
-                            icon: Moon 
+                          {
+                            label: t('dailyguide.panchang.moonphase'),
+                            labelHi: 'चंद्र स्थिति',
+                            value: language === 'EN' ? 'Waxing' : 'बढ़ता हुआ',
+                            icon: Moon
                           }
                         ].map((item, index) => (
                           <div key={index} className="p-3 bg-gradient-to-br from-orange-50 to-orange-100/50 rounded-lg border border-orange-200 hover:shadow-md transition-shadow">
                             <div className="flex items-center space-x-2 mb-2">
                               <item.icon className="w-4 h-4 text-orange-600" />
                               <span className="font-medium text-gray-800 text-sm">{item.label}</span>
-                              <span className="text-xs text-orange-600">({item.labelHi})</span>
+                              {language === 'EN' && <span className="text-xs text-orange-600">({item.labelHi})</span>}
                             </div>
                             <p className="text-gray-700 font-medium text-sm">{item.value}</p>
                           </div>
@@ -257,7 +261,7 @@ const DailyGuide = () => {
                 <CardHeader>
                   <div className="flex items-center space-x-2">
                     <Flame className="w-5 h-5 text-orange-500" />
-                    <CardTitle className="text-lg text-gray-800">Today's Mantra</CardTitle>
+                    <CardTitle className="text-lg text-gray-800">{t('dailyguide.mantra.title')}</CardTitle>
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -277,7 +281,7 @@ const DailyGuide = () => {
                       className="border-orange-300 text-orange-600 hover:bg-orange-50"
                     >
                       <Volume2 className="w-4 h-4 mr-2" />
-                      Listen
+                      {t('dailyguide.mantra.listen')}
                     </Button>
                   </div>
                 </CardContent>
@@ -288,7 +292,7 @@ const DailyGuide = () => {
                 <CardHeader>
                   <div className="flex items-center space-x-2">
                     <Heart className="w-5 h-5 text-orange-500" />
-                    <CardTitle className="text-lg text-gray-800">Spiritual Wisdom</CardTitle>
+                    <CardTitle className="text-lg text-gray-800">{t('dailyguide.wisdom.title')}</CardTitle>
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -314,7 +318,7 @@ const DailyGuide = () => {
               <CardHeader>
                 <div className="flex items-center space-x-2">
                   <Gift className="w-6 h-6 text-orange-500" />
-                  <CardTitle className="text-xl text-gray-800">Upcoming Festivals</CardTitle>
+                  <CardTitle className="text-xl text-gray-800">{t('dailyguide.festivals.title')}</CardTitle>
                 </div>
               </CardHeader>
               <CardContent>
@@ -324,9 +328,9 @@ const DailyGuide = () => {
                       <div className="flex items-center justify-between mb-2">
                         <h3 className="font-semibold text-gray-800">{festival.name}</h3>
                         <Badge variant="secondary" className="bg-orange-200 text-orange-800">
-                          {festival.daysLeft === 0 ? 'Today!' :
-                           festival.daysLeft === 1 ? 'Tomorrow' :
-                           `${festival.daysLeft} days`}
+                          {festival.daysLeft === 0 ? t('dailyguide.festivals.today') :
+                           festival.daysLeft === 1 ? t('dailyguide.festivals.tomorrow') :
+                           `${festival.daysLeft} ${t('dailyguide.festivals.days')}`}
                         </Badge>
                       </div>
                       <p className="text-sm text-orange-600 mb-1">{festival.nameHi || festival.name}</p>
@@ -335,7 +339,7 @@ const DailyGuide = () => {
                   )) : (
                     <div className="col-span-3 text-center py-8 text-gray-500">
                       <Calendar className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                      <p>Loading upcoming festivals...</p>
+                      <p>{t('dailyguide.festivals.loading')}</p>
                     </div>
                   )}
                 </div>
@@ -355,36 +359,38 @@ const DailyGuide = () => {
                 <div className="space-y-4">
                   <div className="flex items-center justify-center space-x-2">
                     <Sparkles className="w-8 h-8 text-purple-500" />
-                    <h3 className="text-2xl font-bold text-gray-800">Daily Horoscope</h3>
+                    <h3 className="text-2xl font-bold text-gray-800">{t('dailyguide.horoscope.title')}</h3>
                     <Sparkles className="w-8 h-8 text-purple-500" />
                   </div>
                   <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                    Discover what the stars have in store for you with personalized daily, weekly, and monthly predictions
+                    {t('dailyguide.horoscope.subtitle')}
                   </p>
-                  <p className="text-purple-600 font-medium">
-                    अपनी दैनिक, साप्ताहिक और मासिक राशिफल जानें
-                  </p>
+                  {language === 'EN' && (
+                    <p className="text-purple-600 font-medium">
+                      अपनी दैनिक, साप्ताहिक और मासिक राशिफल जानें
+                    </p>
+                  )}
                   <div className="pt-4">
                     <a
                       href="/horoscope"
                       className="inline-flex items-center justify-center px-8 py-3 bg-gradient-to-r from-purple-500 to-indigo-600 text-white rounded-full hover:from-purple-600 hover:to-indigo-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
                     >
                       <Star className="w-5 h-5 mr-2" />
-                      View Your Horoscope
+                      {t('dailyguide.horoscope.button')}
                     </a>
                   </div>
                   <div className="grid grid-cols-3 gap-4 mt-6 text-sm">
                     <div className="bg-white/60 rounded-lg p-3">
                       <Sun className="w-6 h-6 text-orange-500 mx-auto mb-1" />
-                      <p className="font-medium text-gray-700">Daily</p>
+                      <p className="font-medium text-gray-700">{t('dailyguide.horoscope.daily')}</p>
                     </div>
                     <div className="bg-white/60 rounded-lg p-3">
                       <Calendar className="w-6 h-6 text-blue-500 mx-auto mb-1" />
-                      <p className="font-medium text-gray-700">Weekly</p>
+                      <p className="font-medium text-gray-700">{t('dailyguide.horoscope.weekly')}</p>
                     </div>
                     <div className="bg-white/60 rounded-lg p-3">
                       <Moon className="w-6 h-6 text-purple-500 mx-auto mb-1" />
-                      <p className="font-medium text-gray-700">Monthly</p>
+                      <p className="font-medium text-gray-700">{t('dailyguide.horoscope.monthly')}</p>
                     </div>
                   </div>
                 </div>
