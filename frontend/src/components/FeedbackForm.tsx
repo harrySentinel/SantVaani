@@ -1,5 +1,6 @@
 import React from 'react';
 import { ExternalLink, Heart } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface FeedbackFormProps {
   isOpen: boolean;
@@ -7,6 +8,7 @@ interface FeedbackFormProps {
 }
 
 const FeedbackForm = ({ isOpen, onClose }: FeedbackFormProps) => {
+  const { t } = useLanguage();
   // Replace this URL with your actual Google Form URL
   const GOOGLE_FORM_URL = 'https://forms.gle/your-form-id-here';
 
@@ -26,7 +28,7 @@ const FeedbackForm = ({ isOpen, onClose }: FeedbackFormProps) => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   <Heart className="w-6 h-6" />
-                  <h2 className="text-xl font-semibold">Share Your Feedback</h2>
+                  <h2 className="text-xl font-semibold">{t('feedback.title')}</h2>
                 </div>
                 <button
                   onClick={onClose}
@@ -36,7 +38,7 @@ const FeedbackForm = ({ isOpen, onClose }: FeedbackFormProps) => {
                 </button>
               </div>
               <p className="text-orange-100 text-sm mt-2">
-                Your feedback helps us create a better spiritual experience for all devotees
+                {t('feedback.subtitle')}
               </p>
             </div>
 
@@ -45,10 +47,10 @@ const FeedbackForm = ({ isOpen, onClose }: FeedbackFormProps) => {
               <div className="text-center space-y-4">
                 <div className="text-6xl">🙏</div>
                 <h3 className="text-lg font-semibold text-gray-800">
-                  Help Us Serve Better
+                  {t('feedback.help.title')}
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Your thoughts and suggestions are invaluable to us. Click below to share your feedback through our secure Google Form.
+                  {t('feedback.help.description')}
                 </p>
               </div>
 
@@ -58,14 +60,14 @@ const FeedbackForm = ({ isOpen, onClose }: FeedbackFormProps) => {
                   className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-3 px-4 rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all duration-200 flex items-center justify-center space-x-2"
                 >
                   <ExternalLink className="w-4 h-4" />
-                  <span>Open Feedback Form</span>
+                  <span>{t('feedback.button.open')}</span>
                 </button>
-                
+
                 <button
                   onClick={onClose}
                   className="w-full border border-gray-300 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-50 transition-all duration-200"
                 >
-                  Maybe Later
+                  {t('feedback.button.later')}
                 </button>
               </div>
             </div>
@@ -73,7 +75,7 @@ const FeedbackForm = ({ isOpen, onClose }: FeedbackFormProps) => {
             {/* Footer */}
             <div className="bg-gray-50 px-6 py-3 rounded-b-2xl">
               <p className="text-xs text-gray-500 text-center">
-                🔒 Your feedback is securely collected through Google Forms
+                {t('feedback.footer')}
               </p>
             </div>
           </div>

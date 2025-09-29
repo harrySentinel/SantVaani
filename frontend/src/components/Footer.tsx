@@ -1,7 +1,10 @@
 import { Link } from 'react-router-dom';
 import { Heart, Mail, Phone } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function Footer() {
+  const { t } = useLanguage();
+
   return (
     <footer className="bg-gradient-to-br from-orange-50 to-orange-100 border-t border-orange-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -13,40 +16,39 @@ export default function Footer() {
                 <span className="text-white font-bold text-sm">ॐ</span>
               </div>
               <span className="text-xl font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent">
-                SantVaani
+                {t('site.name')}
               </span>
             </div>
             <p className="text-gray-600 text-sm leading-relaxed">
-              Spreading the divine wisdom and teachings of great Indian saints across the world. 
-              A digital sanctuary for spiritual seekers.
+              {t('footer.description')}
             </p>
           </div>
 
           {/* Quick Links */}
           <div className="space-y-4">
-            <h3 className="font-semibold text-gray-800">Quick Links</h3>
+            <h3 className="font-semibold text-gray-800">{t('footer.links.title')}</h3>
             <div className="space-y-2">
               <Link to="/saints" className="block text-gray-600 hover:text-orange-600 transition-colors text-sm">
-                Saints
+                {t('footer.links.saints')}
               </Link>
               <Link to="/living-saints" className="block text-gray-600 hover:text-orange-600 transition-colors text-sm">
-                Living Saints
+                {t('footer.links.living')}
               </Link>
               <Link to="/divine" className="block text-gray-600 hover:text-orange-600 transition-colors text-sm">
-                Divine Forms
+                {t('footer.links.divine')}
               </Link>
               <Link to="/bhajans" className="block text-gray-600 hover:text-orange-600 transition-colors text-sm">
-                Bhajans & Quotes
+                {t('footer.links.bhajans')}
               </Link>
               <Link to="/donation" className="block text-gray-600 hover:text-orange-600 transition-colors text-sm">
-                Donation
+                {t('footer.links.donation')}
               </Link>
             </div>
           </div>
 
           {/* Contact */}
           <div className="space-y-4">
-            <h3 className="font-semibold text-gray-800">Connect</h3>
+            <h3 className="font-semibold text-gray-800">{t('footer.connect.title')}</h3>
             <div className="space-y-2">
               <div className="flex items-center space-x-2 text-gray-600 text-sm">
                 <Mail className="w-4 h-4" />
@@ -62,9 +64,9 @@ export default function Footer() {
 
         <div className="border-t border-orange-200 mt-8 pt-6 text-center">
           <p className="text-gray-500 text-sm flex items-center justify-center space-x-1">
-            <span>Made with</span>
+            <span>{t('footer.made.with')}</span>
             <Heart className="w-4 h-4 text-red-500" />
-            <span>for spiritual seekers worldwide</span>
+            <span>{t('footer.made.for')}</span>
           </p>
         </div>
       </div>

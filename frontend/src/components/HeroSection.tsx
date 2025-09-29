@@ -5,9 +5,11 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowDown, Sparkles, Heart, Shield, Users, Unlock } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function HeroSection() {
   const [currentQuote, setCurrentQuote] = useState(0);
+  const { t, language } = useLanguage();
 
   const spiritualQuotes = [
     {
@@ -53,24 +55,34 @@ export default function HeroSection() {
             </div>
             
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-orange-500 via-orange-600 to-orange-700 bg-clip-text text-transparent leading-tight">
-              SantVaani
+              {t('site.name')}
             </h1>
-            
-            <p className="text-xl md:text-2xl text-gray-600 font-medium">
-              संतवाणी
-            </p>
+
+            {language === 'EN' && (
+              <p className="text-xl md:text-2xl text-gray-600 font-medium">
+                संतवाणी
+              </p>
+            )}
           </div>
 
           {/* Tagline */}
           <div className="max-w-3xl mx-auto space-y-4">
             <h2 className="text-2xl md:text-3xl lg:text-4xl text-gray-800 font-semibold leading-relaxed">
-              Where Ancient Wisdom Meets
-              <span className="text-orange-600"> Modern Hearts</span>
+              {language === 'EN' ? (
+                <>
+                  Where Ancient Wisdom Meets
+                  <span className="text-orange-600"> Modern Hearts</span>
+                </>
+              ) : (
+                <>
+                  जहाँ <span className="text-orange-600">प्राचीन ज्ञान</span> मिलता है
+                  <span className="text-orange-600"> आधुनिक हृदयों</span> से
+                </>
+              )}
             </h2>
-            
+
             <p className="text-lg md:text-xl text-gray-600 leading-relaxed">
-              Discover the profound teachings, inspiring stories, and divine bhakti of India's greatest saints. 
-              A digital sanctuary for spiritual seekers on their journey to enlightenment.
+              {t('hero.description.main')}
             </p>
           </div>
 
@@ -79,7 +91,7 @@ export default function HeroSection() {
           <div className="max-w-2xl mx-auto bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-orange-100">
             <div className="space-y-3 min-h-[100px] flex flex-col justify-center">
               <p className="text-lg text-gray-700 italic leading-relaxed">
-                "{spiritualQuotes[currentQuote].text}"
+                "{language === 'EN' ? spiritualQuotes[currentQuote].text : spiritualQuotes[currentQuote].textHi}"
               </p>
               <p className="text-sm text-orange-600 font-medium">
                 {spiritualQuotes[currentQuote].author}
@@ -107,7 +119,7 @@ export default function HeroSection() {
                 className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
               >
                 <Heart className="w-5 h-5 mr-2" />
-                Explore Saints
+                {t('hero.button.saints')}
               </Button>
             </Link>
             
@@ -118,7 +130,7 @@ export default function HeroSection() {
                 className="border-2 border-orange-500 text-orange-600 hover:bg-orange-50 px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
               >
                 <Sparkles className="w-5 h-5 mr-2" />
-                Divine Forms
+                {t('hero.button.divine')}
               </Button>
             </Link>
           </div>
@@ -126,7 +138,7 @@ export default function HeroSection() {
           {/* Simple Free Access Message */}
           <div className="max-w-3xl mx-auto pt-6">
             <p className="text-center text-gray-600 font-medium">
-              🙏 <em>Completely free • No registration required • Pure spiritual content</em> 🙏
+              <em>{t('hero.free.message')}</em>
             </p>
           </div>
 
