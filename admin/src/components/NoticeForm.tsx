@@ -46,7 +46,7 @@ export default function NoticeForm({ notice, isOpen, onClose, onSave }: NoticeFo
     title: '',
     message: '',
     message_hi: '',
-    type: 'announcement' as const,
+    type: 'announcement' as 'festival' | 'announcement' | 'greeting' | 'update',
     is_active: true,
     expires_at: '',
   })
