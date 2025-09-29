@@ -156,7 +156,7 @@ export default function NoticeForm({ notice, isOpen, onClose, onSave }: NoticeFo
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto mx-4 sm:mx-0">
+      <DialogContent className="modal-enhanced max-w-2xl max-h-[90vh] overflow-y-auto mx-4 sm:mx-0">
         <DialogHeader>
           <DialogTitle>{notice ? 'Edit Notice' : 'Create New Notice'}</DialogTitle>
           <DialogDescription>
@@ -173,7 +173,7 @@ export default function NoticeForm({ notice, isOpen, onClose, onSave }: NoticeFo
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 placeholder="e.g., Navratri Wishes 🌸"
-                className="w-full"
+                className="w-full input-enhanced focus-enhanced"
               />
             </div>
 
@@ -200,7 +200,7 @@ export default function NoticeForm({ notice, isOpen, onClose, onSave }: NoticeFo
               value={formData.message}
               onChange={(e) => setFormData({ ...formData, message: e.target.value })}
               placeholder="Enter the notice message in English..."
-              className="min-h-[100px]"
+              className="min-h-[100px] textarea-enhanced focus-enhanced"
             />
           </div>
 
@@ -211,7 +211,7 @@ export default function NoticeForm({ notice, isOpen, onClose, onSave }: NoticeFo
               value={formData.message_hi}
               onChange={(e) => setFormData({ ...formData, message_hi: e.target.value })}
               placeholder="वैकल्पिक हिंदी संदेश दर्ज करें..."
-              className="min-h-[100px]"
+              className="min-h-[100px] textarea-enhanced focus-enhanced"
             />
           </div>
 
@@ -223,7 +223,7 @@ export default function NoticeForm({ notice, isOpen, onClose, onSave }: NoticeFo
                 type="date"
                 value={formData.expires_at}
                 onChange={(e) => setFormData({ ...formData, expires_at: e.target.value })}
-                className="w-full"
+                className="w-full input-enhanced focus-enhanced"
               />
             </div>
 

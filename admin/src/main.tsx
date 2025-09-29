@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom'
 import App from './App.tsx'
 import './index.css'
 import './styles/mobile.css'
+import './styles/enhanced.css'
 
 const root = document.getElementById('root')
 

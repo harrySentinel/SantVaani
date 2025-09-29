@@ -39,7 +39,7 @@ interface ResponsiveTableCellProps {
 // Main table container - shows table on desktop, cards on mobile
 export function ResponsiveTable({ children, className = '' }: ResponsiveTableProps) {
   return (
-    <div className={`bg-white shadow-sm rounded-lg border border-gray-200 overflow-hidden ${className}`}>
+    <div className={`table-enhanced ${className}`}>
       {/* Desktop table view */}
       <div className="hidden md:block overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">

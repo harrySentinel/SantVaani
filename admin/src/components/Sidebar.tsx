@@ -97,19 +97,19 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
 
       {/* Sidebar */}
       <div className={cn(
-        "fixed inset-y-0 left-0 z-50 w-64 bg-white transform transition-transform duration-300 ease-in-out border-r border-gray-200 md:translate-x-0 md:static md:z-auto",
+        "fixed inset-y-0 left-0 z-50 w-64 enhanced-sidebar transform transition-all duration-500 ease-in-out md:translate-x-0 md:static md:z-auto",
         sidebarOpen ? "translate-x-0" : "-translate-x-full"
       )}>
         <div className="flex flex-col flex-grow pt-4 sm:pt-5 overflow-y-auto">
           {/* Close button for mobile */}
           <div className="flex items-center justify-between px-6 md:hidden">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">🕉️</span>
+              <div className="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center shadow-lg">
+                <span className="text-white font-bold text-xl">🕉️</span>
               </div>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">SantVaani</h1>
-                <p className="text-xs text-gray-500">Admin Panel</p>
+                <h1 className="text-xl font-bold text-gradient">SantVaani</h1>
+                <p className="text-xs text-gray-500 font-medium">Admin Panel</p>
               </div>
             </div>
             <button
@@ -123,12 +123,12 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
           {/* Logo for desktop */}
           <div className="hidden md:flex items-center flex-shrink-0 px-6">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">🕉️</span>
+              <div className="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center shadow-lg">
+                <span className="text-white font-bold text-xl">🕉️</span>
               </div>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">SantVaani</h1>
-                <p className="text-xs text-gray-500">Admin Panel</p>
+                <h1 className="text-xl font-bold text-gradient">SantVaani</h1>
+                <p className="text-xs text-gray-500 font-medium">Admin Panel</p>
               </div>
             </div>
           </div>
@@ -143,10 +143,10 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                 onClick={() => setSidebarOpen(false)}
                 className={({ isActive }) =>
                   cn(
-                    'group flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-colors touch-manipulation',
+                    'sidebar-nav-item group flex items-center px-4 py-3 text-sm font-medium transition-all duration-300 touch-manipulation relative z-10',
                     isActive
-                      ? 'bg-orange-50 text-orange-700 border-l-4 border-orange-500'
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900 active:bg-gray-100'
+                      ? 'active text-white'
+                      : 'text-gray-700 hover:text-gray-900'
                   )
                 }
               >

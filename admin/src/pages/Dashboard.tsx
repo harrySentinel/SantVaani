@@ -72,11 +72,11 @@ export default function Dashboard() {
   ]
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 page-transition">
       {/* Header */}
       <div className="mb-6 sm:mb-8">
-        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-sm sm:text-base text-gray-600 mt-1">Welcome to SantVaani Admin Panel</p>
+        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gradient">Dashboard</h1>
+        <p className="text-sm sm:text-base text-gray-600 mt-1 font-medium">Welcome to SantVaani Admin Panel</p>
       </div>
 
       {/* Stats Grid */}
@@ -85,37 +85,25 @@ export default function Dashboard() {
           <div
             key={stat.name}
             onClick={() => handleQuickAction(stat.route)}
-            className="bg-white overflow-hidden shadow rounded-lg border border-gray-200 cursor-pointer hover:shadow-lg hover:border-gray-300 transition-all duration-200 touch-manipulation"
+            className="stats-card"
           >
-            <div className="p-4 sm:p-6">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <div className={`${stat.color} p-3 rounded-lg`}>
-                    <stat.icon className="h-6 w-6 text-white" />
-                  </div>
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-4">
+                <div className={`stats-icon ${stat.color}`}>
+                  <stat.icon className="h-6 w-6 text-white" />
                 </div>
-                <div className="ml-4 w-0 flex-1">
-                  <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">
-                      {stat.name}
-                    </dt>
-                    <dd className="text-xl sm:text-2xl font-semibold text-gray-900">
-                      {stat.value}
-                    </dd>
-                  </dl>
-                </div>
+                <TrendingUp className="h-4 w-4 text-gray-400" />
               </div>
-              <div className="mt-4">
-                <div className="flex items-center text-sm">
-                  <TrendingUp className={`flex-shrink-0 h-4 w-4 ${
-                    stat.changeType === 'increase' ? 'text-green-500' : 'text-gray-400'
-                  }`} />
-                  <span className={`ml-2 ${
-                    stat.changeType === 'increase' ? 'text-green-600' : 'text-gray-500'
-                  }`}>
-                    {stat.change}
-                  </span>
-                </div>
+              <div>
+                <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
+                  {stat.name}
+                </h3>
+                <p className="text-2xl sm:text-3xl font-bold text-gray-900 mt-1">
+                  {stat.value}
+                </p>
+                <p className="text-sm text-gray-500 mt-1 font-medium">
+                  {stat.change}
+                </p>
               </div>
             </div>
           </div>
