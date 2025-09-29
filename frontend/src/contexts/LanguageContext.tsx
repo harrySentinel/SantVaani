@@ -222,6 +222,21 @@ const translations: Translations = {
     'livingsaints.card.learn.more': 'Learn More',
     'livingsaints.empty.title': 'No Living Saints Found',
     'livingsaints.empty.subtitle': 'We\'re working on adding contemporary spiritual masters to our collection.',
+
+    // Divine Forms Page
+    'divine.title': 'Divine Forms',
+    'divine.subtitle': 'Explore the sacred manifestations of the divine and understand the profound meanings behind each form that has guided humanity for millennia.',
+    'divine.loading': 'Loading divine forms...',
+    'divine.error.retry': 'Try Again',
+    'divine.forms.count': 'Sacred Forms',
+    'divine.search.placeholder': 'Search by name, domain, attributes, significance',
+    'divine.search.clear': 'Clear',
+    'divine.search.no.results': 'No divine forms found for',
+    'divine.search.results': 'Found',
+    'divine.search.showing': 'Showing',
+    'divine.card.learn.more': 'Learn More',
+    'divine.empty.title': 'No Divine Forms Found',
+    'divine.empty.subtitle': 'We\'re working on adding more sacred forms to our collection.',
   },
   HI: {
     // Header
@@ -422,6 +437,21 @@ const translations: Translations = {
     'livingsaints.card.learn.more': 'और जानें',
     'livingsaints.empty.title': 'कोई जीवित संत नहीं मिले',
     'livingsaints.empty.subtitle': 'हम अपने संग्रह में समकालीन आध्यात्मिक गुरुओं को जोड़ने पर काम कर रहे हैं।',
+
+    // Divine Forms Page
+    'divine.title': 'दिव्य रूप',
+    'divine.subtitle': 'दिव्य की पवित्र अभिव्यक्तियों का अन्वेषण करें और उन प्रत्येक रूप के गहन अर्थों को समझें जिन्होंने सहस्राब्दियों से मानवता का मार्गदर्शन किया है।',
+    'divine.loading': 'दिव्य रूप लोड हो रहे हैं...',
+    'divine.error.retry': 'पुनः प्रयास करें',
+    'divine.forms.count': 'पवित्र रूप',
+    'divine.search.placeholder': 'नाम, क्षेत्र, गुण, महत्व द्वारा खोजें',
+    'divine.search.clear': 'साफ़ करें',
+    'divine.search.no.results': 'के लिए कोई दिव्य रूप नहीं मिले',
+    'divine.search.results': 'मिले',
+    'divine.search.showing': 'दिखाया जा रहा',
+    'divine.card.learn.more': 'और जानें',
+    'divine.empty.title': 'कोई दिव्य रूप नहीं मिले',
+    'divine.empty.subtitle': 'हम अपने संग्रह में और अधिक पवित्र रूप जोड़ने पर काम कर रहे हैं।',
   }
 };
 

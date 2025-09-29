@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabaseClient'; 
+import { supabase } from '@/lib/supabaseClient';
 import Navbar from '@/components/Navbar';
+import { useLanguage } from '@/contexts/LanguageContext';
 import Footer from '@/components/Footer';
 import DivineFormModal from '@/components/DivineFormModal';
 import DivineFormShareButton from '@/components/DivineFormShareButton';
@@ -12,6 +13,7 @@ import { usePagination } from '@/hooks/usePagination';
 import BhajanPagination from '@/components/BhajanPagination';
 
 const Divine = () => {
+  const { t, language } = useLanguage();
   const [selectedDivineForm, setSelectedDivineForm] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [divineforms, setDivineForms] = useState([]);
@@ -124,7 +126,7 @@ const Divine = () => {
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center space-y-4">
             <Loader2 className="w-12 h-12 animate-spin text-purple-600 mx-auto" />
-            <p className="text-lg text-gray-600">Loading divine forms...</p>
+            <p className="text-lg text-gray-600">{t('divine.loading')}</p>
           </div>
         </div>
         <Footer />
@@ -144,7 +146,7 @@ const Divine = () => {
               onClick={fetchDivineForms}
               className="px-6 py-3 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition-colors"
             >
-              Try Again
+              {t('divine.error.retry')}
             </button>
           </div>
         </div>
@@ -166,19 +168,18 @@ const Divine = () => {
               <Sparkles className="w-8 h-8 text-purple-500 animate-pulse" />
               <span className="text-3xl">🔱</span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-600 to-orange-600 bg-clip-text text-transparent">
-              Divine Forms
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-600 to-orange-600 bg-clip-text text-transparent pt-2">
+              {t('divine.title')}
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Explore the sacred manifestations of the divine and understand the profound meanings 
-              behind each form that has guided humanity for millennia.
+              {t('divine.subtitle')}
             </p>
             <div className="flex justify-center">
               <Badge variant="secondary" className="bg-purple-100 text-purple-700 px-4 py-2">
                 {searchQuery 
                   ? `${pagination.totalItems} of ${divineforms.length}` 
                   : `${divineforms.length}`
-                } Sacred Forms
+                } {t('divine.forms.count')}
                 {pagination.totalPages > 1 && ` • Page ${pagination.currentPage} of ${pagination.totalPages}`}
               </Badge>
             </div>
