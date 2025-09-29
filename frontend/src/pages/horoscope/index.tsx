@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -51,6 +52,7 @@ interface Horoscope {
 }
 
 const HoroscopePage = () => {
+  const { t, language } = useLanguage();
   const [zodiacSigns, setZodiacSigns] = useState<ZodiacSign[]>([]);
   const [selectedSign, setSelectedSign] = useState<string>('');
   const [activeTab, setActiveTab] = useState<string>('daily');
@@ -244,19 +246,21 @@ const HoroscopePage = () => {
             <div className="flex items-center justify-center mb-4">
               <Sparkles className="w-8 h-8 text-orange-500 mr-3" />
               <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-orange-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
-                Daily Horoscope
+                {t('horoscope.title')}
               </h1>
               <Sparkles className="w-8 h-8 text-purple-500 ml-3" />
             </div>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Discover what the stars have in store for you with our AI-powered spiritual horoscope readings
+              {t('horoscope.subtitle')}
             </p>
-            <p className="text-lg text-orange-600 font-medium">
-              आपके लिए ज्योतिषीय भविष्यवाणी और मार्गदर्शन
-            </p>
+            {language === 'EN' && (
+              <p className="text-lg text-orange-600 font-medium">
+                आपके लिए ज्योतिषीय भविष्यवाणी और मार्गदर्शन
+              </p>
+            )}
             <div className="flex justify-center">
               <Badge variant="secondary" className="bg-orange-100 text-orange-700 px-4 py-2">
-                ✨ AI-Powered Spiritual Guidance
+                {t('horoscope.badge')}
               </Badge>
             </div>
           </motion.div>
@@ -277,16 +281,16 @@ const HoroscopePage = () => {
               <CardHeader className="text-center">
                 <CardTitle className="text-2xl text-gray-800 flex items-center justify-center">
                   <Star className="w-6 h-6 text-orange-500 mr-2" />
-                  Select Your Zodiac Sign
+                  {t('horoscope.select.title')}
                   <Star className="w-6 h-6 text-orange-500 ml-2" />
                 </CardTitle>
-                <p className="text-gray-600">Choose your birth sign to get personalized predictions</p>
+                <p className="text-gray-600">{t('horoscope.select.subtitle')}</p>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <Select value={selectedSign} onValueChange={handleSignSelect}>
                     <SelectTrigger className="w-full max-w-md mx-auto border-orange-300 focus:ring-orange-500 text-base h-12">
-                      <SelectValue placeholder="🌟 Choose your zodiac sign..." />
+                      <SelectValue placeholder={t('horoscope.select.placeholder')} />
                     </SelectTrigger>
                     <SelectContent className="max-h-80 overflow-y-auto">
                       {zodiacSigns.map((sign) => (
@@ -299,7 +303,11 @@ const HoroscopePage = () => {
                             <span className="text-xl">{sign.symbol}</span>
                             <div className="flex flex-col">
                               <div className="text-sm font-medium text-gray-800">
-                                {sign.name} <span className="text-orange-600">({sign.nameHi})</span>
+                                {language === 'EN' ? (
+                                  <>{sign.name} <span className="text-orange-600">({sign.nameHi})</span></>
+                                ) : (
+                                  <>{sign.nameHi} <span className="text-orange-600">({sign.name})</span></>
+                                )}
                               </div>
                               <div className="text-xs text-gray-500">{sign.dates}</div>
                             </div>
@@ -318,8 +326,12 @@ const HoroscopePage = () => {
                     >
                       <div className="text-5xl">{selectedZodiac.symbol}</div>
                       <div className="text-center">
-                        <h3 className="text-2xl font-bold text-gray-800">{selectedZodiac.name}</h3>
-                        <p className="text-orange-600 font-medium text-lg">{selectedZodiac.nameHi}</p>
+                        <h3 className="text-2xl font-bold text-gray-800">
+                          {language === 'EN' ? selectedZodiac.name : selectedZodiac.nameHi}
+                        </h3>
+                        <p className="text-orange-600 font-medium text-lg">
+                          {language === 'EN' ? selectedZodiac.nameHi : selectedZodiac.name}
+                        </p>
                         <p className="text-sm text-gray-500">{selectedZodiac.dates}</p>
                       </div>
                     </motion.div>
@@ -341,15 +353,15 @@ const HoroscopePage = () => {
                   <TabsList className="grid grid-cols-3 w-full max-w-md">
                     <TabsTrigger value="daily" className="flex items-center space-x-2">
                       <Sun className="w-4 h-4" />
-                      <span>Daily</span>
+                      <span>{t('horoscope.tabs.daily')}</span>
                     </TabsTrigger>
                     <TabsTrigger value="weekly" className="flex items-center space-x-2">
                       <Calendar className="w-4 h-4" />
-                      <span>Weekly</span>
+                      <span>{t('horoscope.tabs.weekly')}</span>
                     </TabsTrigger>
                     <TabsTrigger value="monthly" className="flex items-center space-x-2">
                       <Moon className="w-4 h-4" />
-                      <span>Monthly</span>
+                      <span>{t('horoscope.tabs.monthly')}</span>
                     </TabsTrigger>
                   </TabsList>
                 </div>
@@ -362,8 +374,7 @@ const HoroscopePage = () => {
                         <CardContent className="p-8">
                           <div className="text-center space-y-4">
                             <div className="animate-spin w-12 h-12 border-4 border-orange-200 border-t-orange-600 rounded-full mx-auto"></div>
-                            <p className="text-gray-600">Reading the cosmic energies...</p>
-                            <p className="text-sm text-orange-600">कॉस्मिक ऊर्जा पढ़ी जा रही है...</p>
+                            <p className="text-gray-600">{t('horoscope.loading')}</p>
                           </div>
                         </CardContent>
                       </Card>
@@ -377,6 +388,8 @@ const HoroscopePage = () => {
                         summaryLoading={summaryLoading}
                         summary={summaries[activeTab as keyof typeof summaries]}
                         showSummary={showSummary[activeTab as keyof typeof showSummary]}
+                        t={t}
+                        language={language}
                       />
                     ) : (
                       <Card className="border-orange-200 shadow-lg bg-white/90">
@@ -384,9 +397,9 @@ const HoroscopePage = () => {
                           <div className="text-center space-y-4">
                             <Sparkles className="w-16 h-16 text-orange-300 mx-auto" />
                             <p className="text-gray-500 text-lg">
-                              {period === 'daily' ? 'Select your sign to see today\'s horoscope' :
-                               period === 'weekly' ? 'Select your sign to see this week\'s horoscope' :
-                               'Select your sign to see this month\'s horoscope'}
+                              {period === 'daily' ? t('horoscope.empty.daily') :
+                               period === 'weekly' ? t('horoscope.empty.weekly') :
+                               t('horoscope.empty.monthly')}
                             </p>
                           </div>
                         </CardContent>
@@ -407,14 +420,15 @@ const HoroscopePage = () => {
               className="text-center py-16"
             >
               <div className="text-8xl mb-6">🌟</div>
-              <h2 className="text-3xl font-bold text-gray-800 mb-4">Welcome to Your Cosmic Journey</h2>
+              <h2 className="text-3xl font-bold text-gray-800 mb-4">{t('horoscope.welcome.title')}</h2>
               <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
-                Select your zodiac sign above to unlock personalized daily, weekly, and monthly horoscope readings
-                powered by AI and ancient astrological wisdom.
+                {t('horoscope.welcome.description')}
               </p>
-              <p className="text-orange-600 mt-3">
-                अपनी राशि चुनकर व्यक्तिगत भविष्यवाणी प्राप्त करें
-              </p>
+              {language === 'EN' && (
+                <p className="text-orange-600 mt-3">
+                  अपनी राशि चुनकर व्यक्तिगत भविष्यवाणी प्राप्त करें
+                </p>
+              )}
             </motion.div>
           )}
         </div>
@@ -434,7 +448,9 @@ const HoroscopeDisplay = ({
   onSummarize,
   summaryLoading,
   summary,
-  showSummary
+  showSummary,
+  t,
+  language
 }: {
   horoscope: Horoscope;
   period: string;
@@ -444,6 +460,8 @@ const HoroscopeDisplay = ({
   summaryLoading: boolean;
   summary?: string;
   showSummary: boolean;
+  t: (key: string) => string;
+  language: string;
 }) => {
   return (
     <motion.div
@@ -456,12 +474,14 @@ const HoroscopeDisplay = ({
       <Card className={`border-0 shadow-lg bg-gradient-to-r ${getPeriodColor(period)} text-white`}>
         <CardContent className="p-6 text-center">
           <h3 className="text-2xl font-bold capitalize mb-2">
-            {period} Horoscope for {zodiac?.name}
+            {period === 'daily' ? t('horoscope.period.daily.title') :
+             period === 'weekly' ? t('horoscope.period.weekly.title') :
+             t('horoscope.period.monthly.title')} {language === 'EN' ? zodiac?.name : zodiac?.nameHi}
           </h3>
           <p className="opacity-90">
-            {period === 'daily' ? 'Today\'s cosmic guidance' :
-             period === 'weekly' ? 'This week\'s stellar insights' :
-             'This month\'s celestial wisdom'}
+            {period === 'daily' ? t('horoscope.period.daily.subtitle') :
+             period === 'weekly' ? t('horoscope.period.weekly.subtitle') :
+             t('horoscope.period.monthly.subtitle')}
           </p>
           {horoscope.period_theme && (
             <Badge variant="secondary" className="bg-white/20 text-white mt-2">
@@ -476,7 +496,7 @@ const HoroscopeDisplay = ({
         <CardHeader>
           <CardTitle className="flex items-center text-gray-800">
             <Star className="w-5 h-5 text-orange-500 mr-2" />
-            Cosmic Prediction
+            {t('horoscope.prediction.title')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -491,7 +511,7 @@ const HoroscopeDisplay = ({
           {/* AI Summarizer Section */}
           <div className="border-t border-gray-100 pt-4">
             <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600">Need a quick summary?</span>
+              <span className="text-sm text-gray-600">{t('horoscope.summary.prompt')}</span>
               <Button
                 onClick={onSummarize}
                 variant="outline"
@@ -502,12 +522,12 @@ const HoroscopeDisplay = ({
                 {summaryLoading ? (
                   <>
                     <RefreshCw className="w-3 h-3 mr-2 animate-spin" />
-                    Analyzing...
+                    {t('horoscope.summary.analyzing')}
                   </>
                 ) : (
                   <>
                     <Star className="w-3 h-3 mr-2" />
-                    Summarize with AI
+                    {t('horoscope.summary.button')}
                   </>
                 )}
               </Button>
@@ -523,7 +543,7 @@ const HoroscopeDisplay = ({
               >
                 <div className="flex items-center mb-2">
                   <Star className="w-4 h-4 text-orange-500 mr-2" />
-                  <h4 className="font-semibold text-orange-800">संक्षेप में</h4>
+                  <h4 className="font-semibold text-orange-800">{t('horoscope.summary.title')}</h4>
                 </div>
                 <p className="text-orange-700 leading-relaxed font-medium">{summary}</p>
               </motion.div>
@@ -533,7 +553,7 @@ const HoroscopeDisplay = ({
           {horoscope.spiritual_advice && (
             <div className="bg-gradient-to-r from-orange-50 to-purple-50 rounded-lg p-4 border-l-4 border-orange-400">
               <p className="text-sm text-gray-700">
-                <strong>Spiritual Guidance:</strong> {horoscope.spiritual_advice}
+                <strong>{t('horoscope.spiritual.guidance')}</strong> {horoscope.spiritual_advice}
               </p>
             </div>
           )}
@@ -546,7 +566,7 @@ const HoroscopeDisplay = ({
         <Card className="border-orange-200 shadow-md bg-white/95">
           <CardContent className="p-6 text-center">
             <Palette className="w-8 h-8 text-orange-500 mx-auto mb-3" />
-            <p className="text-sm text-gray-600 mb-2">Lucky Color / भाग्यशाली रंग</p>
+            <p className="text-sm text-gray-600 mb-2">{t('horoscope.lucky.color')}</p>
             <Badge
               variant="secondary"
               className="bg-gradient-to-r from-orange-100 to-orange-200 text-orange-700 text-lg px-4 py-2"
@@ -559,7 +579,7 @@ const HoroscopeDisplay = ({
         <Card className="border-purple-200 shadow-md bg-white/95">
           <CardContent className="p-6 text-center">
             <Hash className="w-8 h-8 text-purple-500 mx-auto mb-3" />
-            <p className="text-sm text-gray-600 mb-2">Lucky Number / भाग्यशाली संख्या</p>
+            <p className="text-sm text-gray-600 mb-2">{t('horoscope.lucky.number')}</p>
             <Badge
               variant="secondary"
               className="bg-gradient-to-r from-purple-100 to-purple-200 text-purple-700 text-2xl font-bold px-6 py-2"
@@ -588,7 +608,7 @@ const HoroscopeDisplay = ({
           }}
         >
           <Share2 className="w-4 h-4 mr-2" />
-          Share Your Horoscope
+          {t('horoscope.share.button')}
         </Button>
       </div>
     </motion.div>
