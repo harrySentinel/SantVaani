@@ -36,7 +36,7 @@ export default function Header({ setSidebarOpen }: HeaderProps) {
   }
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200">
+    <header className="enhanced-header">
       <div className="mx-auto px-2 sm:px-4 lg:px-8 py-3 sm:py-4">
         <div className="flex items-center justify-between">
           {/* Left side - Mobile menu button + Page info */}
@@ -46,17 +46,17 @@ export default function Header({ setSidebarOpen }: HeaderProps) {
               variant="ghost"
               size="icon"
               onClick={() => setSidebarOpen(true)}
-              className="md:hidden mr-4"
+              className="md:hidden mr-4 btn-enhanced hover-lift"
             >
               <Menu className="h-5 w-5" />
               <span className="sr-only">Open sidebar</span>
             </Button>
             
             <div className="flex-1 min-w-0">
-              <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 truncate">
+              <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-gradient truncate">
                 Content Management
               </h2>
-              <p className="text-xs sm:text-sm text-gray-600 hidden sm:block">
+              <p className="text-xs sm:text-sm text-gray-600 hidden sm:block font-medium">
                 Manage your spiritual content with ease
               </p>
             </div>
@@ -71,9 +71,9 @@ export default function Header({ setSidebarOpen }: HeaderProps) {
             </Button>
 
             {/* Notifications - Future enhancement */}
-            <Button variant="ghost" size="icon" className="relative">
+            <Button variant="ghost" size="icon" className="relative btn-enhanced hover-lift">
               <Bell className="h-4 w-4 sm:h-5 sm:w-5" />
-              <span className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 h-1.5 w-1.5 sm:h-2 sm:w-2 bg-red-500 rounded-full"></span>
+              <span className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 h-1.5 w-1.5 sm:h-2 sm:w-2 bg-red-500 rounded-full pulse-animation"></span>
               <span className="sr-only">Notifications</span>
             </Button>
             

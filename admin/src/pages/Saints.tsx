@@ -15,6 +15,9 @@ import {
   ResponsiveTableCell,
   MobileCardActions
 } from '@/components/ui/responsive-table'
+import EmptyState from '@/components/ui/empty-state'
+import LoadingScreen from '@/components/ui/loading-screen'
+import FloatingActionButton from '@/components/ui/floating-action-button'
 
 // Saint interface matching your database schema
 interface Saint {
@@ -172,29 +175,22 @@ export default function SaintsPage() {
   }, [])
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-96">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading saints...</p>
-        </div>
-      </div>
-    )
+    return <LoadingScreen message="Loading saints..." />
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 page-transition">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
         <div className="mb-4 sm:mb-0">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Saints Management</h1>
-          <p className="text-gray-600 mt-1">Manage spiritual masters and their biographies</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gradient">Saints Management</h1>
+          <p className="text-gray-600 mt-1 font-medium">Manage spiritual masters and their biographies</p>
         </div>
         <div className="flex space-x-3">
           <Button
             onClick={exportSaintsToCSV}
             variant="outline"
-            className="w-full sm:w-auto text-green-600 border-green-200 hover:bg-green-50"
+            className="w-full sm:w-auto text-green-600 border-green-200 hover:bg-green-50 btn-enhanced hover-lift"
           >
             <Download className="h-4 w-4 mr-2" />
             Export List
@@ -202,14 +198,14 @@ export default function SaintsPage() {
           <Button
             onClick={() => setIsBulkImportOpen(true)}
             variant="outline"
-            className="w-full sm:w-auto"
+            className="w-full sm:w-auto btn-enhanced hover-lift"
           >
             <Upload className="h-4 w-4 mr-2" />
             Bulk Import
           </Button>
           <Button
             onClick={() => setIsAddModalOpen(true)}
-            className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto"
+            className="btn-primary-enhanced w-full sm:w-auto"
           >
             <Plus className="h-4 w-4 mr-2" />
             Add Saint
@@ -219,23 +215,23 @@ export default function SaintsPage() {
 
       {/* Stats Bar */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-        <div className="bg-white p-4 rounded-lg border border-gray-200">
+        <div className="stats-card">
           <div className="text-2xl font-bold text-blue-600">{saints.length}</div>
           <div className="text-sm text-gray-600">Total Saints</div>
         </div>
-        <div className="bg-white p-4 rounded-lg border border-gray-200">
+        <div className="stats-card">
           <div className="text-2xl font-bold text-green-600">
             {saints.filter(s => s.image_url).length}
           </div>
           <div className="text-sm text-gray-600">With Images</div>
         </div>
-        <div className="bg-white p-4 rounded-lg border border-gray-200">
+        <div className="stats-card">
           <div className="text-2xl font-bold text-purple-600">
             {saints.filter(s => s.biography_hi).length}
           </div>
           <div className="text-sm text-gray-600">Hindi Content</div>
         </div>
-        <div className="bg-white p-4 rounded-lg border border-gray-200">
+        <div className="stats-card">
           <div className="text-2xl font-bold text-orange-600">
             {filteredSaints.length}
           </div>
@@ -245,14 +241,14 @@ export default function SaintsPage() {
 
       {/* Search and Actions */}
       <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1 min-w-0">
+        <div className="relative flex-1 min-w-0 search-enhanced">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 z-10" />
           <input
             type="text"
             placeholder="Search saints by name, specialty, region..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+            className="w-full pl-10 pr-4 py-3 border-0 focus:outline-none text-sm input-enhanced"
           />
         </div>
         
@@ -261,7 +257,7 @@ export default function SaintsPage() {
             <Button
               variant="destructive"
               onClick={deleteSelectedSaints}
-              className="shrink-0"
+              className="shrink-0 btn-danger-enhanced hover-lift"
             >
               <Trash2 className="h-4 w-4 mr-2" />
               Delete Selected ({selectedSaints.length})
@@ -384,17 +380,17 @@ export default function SaintsPage() {
                     {/* Status badges */}
                     <div className="flex flex-wrap gap-1">
                       {saint.image_url && (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                        <span className="badge-enhanced badge-success">
                           Has Image
                         </span>
                       )}
                       {saint.biography_hi && (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                        <span className="badge-enhanced badge-info">
                           Hindi Content
                         </span>
                       )}
                       {(!saint.description || !saint.biography) && (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
+                        <span className="badge-enhanced badge-warning">
                           Incomplete
                         </span>
                       )}
@@ -462,17 +458,17 @@ export default function SaintsPage() {
               <ResponsiveTableCell hideOnMobile>
                 <div className="flex flex-col space-y-1">
                   {saint.image_url && (
-                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                    <span className="badge-enhanced badge-success">
                       Has Image
                     </span>
                   )}
                   {saint.biography_hi && (
-                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                    <span className="badge-enhanced badge-info">
                       Hindi Content
                     </span>
                   )}
                   {(!saint.description || !saint.biography) && (
-                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
+                    <span className="badge-enhanced badge-warning">
                       Incomplete
                     </span>
                   )}
@@ -513,14 +509,14 @@ export default function SaintsPage() {
         </ResponsiveTableBody>
 
         {filteredSaints.length === 0 && (
-          <div className="text-center py-12">
-            <div className="text-gray-400 text-lg">
-              {searchQuery ? 'No saints found matching your search.' : 'No saints added yet.'}
-            </div>
-            <div className="text-gray-500 text-sm mt-2">
-              {searchQuery ? 'Try different search terms.' : 'Click "Add Saint" to get started.'}
-            </div>
-          </div>
+          <EmptyState
+            icon="🙏"
+            title={searchQuery ? 'No saints found' : 'No saints added yet'}
+            description={searchQuery ? 'Try different search terms to find what you\'re looking for.' : 'Start building your spiritual content by adding the first saint to your collection.'}
+            actionLabel={searchQuery ? undefined : 'Add First Saint'}
+            onAction={searchQuery ? undefined : () => setIsAddModalOpen(true)}
+            className="py-20"
+          />
         )}
       </ResponsiveTable>
 
@@ -605,6 +601,12 @@ export default function SaintsPage() {
     "biography_hi": "पूरी जीवनी यहाँ..."
   }
 ]`}
+      />
+
+      {/* Mobile Floating Action Button */}
+      <FloatingActionButton
+        onClick={() => setIsAddModalOpen(true)}
+        ariaLabel="Add new saint"
       />
     </div>
   )
