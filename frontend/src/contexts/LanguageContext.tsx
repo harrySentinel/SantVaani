@@ -33,6 +33,11 @@ const translations: Translations = {
     'hero.welcome': 'Welcome to SantVaani',
     'hero.subtitle': 'Discover Divine Wisdom',
     'hero.description': 'Journey through the sacred teachings of India\'s greatest spiritual masters',
+    'hero.tagline': 'Where Ancient Wisdom Meets Modern Hearts',
+    'hero.description.main': 'Discover the profound teachings, inspiring stories, and divine bhakti of India\'s greatest saints. A digital sanctuary for spiritual seekers on their journey to enlightenment.',
+    'hero.button.saints': 'Explore Saints',
+    'hero.button.divine': 'Divine Forms',
+    'hero.free.message': '🙏 Completely free • No registration required • Pure spiritual content 🙏',
 
     // Features Section
     'features.title': 'Explore Sacred Wisdom',
@@ -63,6 +68,27 @@ const translations: Translations = {
     'mission.quote.english': '"Where there is devotion, there is divine power"',
     'mission.learn.more': 'Learn More About Us',
     'mission.feedback': 'Share Feedback',
+
+    // Feedback Form
+    'feedback.title': 'Share Your Feedback',
+    'feedback.subtitle': 'Your feedback helps us create a better spiritual experience for all devotees',
+    'feedback.help.title': 'Help Us Serve Better',
+    'feedback.help.description': 'Your thoughts and suggestions are invaluable to us. Click below to share your feedback through our secure Google Form.',
+    'feedback.button.open': 'Open Feedback Form',
+    'feedback.button.later': 'Maybe Later',
+    'feedback.footer': '🔒 Your feedback is securely collected through Google Forms',
+
+    // Footer
+    'footer.description': 'Spreading the divine wisdom and teachings of great Indian saints across the world. A digital sanctuary for spiritual seekers.',
+    'footer.links.title': 'Quick Links',
+    'footer.links.saints': 'Saints',
+    'footer.links.living': 'Living Saints',
+    'footer.links.divine': 'Divine Forms',
+    'footer.links.bhajans': 'Bhajans & Quotes',
+    'footer.links.donation': 'Donation',
+    'footer.connect.title': 'Connect',
+    'footer.made.with': 'Made with',
+    'footer.made.for': 'for spiritual seekers worldwide',
   },
   HI: {
     // Header
@@ -74,6 +100,11 @@ const translations: Translations = {
     'hero.welcome': 'संतवाणी में आपका स्वागत है',
     'hero.subtitle': 'दिव्य ज्ञान की खोज करें',
     'hero.description': 'भारत के महानतम आध्यात्मिक गुरुओं की पवित्र शिक्षाओं के माध्यम से यात्रा करें',
+    'hero.tagline': 'जहाँ प्राचीन ज्ञान मिलता है आधुनिक हृदयों से',
+    'hero.description.main': 'भारत के महानतम संतों की गहन शिक्षाओं, प्रेरणादायक कहानियों और दिव्य भक्ति की खोज करें। आध्यात्मिक साधकों के लिए एक डिजिटल अभयारण्य, जो प्रबुद्धता की यात्रा पर हैं।',
+    'hero.button.saints': 'संतों की खोज करें',
+    'hero.button.divine': 'दिव्य रूप',
+    'hero.free.message': '🙏 पूर्णतः निःशुल्क • पंजीकरण आवश्यक नहीं • शुद्ध आध्यात्मिक सामग्री 🙏',
 
     // Features Section
     'features.title': 'पवित्र ज्ञान की खोज करें',
@@ -104,6 +135,27 @@ const translations: Translations = {
     'mission.quote.english': '"जहाँ भक्ति है, वहाँ दिव्य शक्ति है"',
     'mission.learn.more': 'हमारे बारे में और जानें',
     'mission.feedback': 'प्रतिक्रिया साझा करें',
+
+    // Feedback Form
+    'feedback.title': 'अपनी प्रतिक्रिया साझा करें',
+    'feedback.subtitle': 'आपकी प्रतिक्रिया हमें सभी भक्तों के लिए एक बेहतर आध्यात्मिक अनुभव बनाने में मदद करती है',
+    'feedback.help.title': 'बेहतर सेवा में हमारी मदद करें',
+    'feedback.help.description': 'आपके विचार और सुझाव हमारे लिए अमूल्य हैं। हमारे सुरक्षित गूगल फॉर्म के माध्यम से अपनी प्रतिक्रिया साझा करने के लिए नीचे क्लिक करें।',
+    'feedback.button.open': 'प्रतिक्रिया फॉर्म खोलें',
+    'feedback.button.later': 'बाद में शायद',
+    'feedback.footer': '🔒 आपकी प्रतिक्रिया गूगल फॉर्म के माध्यम से सुरक्षित रूप से एकत्र की जाती है',
+
+    // Footer
+    'footer.description': 'महान भारतीय संतों के दिव्य ज्ञान और शिक्षाओं को दुनिया भर में फैलाना। आध्यात्मिक साधकों के लिए एक डिजिटल अभयारण्य।',
+    'footer.links.title': 'त्वरित लिंक',
+    'footer.links.saints': 'संत',
+    'footer.links.living': 'जीवित संत',
+    'footer.links.divine': 'दिव्य रूप',
+    'footer.links.bhajans': 'भजन और उद्धरण',
+    'footer.links.donation': 'दान',
+    'footer.connect.title': 'जुड़ें',
+    'footer.made.with': 'के साथ बनाया गया',
+    'footer.made.for': 'दुनिया भर के आध्यात्मिक साधकों के लिए',
   }
 };
 
