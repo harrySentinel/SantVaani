@@ -7,6 +7,14 @@ import { formatDate, truncateText } from '@/lib/utils'
 import SaintForm from '@/components/SaintForm'
 import SaintViewModal from '@/components/SaintViewModal'
 import BulkImport from '@/components/BulkImport'
+import {
+  ResponsiveTable,
+  ResponsiveTableHeader,
+  ResponsiveTableBody,
+  ResponsiveTableRow,
+  ResponsiveTableCell,
+  MobileCardActions
+} from '@/components/ui/responsive-table'
 
 // Saint interface matching your database schema
 interface Saint {
@@ -263,69 +271,67 @@ export default function SaintsPage() {
       </div>
 
       {/* Saints Table */}
-      <div className="bg-white shadow-sm rounded-lg border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 table-fixed"
-                 style={{ minWidth: '800px' }}>
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-4 py-3 text-left">
-                  <input
-                    type="checkbox"
-                    checked={selectedSaints.length === filteredSaints.length && filteredSaints.length > 0}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setSelectedSaints(filteredSaints.map(s => s.id))
-                      } else {
-                        setSelectedSaints([])
-                      }
-                    }}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  />
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Saint
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Specialty
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Period & Region
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredSaints.map((saint) => (
-                <tr 
-                  key={saint.id}
-                  className={selectedSaints.includes(saint.id) ? 'bg-blue-50' : 'hover:bg-gray-50'}
-                >
-                  <td className="px-4 py-4">
-                    <input
-                      type="checkbox"
-                      checked={selectedSaints.includes(saint.id)}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setSelectedSaints([...selectedSaints, saint.id])
-                        } else {
-                          setSelectedSaints(selectedSaints.filter(id => id !== saint.id))
-                        }
-                      }}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    />
-                  </td>
-                  <td className="px-4 py-4">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0 h-10 w-10">
+      <ResponsiveTable>
+        <ResponsiveTableHeader>
+          <tr>
+            <th className="px-4 py-3 text-left">
+              <input
+                type="checkbox"
+                checked={selectedSaints.length === filteredSaints.length && filteredSaints.length > 0}
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    setSelectedSaints(filteredSaints.map(s => s.id))
+                  } else {
+                    setSelectedSaints([])
+                  }
+                }}
+                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+            </th>
+            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Saint
+            </th>
+            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Specialty
+            </th>
+            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Period & Region
+            </th>
+            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Status
+            </th>
+            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Actions
+            </th>
+          </tr>
+        </ResponsiveTableHeader>
+
+        <ResponsiveTableBody>
+          {filteredSaints.map((saint) => (
+            <ResponsiveTableRow
+              key={saint.id}
+              className={selectedSaints.includes(saint.id) ? 'bg-blue-50' : ''}
+              mobileCard={
+                <div className="p-4 space-y-3 border-b border-gray-200 last:border-b-0">
+                  {/* Mobile card header */}
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center space-x-3 flex-1">
+                      <input
+                        type="checkbox"
+                        checked={selectedSaints.includes(saint.id)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedSaints([...selectedSaints, saint.id])
+                          } else {
+                            setSelectedSaints(selectedSaints.filter(id => id !== saint.id))
+                          }
+                        }}
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <div className="flex-shrink-0">
                         {saint.image_url ? (
                           <img
-                            className="h-10 w-10 rounded-full object-cover"
+                            className="h-12 w-12 rounded-full object-cover"
                             src={saint.image_url}
                             alt={saint.name}
                             onError={(e) => {
@@ -333,39 +339,50 @@ export default function SaintsPage() {
                             }}
                           />
                         ) : (
-                          <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                            <span className="text-gray-500 text-sm">{saint.name[0]}</span>
+                          <div className="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center">
+                            <span className="text-gray-500 text-lg font-medium">{saint.name[0]}</span>
                           </div>
                         )}
                       </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">
-                          {saint.name}
-                        </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-lg font-medium text-gray-900 truncate">{saint.name}</h3>
                         {saint.name_hi && (
-                          <div className="text-sm text-gray-500">
-                            {saint.name_hi}
-                          </div>
+                          <p className="text-sm text-gray-500 truncate">{saint.name_hi}</p>
                         )}
                       </div>
                     </div>
-                  </td>
-                  <td className="px-4 py-4 text-sm text-gray-900">
+                    <MobileCardActions
+                      actions={[
+                        { label: 'View', onClick: () => handleViewSaint(saint) },
+                        { label: 'Edit', onClick: () => handleEditSaint(saint) },
+                        { label: 'Delete', onClick: () => setDeleteConfirm(saint.id), variant: 'destructive' }
+                      ]}
+                    />
+                  </div>
+
+                  {/* Mobile card details */}
+                  <div className="space-y-2">
                     <div>
-                      {saint.specialty || 'Not specified'}
+                      <span className="text-xs font-medium text-gray-500">Specialty:</span>
+                      <p className="text-sm text-gray-900">{saint.specialty || 'Not specified'}</p>
+                      {saint.specialty_hi && (
+                        <p className="text-xs text-gray-500">{saint.specialty_hi}</p>
+                      )}
                     </div>
-                    {saint.specialty_hi && (
-                      <div className="text-xs text-gray-500">
-                        {saint.specialty_hi}
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <span className="text-xs font-medium text-gray-500">Period:</span>
+                        <p className="text-sm text-gray-900">{saint.period || 'Unknown'}</p>
                       </div>
-                    )}
-                  </td>
-                  <td className="px-4 py-4 text-sm text-gray-500">
-                    <div>{saint.period || 'Unknown period'}</div>
-                    <div className="text-xs">{saint.region || 'Unknown region'}</div>
-                  </td>
-                  <td className="px-4 py-4">
-                    <div className="flex flex-col space-y-1">
+                      <div>
+                        <span className="text-xs font-medium text-gray-500">Region:</span>
+                        <p className="text-sm text-gray-900">{saint.region || 'Unknown'}</p>
+                      </div>
+                    </div>
+
+                    {/* Status badges */}
+                    <div className="flex flex-wrap gap-1">
                       {saint.image_url && (
                         <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
                           Has Image
@@ -382,41 +399,118 @@ export default function SaintsPage() {
                         </span>
                       )}
                     </div>
-                  </td>
-                  <td className="px-4 py-4 text-sm">
-                    <div className="flex space-x-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleViewSaint(saint)}
-                        title="View saint details"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleEditSaint(saint)}
-                        title="Edit saint"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setDeleteConfirm(saint.id)}
-                        className="text-red-600 hover:text-red-700"
-                        title="Delete saint"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                  </div>
+                </div>
+              }
+            >
+              <ResponsiveTableCell>
+                <input
+                  type="checkbox"
+                  checked={selectedSaints.includes(saint.id)}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setSelectedSaints([...selectedSaints, saint.id])
+                    } else {
+                      setSelectedSaints(selectedSaints.filter(id => id !== saint.id))
+                    }
+                  }}
+                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+              </ResponsiveTableCell>
+
+              <ResponsiveTableCell>
+                <div className="flex items-center">
+                  <div className="flex-shrink-0 h-10 w-10">
+                    {saint.image_url ? (
+                      <img
+                        className="h-10 w-10 rounded-full object-cover"
+                        src={saint.image_url}
+                        alt={saint.name}
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${saint.name}&background=random`
+                        }}
+                      />
+                    ) : (
+                      <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                        <span className="text-gray-500 text-sm">{saint.name[0]}</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="ml-4">
+                    <div className="text-sm font-medium text-gray-900">{saint.name}</div>
+                    {saint.name_hi && (
+                      <div className="text-sm text-gray-500">{saint.name_hi}</div>
+                    )}
+                  </div>
+                </div>
+              </ResponsiveTableCell>
+
+              <ResponsiveTableCell hideOnMobile>
+                <div>
+                  {saint.specialty || 'Not specified'}
+                </div>
+                {saint.specialty_hi && (
+                  <div className="text-xs text-gray-500">{saint.specialty_hi}</div>
+                )}
+              </ResponsiveTableCell>
+
+              <ResponsiveTableCell hideOnMobile>
+                <div>{saint.period || 'Unknown period'}</div>
+                <div className="text-xs">{saint.region || 'Unknown region'}</div>
+              </ResponsiveTableCell>
+
+              <ResponsiveTableCell hideOnMobile>
+                <div className="flex flex-col space-y-1">
+                  {saint.image_url && (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                      Has Image
+                    </span>
+                  )}
+                  {saint.biography_hi && (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                      Hindi Content
+                    </span>
+                  )}
+                  {(!saint.description || !saint.biography) && (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
+                      Incomplete
+                    </span>
+                  )}
+                </div>
+              </ResponsiveTableCell>
+
+              <ResponsiveTableCell hideOnMobile>
+                <div className="flex space-x-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleViewSaint(saint)}
+                    title="View saint details"
+                  >
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleEditSaint(saint)}
+                    title="Edit saint"
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setDeleteConfirm(saint.id)}
+                    className="text-red-600 hover:text-red-700"
+                    title="Delete saint"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </ResponsiveTableCell>
+            </ResponsiveTableRow>
+          ))}
+        </ResponsiveTableBody>
 
         {filteredSaints.length === 0 && (
           <div className="text-center py-12">
@@ -428,7 +522,7 @@ export default function SaintsPage() {
             </div>
           </div>
         )}
-      </div>
+      </ResponsiveTable>
 
       {/* Delete Confirmation Modal */}
       {deleteConfirm && (

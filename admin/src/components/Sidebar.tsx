@@ -97,10 +97,10 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
 
       {/* Sidebar */}
       <div className={cn(
-        "fixed inset-y-0 left-0 z-50 w-64 bg-white transform transition-transform duration-300 ease-in-out border-r border-gray-200 md:translate-x-0",
+        "fixed inset-y-0 left-0 z-50 w-64 bg-white transform transition-transform duration-300 ease-in-out border-r border-gray-200 md:translate-x-0 md:static md:z-auto",
         sidebarOpen ? "translate-x-0" : "-translate-x-full"
       )}>
-        <div className="flex flex-col flex-grow pt-5 overflow-y-auto">
+        <div className="flex flex-col flex-grow pt-4 sm:pt-5 overflow-y-auto">
           {/* Close button for mobile */}
           <div className="flex items-center justify-between px-6 md:hidden">
             <div className="flex items-center space-x-3">
@@ -140,12 +140,13 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
               <NavLink
                 key={item.name}
                 to={item.href}
+                onClick={() => setSidebarOpen(false)}
                 className={({ isActive }) =>
                   cn(
-                    'group flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-colors',
+                    'group flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-colors touch-manipulation',
                     isActive
                       ? 'bg-orange-50 text-orange-700 border-l-4 border-orange-500'
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+                      : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900 active:bg-gray-100'
                   )
                 }
               >
