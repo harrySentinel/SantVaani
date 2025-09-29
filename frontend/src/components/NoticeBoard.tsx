@@ -8,6 +8,7 @@ interface NoticeData {
   message: string;
   messageHi?: string; // Hindi message option
   type: 'festival' | 'announcement' | 'greeting' | 'update';
+  saintImage?: string; // Selected saint image
   isActive: boolean;
   createdAt: string;
   expiresAt?: string;
@@ -32,6 +33,7 @@ const NoticeBoard: React.FC = () => {
             message: data.notice.message,
             messageHi: data.notice.message_hi,
             type: data.notice.type,
+            saintImage: data.notice.saint_image || 'Saint.png',
             isActive: data.notice.is_active,
             createdAt: data.notice.created_at,
             expiresAt: data.notice.expires_at
@@ -274,7 +276,7 @@ const NoticeBoard: React.FC = () => {
                     <div className="absolute inset-0 bg-gradient-to-br from-amber-200/15 via-yellow-100/8 to-transparent rounded-full scale-150 blur-2xl animate-pulse"></div>
 
                     <img
-                      src="/Saint.png"
+                      src={`/${currentNotice.saintImage || 'Saint.png'}`}
                       alt="Saint Character"
                       className="w-56 h-56 md:w-64 md:h-64 object-contain relative z-10 filter drop-shadow-lg"
                     />
