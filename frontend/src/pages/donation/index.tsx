@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLanguage } from '@/contexts/LanguageContext';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -148,20 +149,10 @@ const organizations: Organization[] = [
 ];
 
 const Donation = () => {
+  const { language } = useLanguage();
   const [selectedType, setSelectedType] = useState<'All' | 'Vridh Ashram' | 'Orphanage'>('All');
   const [selectedOrganization, setSelectedOrganization] = useState<Organization | null>(null);
-  const [isHindi, setIsHindi] = useState(false);
-
-  // Listen for language changes from navbar (you could use context for this in a real app)
-  useEffect(() => {
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'language') {
-        setIsHindi(e.newValue === 'hindi');
-      }
-    };
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
+  const isHindi = language === 'HI';
 
   const filteredOrganizations = selectedType === 'All' 
     ? organizations 
@@ -190,7 +181,7 @@ const Donation = () => {
         <div className="text-center mb-12">
           <div className="flex items-center justify-center mb-4">
             <Heart className="w-12 h-12 text-orange-500 mr-3" />
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-orange-600 to-orange-700 bg-clip-text text-transparent">
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-orange-600 to-orange-700 bg-clip-text text-transparent pt-2">
               {getText('Donation Support', 'दान सहयोग')}
             </h1>
           </div>
