@@ -40,6 +40,7 @@ interface NoticeItem {
   message: string
   message_hi: string | null
   type: 'festival' | 'announcement' | 'greeting' | 'update'
+  saint_image: string
   is_active: boolean
   expires_at: string
   created_at: string
