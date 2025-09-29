@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Sparkles, Clock, Lightbulb, Star } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface SpiritualFact {
   id: string;
@@ -12,6 +13,7 @@ interface SpiritualFact {
 }
 
 const SpiritualFactBox = () => {
+  const { t, language } = useLanguage();
   const [currentFactIndex, setCurrentFactIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [facts, setFacts] = useState<SpiritualFact[]>([]);
@@ -33,18 +35,21 @@ const SpiritualFactBox = () => {
           {
             id: '1',
             text: "In the Ramayana, Hanuman's heart contains an image of Rama and Sita, discovered when his chest was opened by the gods to verify his devotion.",
+            text_hi: "रामायण में, हनुमान के हृदय में राम और सीता की छवि है, जो उनकी भक्ति को सत्यापित करने के लिए देवताओं द्वारा उनकी छाती खोले जाने पर खोजी गई।",
             category: "Ramayana",
             icon: ""
           },
           {
             id: '2',
             text: "The Mahabharata mentions that Krishna lifted Govardhan hill for 7 days straight, protecting the villagers from Indra's torrential rains.",
+            text_hi: "महाभारत में उल्लेख है कि कृष्ण ने लगातार 7 दिनों तक गोवर्धन पर्वत को उठाया, ग्रामीणों को इंद्र की मूसलधार बारिश से बचाया।",
             category: "Mahabharata",
             icon: ""
           },
           {
             id: '3',
             text: "Lord Ganesha wrote the entire Mahabharata as Sage Vyasa dictated it, breaking his tusk to use as a pen when his original one broke.",
+            text_hi: "भगवान गणेश ने संपूर्ण महाभारत को महर्षि व्यास के कहे अनुसार लिखा, जब उनकी मूल कलम टूट गई तो अपना दांत तोड़कर कलम के रूप में इस्तेमाल किया।",
             category: "Hindu Deities",
             icon: ""
           }
@@ -90,7 +95,7 @@ const SpiritualFactBox = () => {
               <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-full p-4 shadow-xl animate-pulse mx-auto w-fit mb-4">
                 <Lightbulb className="w-8 h-8 text-white" />
               </div>
-              <p className="text-orange-600 font-medium">Loading spiritual wisdom...</p>
+              <p className="text-orange-600 font-medium">{t('didyouknow.loading')}</p>
             </div>
           </div>
         </div>
@@ -125,7 +130,7 @@ const SpiritualFactBox = () => {
               </div>
               
               <h3 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-orange-600 to-orange-700 bg-clip-text text-transparent mb-2">
-                Did You Know?
+                {t('didyouknow.title')}
               </h3>
               <div className="flex items-center justify-center space-x-2 mb-4">
                 <span className="text-orange-600 font-semibold text-lg">{currentFact.category}</span>
@@ -140,7 +145,7 @@ const SpiritualFactBox = () => {
               <div className={`transition-all duration-500 ${isAnimating ? 'opacity-0 translate-y-6' : 'opacity-100 translate-y-0'}`}>
                 <div className="bg-white/90 backdrop-blur-md rounded-xl p-6 md:p-8 shadow-lg border border-orange-200 max-w-5xl mx-auto ring-1 ring-orange-300/60">
                   <p className="text-gray-900 text-lg md:text-xl leading-relaxed font-semibold text-center max-w-4xl mx-auto tracking-wide">
-                    {currentFact.text}
+                    {language === 'EN' ? currentFact.text : (currentFact.text_hi || currentFact.text)}
                   </p>
                 </div>
               </div>

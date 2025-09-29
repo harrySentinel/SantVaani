@@ -124,6 +124,10 @@ const translations: Translations = {
     'horoscope.empty.daily': 'Select your sign to see today\'s horoscope',
     'horoscope.empty.weekly': 'Select your sign to see this week\'s horoscope',
     'horoscope.empty.monthly': 'Select your sign to see this month\'s horoscope',
+
+    // Did You Know Section
+    'didyouknow.title': 'Did You Know?',
+    'didyouknow.loading': 'Loading spiritual wisdom...',
   },
   HI: {
     // Header
@@ -226,6 +230,10 @@ const translations: Translations = {
     'horoscope.empty.daily': 'आज का राशिफल देखने के लिए अपनी राशि चुनें',
     'horoscope.empty.weekly': 'इस सप्ताह का राशिफल देखने के लिए अपनी राशि चुनें',
     'horoscope.empty.monthly': 'इस महीने का राशिफल देखने के लिए अपनी राशि चुनें',
+
+    // Did You Know Section
+    'didyouknow.title': 'क्या आप जानते हैं?',
+    'didyouknow.loading': 'आध्यात्मिक ज्ञान लोड हो रहा है...',
   }
 };
 
