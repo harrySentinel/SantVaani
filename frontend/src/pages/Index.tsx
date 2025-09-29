@@ -10,56 +10,48 @@ import VisitorCounter from '@/components/VisitorCounter';
 import SpiritualFactBox from '@/components/SpiritualFactBox';
 import FeedbackForm from '@/components/FeedbackForm';
 import NoticeBoard from '@/components/NoticeBoard';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 // Lazy load ChatBot for better performance
 const ChatBot = lazy(() => import('@/components/chatBot'));
 
 const Index = () => {
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
+  const { t } = useLanguage();
   
   const features = [
     {
       icon: Users,
-      title: "Great Saints",
-      titleHi: "महान संत",
-      description: "Discover the life stories and teachings of legendary saints like Meera Bai, Kabir Das, and Tulsidas",
-      descriptionHi: "मीरा बाई, कबीर दास और तुलसीदास जैसे महान संतों की जीवन गाथा और शिक्षाओं की खोज करें",
+      title: t('features.saints.title'),
+      description: t('features.saints.description'),
       to: "/saints",
       color: "from-blue-500 to-blue-600"
     },
     {
       icon: Heart,
-      title: "Living Saints",
-      titleHi: "जीवित संत",
-      description: "Connect with contemporary spiritual masters who continue to spread divine wisdom",
-      descriptionHi: "समकालीन आध्यात्मिक गुरुओं से जुड़ें जो दिव्य ज्ञान फैलाना जारी रखते हैं",
+      title: t('features.living.title'),
+      description: t('features.living.description'),
       to: "/living-saints",
       color: "from-red-500 to-red-600"
     },
     {
       icon: Sparkles,
-      title: "Divine Forms",
-      titleHi: "दिव्य रूप",
-      description: "Explore the sacred forms of the divine and understand their deeper meanings",
-      descriptionHi: "परमात्मा के पवित्र रूपों की खोज करें और उनके गहरे अर्थों को समझें",
+      title: t('features.divine.title'),
+      description: t('features.divine.description'),
       to: "/divine",
       color: "from-purple-500 to-purple-600"
     },
     {
       icon: Book,
-      title: "Bhajans & Quotes",
-      titleHi: "भजन और उद्धरण",
-      description: "Immerse yourself in devotional songs and inspiring spiritual quotes",
-      descriptionHi: "भक्ति गीतों और प्रेरणादायक आध्यात्मिक उद्धरणों में खुद को डुबोएं",
+      title: t('features.bhajans.title'),
+      description: t('features.bhajans.description'),
       to: "/bhajans",
       color: "from-green-500 to-green-600"
     },
     {
       icon: Star,
-      title: "Daily Horoscope",
-      titleHi: "दैनिक राशिफल",
-      description: "Get personalized daily, weekly, and monthly astrological predictions",
-      descriptionHi: "व्यक्तिगत दैनिक, साप्ताहिक और मासिक ज्योतिषीय भविष्यवाणी प्राप्त करें",
+      title: t('features.horoscope.title'),
+      description: t('features.horoscope.description'),
       to: "/horoscope",
       color: "from-purple-500 to-purple-600"
     }
@@ -75,12 +67,10 @@ const Index = () => {
       <div className="bg-gradient-to-r from-orange-400 to-red-500 text-white text-center py-2 px-4 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-orange-400/20 to-red-500/20 animate-pulse"></div>
         <p className="text-sm font-medium relative z-10">
-          ✨ <span className="font-bold">Beta Version</span> - Your feedback helps us improve | 
-          <span className="ml-2">बीटा संस्करण - आपकी प्रतिक्रिया हमें बेहतर बनाती है</span>
+          {t('beta.banner')}
         </p>
       </div>
 
-      
       {/* Hero Section */}
       <HeroSection />
 
@@ -94,16 +84,16 @@ const Index = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
-              Explore Sacred Wisdom
+              {t('features.title')}
             </h2>
 
              {/* Beta Badge - Option 3: Next to heading */}
               <span className="bg-gradient-to-r from-orange-500 to-red-600 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-md">
-                Beta
+                {t('beta.badge')}
               </span>
 
             <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
-              Journey through the rich spiritual heritage of India through our carefully curated collection of saints, teachings, and divine forms.
+              {t('features.subtitle')}
             </p>
           </div>
 
@@ -144,10 +134,10 @@ const Index = () => {
   <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
     <div className="text-center mb-12">
       <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
-        🎬 Live Bhajan Stream
+        {t('live.title')}
       </h2>
       <p className="text-lg text-gray-600">
-        Watch devotional bhajans and spiritual content streaming live
+        {t('live.subtitle')}
       </p>
     </div>
     
@@ -162,15 +152,15 @@ const Index = () => {
           
           <div className="space-y-3">
             <h3 className="text-2xl font-bold text-gray-800 group-hover:text-orange-600 transition-colors">
-              Watch Live Bhajans
+              {t('live.button')}
             </h3>
             <p className="text-gray-600 leading-relaxed">
-              Experience devotional bhajans and spiritual videos streaming live from YouTube
+              {t('live.description')}
             </p>
             <div className="flex items-center justify-center space-x-2">
               <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
               <p className="text-sm text-red-600 font-medium">
-                LIVE NOW
+                {t('live.status')}
               </p>
             </div>
           </div>
@@ -197,19 +187,16 @@ const Index = () => {
           <div className="space-y-8">
             <div className="space-y-4">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-800">
-                Our Sacred Mission
+                {t('mission.title')}
               </h2>
               <p className="text-lg text-gray-600 leading-relaxed">
-                SantVaani is dedicated to preserving and sharing the timeless wisdom of India's greatest spiritual masters. 
-                We believe that in today's fast-paced world, the teachings of these enlightened souls can provide guidance, 
-                peace, and direction to seekers on their spiritual journey.
+                {t('mission.description')}
               </p>
 
                {/* Beta Notice - Option 4: In mission section */}
               <div className="bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-lg p-4 mt-6">
                 <p className="text-sm text-gray-700">
-                  <span className="font-semibold text-orange-600">🛠️ Beta Version Notice:</span> 
-                  We are continuously improving SantVaani. Your feedback and suggestions help us enhance your spiritual journey experience.
+                  {t('mission.beta.notice')}
                 </p>
               </div>
 
@@ -217,31 +204,31 @@ const Index = () => {
 
             <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-2xl p-8 border border-orange-200">
               <blockquote className="text-xl md:text-2xl text-gray-700 italic font-medium leading-relaxed">
-                "जहाँ भक्ति है, वहाँ शक्ति है"
+                {t('mission.quote.sanskrit')}
               </blockquote>
               <p className="text-lg text-orange-600 mt-2">
-                "Where there is devotion, there is divine power"
+                {t('mission.quote.english')}
               </p>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
               <Link to="/about">
-                <Button 
+                <Button
                   size="lg"
                   variant="outline"
                   className="border-2 border-orange-500 text-orange-600 hover:bg-orange-50 px-6 py-3 rounded-full w-full sm:w-auto"
                 >
-                  Learn More About Us
+                  {t('mission.learn.more')}
                 </Button>
               </Link>
-              
+
               <Button
                 onClick={() => setIsFeedbackOpen(true)}
                 size="lg"
                 className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-6 py-3 rounded-full w-full sm:w-auto"
               >
                 <MessageSquare className="w-4 h-4 mr-2" />
-                Share Feedback
+                {t('mission.feedback')}
               </Button>
             </div>
           </div>
