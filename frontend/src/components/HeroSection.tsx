@@ -54,12 +54,12 @@ export default function HeroSection() {
               <Sparkles className="w-8 h-8 text-orange-500 animate-pulse" />
             </div>
             
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-orange-500 via-orange-600 to-orange-700 bg-clip-text text-transparent leading-tight">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-orange-500 via-orange-600 to-orange-700 bg-clip-text text-transparent leading-tight pt-2">
               {t('site.name')}
             </h1>
 
             {language === 'EN' && (
-              <p className="text-xl md:text-2xl text-gray-600 font-medium">
+              <p className="text-xl md:text-2xl text-gray-600 font-medium pt-1">
                 संतवाणी
               </p>
             )}
