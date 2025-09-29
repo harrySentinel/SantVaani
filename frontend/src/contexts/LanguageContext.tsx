@@ -162,6 +162,27 @@ const translations: Translations = {
     'dailyguide.horoscope.daily': 'Daily',
     'dailyguide.horoscope.weekly': 'Weekly',
     'dailyguide.horoscope.monthly': 'Monthly',
+
+    // Events Page
+    'events.title': 'Spiritual Events',
+    'events.subtitle': 'Discover and join spiritual gatherings, bhajans, bhandaras, and satsangs organized by devotees in your community.',
+    'events.create.title': 'Organize a Spiritual Event',
+    'events.create.subtitle': 'Share your bhajan, bhandara, or satsang with the community',
+    'events.create.button': 'Create Event',
+    'events.upcoming.title': 'Upcoming Events',
+    'events.upcoming.subtitle': 'Join these beautiful spiritual gatherings',
+    'events.notify.button': 'Notify Me',
+    'events.details.button': 'Details',
+    'events.verified': 'Verified',
+    'events.notification.on': 'Notification On',
+    'events.login.notify': 'Login to Notify',
+    'events.no.events.title': 'No Events Available',
+    'events.no.events.subtitle': 'No approved events to display at the moment. Check back later!',
+    'events.create.first': 'Create First Event',
+    'events.community.title': 'Build Spiritual Community',
+    'events.community.subtitle': 'Connect with like-minded devotees, share divine experiences, and strengthen our spiritual bonds through meaningful gatherings.',
+    'events.community.quote.hindi': 'संगे शक्ति कलयुगे',
+    'events.community.quote.english': 'In unity lies strength in this age',
   },
   HI: {
     // Header
@@ -302,6 +323,27 @@ const translations: Translations = {
     'dailyguide.horoscope.daily': 'दैनिक',
     'dailyguide.horoscope.weekly': 'साप्ताहिक',
     'dailyguide.horoscope.monthly': 'मासिक',
+
+    // Events Page
+    'events.title': 'आध्यात्मिक कार्यक्रम',
+    'events.subtitle': 'अपने समुदाय के भक्तों द्वारा आयोजित आध्यात्मिक सभाओं, भजनों, भंडारों और सत्संगों की खोज करें और उनमें शामिल हों।',
+    'events.create.title': 'आध्यात्मिक कार्यक्रम आयोजित करें',
+    'events.create.subtitle': 'अपने भजन, भंडारा या सत्संग को समुदाय के साथ साझा करें',
+    'events.create.button': 'कार्यक्रम बनाएं',
+    'events.upcoming.title': 'आगामी कार्यक्रम',
+    'events.upcoming.subtitle': 'इन सुंदर आध्यात्मिक सभाओं में शामिल हों',
+    'events.notify.button': 'मुझे सूचना दें',
+    'events.details.button': 'विवरण',
+    'events.verified': 'सत्यापित',
+    'events.notification.on': 'सूचना चालू',
+    'events.login.notify': 'सूचना के लिए लॉगिन करें',
+    'events.no.events.title': 'कोई कार्यक्रम उपलब्ध नहीं',
+    'events.no.events.subtitle': 'फिलहाल कोई अनुमोदित कार्यक्रम प्रदर्शित करने के लिए नहीं है। बाद में वापस जांचें!',
+    'events.create.first': 'पहला कार्यक्रम बनाएं',
+    'events.community.title': 'आध्यात्मिक समुदाय का निर्माण करें',
+    'events.community.subtitle': 'समान विचारधारा वाले भक्तों से जुड़ें, दिव्य अनुभव साझा करें, और सार्थक सभाओं के माध्यम से हमारे आध्यात्मिक बंधन को मजबूत करें।',
+    'events.community.quote.hindi': 'संगे शक्ति कलयुगे',
+    'events.community.quote.english': 'इस युग में एकता में शक्ति है',
   }
 };
 
