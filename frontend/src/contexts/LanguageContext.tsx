@@ -37,7 +37,6 @@ const translations: Translations = {
     'hero.description.main': 'Discover the profound teachings, inspiring stories, and divine bhakti of India\'s greatest saints. A digital sanctuary for spiritual seekers on their journey to enlightenment.',
     'hero.button.saints': 'Explore Saints',
     'hero.button.divine': 'Divine Forms',
-    'hero.free.message': '🙏 Completely free • No registration required • Pure spiritual content 🙏',
 
     // Features Section
     'features.title': 'Explore Sacred Wisdom',
@@ -198,7 +197,6 @@ const translations: Translations = {
     'hero.description.main': 'भारत के महानतम संतों की गहन शिक्षाओं, प्रेरणादायक कहानियों और दिव्य भक्ति की खोज करें। आध्यात्मिक साधकों के लिए एक डिजिटल अभयारण्य, जो प्रबुद्धता की यात्रा पर हैं।',
     'hero.button.saints': 'संतों की खोज करें',
     'hero.button.divine': 'दिव्य रूप',
-    'hero.free.message': '🙏 पूर्णतः निःशुल्क • पंजीकरण आवश्यक नहीं • शुद्ध आध्यात्मिक सामग्री 🙏',
 
     // Features Section
     'features.title': 'पवित्र ज्ञान की खोज करें',

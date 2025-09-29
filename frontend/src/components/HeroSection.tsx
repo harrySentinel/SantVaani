@@ -135,12 +135,6 @@ export default function HeroSection() {
             </Link>
           </div>
 
-          {/* Simple Free Access Message */}
-          <div className="max-w-3xl mx-auto pt-6">
-            <p className="text-center text-gray-600 font-medium">
-              <em>{t('hero.free.message')}</em>
-            </p>
-          </div>
 
           {/* Scroll Indicator */}
           <div className="pt-16 animate-bounce">
