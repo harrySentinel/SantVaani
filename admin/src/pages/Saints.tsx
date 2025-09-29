@@ -182,11 +182,11 @@ export default function SaintsPage() {
     <div className="space-y-6 page-transition">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
-        <div className="mb-4 sm:mb-0">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gradient">Saints Management</h1>
-          <p className="text-gray-600 mt-1 font-medium">Manage spiritual masters and their biographies</p>
+        <div className="mb-6 sm:mb-0">
+          <h1 className="desktop-heading text-gradient">Saints Management</h1>
+          <p className="text-gray-600 mt-2 font-medium desktop-subheading">Manage spiritual masters and their biographies</p>
         </div>
-        <div className="flex space-x-3">
+        <div className="desktop-button-group">
           <Button
             onClick={exportSaintsToCSV}
             variant="outline"
@@ -214,7 +214,7 @@ export default function SaintsPage() {
       </div>
 
       {/* Stats Bar */}
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+      <div className="desktop-cards-grid">
         <div className="stats-card">
           <div className="text-2xl font-bold text-blue-600">{saints.length}</div>
           <div className="text-sm text-gray-600">Total Saints</div>

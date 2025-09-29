@@ -72,7 +72,14 @@
 .enhanced-sidebar {
   background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
   border-right: 1px solid rgba(226, 232, 240, 0.8);
-  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.05);
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+}
+
+@media (min-width: 768px) {
+  .enhanced-sidebar {
+    margin: 0;
+    padding: 0;
+  }
 }
 
 .sidebar-nav-item {
