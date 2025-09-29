@@ -12,9 +12,10 @@ import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { eventsService } from '@/lib/events';
 import { getFCMToken } from '@/lib/firebase';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const Events = () => {
-
+  const { t, language } = useLanguage();
   const [isCreateFormOpen, setIsCreateFormOpen] = useState(false);
   const [subscribedEvents, setSubscribedEvents] = useState(new Set());
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -575,12 +576,11 @@ const Events = () => {
               <Calendar className="w-8 h-8 text-blue-500 animate-pulse" />
               <span className="text-3xl">📿</span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-orange-600 bg-clip-text text-transparent">
-              Spiritual Events
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-orange-600 bg-clip-text text-transparent pt-2">
+              {t('events.title')}
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Discover and join spiritual gatherings, bhajans, bhandaras, and satsangs
-              organized by devotees in your community.
+              {t('events.subtitle')}
             </p>
           </div>
         </div>
@@ -592,15 +592,15 @@ const Events = () => {
           <div className="bg-gradient-to-r from-blue-600 to-orange-600 rounded-2xl p-6 text-white text-center">
             <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
               <div className="space-y-2">
-                <h2 className="text-2xl font-bold">Organize a Spiritual Event</h2>
-                <p className="text-blue-100">Share your bhajan, bhandara, or satsang with the community</p>
+                <h2 className="text-2xl font-bold">{t('events.create.title')}</h2>
+                <p className="text-blue-100">{t('events.create.subtitle')}</p>
               </div>
               <button
                 onClick={handleCreateEventClick}
                 className="bg-white text-blue-600 px-6 py-3 rounded-full font-semibold hover:bg-blue-50 transition-colors flex items-center space-x-2"
               >
                 <Plus className="w-5 h-5" />
-                <span>Create Event</span>
+                <span>{t('events.create.button')}</span>
               </button>
             </div>
           </div>
@@ -612,12 +612,12 @@ const Events = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h2 className="text-3xl font-bold text-gray-800 mb-2">Upcoming Events</h2>
-              <p className="text-gray-600">Join these beautiful spiritual gatherings</p>
+              <h2 className="text-3xl font-bold text-gray-800 mb-2">{t('events.upcoming.title')}</h2>
+              <p className="text-gray-600">{t('events.upcoming.subtitle')}</p>
             </div>
             <button className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 transition-colors">
               <Bell className="w-5 h-5" />
-              <span>Notify Me</span>
+              <span>{t('events.notify.button')}</span>
             </button>
           </div>
 
@@ -645,7 +645,7 @@ const Events = () => {
                     {/* Verified Badge */}
                     <div className="absolute top-2 left-2 flex items-center space-x-1 bg-white/20 backdrop-blur-sm rounded-full px-2 py-1">
                       <CheckCircle className="w-3 h-3 text-white" />
-                      <span className="text-xs font-medium">Verified</span>
+                      <span className="text-xs font-medium">{t('events.verified')}</span>
                     </div>
 
                     <div className="flex items-center justify-center mt-4">
@@ -707,19 +707,19 @@ const Events = () => {
                             {subscribedEvents.has(event.id) ? (
                               <>
                                 <BellRing className="w-4 h-4" />
-                                <span>Notification On</span>
+                                <span>{t('events.notification.on')}</span>
                               </>
                             ) : (
                               <>
                                 {!user ? (
                                   <>
                                     <Shield className="w-4 h-4" />
-                                    <span>Login to Notify</span>
+                                    <span>{t('events.login.notify')}</span>
                                   </>
                                 ) : (
                                   <>
                                     <Bell className="w-4 h-4" />
-                                    <span>Notify Me</span>
+                                    <span>{t('events.notify.button')}</span>
                                   </>
                                 )}
                               </>
@@ -733,7 +733,7 @@ const Events = () => {
                           onClick={() => handleShowDetails(event)}
                           className="px-4 py-3 border border-gray-300 text-gray-600 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 text-sm font-medium shadow-sm hover:shadow-md"
                         >
-                          Details
+                          {t('events.details.button')}
                         </button>
                       </div>
                     </div>
@@ -745,15 +745,15 @@ const Events = () => {
               // No approved events
               <div className="col-span-full text-center py-12">
                 <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-gray-600 mb-2">No Events Available</h3>
-                <p className="text-gray-500 mb-6">No approved events to display at the moment. Check back later!</p>
+                <h3 className="text-xl font-semibold text-gray-600 mb-2">{t('events.no.events.title')}</h3>
+                <p className="text-gray-500 mb-6">{t('events.no.events.subtitle')}</p>
                 {user && (
                   <button
                     onClick={() => setIsCreateFormOpen(true)}
                     className="bg-gradient-to-r from-blue-600 to-orange-600 text-white px-6 py-3 rounded-xl hover:from-blue-700 hover:to-orange-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                   >
                     <Plus className="w-5 h-5 inline mr-2" />
-                    Create First Event
+                    {t('events.create.first')}
                   </button>
                 )}
               </div>
@@ -767,20 +767,19 @@ const Events = () => {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8">
           <div className="space-y-4">
             <h2 className="text-3xl font-bold text-gray-800">
-              Build Spiritual Community
+              {t('events.community.title')}
             </h2>
             <p className="text-lg text-gray-600 leading-relaxed">
-              Connect with like-minded devotees, share divine experiences, and strengthen
-              our spiritual bonds through meaningful gatherings.
+              {t('events.community.subtitle')}
             </p>
           </div>
 
           <div className="bg-gradient-to-r from-blue-100 to-orange-100 rounded-2xl p-8 border border-blue-200">
             <blockquote className="text-xl md:text-2xl text-gray-700 italic font-medium leading-relaxed">
-              "संगे शक्ति कलयुगे"
+              "{t('events.community.quote.hindi')}"
             </blockquote>
             <p className="text-blue-600 mt-2 text-lg">
-              "In unity lies strength in this age"
+              "{t('events.community.quote.english')}"
             </p>
           </div>
         </div>
