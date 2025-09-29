@@ -97,10 +97,11 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
 
       {/* Sidebar */}
       <div className={cn(
-        "fixed inset-y-0 left-0 z-50 w-64 enhanced-sidebar transform transition-all duration-500 ease-in-out md:translate-x-0 md:static md:z-auto",
-        sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        "w-64 enhanced-sidebar transition-all duration-500 ease-in-out",
+        "fixed inset-y-0 left-0 z-50 md:relative md:z-auto transform md:transform-none",
+        sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
       )}>
-        <div className="flex flex-col flex-grow pt-4 sm:pt-5 overflow-y-auto">
+        <div className="flex flex-col flex-grow pt-5 overflow-y-auto h-full">
           {/* Close button for mobile */}
           <div className="flex items-center justify-between px-6 md:hidden">
             <div className="flex items-center space-x-3">
@@ -135,7 +136,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
         
         {/* Navigation */}
         <div className="mt-8 flex-grow flex flex-col">
-          <nav className="flex-1 px-3 space-y-1">
+          <nav className="desktop-sidebar-nav flex-1 px-3 space-y-1">
             {navigation.map((item) => (
               <NavLink
                 key={item.name}

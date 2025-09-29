@@ -37,7 +37,7 @@ export default function Header({ setSidebarOpen }: HeaderProps) {
 
   return (
     <header className="enhanced-header">
-      <div className="mx-auto px-2 sm:px-4 lg:px-8 py-3 sm:py-4">
+      <div className="mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex items-center justify-between">
           {/* Left side - Mobile menu button + Page info */}
           <div className="flex items-center flex-1">
@@ -53,10 +53,10 @@ export default function Header({ setSidebarOpen }: HeaderProps) {
             </Button>
             
             <div className="flex-1 min-w-0">
-              <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-gradient truncate">
+              <h2 className="text-xl lg:text-2xl font-bold text-gradient truncate">
                 Content Management
               </h2>
-              <p className="text-xs sm:text-sm text-gray-600 hidden sm:block font-medium">
+              <p className="text-sm text-gray-600 hidden sm:block font-medium">
                 Manage your spiritual content with ease
               </p>
             </div>

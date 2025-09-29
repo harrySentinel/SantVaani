@@ -20,7 +20,10 @@
       "Bash(tasklist:*)",
       "Bash(taskkill:*)",
       "WebFetch(domain:santvaani-backend.onrender.com)",
-      "Bash(node server.js)"
+      "Bash(node server.js)",
+      "Bash(git commit:*)",
+      "Bash(git add:*)",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []

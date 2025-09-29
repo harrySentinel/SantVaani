@@ -8,7 +8,10 @@
     "dev": "vite --port 3001",
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "translate-facts": "node translate_facts.js",
+    "export-facts": "node manual_translate_facts.js export",
+    "update-translations": "node manual_translate_facts.js update"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.2",
@@ -24,6 +27,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "date-fns": "^2.30.0",
+    "dotenv": "^16.6.1",
     "lucide-react": "^0.294.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

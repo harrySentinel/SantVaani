@@ -74,13 +74,13 @@ export default function Dashboard() {
   return (
     <div className="space-y-8 page-transition">
       {/* Header */}
-      <div className="mb-6 sm:mb-8">
-        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gradient">Dashboard</h1>
-        <p className="text-sm sm:text-base text-gray-600 mt-1 font-medium">Welcome to SantVaani Admin Panel</p>
+      <div className="mb-8">
+        <h1 className="desktop-heading text-gradient">Dashboard</h1>
+        <p className="text-base text-gray-600 mt-2 font-medium">Welcome to SantVaani Admin Panel</p>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+      <div className="desktop-stats-grid">
         {stats.map((stat) => (
           <div
             key={stat.name}

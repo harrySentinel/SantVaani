@@ -5,6 +5,7 @@ import App from './App.tsx'
 import './index.css'
 import './styles/mobile.css'
 import './styles/enhanced.css'
+import './styles/desktop.css'
 
 const root = document.getElementById('root')
 
