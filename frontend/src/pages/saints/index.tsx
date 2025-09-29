@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { supabase } from '@/lib/supabaseClient';
 import { usePagination } from '@/hooks/usePagination';
 import BeautifulPagination from '@/components/BeautifulPagination';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface Saint {
   id: string;
@@ -28,6 +29,7 @@ interface Saint {
 }
 
 const Saints = () => {
+  const { t, language } = useLanguage();
   const [selectedSaint, setSelectedSaint] = useState<Saint | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [saints, setSaints] = useState<Saint[]>([]);
@@ -156,16 +158,15 @@ const Saints = () => {
               transition={{ duration: 0.6 }}
               className="space-y-4"
             >
-              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-orange-600 to-orange-700 bg-clip-text text-transparent">
-                Great Saints
+              <h1 className={`text-4xl md:text-5xl font-bold bg-gradient-to-r from-orange-600 to-orange-700 bg-clip-text text-transparent ${language === 'HI' ? 'pt-2' : ''}`}>
+                {t('saints.title')}
               </h1>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                Discover the profound wisdom and divine teachings of India's most revered spiritual masters 
-                who have guided humanity on the path of devotion and enlightenment.
+              <p className={`text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed ${language === 'HI' ? 'pt-1' : ''}`}>
+                {t('saints.subtitle')}
               </p>
               <div className="flex justify-center">
                 <Badge variant="secondary" className="bg-orange-100 text-orange-700 px-4 py-2">
-                  Loading Sacred Biographies...
+                  {t('saints.loading.badge')}
                 </Badge>
               </div>
             </motion.div>
@@ -222,12 +223,11 @@ const Saints = () => {
               transition={{ duration: 0.6 }}
               className="space-y-4"
             >
-              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-orange-600 to-orange-700 bg-clip-text text-transparent">
-                Great Saints
+              <h1 className={`text-4xl md:text-5xl font-bold bg-gradient-to-r from-orange-600 to-orange-700 bg-clip-text text-transparent ${language === 'HI' ? 'pt-2' : ''}`}>
+                {t('saints.title')}
               </h1>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                Discover the profound wisdom and divine teachings of India's most revered spiritual masters 
-                who have guided humanity on the path of devotion and enlightenment.
+              <p className={`text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed ${language === 'HI' ? 'pt-1' : ''}`}>
+                {t('saints.subtitle')}
               </p>
               <div className="flex justify-center">
                 <Badge variant="secondary" className="bg-red-100 text-red-700 px-4 py-2">
@@ -241,17 +241,17 @@ const Saints = () => {
         {/* Error Message */}
         <section className="py-16">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
-            <h2 className="text-3xl font-bold text-gray-800">
-              Temporary Issue
+            <h2 className={`text-3xl font-bold text-gray-800 ${language === 'HI' ? 'pt-1' : ''}`}>
+              {t('saints.error.title')}
             </h2>
-            <p className="text-lg text-gray-600">
-              We're experiencing some technical difficulties. Please try refreshing the page.
+            <p className={`text-lg text-gray-600 ${language === 'HI' ? 'pt-1' : ''}`}>
+              {t('saints.error.message')}
             </p>
-            <button 
-              onClick={() => window.location.reload()} 
+            <button
+              onClick={() => window.location.reload()}
               className="inline-flex items-center justify-center px-6 py-3 bg-orange-600 text-white rounded-full hover:bg-orange-700 transition-colors"
             >
-              Refresh Page
+              {t('saints.error.button')}
             </button>
           </div>
         </section>
@@ -275,20 +275,19 @@ const Saints = () => {
             transition={{ duration: 0.6 }}
             className="space-y-4"
           >
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-orange-600 to-orange-700 bg-clip-text text-transparent">
-              Great Saints
+            <h1 className={`text-4xl md:text-5xl font-bold bg-gradient-to-r from-orange-600 to-orange-700 bg-clip-text text-transparent ${language === 'HI' ? 'pt-2' : ''}`}>
+              {t('saints.title')}
             </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Discover the profound wisdom and divine teachings of India's most revered spiritual masters 
-              who have guided humanity on the path of devotion and enlightenment.
+            <p className={`text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed ${language === 'HI' ? 'pt-1' : ''}`}>
+              {t('saints.subtitle')}
             </p>
             <div className="flex justify-center">
               <Badge variant="secondary" className="bg-orange-100 text-orange-700 px-4 py-2">
-                {searchQuery 
-                  ? `${pagination.totalItems} of ${saints.length}` 
+                {searchQuery
+                  ? `${pagination.totalItems} ${language === 'HI' ? 'का' : 'of'} ${saints.length}`
                   : `${saints.length}`
-                } Sacred Biographies
-                {pagination.totalPages > 1 && ` • Page ${pagination.currentPage} of ${pagination.totalPages}`}
+                } {t('saints.biographies.count')}
+                {pagination.totalPages > 1 && ` • ${t('saints.page.info')} ${pagination.currentPage} ${t('saints.page.of')} ${pagination.totalPages}`}
               </Badge>
             </div>
           </motion.div>
@@ -304,7 +303,7 @@ const Saints = () => {
             </div>
             <Input
               type="text"
-              placeholder="खोजें: मीरा बाई, कबीर दास, तुलसीदास... (Search by name, region, specialty)"
+              placeholder={language === 'EN' ? t('saints.search.placeholder') : t('saints.search.placeholder')}
               value={searchQuery}
               onChange={handleSearch}
               className="block w-full pl-10 pr-3 py-3 border-2 border-orange-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 placeholder-gray-500 bg-white/90 backdrop-blur-sm"
@@ -314,17 +313,17 @@ const Saints = () => {
                 onClick={() => setSearchQuery('')}
                 className="absolute inset-y-0 right-0 pr-3 flex items-center"
               >
-                <span className="text-gray-400 hover:text-gray-600 text-sm">Clear</span>
+                <span className="text-gray-400 hover:text-gray-600 text-sm">{t('saints.search.clear')}</span>
               </button>
             )}
           </div>
           {searchQuery && (
             <p className="mt-2 text-sm text-gray-600 text-center">
-              {pagination.totalItems === 0 
-                ? `No saints found for "${searchQuery}"`
-                : `Found ${pagination.totalItems} saint${pagination.totalItems !== 1 ? 's' : ''} matching "${searchQuery}"`
+              {pagination.totalItems === 0
+                ? `${t('saints.search.no.results')} "${searchQuery}"`
+                : `${t('saints.search.results.found')} ${pagination.totalItems} ${pagination.totalItems !== 1 ? t('saints.search.results.saints') : t('saints.search.results.saint')} ${t('saints.search.results.matching')} "${searchQuery}"`
               }
-              {pagination.totalPages > 1 && ` • Showing ${pagination.startIndex}-${pagination.endIndex}`}
+              {pagination.totalPages > 1 && ` • ${t('saints.search.results.showing')} ${pagination.startIndex}-${pagination.endIndex}`}
             </p>
           )}
         </div>
@@ -387,7 +386,7 @@ const Saints = () => {
                     <div className="flex items-center justify-between pt-2">
                       <button className="flex items-center space-x-2 text-orange-600 hover:text-orange-700 transition-colors group">
                         <Heart className="w-4 h-4" />
-                        <span className="text-sm font-medium">Read More</span>
+                        <span className="text-sm font-medium">{t('saints.card.read.more')}</span>
                       </button>
                       
                       <ShareButton 
@@ -434,18 +433,18 @@ const Saints = () => {
       {/* Call to Action */}
       <section className="py-16 bg-gradient-to-r from-orange-100 to-orange-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
-          <h2 className="text-3xl font-bold text-gray-800">
-            Continue Your Spiritual Journey
+          <h2 className={`text-3xl font-bold text-gray-800 ${language === 'HI' ? 'pt-1' : ''}`}>
+            {t('saints.cta.title')}
           </h2>
-          <p className="text-lg text-gray-600">
-            Explore more aspects of divine wisdom through our other sections
+          <p className={`text-lg text-gray-600 ${language === 'HI' ? 'pt-1' : ''}`}>
+            {t('saints.cta.subtitle')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a href="/living-saints" className="inline-flex items-center justify-center px-6 py-3 bg-orange-600 text-white rounded-full hover:bg-orange-700 transition-colors">
-              Living Saints
+              {t('saints.cta.living.saints')}
             </a>
             <a href="/divine" className="inline-flex items-center justify-center px-6 py-3 border-2 border-orange-600 text-orange-600 rounded-full hover:bg-orange-50 transition-colors">
-              Divine Forms
+              {t('saints.cta.divine.forms')}
             </a>
           </div>
         </div>
