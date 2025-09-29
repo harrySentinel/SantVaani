@@ -28,6 +28,7 @@ interface NoticeItem {
   message: string
   message_hi: string | null
   type: 'festival' | 'announcement' | 'greeting' | 'update'
+  saint_image: string
   is_active: boolean
   expires_at: string
   created_at: string
@@ -47,6 +48,7 @@ export default function NoticeForm({ notice, isOpen, onClose, onSave }: NoticeFo
     message: '',
     message_hi: '',
     type: 'announcement' as 'festival' | 'announcement' | 'greeting' | 'update',
+    saint_image: 'Saint.png',
     is_active: true,
     expires_at: '',
   })
@@ -74,6 +76,7 @@ export default function NoticeForm({ notice, isOpen, onClose, onSave }: NoticeFo
         message: notice.message,
         message_hi: notice.message_hi || '',
         type: notice.type,
+        saint_image: notice.saint_image || 'Saint.png',
         is_active: notice.is_active,
         expires_at: notice.expires_at.split('T')[0], // Format for date input
       })
@@ -86,6 +89,7 @@ export default function NoticeForm({ notice, isOpen, onClose, onSave }: NoticeFo
         message: '',
         message_hi: '',
         type: 'announcement',
+        saint_image: 'Saint.png',
         is_active: true,
         expires_at: defaultExpiry.toISOString().split('T')[0],
       })
@@ -213,6 +217,47 @@ export default function NoticeForm({ notice, isOpen, onClose, onSave }: NoticeFo
               placeholder="वैकल्पिक हिंदी संदेश दर्ज करें..."
               className="min-h-[100px] textarea-enhanced focus-enhanced"
             />
+          </div>
+
+          {/* Saint Image Selection */}
+          <div className="space-y-3">
+            <Label htmlFor="saint_image">Saint Character Image</Label>
+            <div className="grid grid-cols-3 gap-4">
+              {['Saint.png', 'Saint2.png', 'Saint3.png'].map((imageName) => (
+                <div
+                  key={imageName}
+                  onClick={() => setFormData({ ...formData, saint_image: imageName })}
+                  className={`
+                    relative cursor-pointer rounded-lg border-2 p-3 transition-all duration-200
+                    ${formData.saint_image === imageName
+                      ? 'border-orange-500 bg-orange-50 shadow-md'
+                      : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                    }
+                  `}
+                >
+                  <div className="aspect-square relative overflow-hidden rounded-md">
+                    <img
+                      src={`/${imageName}`}
+                      alt={`Saint Character ${imageName.replace('.png', '')}`}
+                      className="w-full h-full object-cover"
+                    />
+                    {formData.saint_image === imageName && (
+                      <div className="absolute inset-0 bg-orange-500/20 flex items-center justify-center">
+                        <div className="w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center">
+                          <span className="text-white text-sm font-bold">✓</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-center text-sm font-medium mt-2 text-gray-700">
+                    {imageName.replace('.png', '').replace('Saint', 'Saint ')}
+                  </p>
+                </div>
+              ))}
+            </div>
+            <p className="text-sm text-gray-500">
+              Select the saint character image that will appear with this notice
+            </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
