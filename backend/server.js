@@ -86,6 +86,8 @@ const corsOptions = {
       'http://127.0.0.1:3002',
       'http://127.0.0.1:3003',
       'https://santvaani.vercel.app',  // Production frontend
+      'https://santvaani.com',         // Production domain
+      'https://www.santvaani.com',     // Production domain with www
       process.env.FRONTEND_URL
     ].filter(Boolean);
 
