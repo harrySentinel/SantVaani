@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Calendar, CheckCircle, XCircle, AlertCircle, Eye, MessageSquare, Clock } from 'lucide-react';
+import { Calendar, CheckCircle, XCircle, AlertCircle, Eye, MessageSquare, Clock, Edit } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
+import EventForm from '@/components/EventForm';
 
 interface Event {
   id: string;
@@ -34,6 +35,7 @@ const Events = () => {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isActionModalOpen, setIsActionModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [actionType, setActionType] = useState<'approve' | 'reject'>('approve');
   const [adminFeedback, setAdminFeedback] = useState('');
   const [processingAction, setProcessingAction] = useState(false);
@@ -143,6 +145,21 @@ const Events = () => {
   const openDetailModal = (event: Event) => {
     setSelectedEvent(event);
     setIsDetailModalOpen(true);
+  };
+
+  const openEditModal = (event: Event) => {
+    setSelectedEvent(event);
+    setIsEditModalOpen(true);
+  };
+
+  const closeEditModal = () => {
+    setSelectedEvent(null);
+    setIsEditModalOpen(false);
+  };
+
+  const handleEventSaved = () => {
+    loadEvents(); // Reload the events list
+    closeEditModal();
   };
 
   const getStatusBadge = (status: string) => {
@@ -317,11 +334,13 @@ const Events = () => {
                         {new Date(event.created_at).toLocaleDateString()}
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-right text-sm font-medium space-x-2">
+                    <td className="px-6 py-4 text-right text-sm font-medium">
+                      <div className="flex flex-wrap gap-2 justify-end">
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => openDetailModal(event)}
+                        className="btn-enhanced hover-lift"
                       >
                         <Eye className="w-3 h-3 mr-1" />
                         View
@@ -332,8 +351,17 @@ const Events = () => {
                           <Button
                             variant="outline"
                             size="sm"
+                            onClick={() => openEditModal(event)}
+                            className="text-blue-600 hover:text-blue-700 btn-enhanced hover-lift"
+                          >
+                            <Edit className="w-3 h-3 mr-1" />
+                            Edit
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
                             onClick={() => openActionModal(event, 'approve')}
-                            className="text-green-600 hover:text-green-700"
+                            className="text-green-600 hover:text-green-700 btn-enhanced hover-lift"
                           >
                             <CheckCircle className="w-3 h-3 mr-1" />
                             Approve
@@ -342,13 +370,14 @@ const Events = () => {
                             variant="outline"
                             size="sm"
                             onClick={() => openActionModal(event, 'reject')}
-                            className="text-red-600 hover:text-red-700"
+                            className="text-red-600 hover:text-red-700 btn-enhanced hover-lift"
                           >
                             <XCircle className="w-3 h-3 mr-1" />
                             Reject
                           </Button>
                         </>
                       )}
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -507,6 +536,14 @@ const Events = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Event Edit Modal */}
+      <EventForm
+        event={selectedEvent}
+        isOpen={isEditModalOpen}
+        onClose={closeEditModal}
+        onSave={handleEventSaved}
+      />
     </div>
   );
 };
