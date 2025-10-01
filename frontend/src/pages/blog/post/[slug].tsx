@@ -5,17 +5,17 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import BlogCard from '@/components/blog/BlogCard';
 import SEOHead from '@/components/blog/SEOHead';
+import BlogReader from '@/components/blog/BlogReader';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import {
   Clock, User, Calendar, Eye, Share2, BookOpen, Heart,
   ArrowLeft, ArrowRight, MessageCircle, Twitter, Facebook,
-  Linkedin, MessageSquare, Copy, CheckCircle
+  Linkedin, MessageSquare, Copy, CheckCircle, Maximize2
 } from 'lucide-react';
 import { BlogPost } from '@/types/blog';
-import { blogCategories } from '@/data/blog/categories';
-import { sampleBlogPosts, getPostBySlug, getRelatedPosts } from '@/data/blog/posts';
+import { blogService } from '@/services/blogService';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSpiritualTracking } from '@/hooks/useAnalytics';
 
@@ -26,11 +26,13 @@ const BlogPostDetail: React.FC = () => {
   const [relatedPosts, setRelatedPosts] = useState<BlogPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [isReaderOpen, setIsReaderOpen] = useState(false);
 
   const { t } = useLanguage();
   const { trackQuoteView, trackShare } = useSpiritualTracking();
 
-  // Sample posts data (In production, fetch from API)
+  // Fetch post from API
+  /*
   const samplePosts: BlogPost[] = [
     {
       id: '1',
@@ -208,26 +210,45 @@ Lord Ram's teachings remind us that true strength lies not in power or wealth, b
       featuredImage: '/api/placeholder/1200/600'
     }
   ];
+  */
 
   useEffect(() => {
-    if (slug) {
-      // Simulate API call
-      setTimeout(() => {
-        const foundPost = getPostBySlug(slug);
-        if (foundPost) {
-          setPost(foundPost);
+    const fetchPost = async () => {
+      if (!slug) return;
+
+      try {
+        setIsLoading(true);
+        const response = await blogService.getPost(slug);
+
+        if (response.success && response.post) {
+          setPost(response.post);
+
           // Get related posts from same category
-          const related = getRelatedPosts(foundPost.id, foundPost.category.id, 3);
-          setRelatedPosts(related);
+          const relatedResponse = await blogService.getPosts({
+            category: response.post.category.id,
+            limit: 3
+          });
+
+          if (relatedResponse.success) {
+            // Filter out current post from related
+            const filtered = relatedResponse.posts.filter(p => p.id !== response.post.id);
+            setRelatedPosts(filtered.slice(0, 3));
+          }
 
           // Track blog post view
-          trackQuoteView(`blog_${foundPost.id}`, 'blog_post_detail');
+          trackQuoteView(`blog_${response.post.id}`, 'blog_post_detail');
         } else {
           navigate('/blog');
         }
+      } catch (error) {
+        console.error('Error fetching blog post:', error);
+        navigate('/blog');
+      } finally {
         setIsLoading(false);
-      }, 500);
-    }
+      }
+    };
+
+    fetchPost();
   }, [slug, navigate, trackQuoteView]);
 
   const handleShare = async (platform: string) => {
@@ -320,9 +341,19 @@ Lord Ram's teachings remind us that true strength lies not in power or wealth, b
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50">
-      {post && <SEOHead post={post} />}
-      <Navbar />
+    <>
+      {post && isReaderOpen && (
+        <BlogReader
+          post={post}
+          isOpen={isReaderOpen}
+          onClose={() => setIsReaderOpen(false)}
+          onShare={(platform) => trackShare(post.id, platform)}
+        />
+      )}
+
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50">
+        {post && <SEOHead post={post} />}
+        <Navbar />
 
       {/* Breadcrumbs */}
       <div className="bg-white border-b border-orange-100">
@@ -400,6 +431,18 @@ Lord Ram's teachings remind us that true strength lies not in power or wealth, b
                 </span>
               ))}
             </div>
+
+            {/* Full Screen Reader Button */}
+            <div className="flex justify-center mb-8">
+              <Button
+                onClick={() => setIsReaderOpen(true)}
+                size="lg"
+                className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg"
+              >
+                <Maximize2 className="w-5 h-5 mr-2" />
+                Read in Full Screen
+              </Button>
+            </div>
           </div>
 
           {/* Featured Image */}
@@ -449,7 +492,7 @@ Lord Ram's teachings remind us that true strength lies not in power or wealth, b
         {/* Share Section */}
         <div className="text-center mb-12">
           <h3 className="text-xl font-bold text-gray-900 mb-4">Share this wisdom</h3>
-          <div className="flex justify-center space-x-4">
+          <div className="flex flex-wrap justify-center gap-2 sm:gap-4">
             <Button
               variant="outline"
               size="sm"
@@ -560,8 +603,9 @@ Lord Ram's teachings remind us that true strength lies not in power or wealth, b
         )}
       </article>
 
-      <Footer />
-    </div>
+        <Footer />
+      </div>
+    </>
   );
 };
 

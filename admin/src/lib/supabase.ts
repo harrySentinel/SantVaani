@@ -21,5 +21,6 @@ export const TABLES = {
   BHAJANS: 'bhajans',
   QUOTES: 'quotes',
   EVENTS: 'events',
-  NOTICES: 'notices'
+  NOTICES: 'notices',
+  BLOG_POSTS: 'blog_posts'
 } as const

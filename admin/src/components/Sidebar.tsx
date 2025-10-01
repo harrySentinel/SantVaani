@@ -10,7 +10,8 @@ import {
   Calendar,
   Bell,
   Settings,
-  X
+  X,
+  FileText
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -80,6 +81,13 @@ const navigation = [
     href: '/notices',
     icon: Bell,
     description: 'Manage daily quotes and announcements',
+    count: 0
+  },
+  {
+    name: 'Blog',
+    href: '/blogs',
+    icon: FileText,
+    description: 'Manage spiritual wisdom articles',
     count: 0
   }
 ]
