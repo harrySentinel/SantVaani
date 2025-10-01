@@ -35,7 +35,7 @@ const About = () => {
   const team = [
     {
       name: "Aditya Srivastava",
-      title: "Co-Founder & Developer",
+      title: "Founder & Developer",
       role: "Devotee & Software Engineer building spiritual technology to serve humanity",
       image: "/profie.jpg"
     },
