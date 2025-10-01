@@ -59,24 +59,24 @@ class BlogService {
     if (params?.search) searchParams.append('search', params.search);
 
     const queryString = searchParams.toString();
-    const endpoint = `/blog/posts${queryString ? `?${queryString}` : ''}`;
+    const endpoint = `/api/blog/posts${queryString ? `?${queryString}` : ''}`;
 
     return this.makeRequest<BlogResponse>(endpoint);
   }
 
   // Get single blog post by slug
   async getPost(slug: string): Promise<SinglePostResponse> {
-    return this.makeRequest<SinglePostResponse>(`/blog/posts/${slug}`);
+    return this.makeRequest<SinglePostResponse>(`/api/blog/posts/${slug}`);
   }
 
   // Get featured posts
   async getFeaturedPosts(limit: number = 2): Promise<BlogResponse> {
-    return this.makeRequest<BlogResponse>(`/blog/featured?limit=${limit}`);
+    return this.makeRequest<BlogResponse>(`/api/blog/featured?limit=${limit}`);
   }
 
   // Get blog categories
   async getCategories(): Promise<CategoryResponse> {
-    return this.makeRequest<CategoryResponse>('/blog/categories');
+    return this.makeRequest<CategoryResponse>('/api/blog/categories');
   }
 
   // Create new blog post (admin function)
@@ -95,7 +95,7 @@ class BlogService {
     meta_description?: string;
     meta_keywords?: string[];
   }): Promise<SinglePostResponse> {
-    return this.makeRequest<SinglePostResponse>('/blog/posts', {
+    return this.makeRequest<SinglePostResponse>('/api/blog/posts', {
       method: 'POST',
       body: JSON.stringify(postData),
     });
