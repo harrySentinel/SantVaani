@@ -10,93 +10,39 @@ import { BookOpen, Heart, Sparkles } from 'lucide-react';
 import { BlogPost } from '@/types/blog';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSpiritualTracking } from '@/hooks/useAnalytics';
+import { blogService } from '@/services/blogService';
 
 const BlogIndex: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   const { t } = useLanguage();
   const { trackVisitorCounter } = useSpiritualTracking();
 
-  // Curated spiritual wisdom articles
-  const spiritualPosts: BlogPost[] = [
-    {
-      id: '1',
-      slug: 'finding-inner-peace-through-meditation',
-      title: 'Finding Inner Peace Through Meditation',
-      excerpt: 'Discover simple meditation practices that bring calmness to your daily life and help you connect with your inner self.',
-      content: '# Finding Inner Peace Through Meditation\n\nMeditation...',
-      category: { id: 'meditation', name: 'Meditation', slug: 'meditation', icon: '🧘', color: '#f97316' },
-      tags: ['meditation', 'peace', 'mindfulness'],
-      author: {
-        id: '1',
-        name: 'SantVaani Team',
-        bio: 'Sharing spiritual wisdom with love',
-        role: 'Spiritual Guide',
-      },
-      publishedAt: '2024-09-28',
-      readingTime: 5,
-      featured: true,
-      status: 'published',
-      spiritualQuotes: ['Peace comes from within'],
-      relatedSaints: ['Buddha'],
-      viewCount: 1247,
-      shareCount: 45
-    },
-    {
-      id: '2',
-      slug: 'path-of-devotion-bhakti',
-      title: 'The Path of Devotion and Love',
-      excerpt: 'Explore the beautiful journey of bhakti - how love and devotion can transform your spiritual life.',
-      content: '# The Path of Devotion and Love\n\nBhakti...',
-      category: { id: 'wisdom', name: 'Spiritual Wisdom', slug: 'wisdom', icon: '💫', color: '#ea580c' },
-      tags: ['bhakti', 'devotion', 'love'],
-      author: {
-        id: '1',
-        name: 'SantVaani Team',
-        bio: 'Sharing spiritual wisdom with love',
-        role: 'Spiritual Guide',
-      },
-      publishedAt: '2024-09-25',
-      readingTime: 7,
-      featured: true,
-      status: 'published',
-      spiritualQuotes: ['Love is the bridge between hearts'],
-      relatedSaints: ['Meera Bai'],
-      viewCount: 892,
-      shareCount: 32
-    },
-    {
-      id: '3',
-      slug: 'simple-daily-prayers',
-      title: 'Simple Daily Prayers for Peace',
-      excerpt: 'Learn gentle prayers and mantras that can bring serenity and gratitude to your everyday moments.',
-      content: '# Simple Daily Prayers for Peace\n\nDaily prayers...',
-      category: { id: 'practice', name: 'Daily Practice', slug: 'practice', icon: '🙏', color: '#fb923c' },
-      tags: ['prayer', 'mantras', 'daily practice'],
-      author: {
-        id: '1',
-        name: 'SantVaani Team',
-        bio: 'Sharing spiritual wisdom with love',
-        role: 'Spiritual Guide',
-      },
-      publishedAt: '2024-09-20',
-      readingTime: 4,
-      featured: false,
-      status: 'published',
-      spiritualQuotes: ['Prayer is the key to inner peace'],
-      relatedSaints: ['Sant Tulsidas'],
-      viewCount: 654,
-      shareCount: 28
+  // Fetch blog posts from API
+  const fetchBlogPosts = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const data = await blogService.getPosts({ limit: 3 });
+
+      if (data.success) {
+        setPosts(data.posts);
+      } else {
+        setError(data.error || 'Failed to load blog posts');
+      }
+    } catch (err) {
+      console.error('Error fetching blog posts:', err);
+      setError('Unable to connect to server');
+    } finally {
+      setIsLoading(false);
     }
-  ];
+  };
 
   useEffect(() => {
-    // Load curated spiritual wisdom
-    setTimeout(() => {
-      setPosts(spiritualPosts.slice(0, 3)); // Show only 3 peaceful articles
-      setIsLoading(false);
-    }, 500);
+    fetchBlogPosts();
   }, []);
 
   // Track page view
@@ -158,14 +104,31 @@ const BlogIndex: React.FC = () => {
               </Card>
             ))}
           </div>
-        ) : (
+        ) : error ? (
+          <div className="text-center py-12">
+            <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-gray-600 mb-2">Unable to load posts</h3>
+            <p className="text-gray-500 mb-4">{error}</p>
+            <button
+              onClick={fetchBlogPosts}
+              className="px-4 py-2 bg-orange-400 text-white rounded-lg hover:bg-orange-500 transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
+        ) : posts.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {posts.map((post) => (
               <Card key={post.id} className="group hover:shadow-lg transition-all duration-300 border-0 shadow-sm bg-white">
-                <div className="h-40 bg-gradient-to-br from-orange-50 to-orange-100 rounded-t-lg flex items-center justify-center">
-                  <BookOpen className="w-8 h-8 text-orange-400" />
+                <div className="h-40 rounded-t-lg flex items-center justify-center" style={{ backgroundColor: post.category?.color + '20' || '#fb923c20' }}>
+                  <span className="text-3xl">{post.category?.icon || '💫'}</span>
                 </div>
                 <CardContent className="p-6">
+                  <div className="flex items-center mb-2">
+                    <span className="text-xs px-2 py-1 rounded-full" style={{ backgroundColor: post.category?.color + '20', color: post.category?.color }}>
+                      {post.category?.name}
+                    </span>
+                  </div>
                   <h3 className="text-lg font-medium text-gray-800 mb-3 group-hover:text-orange-600 transition-colors line-clamp-2">
                     {post.title}
                   </h3>
@@ -174,11 +137,27 @@ const BlogIndex: React.FC = () => {
                   </p>
                   <div className="flex items-center justify-between text-xs text-gray-500">
                     <span>{post.readingTime} min read</span>
-                    <span className="text-orange-400">🕉️</span>
+                    <div className="flex items-center space-x-2">
+                      <span>{post.viewCount} views</span>
+                      <span className="text-orange-400">🕉️</span>
+                    </div>
                   </div>
+                  {post.spiritualQuotes && post.spiritualQuotes.length > 0 && (
+                    <div className="mt-3 pt-3 border-t border-gray-100">
+                      <p className="text-xs italic text-gray-500 line-clamp-1">
+                        "{post.spiritualQuotes[0]}"
+                      </p>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-gray-600 mb-2">No posts available</h3>
+            <p className="text-gray-500">Check back soon for new spiritual wisdom</p>
           </div>
         )}
 
