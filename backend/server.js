@@ -1794,6 +1794,343 @@ app.post('/api/user/profile/:userId/welcome-letter', async (req, res) => {
   }
 });
 
+// ============================================
+// BLOG API ENDPOINTS
+// ============================================
+
+// Get latest blog posts (for main blog page)
+app.get('/api/blog/posts', async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 3;
+    const offset = parseInt(req.query.offset) || 0;
+    const category = req.query.category;
+    const search = req.query.search;
+
+    let query = supabase
+      .from('blog_posts')
+      .select(`
+        id,
+        title,
+        slug,
+        excerpt,
+        reading_time,
+        published_at,
+        view_count,
+        spiritual_quotes,
+        blog_categories (
+          id,
+          name,
+          icon,
+          color
+        )
+      `)
+      .eq('status', 'published')
+      .order('published_at', { ascending: false });
+
+    // Add category filter if specified
+    if (category && category !== 'all') {
+      query = query.eq('category_id', category);
+    }
+
+    // Add search filter if specified
+    if (search) {
+      query = query.or(`title.ilike.%${search}%, excerpt.ilike.%${search}%, tags.cs.{${search}}`);
+    }
+
+    // Add pagination
+    query = query.range(offset, offset + limit - 1);
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error('Error fetching blog posts:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to fetch blog posts'
+      });
+    }
+
+    // Transform data to match frontend interface
+    const transformedData = data.map(post => ({
+      id: post.id,
+      slug: post.slug,
+      title: post.title,
+      excerpt: post.excerpt,
+      category: {
+        id: post.blog_categories.id,
+        name: post.blog_categories.name,
+        icon: post.blog_categories.icon,
+        color: post.blog_categories.color
+      },
+      readingTime: post.reading_time,
+      publishedAt: post.published_at,
+      viewCount: post.view_count,
+      spiritualQuotes: post.spiritual_quotes || []
+    }));
+
+    res.json({
+      success: true,
+      posts: transformedData,
+      hasMore: data.length === limit // Simple check for pagination
+    });
+
+  } catch (error) {
+    console.error('Error in blog posts endpoint:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+});
+
+// Get single blog post by slug
+app.get('/api/blog/posts/:slug', async (req, res) => {
+  try {
+    const { slug } = req.params;
+
+    const { data, error } = await supabase
+      .from('blog_posts')
+      .select(`
+        *,
+        blog_categories (
+          id,
+          name,
+          icon,
+          color
+        )
+      `)
+      .eq('slug', slug)
+      .eq('status', 'published')
+      .single();
+
+    if (error || !data) {
+      return res.status(404).json({
+        success: false,
+        error: 'Blog post not found'
+      });
+    }
+
+    // Increment view count
+    await supabase.rpc('increment_blog_view_count', { post_id: data.id });
+
+    // Transform data to match frontend interface
+    const transformedPost = {
+      id: data.id,
+      slug: data.slug,
+      title: data.title,
+      excerpt: data.excerpt,
+      content: data.content,
+      category: {
+        id: data.blog_categories.id,
+        name: data.blog_categories.name,
+        slug: data.blog_categories.slug,
+        icon: data.blog_categories.icon,
+        color: data.blog_categories.color
+      },
+      tags: data.tags || [],
+      author: {
+        id: '1',
+        name: data.author_name || 'SantVaani Team',
+        bio: data.author_bio || 'Sharing spiritual wisdom with love',
+        role: data.author_role || 'Spiritual Guide'
+      },
+      publishedAt: data.published_at,
+      readingTime: data.reading_time,
+      featured: data.featured,
+      status: data.status,
+      spiritualQuotes: data.spiritual_quotes || [],
+      relatedSaints: data.related_saints || [],
+      viewCount: data.view_count + 1, // Include the incremented count
+      shareCount: data.share_count || 0,
+      metaTitle: data.meta_title,
+      metaDescription: data.meta_description,
+      metaKeywords: data.meta_keywords || []
+    };
+
+    res.json({
+      success: true,
+      post: transformedPost
+    });
+
+  } catch (error) {
+    console.error('Error fetching blog post:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+});
+
+// Get blog categories
+app.get('/api/blog/categories', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('blog_categories')
+      .select('*')
+      .order('name');
+
+    if (error) {
+      console.error('Error fetching blog categories:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to fetch blog categories'
+      });
+    }
+
+    res.json({
+      success: true,
+      categories: data
+    });
+
+  } catch (error) {
+    console.error('Error in blog categories endpoint:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+});
+
+// Get featured blog posts
+app.get('/api/blog/featured', async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 2;
+
+    const { data, error } = await supabase
+      .from('blog_posts')
+      .select(`
+        id,
+        title,
+        slug,
+        excerpt,
+        reading_time,
+        published_at,
+        view_count,
+        spiritual_quotes,
+        blog_categories (
+          id,
+          name,
+          icon,
+          color
+        )
+      `)
+      .eq('status', 'published')
+      .eq('featured', true)
+      .order('published_at', { ascending: false })
+      .limit(limit);
+
+    if (error) {
+      console.error('Error fetching featured posts:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to fetch featured posts'
+      });
+    }
+
+    // Transform data to match frontend interface
+    const transformedData = data.map(post => ({
+      id: post.id,
+      slug: post.slug,
+      title: post.title,
+      excerpt: post.excerpt,
+      category: {
+        id: post.blog_categories.id,
+        name: post.blog_categories.name,
+        icon: post.blog_categories.icon,
+        color: post.blog_categories.color
+      },
+      readingTime: post.reading_time,
+      publishedAt: post.published_at,
+      viewCount: post.view_count,
+      spiritualQuotes: post.spiritual_quotes || [],
+      featured: true
+    }));
+
+    res.json({
+      success: true,
+      posts: transformedData
+    });
+
+  } catch (error) {
+    console.error('Error in featured posts endpoint:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+});
+
+// Admin endpoints for creating/updating posts (basic implementation)
+app.post('/api/blog/posts', async (req, res) => {
+  try {
+    const {
+      title,
+      slug,
+      excerpt,
+      content,
+      category_id,
+      tags = [],
+      reading_time = 5,
+      featured = false,
+      spiritual_quotes = [],
+      related_saints = [],
+      meta_title,
+      meta_description,
+      meta_keywords = []
+    } = req.body;
+
+    // Basic validation
+    if (!title || !slug || !excerpt || !content || !category_id) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required fields: title, slug, excerpt, content, category_id'
+      });
+    }
+
+    const { data, error } = await supabase
+      .from('blog_posts')
+      .insert({
+        title,
+        slug,
+        excerpt,
+        content,
+        category_id,
+        tags,
+        reading_time,
+        featured,
+        spiritual_quotes,
+        related_saints,
+        meta_title: meta_title || title,
+        meta_description: meta_description || excerpt,
+        meta_keywords,
+        status: 'published'
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating blog post:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to create blog post'
+      });
+    }
+
+    res.json({
+      success: true,
+      post: data,
+      message: 'Blog post created successfully'
+    });
+
+  } catch (error) {
+    console.error('Error in create post endpoint:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+});
+
 // Initialize on startup
 initializeServer();
 
