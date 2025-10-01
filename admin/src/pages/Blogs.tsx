@@ -249,12 +249,13 @@ export default function Blogs() {
                 </ResponsiveTableCell>
 
                 <ResponsiveTableCell label="Actions">
-                  <MobileCardActions>
+                  <div className="flex gap-2 justify-end">
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => window.open(`/blog/post/${post.slug}`, '_blank')}
                       title="View Post"
+                      className="hidden md:flex"
                     >
                       <Eye className="w-4 h-4" />
                     </Button>
@@ -263,6 +264,7 @@ export default function Blogs() {
                       size="sm"
                       onClick={() => handleEdit(post)}
                       title="Edit Post"
+                      className="hidden md:flex"
                     >
                       <Edit className="w-4 h-4" />
                     </Button>
@@ -270,12 +272,29 @@ export default function Blogs() {
                       variant="ghost"
                       size="sm"
                       onClick={() => handleDelete(post.id)}
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50 hidden md:flex"
                       title="Delete Post"
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
-                  </MobileCardActions>
+                    <MobileCardActions
+                      actions={[
+                        {
+                          label: 'View Post',
+                          onClick: () => window.open(`/blog/post/${post.slug}`, '_blank')
+                        },
+                        {
+                          label: 'Edit Post',
+                          onClick: () => handleEdit(post)
+                        },
+                        {
+                          label: 'Delete Post',
+                          onClick: () => handleDelete(post.id),
+                          variant: 'destructive'
+                        }
+                      ]}
+                    />
+                  </div>
                 </ResponsiveTableCell>
               </ResponsiveTableRow>
             ))}
