@@ -16,7 +16,6 @@ import {
   MobileCardActions
 } from '@/components/ui/responsive-table'
 import LoadingScreen from '@/components/ui/loading-screen'
-import EmptyState from '@/components/ui/empty-state'
 
 interface BlogPost {
   id: string
@@ -184,17 +183,15 @@ export default function Blogs() {
 
       {/* Table */}
       {filteredPosts.length === 0 ? (
-        <EmptyState
-          icon={FileText}
-          title="No blog posts yet"
-          description="Start creating spiritual wisdom articles"
-          action={
-            <Button onClick={() => setIsFormOpen(true)}>
-              <Plus className="w-4 h-4 mr-2" />
-              Create First Post
-            </Button>
-          }
-        />
+        <div className="text-center py-12">
+          <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+          <h3 className="text-xl font-semibold text-gray-600 mb-2">No blog posts yet</h3>
+          <p className="text-gray-500 mb-6">Start creating spiritual wisdom articles</p>
+          <Button onClick={() => setIsFormOpen(true)}>
+            <Plus className="w-4 h-4 mr-2" />
+            Create First Post
+          </Button>
+        </div>
       ) : (
         <ResponsiveTable>
           <ResponsiveTableHeader>
@@ -209,14 +206,14 @@ export default function Blogs() {
           <ResponsiveTableBody>
             {filteredPosts.map((post) => (
               <ResponsiveTableRow key={post.id}>
-                <ResponsiveTableCell label="Title">
+                <ResponsiveTableCell>
                   <div className="space-y-1">
                     <div className="font-medium">{post.title}</div>
                     <div className="text-xs text-gray-500">/{post.slug}</div>
                   </div>
                 </ResponsiveTableCell>
 
-                <ResponsiveTableCell label="Category">
+                <ResponsiveTableCell>
                   {post.blog_categories && (
                     <Badge variant="outline" className="text-xs">
                       {post.blog_categories.icon} {post.blog_categories.name}
@@ -224,7 +221,7 @@ export default function Blogs() {
                   )}
                 </ResponsiveTableCell>
 
-                <ResponsiveTableCell label="Status">
+                <ResponsiveTableCell>
                   <div className="space-y-1">
                     <Badge variant={post.status === 'published' ? 'default' : 'secondary'}>
                       {post.status}
@@ -238,7 +235,7 @@ export default function Blogs() {
                   </div>
                 </ResponsiveTableCell>
 
-                <ResponsiveTableCell label="Details">
+                <ResponsiveTableCell hideOnMobile>
                   <div className="text-sm space-y-1">
                     <div>📖 {post.reading_time} min read</div>
                     <div>🏷️ {post.tags?.length || 0} tags</div>
@@ -248,7 +245,7 @@ export default function Blogs() {
                   </div>
                 </ResponsiveTableCell>
 
-                <ResponsiveTableCell label="Actions">
+                <ResponsiveTableCell>
                   <div className="flex gap-2 justify-end">
                     <Button
                       variant="ghost"
