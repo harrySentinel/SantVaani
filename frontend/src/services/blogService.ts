@@ -1,7 +1,7 @@
 // Blog Service for SantVaani API calls
 import { BlogPost, BlogCategory } from '@/types/blog';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 export interface BlogResponse {
   success: boolean;
