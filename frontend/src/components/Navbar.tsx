@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, Users, Heart, Sparkles, Book, Info, IndianRupee, Calendar, Star, ChevronDown, CalendarDays, LogIn, UserPlus, User, LogOut } from 'lucide-react';
+import { Menu, X, Users, Heart, Sparkles, Book, Info, IndianRupee, Calendar, Star, ChevronDown, CalendarDays, LogIn, UserPlus, User, LogOut, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -42,13 +42,14 @@ export default function Navbar() {
     { to: '/horoscope', label: 'Horoscope', labelHi: 'राशिफल', icon: Star },
     { to: '/events', label: 'Events', labelHi: 'कार्यक्रम', icon: CalendarDays },
     { to: '/saints', label: 'Saints', labelHi: 'संत', icon: Users },
-    { to: '/bhajans', label: 'Bhajans', labelHi: 'भजन', icon: Book },
+    { to: '/blog', label: 'Blog', labelHi: 'ब्लॉग', icon: BookOpen },
   ];
 
   // Secondary navigation items (in dropdown/mobile menu)
   const secondaryItems = [
     { to: '/living-saints', label: 'Living Saints', labelHi: 'जीवित संत', icon: Heart },
     { to: '/divine', label: 'Divine Forms', labelHi: 'दिव्य रूप', icon: Sparkles },
+    { to: '/bhajans', label: 'Bhajans', labelHi: 'भजन', icon: Book },
     { to: '/donation', label: 'Donation', labelHi: 'दान', icon: IndianRupee },
     { to: '/about', label: 'About', labelHi: 'हमारे बारे में', icon: Info },
   ];

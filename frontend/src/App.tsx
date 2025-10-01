@@ -11,6 +11,8 @@ import { lazy } from "react";
 import { getFCMToken, onFCMMessage } from "@/lib/firebase";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import AnalyticsProvider from "@/components/AnalyticsProvider";
+import { HelmetProvider } from "react-helmet-async";
 
 // Lazy load pages for better code splitting
 const Index = lazy(() => import("./pages/Index"));
@@ -28,6 +30,9 @@ const Login = lazy(() => import("./pages/auth/login"));
 const Signup = lazy(() => import("./pages/auth/signup"));
 const ResetPassword = lazy(() => import("./pages/auth/reset-password"));
 const Dashboard = lazy(() => import("./pages/dashboard/index"));
+const BlogIndex = lazy(() => import("./pages/blog/index"));
+const BlogPostDetail = lazy(() => import("./pages/blog/post/[slug]"));
+const BlogCategoryPage = lazy(() => import("./pages/blog/category/[slug]"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -59,13 +64,15 @@ const App = () => {
 
   return (
     <ErrorBoundary>
-      <LanguageProvider>
-        <AuthProvider>
-          <QueryClientProvider client={queryClient}>
-            <TooltipProvider>
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
+      <HelmetProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            <QueryClientProvider client={queryClient}>
+              <TooltipProvider>
+                <Toaster />
+                <Sonner />
+                <BrowserRouter>
+                  <AnalyticsProvider>
           <Suspense fallback={<LoadingPage text="Loading SantVaani..." />}>
             <Routes>
               <Route path="/" element={<Index />} />
@@ -83,15 +90,20 @@ const App = () => {
               <Route path="/signup" element={<Signup />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/blog" element={<BlogIndex />} />
+              <Route path="/blog/post/:slug" element={<BlogPostDetail />} />
+              <Route path="/blog/category/:slug" element={<BlogCategoryPage />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
-          </BrowserRouter>
-            </TooltipProvider>
-          </QueryClientProvider>
-        </AuthProvider>
-      </LanguageProvider>
+                  </AnalyticsProvider>
+                </BrowserRouter>
+              </TooltipProvider>
+            </QueryClientProvider>
+          </AuthProvider>
+        </LanguageProvider>
+      </HelmetProvider>
     </ErrorBoundary>
   );
 };

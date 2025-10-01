@@ -35,9 +35,15 @@ const About = () => {
   const team = [
     {
       name: "Aditya Srivastava",
-      title: "Founder & Developer",
+      title: "Co-Founder & Developer",
       role: "Devotee & Software Engineer building spiritual technology to serve humanity",
       image: "/profie.jpg"
+    },
+    {
+      name: "Neeraj Yadav",
+      title: "Co-Founder & Developer",
+      role: "Spiritual developer and tech visionary dedicated to building divine technology solutions",
+      image: "/founder2.jpg"
     }
   ];
 
@@ -164,33 +170,33 @@ const About = () => {
       <section className="py-16 bg-gradient-to-r from-blue-50 to-orange-50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">Our Sacred Work</h2>
+            <h2 className="text-3xl font-bold text-gray-800 mb-4">Our Co-Founders</h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              SantVaani is supported by dedicated individuals who work with reverence to ensure 
+              SantVaani is guided by dedicated co-founders who work with reverence to ensure
               the authentic preservation and sharing of spiritual wisdom.
             </p>
           </div>
 
-          <div className="flex justify-center">
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {team.map((member, index) => (
               <Card key={index} className="group hover:shadow-xl transition-all duration-300 border-0 shadow-lg bg-white/90 backdrop-blur-sm">
-                <CardContent className="p-6 text-center space-y-4">
-                  <img 
+                <CardContent className="p-8 text-center space-y-4">
+                  <img
                     src={member.image}
                     alt={member.name}
-                    className="w-20 h-20 rounded-full mx-auto object-cover group-hover:scale-110 transition-transform duration-300"
+                    className="w-24 h-24 rounded-full mx-auto object-cover group-hover:scale-110 transition-transform duration-300 border-4 border-gradient-to-br from-blue-200 to-orange-200"
                   />
-                  
+
                   <div className="space-y-2">
-                    <h3 className="text-lg font-semibold text-gray-800">
+                    <h3 className="text-xl font-semibold text-gray-800">
                       {member.name}
                     </h3>
-                    <p className="text-blue-600 text-sm font-medium">
+                    <p className="text-blue-600 font-medium">
                       {member.title}
                     </p>
                   </div>
 
-                  <p className="text-gray-600 text-sm leading-relaxed">
+                  <p className="text-gray-600 leading-relaxed">
                     {member.role}
                   </p>
                 </CardContent>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Users, Sparkles, Star } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
+import { useSpiritualTracking } from '@/hooks/useAnalytics';
 
 interface VisitorCounterProps {
   className?: string;
@@ -31,6 +32,9 @@ const VisitorCounter: React.FC<VisitorCounterProps> = ({ className = '' }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const hasTracked = useRef(false);
 
+  // Analytics tracking
+  const { trackVisitorCounter } = useSpiritualTracking();
+
   // Track visitor and get count
   useEffect(() => {
     const trackVisitor = async () => {
@@ -41,8 +45,7 @@ const VisitorCounter: React.FC<VisitorCounterProps> = ({ className = '' }) => {
         // First, try to get current count
         const { data: currentData, error: fetchError } = await supabase
           .from('visitor_stats')
-          .select('total_visitors')
-          .order('id', { ascending: false })
+          .select('id, total_visitors')
           .limit(1)
           .single();
 
@@ -51,23 +54,24 @@ const VisitorCounter: React.FC<VisitorCounterProps> = ({ className = '' }) => {
         // If table doesn't exist or is empty, start with fallback count
         if (fetchError) {
           console.log('visitor_stats table might not exist or be empty:', fetchError.message);
-          currentCount = 125847; // Use fallback
+          currentCount = 30; // Start from 30 for real tracking
           setCount(currentCount);
           setIsLoading(false);
           return;
         }
 
-        currentCount = currentData?.total_visitors || 125847;
+        currentCount = currentData?.total_visitors || 30;
 
         // Check if this is a new visitor (check every 24 hours)
         const lastVisit = localStorage.getItem('santvaani_last_visit');
+        const sessionVisit = sessionStorage.getItem('santvaani_session_tracked');
         const now = new Date().toISOString();
         const isNewVisitor = !lastVisit ||
           (new Date(now).getTime() - new Date(lastVisit).getTime()) > 24 * 60 * 60 * 1000; // 24 hours
 
         let newCount = currentCount;
 
-        if (isNewVisitor && !hasTracked.current) {
+        if (isNewVisitor && !hasTracked.current && !sessionVisit) {
           try {
             // Try to use the increment function if it exists
             const { data: functionResult, error: functionError } = await supabase.rpc('increment_visitor_count');
@@ -91,6 +95,7 @@ const VisitorCounter: React.FC<VisitorCounterProps> = ({ className = '' }) => {
             }
 
             localStorage.setItem('santvaani_last_visit', now);
+            sessionStorage.setItem('santvaani_session_tracked', 'true');
             hasTracked.current = true;
           } catch (updateError) {
             console.error('Error updating visitor count:', updateError);
@@ -101,10 +106,13 @@ const VisitorCounter: React.FC<VisitorCounterProps> = ({ className = '' }) => {
         setCount(newCount);
         setIsLoading(false);
 
+        // Track visitor counter view for analytics
+        trackVisitorCounter(newCount);
+
       } catch (err) {
         console.error('Error tracking visitor:', err);
         setError('Unable to load visitor count');
-        setCount(125847); // Fallback count
+        setCount(30); // Fallback count starts from 30
         setIsLoading(false);
       }
     };
