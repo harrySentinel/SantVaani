@@ -11,7 +11,7 @@ import { Separator } from '@/components/ui/separator';
 import {
   Clock, User, Calendar, Eye, Share2, BookOpen, Heart,
   ArrowLeft, ArrowRight, MessageCircle, Twitter, Facebook,
-  Linkedin, WhatsApp, Copy, CheckCircle
+  Linkedin, MessageSquare, Copy, CheckCircle
 } from 'lucide-react';
 import { BlogPost } from '@/types/blog';
 import { blogCategories } from '@/data/blog/categories';
@@ -483,7 +483,7 @@ Lord Ram's teachings remind us that true strength lies not in power or wealth, b
               onClick={() => handleShare('whatsapp')}
               className="hover:bg-green-50 hover:border-green-300"
             >
-              <WhatsApp className="w-4 h-4 mr-2" />
+              <MessageSquare className="w-4 h-4 mr-2" />
               WhatsApp
             </Button>
             <Button
