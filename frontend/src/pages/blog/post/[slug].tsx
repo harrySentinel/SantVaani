@@ -18,6 +18,10 @@ import { BlogPost } from '@/types/blog';
 import { blogService } from '@/services/blogService';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSpiritualTracking } from '@/hooks/useAnalytics';
+import { useBlogView } from '@/hooks/useBlogView';
+import LikeButton from '@/components/blog/LikeButton';
+import BookmarkButton from '@/components/blog/BookmarkButton';
+import CommentsSection from '@/components/blog/CommentsSection';
 
 const BlogPostDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -30,6 +34,9 @@ const BlogPostDetail: React.FC = () => {
 
   const { t } = useLanguage();
   const { trackQuoteView, trackShare } = useSpiritualTracking();
+
+  // Track blog view
+  useBlogView(post?.id || '');
 
   // Fetch post from API
   /*
@@ -550,6 +557,12 @@ Lord Ram's teachings remind us that true strength lies not in power or wealth, b
           </div>
         </div>
 
+        {/* Like and Bookmark Buttons */}
+        <div className="flex items-center justify-center gap-4 my-8">
+          <LikeButton postId={post.id} showCount size="lg" />
+          <BookmarkButton postId={post.id} showText size="lg" />
+        </div>
+
         <Separator className="my-12" />
 
         {/* Author Info */}
@@ -589,6 +602,11 @@ Lord Ram's teachings remind us that true strength lies not in power or wealth, b
             </Link>
           </Button>
         </div>
+
+        {/* Comments Section */}
+        <CommentsSection postId={post.id} className="mb-16" />
+
+        <Separator className="my-12" />
 
         {/* Related Posts */}
         {relatedPosts.length > 0 && (

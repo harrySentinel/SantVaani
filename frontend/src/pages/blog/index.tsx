@@ -11,6 +11,7 @@ import { BlogPost } from '@/types/blog';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSpiritualTracking } from '@/hooks/useAnalytics';
 import { blogService } from '@/services/blogService';
+import Leaderboard from '@/components/blog/Leaderboard';
 
 const BlogIndex: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -117,8 +118,10 @@ const BlogIndex: React.FC = () => {
             </button>
           </div>
         ) : posts.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {posts.map((post) => (
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            {/* Blog Posts - 3 columns */}
+            <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+              {posts.map((post) => (
               <Link key={post.id} to={`/blog/post/${post.slug}`} className="block">
                 <Card className="group hover:shadow-lg transition-all duration-300 border-0 shadow-sm bg-white cursor-pointer">
                   <div className="h-40 rounded-t-lg flex items-center justify-center" style={{ backgroundColor: post.category?.color + '20' || '#fb923c20' }}>
@@ -153,7 +156,15 @@ const BlogIndex: React.FC = () => {
                   </CardContent>
                 </Card>
               </Link>
-            ))}
+              ))}
+            </div>
+
+            {/* Leaderboard Sidebar - 1 column */}
+            <div className="lg:col-span-1">
+              <div className="lg:sticky lg:top-4">
+                <Leaderboard limit={5} />
+              </div>
+            </div>
           </div>
         ) : (
           <div className="text-center py-12">
