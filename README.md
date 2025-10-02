@@ -186,7 +186,7 @@ VITE_BACKEND_URL=your_backend_url
 
 **Backend (.env):**
 ```env
-GEMINI_API_KEY=your_gemini_api_key
+GROQ_API_KEY=your_groq_api_key
 YOUTUBE_API_KEY=your_youtube_api_key
 FRONTEND_URL=your_frontend_url
 PORT=5000

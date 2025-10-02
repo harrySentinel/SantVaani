@@ -454,7 +454,7 @@ setInterval(async () => {
 
 // Real Horoscope API Helper Function
 async function fetchRealHoroscope(zodiacSign, period = 'daily') {
-  const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+  const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
   try {
     // Map our period format to API format
@@ -510,7 +510,7 @@ async function fetchRealHoroscope(zodiacSign, period = 'daily') {
     let hindiPrediction = '';
     let spiritualAdvice = '';
 
-    if (GEMINI_API_KEY) {
+    if (GROQ_API_KEY) {
       try {
         const translationPrompt = `Translate this horoscope prediction to Hindi and add spiritual guidance:
 
@@ -524,27 +524,26 @@ RESPONSE FORMAT (JSON only):
 
 Make the Hindi natural and the spiritual advice meaningful and uplifting.`;
 
-        const translationResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
+        const translationResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
           method: 'POST',
           headers: {
+            'Authorization': `Bearer ${GROQ_API_KEY}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            contents: [{
-              parts: [{
-                text: translationPrompt
-              }]
+            model: 'llama-3.1-8b-instant',
+            messages: [{
+              role: 'user',
+              content: translationPrompt
             }],
-            generationConfig: {
-              temperature: 0.7,
-              maxOutputTokens: 512,
-            }
+            temperature: 0.7,
+            max_tokens: 512,
           })
         });
 
         if (translationResponse.ok) {
           const translationData = await translationResponse.json();
-          const translationText = translationData.candidates?.[0]?.content?.parts?.[0]?.text;
+          const translationText = translationData.choices?.[0]?.message?.content;
 
           if (translationText) {
             const jsonMatch = translationText.match(/\{[\s\S]*\}/);
@@ -683,9 +682,9 @@ app.get('/api/horoscope/:zodiacSign/:period?', async (req, res) => {
 app.post('/api/horoscope/summarize', async (req, res) => {
   try {
     const { prediction, period, zodiacSign } = req.body;
-    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+    const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
-    if (!GEMINI_API_KEY) {
+    if (!GROQ_API_KEY) {
       return res.status(500).json({
         success: false,
         error: 'AI service not available'
@@ -716,30 +715,29 @@ RESPONSE FORMAT (JSON only):
 
 Make it clear and meaningful in Hindi.`;
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
+        'Authorization': `Bearer ${GROQ_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        contents: [{
-          parts: [{
-            text: prompt
-          }]
+        model: 'llama-3.1-8b-instant',
+        messages: [{
+          role: 'user',
+          content: prompt
         }],
-        generationConfig: {
-          temperature: 0.3,
-          maxOutputTokens: 256,
-        }
+        temperature: 0.3,
+        max_tokens: 256,
       })
     });
 
     if (!response.ok) {
-      throw new Error(`Gemini API error: ${response.status}`);
+      throw new Error(`Groq API error: ${response.status}`);
     }
 
     const data = await response.json();
-    const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    const generatedText = data.choices?.[0]?.message?.content;
 
     if (!generatedText) {
       throw new Error('No response from AI');
@@ -784,7 +782,7 @@ app.get('/api/health', (req, res) => {
     message: 'SantVaani Backend is running',
     timestamp: new Date().toISOString(),
     youtubeApi: YOUTUBE_API_KEY ? 'Configured' : 'Not Configured',
-    geminiApi: process.env.GEMINI_API_KEY ? 'Configured' : 'Not Configured',
+    groqApi: process.env.GROQ_API_KEY ? 'Configured' : 'Not Configured',
     cacheStatus: {
       hasData: !!bhajanCache.data,
       lastUpdated: bhajanCache.lastUpdated,
@@ -893,85 +891,94 @@ app.post('/api/chat', async (req, res) => {
       });
     }
 
-    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-    if (!GEMINI_API_KEY) {
-      console.error('Gemini API key not configured');
+    const GROQ_API_KEY = process.env.GROQ_API_KEY;
+    if (!GROQ_API_KEY) {
+      console.error('Groq API key not configured');
       return res.status(500).json({
         error: 'API Configuration Error',
         message: 'सेवा अस्थायी रूप से अनुपलब्ध है। कृपया बाद में प्रयास करें।'
       });
     }
 
-    const systemPrompt = `You are SantVaani, a wise and compassionate spiritual guide who shares practical life wisdom inspired by the Shreemad Bhagavad Gita. You speak with the warmth and understanding of Bhagwan Krishna — not as a preacher, but as a close, caring friend.
+    // Create enhanced system prompt with proper structure
+    const systemPrompt = `You are SantVaani, a wise and compassionate spiritual guide inspired by the Shreemad Bhagavad Gita. You provide practical life wisdom, motivation, and guidance based on the eternal teachings of Lord Krishna.
 
-IMPORTANT GUIDELINES:
-- NEVER start with "Namaste" or "Kaunteya"
-- Begin with empathy and emotional understanding — especially if the user seems low, confused, or in pain
-- Offer Gita wisdom only after connecting with the users feelings
-- Speak in natural Hinglish (a mix of Hindi and English), like a supportive friend
-- Keep responses short, warm, and relatable (3-4 sentences max)
-- Use Gita verses only when they are truly helpful and easy to understand
-- For academic stress, depression, or real-life struggles — focus on practical support, not Sanskrit-heavy quotes
-- Language must be simple, gentle, and reassuring
+CORE PRINCIPLES:
+1. LANGUAGE MATCHING: Respond in the EXACT same language the user writes in
+   - If user writes in English → respond in English
+   - If user writes in Hindi → respond in Hindi
+   - If user writes in Hinglish → respond in Hinglish
 
-RESPONSE STYLE:
-If the user seems emotionally off — begin with gentle empathy (don't use "are yaar", "aap" -> talk in a respectful manner)
-- Otherwise, reply in a calm, friendly tone
-- Share relevant Gita wisdom in simple Hinglish
-- End with a hopeful or comforting line, when appropriate
-- Avoid overusing Sanskrit or sounding preachy
+2. BHAGAVAD GITA REFERENCES: Always include relevant Gita verses (shloka) when applicable
+   - Quote the Sanskrit verse
+   - Provide translation in user's language
+   - Explain its practical meaning and application
 
-If the user asks something unrelated to Gita/spiritual guidance, respond with:
-"मैं गीता के ज्ञान से आपकी मदद कर सकता हूँ। आपको किस बात की परेशानी है?" (I can help you with Gita wisdom. What's troubling you?)
+3. RESPONSE STRUCTURE:
+   - Start with empathy and understanding
+   - Address their specific concern or question
+   - Share relevant Bhagavad Gita wisdom with verse reference (Chapter.Verse)
+   - Provide practical, actionable advice
+   - End with motivation and encouragement
 
-User's message: "${message}"
+4. TONE & STYLE:
+   - Warm, compassionate, and non-judgmental
+   - Like a wise friend, not a preacher
+   - Use simple, clear language
+   - Be motivational and uplifting
+   - Provide complete, thoughtful responses (5-8 sentences)
 
-Please respond with genuine compassion and practical spiritual guidance.`;
+5. CONTENT GUIDELINES:
+   - Focus on Gita teachings for life problems, stress, confusion, relationships, career, purpose
+   - Give practical spiritual guidance
+   - Use real-life examples when helpful
+   - Avoid generic responses - be specific to their question
+   - If question is unrelated to spirituality, gently redirect to how Gita wisdom can help
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
+6. FORBIDDEN:
+   - Don't start with "Namaste" (unless user does)
+   - Don't force Hinglish - match user's language exactly
+   - Don't give short 2-3 sentence responses
+   - Don't be preachy or use complex Sanskrit without translation
+   - Don't ignore their emotions or concerns
+
+EXAMPLE GOOD RESPONSES:
+
+English Question: "I feel lost in life, don't know my purpose"
+Response: "I understand how overwhelming it feels when you're unsure of your path. This confusion about purpose is something even Arjuna faced on the battlefield. In Bhagavad Gita (2.47), Krishna teaches: 'कर्मण्येवाधिकारस्ते मा फलेषु कदाचन' (Karmanye Vadhikaraste Ma Phaleshu Kadachana) - 'You have the right to perform your duties, but not to the fruits of your actions.' This means your purpose isn't about achieving a specific outcome, but about dedicating yourself fully to your present actions. Start by identifying what naturally draws your interest and energy. Do that work with complete sincerity, without worrying about results. Your purpose will reveal itself through consistent, honest effort. Remember, even Krishna didn't tell Arjuna what his purpose should be - he helped him discover it within himself. Trust the process, and take one sincere step at a time."
+
+Hindi Question: "मुझे बहुत गुस्सा आता है, कैसे control करूं?"
+Response: "मैं समझता हूं कि गुस्से को control करना कितना मुश्किल होता है। भगवान कृष्ण ने गीता में इस बारे में बहुत सुंदर बात कही है। गीता (2.62-63) में कहा गया है: 'ध्यायतो विषयान्पुंसः सङ्गस्तेषूपजायते। सङ्गात् संजायते कामः कामात्क्रोधोऽभिजायते।' जब हम किसी चीज़ के बारे में बार-बार सोचते हैं, तो उससे आसक्ति पैदा होती है, फिर इच्छा और उससे क्रोध। गुस्से को control करने के लिए: 1) जब भी क्रोध आए, तुरंत 3 गहरी सांसें लें, 2) उस विचार को जो गुस्सा trigger कर रहा है, उससे अपना ध्यान हटाएं, 3) याद रखें कि क्रोध में लिया गया निर्णय हमेशा गलत होता है। गीता (16.21) में क्रोध को नर्क का द्वार बताया गया है। इसलिए जब भी गुस्सा आए, मन में कहें 'यह मेरा दुश्मन है, मेरा स्वभाव नहीं।' धीरे-धीरे आप इसे control करना सीख जाएंगे। आप कर सकते हैं!"
+
+User's message: "${message}"`;
+
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
+        'Authorization': `Bearer ${GROQ_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        contents: [{
-          parts: [{
-            text: systemPrompt
-          }]
+        model: 'llama-3.3-70b-versatile',
+        messages: [{
+          role: 'system',
+          content: systemPrompt
+        }, {
+          role: 'user',
+          content: message
         }],
-        generationConfig: {
-          temperature: 0.8,
-          topK: 40,
-          topP: 0.95,
-          maxOutputTokens: 512,
-        },
-        safetySettings: [
-          {
-            category: "HARM_CATEGORY_HARASSMENT",
-            threshold: "BLOCK_MEDIUM_AND_ABOVE"
-          },
-          {
-            category: "HARM_CATEGORY_HATE_SPEECH",
-            threshold: "BLOCK_MEDIUM_AND_ABOVE"
-          },
-          {
-            category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-            threshold: "BLOCK_MEDIUM_AND_ABOVE"
-          },
-          {
-            category: "HARM_CATEGORY_DANGEROUS_CONTENT",
-            threshold: "BLOCK_MEDIUM_AND_ABOVE"
-          }
-        ]
+        temperature: 0.7,
+        max_tokens: 800,
+        top_p: 0.9,
       })
     });
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      console.error('Gemini API Error:', errorData);
-      
+      console.error('Groq API Error:', errorData);
+
       let errorMessage = 'तकनीकी समस्या है। कृपया बाद में प्रयास करें। 🙏';
-      
+
       if (response.status === 400) {
         errorMessage = 'अमान्य अनुरोध। कृपया पुनः प्रयास करें।';
       } else if (response.status === 429) {
@@ -979,27 +986,27 @@ Please respond with genuine compassion and practical spiritual guidance.`;
       } else if (response.status === 403) {
         errorMessage = 'API पहुंच में समस्या। कृपया व्यवस्थापक से संपर्क करें।';
       }
-      
+
       return res.status(response.status).json({
-        error: 'Gemini API Error',
+        error: 'Groq API Error',
         message: errorMessage
       });
     }
 
     const data = await response.json();
-    
-    if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0]) {
-      const aiResponse = data.candidates[0].content.parts[0].text;
-      
+
+    if (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
+      const aiResponse = data.choices[0].message.content;
+
       res.json({
         success: true,
         response: aiResponse,
         timestamp: new Date().toISOString()
       });
     } else if (data.error) {
-      throw new Error(`Gemini API Error: ${data.error.message}`);
+      throw new Error(`Groq API Error: ${data.error.message}`);
     } else {
-      throw new Error('Invalid response format from Gemini API');
+      throw new Error('Invalid response format from Groq API');
     }
     
   } catch (error) {
@@ -2150,7 +2157,7 @@ initializeServer();
 app.listen(PORT, () => {
   console.log(`🚀 SantVaani Backend Server running on port ${PORT}`);
   console.log(`📱 Allowed Origins: http://localhost:3000, http://localhost:8080, http://localhost:8081, http://localhost:5173, ${process.env.FRONTEND_URL || 'none'}`);
-  console.log(`🔑 Gemini API: ${process.env.GEMINI_API_KEY ? 'Configured ✅' : 'Not Configured ❌'}`);
+  console.log(`🤖 Groq API: ${process.env.GROQ_API_KEY ? 'Configured ✅' : 'Not Configured ❌'}`);
   console.log(`🎵 YouTube API: ${YOUTUBE_API_KEY ? 'Configured ✅' : 'Not Configured ❌'}`);
   console.log(`⏰ Cache Duration: ${CACHE_DURATION / (1000 * 60 * 60)} hours`);
   
