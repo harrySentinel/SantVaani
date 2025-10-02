@@ -5,7 +5,8 @@ A spiritual content aggregation service that provides bhajan data, AI-powered Gi
 ## 🚀 Features
 
 - **YouTube API Integration**: Live bhajan fetching and caching
-- **Gemini AI Chatbot**: Bhagavad Gita wisdom powered by Google's Gemini AI
+- **Groq AI Chatbot**: Bhagavad Gita wisdom powered by Groq (Llama 3.3)
+- **AI-Powered Translation**: Hindi translation and spiritual guidance
 - **Rate Limiting**: Protection against API abuse
 - **CORS Configuration**: Secure cross-origin resource sharing
 - **Caching System**: Efficient data caching for better performance
@@ -34,7 +35,7 @@ POST /api/chat
 - Node.js 18+
 - npm
 - YouTube API Key
-- Gemini API Key
+- Groq API Key (get free at https://console.groq.com)
 
 ### Installation
 ```bash
@@ -44,7 +45,7 @@ npm install
 ### Environment Variables
 Create a `.env` file:
 ```env
-GEMINI_API_KEY=your_gemini_api_key
+GROQ_API_KEY=your_groq_api_key
 YOUTUBE_API_KEY=your_youtube_api_key
 FRONTEND_URL=http://localhost:8080
 PORT=5000

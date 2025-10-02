@@ -37,3 +37,11 @@ firebase-key-single-line.txt
 create_notification_tables.sql
 fix_event_id_datatype.sql
 fix_notification_policies.sql
+
+# Blog gamification SQL files
+database/blog_social_features.sql
+database/blog_social_features_fixed.sql
+database/blog_social_step_by_step.sql
+database/blog_social_simple.sql
+database/cleanup_first.sql
+database/nuclear_cleanup.sql
