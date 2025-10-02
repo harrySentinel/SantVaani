@@ -71,25 +71,27 @@ const corsOptions = {
     const allowedOrigins = [
       'http://localhost:3000',
       'http://localhost:8080',
-      'http://localhost:8081',  // Your frontend port
-      'http://localhost:8082',  // Your frontend port
-      'http://localhost:8084',  // Your current frontend port
+      'http://localhost:8081',
+      'http://localhost:8082',
+      'http://localhost:8084',
+      'http://localhost:8087',
       'http://localhost:5173',
-      'http://localhost:3001',  // Admin panel ports
+      'http://localhost:3001',
       'http://localhost:3002',
       'http://localhost:3003',
       'http://127.0.0.1:3000',
       'http://127.0.0.1:8080',
-      'http://127.0.0.1:8081',  // Your frontend port
-      'http://127.0.0.1:8082',  // Your frontend port
-      'http://127.0.0.1:8084',  // Your current frontend port
+      'http://127.0.0.1:8081',
+      'http://127.0.0.1:8082',
+      'http://127.0.0.1:8084',
+      'http://127.0.0.1:8087',
       'http://127.0.0.1:5173',
-      'http://127.0.0.1:3001',  // Admin panel ports
+      'http://127.0.0.1:3001',
       'http://127.0.0.1:3002',
       'http://127.0.0.1:3003',
-      'https://santvaani.vercel.app',  // Production frontend
-      'https://santvaani.com',         // Production domain
-      'https://www.santvaani.com',     // Production domain with www
+      'https://santvaani.vercel.app',
+      'https://santvaani.com',
+      'https://www.santvaani.com',
       process.env.FRONTEND_URL
     ].filter(Boolean);
 
