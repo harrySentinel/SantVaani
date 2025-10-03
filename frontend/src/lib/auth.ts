@@ -16,6 +16,7 @@ export interface SignUpData {
   email: string;
   password: string;
   name: string;
+  username: string;
   phone?: string;
 }
 
@@ -27,13 +28,15 @@ export interface SignInData {
 // Auth service functions
 export const authService = {
   // Sign up new user
-  async signUp({ email, password, name, phone }: SignUpData) {
+  async signUp({ email, password, name, username, phone }: SignUpData) {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: {
           name,
+          username,
+          full_name: name,
           phone,
           role: 'user' // Default role
         },

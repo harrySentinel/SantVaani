@@ -7,7 +7,7 @@ interface AuthContextType {
   session: Session | null;
   loading: boolean;
   isAdmin: boolean;
-  signUp: (data: { email: string; password: string; name: string; phone?: string }) => Promise<any>;
+  signUp: (data: { email: string; password: string; name: string; username: string; phone?: string }) => Promise<any>;
   signIn: (data: { email: string; password: string }) => Promise<any>;
   signInWithGoogle: () => Promise<any>;
   resetPassword: (email: string) => Promise<any>;
@@ -54,7 +54,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = async (userData: { email: string; password: string; name: string; phone?: string }) => {
+  const signUp = async (userData: { email: string; password: string; name: string; username: string; phone?: string }) => {
     setLoading(true);
     try {
       const result = await authService.signUp(userData);

@@ -13,6 +13,7 @@ const Signup = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
+    username: '',
     email: '',
     phone: '',
     password: '',
@@ -30,10 +31,29 @@ const Signup = () => {
     e.preventDefault();
 
     // Validation
-    if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
+    if (!formData.name || !formData.username || !formData.email || !formData.password || !formData.confirmPassword) {
       toast({
         title: "⚠️ Missing Information",
         description: "Please fill in all required fields",
+        duration: 3000,
+      });
+      return;
+    }
+
+    // Username validation
+    if (formData.username.length < 3) {
+      toast({
+        title: "⚠️ Invalid Username",
+        description: "Username must be at least 3 characters",
+        duration: 3000,
+      });
+      return;
+    }
+
+    if (!/^[a-zA-Z0-9_]+$/.test(formData.username)) {
+      toast({
+        title: "⚠️ Invalid Username",
+        description: "Username can only contain letters, numbers, and underscores",
         duration: 3000,
       });
       return;
@@ -65,6 +85,7 @@ const Signup = () => {
         email: formData.email,
         password: formData.password,
         name: formData.name,
+        username: formData.username,
         phone: formData.phone
       });
 
@@ -165,6 +186,24 @@ const Signup = () => {
                     required
                   />
                 </div>
+              </div>
+
+              {/* Username Field */}
+              <div className="space-y-2">
+                <Label htmlFor="username" className="text-gray-700 font-medium">Username *</Label>
+                <div className="relative">
+                  <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Input
+                    id="username"
+                    type="text"
+                    placeholder="Choose a unique username"
+                    value={formData.username}
+                    onChange={(e) => handleInputChange('username', e.target.value.toLowerCase())}
+                    className="pl-10 border-gray-200 focus:ring-2 focus:ring-orange-300 focus:border-orange-400 transition-colors"
+                    required
+                  />
+                </div>
+                <p className="text-xs text-gray-500">Letters, numbers, and underscores only</p>
               </div>
 
               {/* Email Field */}

@@ -21,7 +21,8 @@ import {
   Download,
   Bookmark,
   BookOpen,
-  List
+  List,
+  Settings
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
@@ -268,6 +269,12 @@ const Dashboard = () => {
             </div>
 
             <div className="flex items-center space-x-3">
+              <Link to="/profile-settings">
+                <Button variant="outline" className="flex items-center space-x-2">
+                  <Settings className="w-4 h-4" />
+                  <span>Edit Profile</span>
+                </Button>
+              </Link>
               <Link to="/events">
                 <Button variant="outline" className="flex items-center space-x-2">
                   <Eye className="w-4 h-4" />
