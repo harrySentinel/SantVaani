@@ -30,6 +30,7 @@ const Login = lazy(() => import("./pages/auth/login"));
 const Signup = lazy(() => import("./pages/auth/signup"));
 const ResetPassword = lazy(() => import("./pages/auth/reset-password"));
 const Dashboard = lazy(() => import("./pages/dashboard/index"));
+const ProfileSettings = lazy(() => import("./pages/profile-settings/index"));
 const BlogIndex = lazy(() => import("./pages/blog/index"));
 const BlogPostDetail = lazy(() => import("./pages/blog/post/[slug]"));
 const BlogCategoryPage = lazy(() => import("./pages/blog/category/[slug]"));
@@ -90,6 +91,7 @@ const App = () => {
               <Route path="/signup" element={<Signup />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/profile-settings" element={<ProfileSettings />} />
               <Route path="/blog" element={<BlogIndex />} />
               <Route path="/blog/post/:slug" element={<BlogPostDetail />} />
               <Route path="/blog/category/:slug" element={<BlogCategoryPage />} />

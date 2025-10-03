@@ -258,10 +258,20 @@ export const addComment = async (
  */
 export const getPostComments = async (postId: string) => {
   try {
-    // Get all comments
+    // Get all comments with user data
     const { data, error } = await supabase
       .from('blog_comments')
-      .select('*')
+      .select(`
+        *,
+        user:user_id (
+          email,
+          user_profiles (
+            username,
+            full_name,
+            avatar_url
+          )
+        )
+      `)
       .eq('blog_post_id', postId)
       .eq('is_approved', true)
       .order('created_at', { ascending: true })
