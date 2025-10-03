@@ -483,16 +483,18 @@ const Dashboard = () => {
               {savedBlogs.map((blog: any) => (
                 <Card key={blog.id} className="shadow-lg border-0 bg-white rounded-2xl overflow-hidden hover:shadow-2xl transition-shadow">
                   <CardContent className="p-0">
-                    {/* Featured Image */}
-                    {blog.featured_image && (
-                      <div className="h-48 overflow-hidden">
+                    {/* Featured Image - Default gradient if no image */}
+                    <div className="h-48 overflow-hidden bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                      {blog.featured_image ? (
                         <img
                           src={blog.featured_image}
                           alt={blog.title}
                           className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                         />
-                      </div>
-                    )}
+                      ) : (
+                        <BookOpen className="w-16 h-16 text-white opacity-50" />
+                      )}
+                    </div>
 
                     {/* Blog Details */}
                     <div className="p-6 space-y-4">
