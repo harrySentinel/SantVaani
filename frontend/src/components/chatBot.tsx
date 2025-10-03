@@ -15,7 +15,7 @@ interface ChatBotProps {
 
 const ChatBot: React.FC<ChatBotProps> = ({
   className = '',
-  initialMessage = 'Namaste 🙏\n\nI am SantVaani, your spiritual guide powered by the wisdom of the Bhagavad Gita. If your heart feels heavy or things don\'t make sense right now, I am here to listen and help.\n\nAsk me anything about life, relationships, purpose, or spiritual guidance.',
+  initialMessage = 'नमस्ते 🙏 Namaste\n\nमैं संतवाणी हूं, भगवद गीता के ज्ञान से संचालित आपका आध्यात्मिक मार्गदर्शक।\nI am SantVaani, your spiritual guide powered by the wisdom of the Bhagavad Gita.\n\nयदि आपका मन भारी है या जीवन में कुछ समझ नहीं आ रहा है, तो मैं यहां हूं सुनने और मदद करने के लिए।\nIf your heart feels heavy or things don\'t make sense right now, I am here to listen and help.\n\nजीवन, रिश्ते, उद्देश्य या आध्यात्मिक मार्गदर्शन के बारे में कुछ भी पूछें।\nAsk me anything about life, relationships, purpose, or spiritual guidance.',
 }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [messages, setMessages] = useState<Message[]>([
@@ -328,7 +328,7 @@ const ChatBot: React.FC<ChatBotProps> = ({
                     value={inputMessage}
                     onChange={(e) => setInputMessage(e.target.value)}
                     onKeyPress={handleKeyPress}
-                    placeholder="Ask about life, spirituality, or Gita wisdom..."
+                    placeholder="जीवन, आध्यात्मिकता या गीता के बारे में पूछें | Ask about life, spirituality..."
                     disabled={isLoading || backendStatus === 'disconnected'}
                     className="flex-1 p-3 sm:p-4 rounded-xl border-2 border-orange-200
                       focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent
