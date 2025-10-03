@@ -231,8 +231,8 @@ const ChatBot: React.FC<ChatBotProps> = ({
       {/* Full Screen Modal */}
       {isOpen && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="absolute inset-0 flex items-center justify-center p-4">
-            <div className="w-full max-w-4xl h-full max-h-[90vh] bg-white rounded-2xl shadow-2xl flex flex-col animate-in zoom-in-95 duration-300">
+          <div className="absolute inset-0 flex items-center justify-center p-2 sm:p-4">
+            <div className="w-full max-w-4xl h-full sm:max-h-[90vh] bg-white rounded-2xl shadow-2xl flex flex-col animate-in zoom-in-95 duration-300">
 
               {/* Header */}
               <div className="bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 rounded-t-2xl p-6 flex items-center justify-between shadow-lg">
@@ -319,8 +319,8 @@ const ChatBot: React.FC<ChatBotProps> = ({
                 <div ref={messagesEndRef} />
               </div>
 
-              {/* Input Area */}
-              <div className="p-6 border-t border-orange-100 bg-gradient-to-r from-orange-50/50 to-white rounded-b-2xl">
+              {/* Input Area - Fixed to bottom on mobile */}
+              <div className="p-4 sm:p-6 border-t border-orange-100 bg-gradient-to-r from-orange-50/50 to-white rounded-b-2xl">
                 <div className="flex items-center space-x-3">
                   <input
                     ref={inputRef}
@@ -330,7 +330,7 @@ const ChatBot: React.FC<ChatBotProps> = ({
                     onKeyPress={handleKeyPress}
                     placeholder="Ask about life, spirituality, or Gita wisdom..."
                     disabled={isLoading || backendStatus === 'disconnected'}
-                    className="flex-1 p-4 rounded-xl border-2 border-orange-200
+                    className="flex-1 p-3 sm:p-4 rounded-xl border-2 border-orange-200
                       focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent
                       bg-white text-gray-700 placeholder-gray-400 text-base
                       disabled:opacity-50 disabled:cursor-not-allowed
@@ -339,30 +339,18 @@ const ChatBot: React.FC<ChatBotProps> = ({
                   <button
                     onClick={handleSendMessage}
                     disabled={!inputMessage.trim() || isLoading || backendStatus === 'disconnected'}
-                    className="w-14 h-14 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl
+                    className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl
                       flex items-center justify-center text-white hover:from-orange-600 hover:to-red-600
                       transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-lg
-                      disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                      disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex-shrink-0"
                     aria-label="Send message"
                   >
                     {isLoading ? (
-                      <Loader2 className="w-6 h-6 animate-spin" />
+                      <Loader2 className="w-5 h-5 sm:w-6 sm:h-6 animate-spin" />
                     ) : (
-                      <Send className="w-6 h-6" />
+                      <Send className="w-5 h-5 sm:w-6 sm:h-6" />
                     )}
                   </button>
-                </div>
-
-                {/* Status Indicator */}
-                <div className="flex items-center justify-center mt-3">
-                  <div className="flex items-center space-x-2 text-sm text-gray-500">
-                    <div className={`w-2 h-2 rounded-full ${getStatusColor()}`}></div>
-                    <span>
-                      {backendStatus === 'connected' && 'Connected'}
-                      {backendStatus === 'disconnected' && 'Offline'}
-                      {backendStatus === 'checking' && 'Connecting...'}
-                    </span>
-                  </div>
                 </div>
               </div>
             </div>
