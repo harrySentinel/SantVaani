@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -18,18 +18,26 @@ import {
   Eye,
   Loader2,
   Gift,
-  Download
+  Download,
+  Bookmark,
+  BookOpen,
+  List
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { eventsService, Event } from '@/lib/events';
 import DivineWelcomeLetter from '@/components/DivineWelcomeLetter';
+import { getUserBookmarks } from '@/services/blogSocialService';
 
 const Dashboard = () => {
   const [userEvents, setUserEvents] = useState<Event[]>([]);
   const [isLoadingEvents, setIsLoadingEvents] = useState(true);
   const [showWelcomeLetter, setShowWelcomeLetter] = useState(false);
   const [userProfile, setUserProfile] = useState<any>(null);
+  const [savedBlogs, setSavedBlogs] = useState<any[]>([]);
+  const [isLoadingBlogs, setIsLoadingBlogs] = useState(true);
+  const savedBlogsRef = useRef<HTMLDivElement>(null);
+  const eventsRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { user, loading, signOut } = useAuth();
 
@@ -49,6 +57,7 @@ const Dashboard = () => {
     if (user) {
       loadUserEvents();
       loadUserProfile();
+      loadSavedBlogs();
 
       // Always show welcome letter initially (robust fallback)
       // This ensures it shows even if backend APIs are down
@@ -128,6 +137,41 @@ const Dashboard = () => {
         duration: 6000,
       });
     }
+  };
+
+  const loadSavedBlogs = async () => {
+    if (!user) return;
+
+    try {
+      setIsLoadingBlogs(true);
+      console.log('Loading bookmarks for user ID:', user.id);
+      const result = await getUserBookmarks(user.id);
+
+      if (result.success) {
+        // Extract blog posts from bookmarks
+        const blogs = result.bookmarks
+          .map((bookmark: any) => bookmark.blog_posts)
+          .filter((blog: any) => blog !== null);
+
+        console.log('Retrieved bookmarked blogs:', blogs);
+        setSavedBlogs(blogs);
+      } else {
+        throw new Error(result.error || 'Failed to load bookmarks');
+      }
+    } catch (error) {
+      console.error('Error loading saved blogs:', error);
+      toast({
+        title: "⚠️ Error Loading Bookmarks",
+        description: "Failed to load your saved blogs. Please refresh the page.",
+        duration: 4000,
+      });
+    } finally {
+      setIsLoadingBlogs(false);
+    }
+  };
+
+  const scrollToSection = (ref: React.RefObject<HTMLDivElement>) => {
+    ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   const handleLogout = async () => {
@@ -282,6 +326,72 @@ const Dashboard = () => {
         </div>
       </section>
 
+      {/* Quick Actions Section */}
+      <section className="py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-orange-600 bg-clip-text text-transparent">
+              Quick Actions
+            </h2>
+            <p className="text-gray-600 mt-1">Navigate to your favorite sections</p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Card
+              className="bg-white shadow-lg border-0 hover:shadow-xl transition-all cursor-pointer group"
+              onClick={() => navigate('/blog')}
+            >
+              <CardContent className="p-6 text-center">
+                <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                  <BookOpen className="w-7 h-7 text-white" />
+                </div>
+                <p className="font-semibold text-gray-800">Browse Blogs</p>
+                <p className="text-xs text-gray-500 mt-1">Read latest posts</p>
+              </CardContent>
+            </Card>
+
+            <Card
+              className="bg-white shadow-lg border-0 hover:shadow-xl transition-all cursor-pointer group"
+              onClick={() => scrollToSection(savedBlogsRef)}
+            >
+              <CardContent className="p-6 text-center">
+                <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                  <Bookmark className="w-7 h-7 text-white" />
+                </div>
+                <p className="font-semibold text-gray-800">My Bookmarks</p>
+                <p className="text-xs text-gray-500 mt-1">View saved blogs</p>
+              </CardContent>
+            </Card>
+
+            <Card
+              className="bg-white shadow-lg border-0 hover:shadow-xl transition-all cursor-pointer group"
+              onClick={() => navigate('/events')}
+            >
+              <CardContent className="p-6 text-center">
+                <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                  <Calendar className="w-7 h-7 text-white" />
+                </div>
+                <p className="font-semibold text-gray-800">Create Event</p>
+                <p className="text-xs text-gray-500 mt-1">Organize gathering</p>
+              </CardContent>
+            </Card>
+
+            <Card
+              className="bg-white shadow-lg border-0 hover:shadow-xl transition-all cursor-pointer group"
+              onClick={() => scrollToSection(eventsRef)}
+            >
+              <CardContent className="p-6 text-center">
+                <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                  <List className="w-7 h-7 text-white" />
+                </div>
+                <p className="font-semibold text-gray-800">My Events</p>
+                <p className="text-xs text-gray-500 mt-1">View your events</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
       {/* Divine Welcome Letter Section */}
       {showWelcomeLetter && user && (
         <section className="py-8">
@@ -331,31 +441,100 @@ const Dashboard = () => {
         </section>
       )}
 
-      {/* Create New Event CTA */}
-      <section className="py-6">
+      {/* Saved Blogs Section */}
+      <section className="py-12" ref={savedBlogsRef}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-r from-blue-600 to-orange-600 rounded-2xl p-6 text-white text-center">
-            <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
-              <div className="space-y-2">
-                <h2 className="text-xl font-bold">Ready to organize another event?</h2>
-                <p className="text-blue-100">Share your spiritual gathering with the community</p>
-              </div>
-              <Link to="/events">
-                <Button className="bg-white text-blue-600 hover:bg-blue-50 transition-colors flex items-center space-x-2">
-                  <Plus className="w-5 h-5" />
-                  <span>Create New Event</span>
-                </Button>
-              </Link>
-            </div>
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
+              Saved Blogs
+            </h2>
+            <p className="text-gray-600">Your bookmarked spiritual readings</p>
           </div>
+
+          {isLoadingBlogs ? (
+            // Loading skeleton
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Array.from({ length: 3 }).map((_, index) => (
+                <Card key={index} className="shadow-lg border-0 bg-white rounded-2xl overflow-hidden animate-pulse">
+                  <div className="h-48 bg-gray-200"></div>
+                  <div className="p-6 space-y-4">
+                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                    <div className="h-3 bg-gray-200 rounded w-full"></div>
+                    <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          ) : savedBlogs.length === 0 ? (
+            <Card className="text-center py-12 shadow-lg border-0">
+              <CardContent>
+                <Bookmark className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-600 mb-2">No Saved Blogs Yet</h3>
+                <p className="text-gray-500 mb-6">Start bookmarking blogs to save them for later</p>
+                <Link to="/blog">
+                  <Button className="bg-gradient-to-r from-purple-600 to-pink-600">
+                    Browse Blogs
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {savedBlogs.map((blog: any) => (
+                <Card key={blog.id} className="shadow-lg border-0 bg-white rounded-2xl overflow-hidden hover:shadow-2xl transition-shadow">
+                  <CardContent className="p-0">
+                    {/* Featured Image */}
+                    {blog.featured_image && (
+                      <div className="h-48 overflow-hidden">
+                        <img
+                          src={blog.featured_image}
+                          alt={blog.title}
+                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                    )}
+
+                    {/* Blog Details */}
+                    <div className="p-6 space-y-4">
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-800 mb-2 line-clamp-2">
+                          {blog.title}
+                        </h3>
+                        <p className="text-gray-600 text-sm line-clamp-3">
+                          {blog.excerpt}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                        <Link to={`/blog/${blog.slug}`}>
+                          <Button
+                            variant="outline"
+                            className="flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white border-0 hover:opacity-90"
+                          >
+                            <BookOpen className="w-4 h-4" />
+                            <span>Read More</span>
+                          </Button>
+                        </Link>
+                        <p className="text-xs text-gray-500">
+                          {new Date(blog.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
       {/* User Events */}
-      <section className="py-12">
+      <section className="py-12" ref={eventsRef}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
-            <h2 className="text-3xl font-bold text-gray-800 mb-2">Your Events</h2>
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-orange-600 bg-clip-text text-transparent mb-2">
+              Your Events
+            </h2>
             <p className="text-gray-600">Track the status of your submitted events</p>
           </div>
 
