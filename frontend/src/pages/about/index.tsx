@@ -170,9 +170,9 @@ const About = () => {
       <section className="py-16 bg-gradient-to-r from-blue-50 to-orange-50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">Our Co-Founders</h2>
+            <h2 className="text-3xl font-bold text-gray-800 mb-4">Meet the Team</h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              SantVaani is guided by dedicated co-founders who work with reverence to ensure
+              SantVaani is built by a dedicated team working with reverence to ensure
               the authentic preservation and sharing of spiritual wisdom.
             </p>
           </div>
