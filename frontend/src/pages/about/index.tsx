@@ -62,10 +62,14 @@ const About = () => {
             </div>
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-orange-600 bg-clip-text text-transparent">
               About SantVaani
+              <span className="block text-3xl md:text-4xl mt-2">संतवाणी के बारे में</span>
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              A digital sanctuary dedicated to preserving and sharing the profound wisdom 
+              A digital sanctuary dedicated to preserving and sharing the profound wisdom
               of India's greatest spiritual masters with seekers around the world.
+            </p>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed mt-3">
+              भारत के महान आध्यात्मिक गुरुओं के गहन ज्ञान को संरक्षित करने और दुनिया भर के साधकों के साथ साझा करने के लिए समर्पित एक डिजिटल अभयारण्य।
             </p>
           </div>
         </div>
@@ -79,25 +83,31 @@ const About = () => {
               <div className="space-y-4">
                 <div className="flex items-center space-x-2">
                   <Target className="w-6 h-6 text-blue-600" />
-                  <h2 className="text-3xl font-bold text-gray-800">Our Mission</h2>
+                  <h2 className="text-3xl font-bold text-gray-800">Our Mission | हमारा लक्ष्य</h2>
                 </div>
                 <p className="text-lg text-gray-600 leading-relaxed">
-                  SantVaani was born from a deep reverence for the spiritual heritage of India and 
-                  a desire to make these timeless teachings accessible to modern seekers. We believe 
-                  that in today's fast-paced world, the wisdom of our saints can provide guidance, 
+                  SantVaani was born from a deep reverence for the spiritual heritage of India and
+                  a desire to make these timeless teachings accessible to modern seekers. We believe
+                  that in today's fast-paced world, the wisdom of our saints can provide guidance,
                   peace, and direction.
+                </p>
+                <p className="text-base text-gray-600 leading-relaxed">
+                  संतवाणी का जन्म भारत की आध्यात्मिक विरासत के प्रति गहरी श्रद्धा और इन कालातीत शिक्षाओं को आधुनिक साधकों के लिए सुलभ बनाने की इच्छा से हुआ। हम मानते हैं कि आज की तेज़-तर्रार दुनिया में, हमारे संतों का ज्ञान मार्गदर्शन, शांति और दिशा प्रदान कर सकता है।
                 </p>
               </div>
 
               <div className="space-y-4">
                 <div className="flex items-center space-x-2">
                   <Lightbulb className="w-6 h-6 text-orange-600" />
-                  <h3 className="text-xl font-semibold text-gray-800">Our Vision</h3>
+                  <h3 className="text-xl font-semibold text-gray-800">Our Vision | हमारी दृष्टि</h3>
                 </div>
                 <p className="text-gray-600 leading-relaxed">
-                  To create a global community where spiritual wisdom flows freely, where seekers 
-                  can find authentic teachings, and where the divine love of our saints continues 
+                  To create a global community where spiritual wisdom flows freely, where seekers
+                  can find authentic teachings, and where the divine love of our saints continues
                   to transform hearts across all boundaries of culture, language, and geography.
+                </p>
+                <p className="text-gray-600 leading-relaxed">
+                  एक वैश्विक समुदाय बनाना जहां आध्यात्मिक ज्ञान स्वतंत्र रूप से बहे, जहां साधक प्रामाणिक शिक्षाएं पा सकें, और जहां हमारे संतों का दिव्य प्रेम संस्कृति, भाषा और भूगोल की सभी सीमाओं को पार करते हुए हृदयों को परिवर्तित करता रहे।
                 </p>
               </div>
 
@@ -130,9 +140,12 @@ const About = () => {
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">Our Core Values</h2>
+            <h2 className="text-3xl font-bold text-gray-800 mb-4">Our Core Values | हमारे मूल मूल्य</h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               The principles that guide our work and ensure authentic representation of spiritual wisdom
+            </p>
+            <p className="text-base text-gray-600 max-w-2xl mx-auto mt-2">
+              वे सिद्धांत जो हमारे काम का मार्गदर्शन करते हैं और आध्यात्मिक ज्ञान की प्रामाणिक अभिव्यक्ति सुनिश्चित करते हैं
             </p>
           </div>
 
@@ -170,10 +183,13 @@ const About = () => {
       <section className="py-16 bg-gradient-to-r from-blue-50 to-orange-50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">Meet the Team</h2>
+            <h2 className="text-3xl font-bold text-gray-800 mb-4">Meet the Team | टीम से मिलें</h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               SantVaani is built by a dedicated team working with reverence to ensure
               the authentic preservation and sharing of spiritual wisdom.
+            </p>
+            <p className="text-base text-gray-600 max-w-2xl mx-auto mt-2">
+              संतवाणी एक समर्पित टीम द्वारा बनाई गई है जो आध्यात्मिक ज्ञान के प्रामाणिक संरक्षण और साझाकरण को सुनिश्चित करने के लिए श्रद्धा के साथ काम कर रही है।
             </p>
           </div>
 
@@ -211,12 +227,15 @@ const About = () => {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8">
           <div className="space-y-4">
             <h2 className="text-3xl font-bold text-gray-800">
-              Join Our Spiritual Journey
+              Join Our Spiritual Journey | हमारी आध्यात्मिक यात्रा में शामिल हों
             </h2>
             <p className="text-lg text-gray-600 leading-relaxed">
-              Whether you are beginning your spiritual path or deepening your practice, 
-              SantVaani welcomes you to explore, learn, and grow. Together, we can keep the 
+              Whether you are beginning your spiritual path or deepening your practice,
+              SantVaani welcomes you to explore, learn, and grow. Together, we can keep the
               flame of divine wisdom burning bright for generations to come.
+            </p>
+            <p className="text-base text-gray-600 leading-relaxed">
+              चाहे आप अपने आध्यात्मिक पथ की शुरुआत कर रहे हों या अपने अभ्यास को गहरा कर रहे हों, संतवाणी आपका स्वागत करता है अन्वेषण, सीखने और बढ़ने के लिए। साथ मिलकर, हम आने वाली पीढ़ियों के लिए दिव्य ज्ञान की ज्योति को उज्ज्वल रख सकते हैं।
             </p>
           </div>
 

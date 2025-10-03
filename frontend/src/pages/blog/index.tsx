@@ -11,7 +11,6 @@ import { BlogPost } from '@/types/blog';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSpiritualTracking } from '@/hooks/useAnalytics';
 import { blogService } from '@/services/blogService';
-import Leaderboard from '@/components/blog/Leaderboard';
 
 const BlogIndex: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -118,53 +117,43 @@ const BlogIndex: React.FC = () => {
             </button>
           </div>
         ) : posts.length > 0 ? (
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            {/* Blog Posts - 3 columns */}
-            <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-              {posts.map((post) => (
-              <Link key={post.id} to={`/blog/post/${post.slug}`} className="block">
-                <Card className="group hover:shadow-lg transition-all duration-300 border-0 shadow-sm bg-white cursor-pointer">
-                  <div className="h-40 rounded-t-lg flex items-center justify-center" style={{ backgroundColor: post.category?.color + '20' || '#fb923c20' }}>
-                    <span className="text-3xl">{post.category?.icon || '💫'}</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+            {posts.map((post) => (
+            <Link key={post.id} to={`/blog/post/${post.slug}`} className="block">
+              <Card className="group hover:shadow-lg transition-all duration-300 border-0 shadow-sm bg-white cursor-pointer">
+                <div className="h-40 rounded-t-lg flex items-center justify-center" style={{ backgroundColor: post.category?.color + '20' || '#fb923c20' }}>
+                  <span className="text-3xl">{post.category?.icon || '💫'}</span>
+                </div>
+                <CardContent className="p-6">
+                  <div className="flex items-center mb-2">
+                    <span className="text-xs px-2 py-1 rounded-full" style={{ backgroundColor: post.category?.color + '20', color: post.category?.color }}>
+                      {post.category?.name}
+                    </span>
                   </div>
-                  <CardContent className="p-6">
-                    <div className="flex items-center mb-2">
-                      <span className="text-xs px-2 py-1 rounded-full" style={{ backgroundColor: post.category?.color + '20', color: post.category?.color }}>
-                        {post.category?.name}
-                      </span>
+                  <h3 className="text-lg font-medium text-gray-800 mb-3 group-hover:text-orange-600 transition-colors line-clamp-2">
+                    {post.title}
+                  </h3>
+                  <p className="text-gray-600 text-sm leading-relaxed line-clamp-3 mb-4">
+                    {post.excerpt}
+                  </p>
+                  <div className="flex items-center justify-between text-xs text-gray-500">
+                    <span>{post.readingTime} min read</span>
+                    <div className="flex items-center space-x-2">
+                      <span>{post.viewCount} views</span>
+                      <span className="text-orange-400">🕉️</span>
                     </div>
-                    <h3 className="text-lg font-medium text-gray-800 mb-3 group-hover:text-orange-600 transition-colors line-clamp-2">
-                      {post.title}
-                    </h3>
-                    <p className="text-gray-600 text-sm leading-relaxed line-clamp-3 mb-4">
-                      {post.excerpt}
-                    </p>
-                    <div className="flex items-center justify-between text-xs text-gray-500">
-                      <span>{post.readingTime} min read</span>
-                      <div className="flex items-center space-x-2">
-                        <span>{post.viewCount} views</span>
-                        <span className="text-orange-400">🕉️</span>
-                      </div>
+                  </div>
+                  {post.spiritualQuotes && post.spiritualQuotes.length > 0 && (
+                    <div className="mt-3 pt-3 border-t border-gray-100">
+                      <p className="text-xs italic text-gray-500 line-clamp-1">
+                        "{post.spiritualQuotes[0]}"
+                      </p>
                     </div>
-                    {post.spiritualQuotes && post.spiritualQuotes.length > 0 && (
-                      <div className="mt-3 pt-3 border-t border-gray-100">
-                        <p className="text-xs italic text-gray-500 line-clamp-1">
-                          "{post.spiritualQuotes[0]}"
-                        </p>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </Link>
-              ))}
-            </div>
-
-            {/* Leaderboard Sidebar - 1 column */}
-            <div className="lg:col-span-1">
-              <div className="lg:sticky lg:top-4">
-                <Leaderboard limit={5} />
-              </div>
-            </div>
+                  )}
+                </CardContent>
+              </Card>
+            </Link>
+            ))}
           </div>
         ) : (
           <div className="text-center py-12">

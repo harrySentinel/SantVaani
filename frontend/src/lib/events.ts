@@ -77,12 +77,15 @@ export const eventsService = {
     return data;
   },
 
-  // Get all approved events (public)
+  // Get all approved events (public) - filters out expired events
   async getApprovedEvents(): Promise<Event[]> {
+    const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+
     const { data, error } = await supabase
       .from('events')
       .select('*')
       .eq('status', 'approved')
+      .gte('date', today) // Only get events with date >= today
       .order('date', { ascending: true });
 
     if (error) {
