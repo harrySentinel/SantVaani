@@ -45,3 +45,6 @@ database/blog_social_step_by_step.sql
 database/blog_social_simple.sql
 database/cleanup_first.sql
 database/nuclear_cleanup.sql
+
+# Blog gamification implementation doc (context only)
+BLOG_GAMIFICATION_IMPLEMENTATION.md
