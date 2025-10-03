@@ -52,11 +52,11 @@ export default function Footer() {
             <div className="space-y-2">
               <div className="flex items-center space-x-2 text-gray-600 text-sm">
                 <Mail className="w-4 h-4" />
-                <span>contact@santvaani.com</span>
+                <span>santvaani.app@gmail.com</span>
               </div>
               <div className="flex items-center space-x-2 text-gray-600 text-sm">
                 <Phone className="w-4 h-4" />
-                <span>+91 98765 43210</span>
+                <span>+91 87070 43565</span>
               </div>
             </div>
           </div>
