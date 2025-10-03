@@ -205,6 +205,7 @@ export const getUserBookmarks = async (userId: string) => {
           title,
           slug,
           excerpt,
+          featured_image,
           created_at
         )
       `)
