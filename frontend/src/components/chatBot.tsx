@@ -1,31 +1,33 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { MessageCircle, X, Send, Sparkles, Loader2 } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface Message {
   id: string;
   type: 'user' | 'bot';
   content: string;
   timestamp: Date;
+  isAnimating?: boolean;
 }
 
 interface ChatBotProps {
   className?: string;
-  initialMessage?: string;
 }
 
-const ChatBot: React.FC<ChatBotProps> = ({
-  className = '',
-  initialMessage = 'नमस्ते 🙏 Namaste\n\nमैं संतवाणी हूं, भगवद गीता के ज्ञान से संचालित आपका आध्यात्मिक मार्गदर्शक।\nI am SantVaani, your spiritual guide powered by the wisdom of the Bhagavad Gita.\n\nयदि आपका मन भारी है या जीवन में कुछ समझ नहीं आ रहा है, तो मैं यहां हूं सुनने और मदद करने के लिए।\nIf your heart feels heavy or things don\'t make sense right now, I am here to listen and help.\n\nजीवन, रिश्ते, उद्देश्य या आध्यात्मिक मार्गदर्शन के बारे में कुछ भी पूछें।\nAsk me anything about life, relationships, purpose, or spiritual guidance.',
-}) => {
+const INITIAL_MESSAGES = {
+  en: 'Namaste 🙏\n\nI am SantVaani, your spiritual guide powered by the wisdom of the Bhagavad Gita.\n\nIf your heart feels heavy or things don\'t make sense right now, I am here to listen and help.\n\nAsk me anything about life, relationships, purpose, or spiritual guidance.',
+  hi: 'नमस्ते 🙏\n\nमैं संतवाणी हूं, भगवद गीता के ज्ञान से संचालित आपका आध्यात्मिक मार्गदर्शक।\n\nयदि आपका मन भारी है या जीवन में कुछ समझ नहीं आ रहा है, तो मैं यहां हूं सुनने और मदद करने के लिए।\n\nजीवन, रिश्ते, उद्देश्य या आध्यात्मिक मार्गदर्शन के बारे में कुछ भी पूछें।'
+};
+
+const PLACEHOLDERS = {
+  en: 'Ask about life, spirituality, or Gita wisdom...',
+  hi: 'जीवन, आध्यात्मिकता या गीता ज्ञान के बारे में पूछें...'
+};
+
+const ChatBot: React.FC<ChatBotProps> = ({ className = '' }) => {
+  const { language } = useLanguage();
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      type: 'bot',
-      content: initialMessage,
-      timestamp: new Date()
-    }
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState<string>('');
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -42,6 +44,17 @@ const ChatBot: React.FC<ChatBotProps> = ({
   };
 
   const BACKEND_URL = getBackendUrl();
+
+  // Initialize messages based on language
+  useEffect(() => {
+    const initialMsg: Message = {
+      id: '1',
+      type: 'bot',
+      content: INITIAL_MESSAGES[language as keyof typeof INITIAL_MESSAGES] || INITIAL_MESSAGES.en,
+      timestamp: new Date()
+    };
+    setMessages([initialMsg]);
+  }, [language]);
 
   // Smooth scrolling to bottom
   const scrollToBottom = useCallback(() => {
@@ -138,6 +151,33 @@ const ChatBot: React.FC<ChatBotProps> = ({
     }
   };
 
+  // Typing animation for bot messages
+  const animateMessage = useCallback((content: string, messageId: string) => {
+    let currentIndex = 0;
+    const words = content.split(' ');
+
+    const interval = setInterval(() => {
+      if (currentIndex < words.length) {
+        const displayContent = words.slice(0, currentIndex + 1).join(' ');
+        setMessages(prev => prev.map(msg =>
+          msg.id === messageId
+            ? { ...msg, content: displayContent, isAnimating: true }
+            : msg
+        ));
+        currentIndex++;
+      } else {
+        clearInterval(interval);
+        setMessages(prev => prev.map(msg =>
+          msg.id === messageId
+            ? { ...msg, isAnimating: false }
+            : msg
+        ));
+      }
+    }, 50); // Speed of typing animation (50ms per word)
+
+    return () => clearInterval(interval);
+  }, []);
+
   // Handle sending messages
   const handleSendMessage = async (): Promise<void> => {
     if (!inputMessage.trim() || isLoading) return;
@@ -158,14 +198,20 @@ const ChatBot: React.FC<ChatBotProps> = ({
     try {
       const aiResponseContent = await getBackendResponse(userMessageText);
 
+      const botResponseId = (Date.now() + 1).toString();
       const botResponse: Message = {
-        id: (Date.now() + 1).toString(),
+        id: botResponseId,
         type: 'bot',
-        content: aiResponseContent,
-        timestamp: new Date()
+        content: '',
+        timestamp: new Date(),
+        isAnimating: true
       };
 
       setMessages(prev => [...prev, botResponse]);
+      setIsTyping(false);
+
+      // Start typing animation
+      animateMessage(aiResponseContent, botResponseId);
 
     } catch (error) {
       console.error('Error in chat:', error);
@@ -176,7 +222,6 @@ const ChatBot: React.FC<ChatBotProps> = ({
         timestamp: new Date()
       };
       setMessages(prev => [...prev, errorResponse]);
-    } finally {
       setIsTyping(false);
     }
   };
@@ -242,24 +287,28 @@ const ChatBot: React.FC<ChatBotProps> = ({
             <div className="w-full max-w-4xl h-full sm:h-auto sm:max-h-[90vh] bg-white sm:rounded-2xl shadow-2xl flex flex-col animate-in slide-in-from-bottom sm:zoom-in-95 duration-300">
 
               {/* Header */}
-              <div className="bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 rounded-t-2xl p-6 flex items-center justify-between shadow-lg">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm border border-white/30">
-                    <Sparkles className="w-6 h-6 text-white" />
+              <div className="bg-gradient-to-r from-orange-500 via-orange-600 to-red-500 rounded-t-2xl p-6 flex items-center justify-between shadow-lg relative overflow-hidden">
+                {/* Animated background pattern */}
+                <div className="absolute inset-0 opacity-10">
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
+                </div>
+                <div className="flex items-center space-x-4 relative z-10">
+                  <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm border-2 border-white/40 shadow-lg">
+                    <Sparkles className="w-6 h-6 text-white animate-pulse" />
                   </div>
                   <div>
-                    <h2 className="text-white font-bold text-2xl flex items-center">
+                    <h2 className="text-white font-bold text-2xl flex items-center drop-shadow-md">
                       SantVaani Guide
                     </h2>
-                    <p className="text-white/90 text-sm flex items-center mt-1">
-                      <span className={`w-2 h-2 ${getStatusColor()} rounded-full mr-2 ${backendStatus === 'connected' ? 'animate-pulse' : ''}`}></span>
-                      Powered by Bhagavad Gita Wisdom
+                    <p className="text-white/95 text-sm flex items-center mt-1">
+                      <span className={`w-2 h-2 ${getStatusColor()} rounded-full mr-2 shadow-lg ${backendStatus === 'connected' ? 'animate-pulse' : ''}`}></span>
+                      Powered by Gita Wisdom
                     </p>
                   </div>
                 </div>
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="text-white/80 hover:text-white transition-all duration-200 p-2 rounded-full hover:bg-white/10 active:scale-95"
+                  className="text-white/90 hover:text-white transition-all duration-200 p-2 rounded-full hover:bg-white/20 active:scale-95 relative z-10"
                   aria-label="Close chat"
                 >
                   <X className="w-6 h-6" />
@@ -293,6 +342,9 @@ const ChatBot: React.FC<ChatBotProps> = ({
                         message.type === 'user' ? 'text-white' : 'text-gray-700'
                       }`}>
                         {message.content}
+                        {message.isAnimating && (
+                          <span className="inline-block w-1 h-4 ml-1 bg-orange-500 animate-pulse"></span>
+                        )}
                       </p>
                       <p className={`text-xs mt-2 ${
                         message.type === 'user' ? 'text-white/70' : 'text-gray-400'
@@ -336,7 +388,7 @@ const ChatBot: React.FC<ChatBotProps> = ({
                     onChange={(e) => setInputMessage(e.target.value)}
                     onKeyPress={handleKeyPress}
                     onFocus={handleInputFocus}
-                    placeholder="जीवन, आध्यात्मिकता या गीता के बारे में पूछें | Ask about life, spirituality..."
+                    placeholder={PLACEHOLDERS[language as keyof typeof PLACEHOLDERS] || PLACEHOLDERS.en}
                     disabled={isLoading || backendStatus === 'disconnected'}
                     className="flex-1 p-3 sm:p-4 rounded-xl border-2 border-orange-200
                       focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent
