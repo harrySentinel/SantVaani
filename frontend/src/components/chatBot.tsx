@@ -198,6 +198,13 @@ const ChatBot: React.FC<ChatBotProps> = ({
     }
   };
 
+  // Handle input focus - scroll into view on mobile
+  const handleInputFocus = () => {
+    setTimeout(() => {
+      inputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }, 300);
+  };
+
   // Get status indicator
   const getStatusColor = () => {
     switch (backendStatus) {
@@ -230,9 +237,9 @@ const ChatBot: React.FC<ChatBotProps> = ({
 
       {/* Full Screen Modal */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="absolute inset-0 flex items-center justify-center p-2 sm:p-4">
-            <div className="w-full max-w-4xl h-full sm:max-h-[90vh] bg-white rounded-2xl shadow-2xl flex flex-col animate-in zoom-in-95 duration-300">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200 overflow-hidden">
+          <div className="h-full flex items-end sm:items-center justify-center p-0 sm:p-4">
+            <div className="w-full max-w-4xl h-full sm:h-auto sm:max-h-[90vh] bg-white sm:rounded-2xl shadow-2xl flex flex-col animate-in slide-in-from-bottom sm:zoom-in-95 duration-300">
 
               {/* Header */}
               <div className="bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 rounded-t-2xl p-6 flex items-center justify-between shadow-lg">
@@ -328,6 +335,7 @@ const ChatBot: React.FC<ChatBotProps> = ({
                     value={inputMessage}
                     onChange={(e) => setInputMessage(e.target.value)}
                     onKeyPress={handleKeyPress}
+                    onFocus={handleInputFocus}
                     placeholder="जीवन, आध्यात्मिकता या गीता के बारे में पूछें | Ask about life, spirituality..."
                     disabled={isLoading || backendStatus === 'disconnected'}
                     className="flex-1 p-3 sm:p-4 rounded-xl border-2 border-orange-200
