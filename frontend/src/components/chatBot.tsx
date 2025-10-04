@@ -45,16 +45,18 @@ const ChatBot: React.FC<ChatBotProps> = ({ className = '' }) => {
 
   const BACKEND_URL = getBackendUrl();
 
-  // Initialize messages based on language
+  // Initialize messages based on language (only when chatbot first opens)
   useEffect(() => {
-    const initialMsg: Message = {
-      id: '1',
-      type: 'bot',
-      content: INITIAL_MESSAGES[language as keyof typeof INITIAL_MESSAGES] || INITIAL_MESSAGES.en,
-      timestamp: new Date()
-    };
-    setMessages([initialMsg]);
-  }, [language]);
+    if (isOpen && messages.length === 0) {
+      const initialMsg: Message = {
+        id: '1',
+        type: 'bot',
+        content: INITIAL_MESSAGES[language as keyof typeof INITIAL_MESSAGES] || INITIAL_MESSAGES.en,
+        timestamp: new Date()
+      };
+      setMessages([initialMsg]);
+    }
+  }, [isOpen, language]);
 
   // Smooth scrolling to bottom
   const scrollToBottom = useCallback(() => {
@@ -173,7 +175,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ className = '' }) => {
             : msg
         ));
       }
-    }, 50); // Speed of typing animation (50ms per word)
+    }, 30); // Speed of typing animation (30ms per word for smoother effect)
 
     return () => clearInterval(interval);
   }, []);
