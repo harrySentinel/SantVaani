@@ -241,6 +241,7 @@ export const addComment = async (
         user_id: userId,
         comment_text: commentText,
         parent_comment_id: parentCommentId,
+        is_approved: true, // Auto-approve comments (admins can still delete if needed)
       })
       .select('*')
       .single()
