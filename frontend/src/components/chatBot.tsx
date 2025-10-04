@@ -245,11 +245,12 @@ const ChatBot: React.FC<ChatBotProps> = ({ className = '' }) => {
     }
   };
 
-  // Handle input focus - scroll into view on mobile
+  // Handle input focus - removed scroll behavior to fix keyboard overlap
   const handleInputFocus = () => {
+    // Scroll to bottom of messages instead of input field
     setTimeout(() => {
-      inputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
-    }, 300);
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
   };
 
   // Get status indicator
@@ -286,7 +287,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ className = '' }) => {
       {isOpen && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200 overflow-hidden">
           <div className="h-full flex items-end sm:items-center justify-center p-0 sm:p-4">
-            <div className="w-full max-w-4xl h-full sm:h-auto sm:max-h-[90vh] bg-white sm:rounded-2xl shadow-2xl flex flex-col animate-in slide-in-from-bottom sm:zoom-in-95 duration-300">
+            <div className="w-full max-w-6xl h-full sm:h-auto sm:max-h-[90vh] bg-white sm:rounded-2xl shadow-2xl flex flex-col animate-in slide-in-from-bottom sm:zoom-in-95 duration-300">
 
               {/* Header */}
               <div className="bg-gradient-to-r from-orange-500 via-orange-600 to-red-500 rounded-t-2xl p-6 flex items-center justify-between shadow-lg relative overflow-hidden">
@@ -327,7 +328,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ className = '' }) => {
                     key={message.id}
                     className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-4 duration-300`}
                   >
-                    <div className={`max-w-[75%] rounded-2xl p-4 ${
+                    <div className={`max-w-[85%] sm:max-w-[80%] rounded-2xl p-4 ${
                       message.type === 'user'
                         ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg'
                         : 'bg-white border border-orange-200 text-gray-800 shadow-md'
