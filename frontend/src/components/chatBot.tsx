@@ -56,7 +56,19 @@ const ChatBot: React.FC<ChatBotProps> = ({ className = '' }) => {
       };
       setMessages([initialMsg]);
     }
-  }, [isOpen, language]);
+  }, [isOpen]);
+
+  // Update greeting message when language changes
+  useEffect(() => {
+    if (messages.length > 0 && messages[0].id === '1') {
+      const updatedMessages = [...messages];
+      updatedMessages[0] = {
+        ...updatedMessages[0],
+        content: INITIAL_MESSAGES[language as keyof typeof INITIAL_MESSAGES] || INITIAL_MESSAGES.en
+      };
+      setMessages(updatedMessages);
+    }
+  }, [language]);
 
   // Smooth scrolling to bottom
   const scrollToBottom = useCallback(() => {
