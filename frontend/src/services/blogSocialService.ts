@@ -24,7 +24,6 @@ export interface BlogComment {
   user_id: string
   parent_comment_id: string | null
   comment_text: string
-  is_approved: boolean
   created_at: string
   updated_at: string
   user?: {
@@ -241,7 +240,6 @@ export const addComment = async (
         user_id: userId,
         comment_text: commentText,
         parent_comment_id: parentCommentId,
-        is_approved: true, // Auto-approve comments (admins can still delete if needed)
       })
       .select('*')
       .single()
@@ -274,7 +272,6 @@ export const getPostComments = async (postId: string) => {
         )
       `)
       .eq('blog_post_id', postId)
-      .eq('is_approved', true)
       .order('created_at', { ascending: true })
 
     if (error) throw error
@@ -361,7 +358,6 @@ export const getCommentsCount = async (postId: string) => {
       .from('blog_comments')
       .select('*', { count: 'exact', head: true })
       .eq('blog_post_id', postId)
-      .eq('is_approved', true)
 
     if (error) throw error
     return { success: true, count: count || 0 }
