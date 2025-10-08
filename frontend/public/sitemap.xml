@@ -1,117 +1,146 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Main Pages -->
   <url>
     <loc>https://santvaani.com/</loc>
-    <lastmod>2024-12-30</lastmod>
+    <lastmod>2025-10-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
+    <loc>https://santvaani.com/about</loc>
+    <lastmod>2025-10-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Saints Section -->
+  <url>
     <loc>https://santvaani.com/saints</loc>
-    <lastmod>2024-12-30</lastmod>
+    <lastmod>2025-10-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
+    <loc>https://santvaani.com/living-saints</loc>
+    <lastmod>2025-10-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Divine Forms -->
+  <url>
+    <loc>https://santvaani.com/divine</loc>
+    <lastmod>2025-10-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Daily Features -->
+  <url>
     <loc>https://santvaani.com/daily-guide</loc>
-    <lastmod>2024-12-30</lastmod>
+    <lastmod>2025-10-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://santvaani.com/horoscope</loc>
-    <lastmod>2024-12-30</lastmod>
+    <lastmod>2025-10-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
+
+  <!-- Bhajans & Media -->
   <url>
     <loc>https://santvaani.com/bhajans</loc>
-    <lastmod>2024-12-30</lastmod>
+    <lastmod>2025-10-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
+  <url>
+    <loc>https://santvaani.com/live-bhajans</loc>
+    <lastmod>2025-10-08</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Community -->
   <url>
     <loc>https://santvaani.com/events</loc>
-    <lastmod>2024-12-30</lastmod>
+    <lastmod>2025-10-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://santvaani.com/feedback</loc>
-    <lastmod>2024-12-30</lastmod>
+    <loc>https://santvaani.com/donation</loc>
+    <lastmod>2025-10-08</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.6</priority>
   </url>
+
+  <!-- Blog -->
   <url>
     <loc>https://santvaani.com/blog</loc>
-    <lastmod>2024-12-30</lastmod>
+    <lastmod>2025-10-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
-  <url>
-    <loc>https://santvaani.com/blog/spiritual-wisdom</loc>
-    <lastmod>2024-12-30</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://santvaani.com/blog/daily-guidance</loc>
-    <lastmod>2024-12-30</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://santvaani.com/blog/meditation-practices</loc>
-    <lastmod>2024-12-30</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
+
+  <!-- Blog Categories -->
   <url>
     <loc>https://santvaani.com/blog/category/spiritual-wisdom</loc>
-    <lastmod>2024-12-30</lastmod>
+    <lastmod>2025-10-08</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://santvaani.com/blog/category/daily-guidance</loc>
-    <lastmod>2024-12-30</lastmod>
+    <lastmod>2025-10-08</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://santvaani.com/blog/category/meditation-practices</loc>
-    <lastmod>2024-12-30</lastmod>
+    <lastmod>2025-10-08</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://santvaani.com/blog/category/festival-guides</loc>
-    <lastmod>2024-12-30</lastmod>
+    <lastmod>2025-10-08</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://santvaani.com/blog/category/saint-stories</loc>
-    <lastmod>2024-12-30</lastmod>
+    <lastmod>2025-10-08</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://santvaani.com/blog/category/spiritual-philosophy</loc>
-    <lastmod>2024-12-30</lastmod>
+    <lastmod>2025-10-08</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://santvaani.com/blog/category/modern-spirituality</loc>
-    <lastmod>2024-12-30</lastmod>
+    <lastmod>2025-10-08</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://santvaani.com/blog/category/healing-wellness</loc>
-    <lastmod>2024-12-30</lastmod>
+    <lastmod>2025-10-08</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Other Pages -->
+  <url>
+    <loc>https://santvaani.com/feedback</loc>
+    <lastmod>2025-10-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
   </url>
 </urlset>
