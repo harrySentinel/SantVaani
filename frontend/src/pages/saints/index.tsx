@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import SEO from '@/components/SEO';
+import StructuredData, { BreadcrumbSchema } from '@/components/StructuredData';
 import SaintModal from '@/components/SaintModal';
 import ShareButton from '@/components/ShareButton';
 import { Card, CardContent } from '@/components/ui/card';
@@ -264,6 +266,19 @@ const Saints = () => {
   // Main component - EXACTLY the same as your original
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-white">
+      <SEO
+        title="Great Saints - Discover India's Spiritual Masters"
+        description="Explore the profound wisdom and divine teachings of India's most revered spiritual masters including Meera Bai, Kabir Das, Tulsidas, and many more."
+        canonical="https://santvaani.com/saints"
+        keywords="Indian saints, spiritual masters, Meera Bai, Kabir Das, Tulsidas, Surdas, Sant Ravidas, spiritual teachings, Hindu saints, bhakti saints"
+      />
+      <StructuredData type="website" />
+      <BreadcrumbSchema
+        items={[
+          { name: 'Home', url: 'https://santvaani.com' },
+          { name: 'Saints', url: 'https://santvaani.com/saints' }
+        ]}
+      />
       <Navbar />
       
       {/* Header */}

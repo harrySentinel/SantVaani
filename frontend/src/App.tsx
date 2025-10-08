@@ -81,7 +81,7 @@ const App = () => {
               <Route path="/living-saints" element={<LivingSaints />} />
               <Route path="/divine" element={<Divine />} />
               <Route path="/bhajans" element={<Bhajans />} />
-               <Route path="/live-bhajan" element={<LiveBhajan />} />
+               <Route path="/live-bhajans" element={<LiveBhajan />} />
               <Route path="/daily-guide" element={<DailyGuide />} />
               <Route path="/horoscope" element={<Horoscope />} />
               <Route path="/events" element={<Events />} />

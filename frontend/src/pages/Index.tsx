@@ -2,6 +2,8 @@ import { useState, Suspense, lazy } from 'react';
 import HeroSection from '@/components/HeroSection';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import SEO from '@/components/SEO';
+import StructuredData from '@/components/StructuredData';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -59,6 +61,13 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-white">
+      <SEO
+        title="SantVaani - Where Ancient Wisdom Meets Modern Hearts"
+        description="Discover the profound teachings and divine wisdom of India's greatest saints. Explore bhajans, spiritual quotes, daily horoscopes, and connect with a global community of seekers."
+        canonical="https://santvaani.com"
+        keywords="Indian saints, spirituality, bhajans, spiritual quotes, meditation, Hindu spirituality, daily horoscope, spiritual community, divine wisdom, sant vaani"
+      />
+      <StructuredData type="website" />
       <Navbar />
       <NoticeBoard />
 

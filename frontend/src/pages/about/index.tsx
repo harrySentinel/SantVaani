@@ -1,6 +1,8 @@
 
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import SEO from '@/components/SEO';
+import StructuredData, { BreadcrumbSchema } from '@/components/StructuredData';
 import { Card, CardContent } from '@/components/ui/card';
 import { Heart, Globe, Users, BookOpen, Lightbulb, Target } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -51,6 +53,19 @@ const About = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-orange-50">
+      <SEO
+        title="About SantVaani - Our Mission & Vision"
+        description="Learn about SantVaani's mission to preserve and share the profound wisdom of India's greatest spiritual masters. Meet our team and discover our vision for a global spiritual community."
+        canonical="https://santvaani.com/about"
+        keywords="about santvaani, spiritual platform, Indian saints, spiritual wisdom, our mission, spiritual community, digital ashram"
+      />
+      <StructuredData type="organization" />
+      <BreadcrumbSchema
+        items={[
+          { name: 'Home', url: 'https://santvaani.com' },
+          { name: 'About', url: 'https://santvaani.com/about' }
+        ]}
+      />
       <Navbar />
       
       {/* Header */}
