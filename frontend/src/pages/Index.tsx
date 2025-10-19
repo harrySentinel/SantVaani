@@ -150,7 +150,7 @@ const Index = () => {
       </p>
     </div>
     
-    <Link to="/live-bhajan">
+    <Link to="/live-bhajans">
       <Card className="group hover:shadow-2xl transition-all duration-300 transform hover:scale-105 border-0 shadow-xl bg-gradient-to-br from-white to-orange-50 backdrop-blur-sm max-w-md mx-auto">
         <CardContent className="p-8 text-center space-y-6">
           <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg relative">
