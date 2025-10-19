@@ -262,13 +262,10 @@ export const getPostComments = async (postId: string) => {
       .from('blog_comments')
       .select(`
         *,
-        user:user_id (
+        users!blog_comments_user_id_fkey (
+          id,
           email,
-          user_profiles (
-            username,
-            full_name,
-            avatar_url
-          )
+          user_metadata
         )
       `)
       .eq('blog_post_id', postId)

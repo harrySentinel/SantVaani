@@ -99,7 +99,10 @@ export default function CommentsSection({
     setIsFetching(true)
     const result = await getPostComments(postId)
     if (result.success) {
+      console.log('📝 Comments fetched:', result.comments)
       setComments(result.comments)
+    } else {
+      console.error('❌ Error fetching comments:', result.error)
     }
     setIsFetching(false)
   }
@@ -271,7 +274,7 @@ export default function CommentsSection({
               {replyingTo === comment.id && (
                 <div className="ml-8 mt-4 bg-orange-50 rounded-lg p-4 border border-orange-200">
                   <p className="text-sm font-medium text-orange-900 mb-2">
-                    Replying to {comment.user?.email?.split('@')[0] || 'user'}
+                    Replying to {comment.users?.email?.split('@')[0] || 'user'}
                   </p>
                   <Textarea
                     placeholder="Write your reply..."

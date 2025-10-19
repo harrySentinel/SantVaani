@@ -88,15 +88,15 @@ export default function CommentItem({
   }
 
   const getUserDisplay = () => {
-    // Try to get username from user_profiles, fallback to email
-    if (comment.user?.user_profiles?.[0]?.username) {
-      return comment.user.user_profiles[0].username
+    // Try to get username from users table or user_metadata
+    if (comment.users?.user_metadata?.username) {
+      return comment.users.user_metadata.username
     }
-    if (comment.user?.user_profiles?.[0]?.full_name) {
-      return comment.user.user_profiles[0].full_name
+    if (comment.users?.user_metadata?.full_name) {
+      return comment.users.user_metadata.full_name
     }
-    if (comment.user?.email) {
-      return comment.user.email.split('@')[0]
+    if (comment.users?.email) {
+      return comment.users.email.split('@')[0]
     }
     return 'Anonymous'
   }
