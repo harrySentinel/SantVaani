@@ -305,7 +305,7 @@ export default function BlogForm({ post, isOpen, onClose, onSave }: BlogFormProp
     }))
   }
 
-  // AI SEO Optimization - Similar to Hashnode
+  // AI SEO Optimization - Similar to Hashnode (Direct Groq API call)
   const generateSEOSuggestions = async () => {
     if (!formData.title || !formData.excerpt) {
       toast({
@@ -318,21 +318,70 @@ export default function BlogForm({ post, isOpen, onClose, onSave }: BlogFormProp
 
     setAiLoading(true)
     try {
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'}/api/blog/ai/seo-optimize`, {
+      // Use Groq API directly from frontend (from environment variable)
+      const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY
+
+      if (!GROQ_API_KEY) {
+        throw new Error('Groq API key not configured')
+      }
+
+      const languageContext = contentLanguage === 'hi'
+        ? 'Hindi (हिंदी)'
+        : contentLanguage === 'en'
+        ? 'English'
+        : 'both Hindi and English (bilingual)'
+
+      const prompt = `You are an SEO expert for a spiritual blog platform called SantVaani. Generate SEO-optimized metadata for this blog post in ${languageContext}.
+
+Blog Title: "${formData.title}"
+Excerpt: "${formData.excerpt}"
+${formData.content ? `First paragraph: "${formData.content.substring(0, 200)}..."` : ''}
+
+Generate the following in JSON format:
+{
+  "metaTitle": "SEO-optimized title (50-60 characters, includes keywords)",
+  "metaDescription": "Compelling meta description (150-160 characters, includes call-to-action)",
+  "keywords": ["keyword1", "keyword2", "keyword3", "keyword4", "keyword5"],
+  "suggestedTags": ["tag1", "tag2", "tag3"]
+}
+
+IMPORTANT:
+- metaTitle should be catchy and include main keywords
+- metaDescription should be engaging and make people want to click
+- Include spirituality-related keywords relevant to the content
+- For Hindi content, use Hindi keywords; for English use English keywords
+- Focus on Indian spiritual terms, saint names, and practices`
+
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Authorization': `Bearer ${GROQ_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
-          title: formData.title,
-          excerpt: formData.excerpt,
-          content: formData.content.substring(0, 500), // First 500 chars for context
-          language: contentLanguage
+          model: 'llama-3.1-70b-versatile',
+          messages: [{
+            role: 'user',
+            content: prompt
+          }],
+          temperature: 0.7,
+          max_tokens: 800,
         })
       })
 
-      if (!response.ok) throw new Error('Failed to generate suggestions')
+      if (!response.ok) throw new Error('Groq API error')
 
       const data = await response.json()
-      setSeoSuggestions(data.suggestions)
+      const generatedText = data.choices?.[0]?.message?.content
+
+      if (!generatedText) throw new Error('No response from AI')
+
+      // Extract JSON from response
+      const jsonMatch = generatedText.match(/\{[\s\S]*\}/)
+      if (!jsonMatch) throw new Error('Invalid AI response format')
+
+      const suggestions = JSON.parse(jsonMatch[0])
+      setSeoSuggestions(suggestions)
 
       toast({
         title: 'AI Suggestions Ready!',
@@ -340,10 +389,20 @@ export default function BlogForm({ post, isOpen, onClose, onSave }: BlogFormProp
       })
     } catch (error: any) {
       console.error('AI SEO Error:', error)
+
+      // Fallback suggestions
+      const fallbackSuggestions = {
+        metaTitle: `${formData.title} | SantVaani Spiritual Blog`,
+        metaDescription: formData.excerpt.substring(0, 157) + '...',
+        keywords: ['spirituality', 'hindu wisdom', 'sant vaani', 'spiritual guidance', 'meditation'],
+        suggestedTags: ['spirituality', 'wisdom', 'guidance']
+      }
+
+      setSeoSuggestions(fallbackSuggestions)
+
       toast({
-        title: 'AI temporarily unavailable',
-        description: 'Using basic SEO suggestions',
-        variant: 'destructive'
+        title: 'Using fallback suggestions',
+        description: 'AI unavailable, showing basic SEO suggestions',
       })
     } finally {
       setAiLoading(false)
@@ -363,7 +422,7 @@ export default function BlogForm({ post, isOpen, onClose, onSave }: BlogFormProp
     })
   }
 
-  // Auto-translate content (Hindi <-> English)
+  // Auto-translate content (Hindi <-> English) - Direct Groq API call
   const translateContent = async (targetLang: 'hi' | 'en') => {
     if (!formData.content) {
       toast({
@@ -376,27 +435,71 @@ export default function BlogForm({ post, isOpen, onClose, onSave }: BlogFormProp
 
     setTranslating(true)
     try {
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'}/api/blog/ai/translate`, {
+      const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY
+
+      if (!GROQ_API_KEY) {
+        throw new Error('Groq API key not configured')
+      }
+
+      const targetLangName = targetLang === 'hi' ? 'Hindi (हिंदी)' : 'English'
+      const sourceLangName = targetLang === 'hi' ? 'English' : 'Hindi (हिंदी)'
+
+      const prompt = `You are a professional translator specializing in spiritual and religious content. Translate the following blog post from ${sourceLangName} to ${targetLangName}.
+
+Title: "${formData.title}"
+Excerpt: "${formData.excerpt}"
+Content: "${formData.content.substring(0, 1000)}${formData.content.length > 1000 ? '...' : ''}"
+
+IMPORTANT RULES:
+1. Maintain spiritual terminology accurately (e.g., dharma, karma, bhakti)
+2. Keep saint names in original form
+3. Preserve emotional and spiritual tone
+4. Use culturally appropriate expressions
+5. Don't translate proper nouns like names of gods, saints, or sacred texts
+
+Return ONLY a JSON object:
+{
+  "title": "translated title",
+  "excerpt": "translated excerpt",
+  "content": "translated content"
+}`
+
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Authorization': `Bearer ${GROQ_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
-          content: formData.content,
-          title: formData.title,
-          excerpt: formData.excerpt,
-          targetLanguage: targetLang
+          model: 'llama-3.1-70b-versatile',
+          messages: [{
+            role: 'user',
+            content: prompt
+          }],
+          temperature: 0.5,
+          max_tokens: 2000,
         })
       })
 
-      if (!response.ok) throw new Error('Translation failed')
+      if (!response.ok) throw new Error('Groq API error')
 
       const data = await response.json()
+      const generatedText = data.choices?.[0]?.message?.content
+
+      if (!generatedText) throw new Error('No response from AI')
+
+      // Extract JSON from response
+      const jsonMatch = generatedText.match(/\{[\s\S]*\}/)
+      if (!jsonMatch) throw new Error('Invalid AI response format')
+
+      const translated = JSON.parse(jsonMatch[0])
 
       // Update with translated content
       setFormData(prev => ({
         ...prev,
-        title: data.translated.title || prev.title,
-        excerpt: data.translated.excerpt || prev.excerpt,
-        content: data.translated.content || prev.content
+        title: translated.title || prev.title,
+        excerpt: translated.excerpt || prev.excerpt,
+        content: translated.content || prev.content
       }))
 
       toast({
