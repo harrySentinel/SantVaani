@@ -321,8 +321,10 @@ export default function BlogForm({ post, isOpen, onClose, onSave }: BlogFormProp
       // Use Groq API directly from frontend (from environment variable)
       const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY
 
+      console.log('🔑 Checking API key...', GROQ_API_KEY ? 'Key found!' : 'Key missing!')
+
       if (!GROQ_API_KEY) {
-        throw new Error('Groq API key not configured')
+        throw new Error('Groq API key not configured. Please add VITE_GROQ_API_KEY to environment variables.')
       }
 
       const languageContext = contentLanguage === 'hi'
