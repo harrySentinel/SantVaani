@@ -257,30 +257,57 @@ export const addComment = async (
  */
 export const getPostComments = async (postId: string) => {
   try {
-    // Get all comments with user data
+    console.log('🔍 Fetching comments for post:', postId)
+
+    // Get all comments with user profiles
     const { data, error } = await supabase
       .from('blog_comments')
       .select(`
-        *,
-        users!blog_comments_user_id_fkey (
+        id,
+        blog_post_id,
+        user_id,
+        parent_comment_id,
+        comment_text,
+        created_at,
+        updated_at,
+        user_profiles (
           id,
-          email,
-          user_metadata
+          username,
+          full_name,
+          avatar_url
         )
       `)
       .eq('blog_post_id', postId)
+      .eq('is_approved', true)
       .order('created_at', { ascending: true })
 
-    if (error) throw error
+    if (error) {
+      console.error('❌ Error fetching comments:', error)
+      throw error
+    }
 
-    // Organize comments into parent-child structure
+    console.log(`✅ Fetched ${data?.length || 0} comments`)
+
+    // Organize comments into parent-child structure with user data
     const comments = data || []
     const commentMap: { [key: string]: any } = {}
     const rootComments: any[] = []
 
-    // First pass: create comment objects
+    // First pass: create comment objects with user data
     comments.forEach((comment: any) => {
-      commentMap[comment.id] = { ...comment, replies: [] }
+      const userProfile = comment.user_profiles || {}
+      commentMap[comment.id] = {
+        ...comment,
+        users: {
+          email: userProfile.username || userProfile.full_name || 'User',
+          user_profiles: {
+            username: userProfile.username,
+            full_name: userProfile.full_name,
+            avatar_url: userProfile.avatar_url
+          }
+        },
+        replies: []
+      }
     })
 
     // Second pass: build tree structure
@@ -295,9 +322,10 @@ export const getPostComments = async (postId: string) => {
       }
     })
 
+    console.log(`📊 Organized into ${rootComments.length} root comments`)
     return { success: true, comments: rootComments }
   } catch (error: any) {
-    console.error('Error getting comments:', error)
+    console.error('❌ Error getting comments:', error)
     return { success: false, comments: [], error: error.message }
   }
 }

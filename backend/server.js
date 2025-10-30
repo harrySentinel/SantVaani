@@ -2023,6 +2023,218 @@ app.post('/api/blog/posts', async (req, res) => {
 
 console.log('✅ Blog routes registered successfully');
 
+// ============================================
+// AI-POWERED BLOG FEATURES
+// ============================================
+
+console.log('🤖 Registering AI blog features...');
+
+// AI SEO Optimization Endpoint (Like Hashnode)
+app.post('/api/blog/ai/seo-optimize', async (req, res) => {
+  try {
+    const { title, excerpt, content, language = 'hi' } = req.body;
+
+    if (!title || !excerpt) {
+      return res.status(400).json({
+        success: false,
+        error: 'Title and excerpt are required'
+      });
+    }
+
+    const GROQ_API_KEY = process.env.GROQ_API_KEY;
+    if (!GROQ_API_KEY) {
+      return res.status(500).json({
+        success: false,
+        error: 'AI service not configured'
+      });
+    }
+
+    const languageContext = language === 'hi'
+      ? 'Hindi (हिंदी)'
+      : language === 'en'
+      ? 'English'
+      : 'both Hindi and English (bilingual)';
+
+    const prompt = `You are an SEO expert for a spiritual blog platform called SantVaani. Generate SEO-optimized metadata for this blog post in ${languageContext}.
+
+Blog Title: "${title}"
+Excerpt: "${excerpt}"
+${content ? `First paragraph: "${content.substring(0, 200)}..."` : ''}
+
+Generate the following in JSON format:
+{
+  "metaTitle": "SEO-optimized title (50-60 characters, includes keywords)",
+  "metaDescription": "Compelling meta description (150-160 characters, includes call-to-action)",
+  "keywords": ["keyword1", "keyword2", "keyword3", "keyword4", "keyword5"],
+  "suggestedTags": ["tag1", "tag2", "tag3"]
+}
+
+IMPORTANT:
+- metaTitle should be catchy and include main keywords
+- metaDescription should be engaging and make people want to click
+- Include spirituality-related keywords relevant to the content
+- For Hindi content, use Hindi keywords; for English use English keywords
+- Focus on Indian spiritual terms, saint names, and practices`;
+
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${GROQ_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'llama-3.1-70b-versatile',
+        messages: [{
+          role: 'user',
+          content: prompt
+        }],
+        temperature: 0.7,
+        max_tokens: 800,
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Groq API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const generatedText = data.choices?.[0]?.message?.content;
+
+    if (!generatedText) {
+      throw new Error('No response from AI');
+    }
+
+    // Extract JSON from response
+    const jsonMatch = generatedText.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new Error('Invalid AI response format');
+    }
+
+    const suggestions = JSON.parse(jsonMatch[0]);
+
+    res.json({
+      success: true,
+      suggestions,
+      source: 'AI-Powered'
+    });
+
+  } catch (error) {
+    console.error('AI SEO optimization error:', error);
+
+    // Fallback suggestions
+    const fallbackSuggestions = {
+      metaTitle: `${req.body.title} | SantVaani Spiritual Blog`,
+      metaDescription: req.body.excerpt.substring(0, 157) + '...',
+      keywords: ['spirituality', 'hindu wisdom', 'sant vaani', 'spiritual guidance', 'meditation'],
+      suggestedTags: ['spirituality', 'wisdom', 'guidance']
+    };
+
+    res.json({
+      success: true,
+      suggestions: fallbackSuggestions,
+      source: 'Fallback'
+    });
+  }
+});
+
+// AI Translation Endpoint (Hindi <-> English)
+app.post('/api/blog/ai/translate', async (req, res) => {
+  try {
+    const { title, excerpt, content, targetLanguage } = req.body;
+
+    if (!content) {
+      return res.status(400).json({
+        success: false,
+        error: 'Content is required for translation'
+      });
+    }
+
+    const GROQ_API_KEY = process.env.GROQ_API_KEY;
+    if (!GROQ_API_KEY) {
+      return res.status(500).json({
+        success: false,
+        error: 'AI service not configured'
+      });
+    }
+
+    const targetLangName = targetLanguage === 'hi' ? 'Hindi (हिंदी)' : 'English';
+    const sourceLangName = targetLanguage === 'hi' ? 'English' : 'Hindi (हिंदी)';
+
+    const prompt = `You are a professional translator specializing in spiritual and religious content. Translate the following blog post from ${sourceLangName} to ${targetLangName}.
+
+Title: "${title}"
+Excerpt: "${excerpt}"
+Content: "${content.substring(0, 1000)}${content.length > 1000 ? '...' : ''}"
+
+IMPORTANT RULES:
+1. Maintain spiritual terminology accurately (e.g., dharma, karma, bhakti)
+2. Keep saint names in original form
+3. Preserve emotional and spiritual tone
+4. Use culturally appropriate expressions
+5. Don't translate proper nouns like names of gods, saints, or sacred texts
+
+Return ONLY a JSON object:
+{
+  "title": "translated title",
+  "excerpt": "translated excerpt",
+  "content": "translated content"
+}`;
+
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${GROQ_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'llama-3.1-70b-versatile',
+        messages: [{
+          role: 'user',
+          content: prompt
+        }],
+        temperature: 0.5,
+        max_tokens: 2000,
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Groq API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const generatedText = data.choices?.[0]?.message?.content;
+
+    if (!generatedText) {
+      throw new Error('No response from AI');
+    }
+
+    // Extract JSON from response
+    const jsonMatch = generatedText.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new Error('Invalid AI response format');
+    }
+
+    const translated = JSON.parse(jsonMatch[0]);
+
+    res.json({
+      success: true,
+      translated,
+      targetLanguage,
+      source: 'AI-Powered'
+    });
+
+  } catch (error) {
+    console.error('AI translation error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Translation failed. Please try again or translate manually.',
+      details: error.message
+    });
+  }
+});
+
+console.log('✅ AI blog features registered successfully');
+
 // 404 handler (MUST be last)
 app.use((req, res) => {
   res.status(404).json({

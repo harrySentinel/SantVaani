@@ -12,6 +12,7 @@ import VisitorCounter from '@/components/VisitorCounter';
 import SpiritualFactBox from '@/components/SpiritualFactBox';
 import FeedbackForm from '@/components/FeedbackForm';
 import NoticeBoard from '@/components/NoticeBoard';
+import LandingBlogSection from '@/components/LandingBlogSection';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 // Lazy load ChatBot for better performance
@@ -189,6 +190,9 @@ const Index = () => {
           <VisitorCounter className="mb-8" />
         </div>
       </section>
+
+      {/* Featured Blog Posts Section */}
+      <LandingBlogSection />
 
       {/* Mission Section */}
       <section className="py-20 bg-white">

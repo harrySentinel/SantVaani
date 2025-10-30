@@ -13,9 +13,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { useToast } from '@/hooks/use-toast'
 import { supabase, TABLES } from '@/lib/supabase'
-import { Upload, X, Loader2, Image as ImageIcon } from 'lucide-react'
+import { Upload, X, Loader2, Image as ImageIcon, Sparkles, CheckCircle, AlertCircle, Languages, Wand2 } from 'lucide-react'
 
 interface BlogPost {
   id: string
@@ -54,6 +61,12 @@ export default function BlogForm({ post, isOpen, onClose, onSave }: BlogFormProp
   const [saintInput, setSaintInput] = useState('')
   const [keywordInput, setKeywordInput] = useState('')
   const [imagePreview, setImagePreview] = useState<string | null>(null)
+
+  // AI Features
+  const [aiLoading, setAiLoading] = useState(false)
+  const [seoSuggestions, setSeoSuggestions] = useState<any>(null)
+  const [contentLanguage, setContentLanguage] = useState<'hi' | 'en' | 'both'>('hi')
+  const [translating, setTranslating] = useState(false)
 
   const [formData, setFormData] = useState({
     title: '',
@@ -292,6 +305,166 @@ export default function BlogForm({ post, isOpen, onClose, onSave }: BlogFormProp
     }))
   }
 
+  // AI SEO Optimization - Similar to Hashnode
+  const generateSEOSuggestions = async () => {
+    if (!formData.title || !formData.excerpt) {
+      toast({
+        title: 'Title and excerpt required',
+        description: 'Please fill in title and excerpt first',
+        variant: 'destructive'
+      })
+      return
+    }
+
+    setAiLoading(true)
+    try {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'}/api/blog/ai/seo-optimize`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: formData.title,
+          excerpt: formData.excerpt,
+          content: formData.content.substring(0, 500), // First 500 chars for context
+          language: contentLanguage
+        })
+      })
+
+      if (!response.ok) throw new Error('Failed to generate suggestions')
+
+      const data = await response.json()
+      setSeoSuggestions(data.suggestions)
+
+      toast({
+        title: 'AI Suggestions Ready!',
+        description: 'Review the SEO-optimized suggestions below',
+      })
+    } catch (error: any) {
+      console.error('AI SEO Error:', error)
+      toast({
+        title: 'AI temporarily unavailable',
+        description: 'Using basic SEO suggestions',
+        variant: 'destructive'
+      })
+    } finally {
+      setAiLoading(false)
+    }
+  }
+
+  // Apply AI suggestion
+  const applySuggestion = (field: 'meta_title' | 'meta_description' | 'meta_keywords', value: any) => {
+    if (field === 'meta_keywords' && Array.isArray(value)) {
+      setFormData(prev => ({ ...prev, meta_keywords: value }))
+    } else {
+      setFormData(prev => ({ ...prev, [field]: value }))
+    }
+    toast({
+      title: 'Applied!',
+      description: 'AI suggestion has been applied',
+    })
+  }
+
+  // Auto-translate content (Hindi <-> English)
+  const translateContent = async (targetLang: 'hi' | 'en') => {
+    if (!formData.content) {
+      toast({
+        title: 'No content to translate',
+        description: 'Please write some content first',
+        variant: 'destructive'
+      })
+      return
+    }
+
+    setTranslating(true)
+    try {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'}/api/blog/ai/translate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: formData.content,
+          title: formData.title,
+          excerpt: formData.excerpt,
+          targetLanguage: targetLang
+        })
+      })
+
+      if (!response.ok) throw new Error('Translation failed')
+
+      const data = await response.json()
+
+      // Update with translated content
+      setFormData(prev => ({
+        ...prev,
+        title: data.translated.title || prev.title,
+        excerpt: data.translated.excerpt || prev.excerpt,
+        content: data.translated.content || prev.content
+      }))
+
+      toast({
+        title: 'Translation Complete!',
+        description: `Content translated to ${targetLang === 'hi' ? 'Hindi' : 'English'}`,
+      })
+    } catch (error: any) {
+      console.error('Translation Error:', error)
+      toast({
+        title: 'Translation failed',
+        description: 'Please try again or translate manually',
+        variant: 'destructive'
+      })
+    } finally {
+      setTranslating(false)
+    }
+  }
+
+  // Calculate SEO Score
+  const calculateSEOScore = () => {
+    let score = 0
+    const checks = []
+
+    // Title length (50-60 chars is ideal)
+    if (formData.meta_title.length >= 50 && formData.meta_title.length <= 60) {
+      score += 20
+      checks.push({ text: 'Title length optimal', passed: true })
+    } else {
+      checks.push({ text: 'Title should be 50-60 characters', passed: false })
+    }
+
+    // Description length (150-160 chars is ideal)
+    if (formData.meta_description.length >= 150 && formData.meta_description.length <= 160) {
+      score += 20
+      checks.push({ text: 'Meta description length optimal', passed: true })
+    } else {
+      checks.push({ text: 'Meta description should be 150-160 characters', passed: false })
+    }
+
+    // Has keywords
+    if (formData.meta_keywords.length >= 3) {
+      score += 20
+      checks.push({ text: 'Has sufficient keywords', passed: true })
+    } else {
+      checks.push({ text: 'Add at least 3 keywords', passed: false })
+    }
+
+    // Has excerpt
+    if (formData.excerpt.length > 50) {
+      score += 20
+      checks.push({ text: 'Has good excerpt', passed: true })
+    } else {
+      checks.push({ text: 'Excerpt should be longer', passed: false })
+    }
+
+    // Has spiritual quotes
+    if (formData.spiritual_quotes && formData.spiritual_quotes.length > 0) {
+      score += 20
+      checks.push({ text: 'Has spiritual quotes', passed: true })
+    } else {
+      checks.push({ text: 'Add spiritual quotes for engagement', passed: false })
+    }
+
+    return { score, checks }
+  }
+
+  const seoScore = calculateSEOScore()
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -365,18 +538,200 @@ export default function BlogForm({ post, isOpen, onClose, onSave }: BlogFormProp
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Language Selection & AI Tools */}
+          <Card className="border-orange-200 bg-orange-50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Sparkles className="w-5 h-5 text-orange-600" />
+                AI-Powered Blog Editor
+              </CardTitle>
+              <CardDescription>
+                Choose language and get AI-powered SEO suggestions
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-3 gap-3">
+                <Button
+                  type="button"
+                  variant={contentLanguage === 'hi' ? 'default' : 'outline'}
+                  onClick={() => setContentLanguage('hi')}
+                  className={contentLanguage === 'hi' ? 'bg-orange-600' : ''}
+                >
+                  <Languages className="w-4 h-4 mr-2" />
+                  हिंदी Only
+                </Button>
+                <Button
+                  type="button"
+                  variant={contentLanguage === 'en' ? 'default' : 'outline'}
+                  onClick={() => setContentLanguage('en')}
+                  className={contentLanguage === 'en' ? 'bg-orange-600' : ''}
+                >
+                  <Languages className="w-4 h-4 mr-2" />
+                  English Only
+                </Button>
+                <Button
+                  type="button"
+                  variant={contentLanguage === 'both' ? 'default' : 'outline'}
+                  onClick={() => setContentLanguage('both')}
+                  className={contentLanguage === 'both' ? 'bg-orange-600' : ''}
+                >
+                  <Languages className="w-4 h-4 mr-2" />
+                  Bilingual
+                </Button>
+              </div>
+
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  onClick={generateSEOSuggestions}
+                  disabled={aiLoading || !formData.title}
+                  className="flex-1 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700"
+                >
+                  {aiLoading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <Wand2 className="w-4 h-4 mr-2" />
+                      Generate SEO Suggestions
+                    </>
+                  )}
+                </Button>
+
+                {contentLanguage === 'both' && (
+                  <Button
+                    type="button"
+                    onClick={() => translateContent(formData.content.match(/[\u0900-\u097F]/) ? 'en' : 'hi')}
+                    disabled={translating || !formData.content}
+                    variant="outline"
+                  >
+                    {translating ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Translating...
+                      </>
+                    ) : (
+                      <>
+                        <Languages className="w-4 h-4 mr-2" />
+                        Auto-Translate
+                      </>
+                    )}
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* SEO Score Card */}
+          <Card className={`border-2 ${seoScore.score >= 80 ? 'border-green-300 bg-green-50' : seoScore.score >= 60 ? 'border-yellow-300 bg-yellow-50' : 'border-red-300 bg-red-50'}`}>
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <span className="text-lg">SEO Score</span>
+                <span className={`text-3xl font-bold ${seoScore.score >= 80 ? 'text-green-600' : seoScore.score >= 60 ? 'text-yellow-600' : 'text-red-600'}`}>
+                  {seoScore.score}%
+                </span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {seoScore.checks.map((check, idx) => (
+                  <div key={idx} className="flex items-center gap-2 text-sm">
+                    {check.passed ? (
+                      <CheckCircle className="w-4 h-4 text-green-600" />
+                    ) : (
+                      <AlertCircle className="w-4 h-4 text-red-600" />
+                    )}
+                    <span className={check.passed ? 'text-green-700' : 'text-red-700'}>
+                      {check.text}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* AI Suggestions Display */}
+          {seoSuggestions && (
+            <Card className="border-purple-200 bg-purple-50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Sparkles className="w-5 h-5 text-purple-600" />
+                  AI SEO Suggestions (Like Hashnode)
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Optimized Title */}
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Optimized Meta Title:</Label>
+                  <div className="flex gap-2">
+                    <div className="flex-1 p-3 bg-white rounded border text-sm">
+                      {seoSuggestions.metaTitle}
+                    </div>
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={() => applySuggestion('meta_title', seoSuggestions.metaTitle)}
+                    >
+                      Apply
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Optimized Description */}
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Optimized Meta Description:</Label>
+                  <div className="flex gap-2">
+                    <div className="flex-1 p-3 bg-white rounded border text-sm">
+                      {seoSuggestions.metaDescription}
+                    </div>
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={() => applySuggestion('meta_description', seoSuggestions.metaDescription)}
+                    >
+                      Apply
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Suggested Keywords */}
+                {seoSuggestions.keywords && (
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">Suggested Keywords:</Label>
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 flex flex-wrap gap-2">
+                        {seoSuggestions.keywords.map((kw: string, idx: number) => (
+                          <Badge key={idx} variant="secondary">{kw}</Badge>
+                        ))}
+                      </div>
+                      <Button
+                        type="button"
+                        size="sm"
+                        onClick={() => applySuggestion('meta_keywords', seoSuggestions.keywords)}
+                      >
+                        Apply All
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
           {/* Basic Information */}
           <div className="space-y-4">
             <h3 className="font-semibold text-lg">Basic Information</h3>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="col-span-2">
-                <Label htmlFor="title">Title *</Label>
+                <Label htmlFor="title">Title * {contentLanguage === 'hi' && '(हिंदी में)'} {contentLanguage === 'en' && '(English)'}</Label>
                 <Input
                   id="title"
                   value={formData.title}
                   onChange={(e) => handleTitleChange(e.target.value)}
-                  placeholder="Enter blog post title"
+                  placeholder={contentLanguage === 'hi' ? 'ब्लॉग पोस्ट का शीर्षक दर्ज करें' : 'Enter blog post title'}
                   required
                 />
               </div>
