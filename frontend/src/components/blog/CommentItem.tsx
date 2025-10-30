@@ -88,17 +88,18 @@ export default function CommentItem({
   }
 
   const getUserDisplay = () => {
-    // Try to get username from users table or user_metadata
-    if (comment.users?.user_metadata?.username) {
-      return comment.users.user_metadata.username
+    // Try to get user info from user_profiles first (preferred)
+    if (comment.users?.user_profiles?.full_name) {
+      return comment.users.user_profiles.full_name
     }
-    if (comment.users?.user_metadata?.full_name) {
-      return comment.users.user_metadata.full_name
+    if (comment.users?.user_profiles?.username) {
+      return comment.users.user_profiles.username
     }
+    // Fallback to email (from our fix in blogSocialService)
     if (comment.users?.email) {
       return comment.users.email.split('@')[0]
     }
-    return 'Anonymous'
+    return 'Anonymous User'
   }
 
   return (

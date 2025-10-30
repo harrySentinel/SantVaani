@@ -58,17 +58,27 @@ const ChatBot: React.FC<ChatBotProps> = ({ className = '' }) => {
     }
   }, [isOpen]);
 
-  // Update greeting message when language changes
+  // Update greeting message when language changes (only if it's the initial greeting)
   useEffect(() => {
-    if (messages.length > 0 && messages[0].id === '1') {
-      const updatedMessages = [...messages];
-      updatedMessages[0] = {
-        ...updatedMessages[0],
-        content: INITIAL_MESSAGES[language as keyof typeof INITIAL_MESSAGES] || INITIAL_MESSAGES.en
-      };
-      setMessages(updatedMessages);
+    if (isOpen && messages.length > 0 && messages[0].type === 'bot') {
+      // Check if the first message is still a greeting (hasn't been cleared)
+      const firstMessage = messages[0];
+      const isGreetingMessage =
+        firstMessage.content.includes('Namaste') ||
+        firstMessage.content.includes('नमस्ते') ||
+        firstMessage.content.includes('SantVaani') ||
+        firstMessage.content.includes('संतवाणी');
+
+      if (isGreetingMessage) {
+        const updatedMessages = [...messages];
+        updatedMessages[0] = {
+          ...updatedMessages[0],
+          content: INITIAL_MESSAGES[language as keyof typeof INITIAL_MESSAGES] || INITIAL_MESSAGES.en
+        };
+        setMessages(updatedMessages);
+      }
     }
-  }, [language]);
+  }, [language, isOpen]);
 
   // Smooth scrolling to bottom
   const scrollToBottom = useCallback(() => {
