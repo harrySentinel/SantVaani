@@ -1785,6 +1785,7 @@ app.get('/api/blog/posts/:slug', async (req, res) => {
         blog_categories (
           id,
           name,
+          slug,
           icon,
           color
         )
@@ -1810,6 +1811,7 @@ app.get('/api/blog/posts/:slug', async (req, res) => {
       title: data.title,
       excerpt: data.excerpt,
       content: data.content,
+      featuredImage: data.featured_image,
       category: {
         id: data.blog_categories.id,
         name: data.blog_categories.name,
