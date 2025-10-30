@@ -376,8 +376,29 @@ export const BlogReader: React.FC<BlogReaderProps> = ({
               </div>
             </div>
           )}
+
+          {/* Exit Fullscreen Button - Prominent at Bottom */}
+          <div className="mt-16 mb-8 flex justify-center">
+            <Button
+              onClick={onClose}
+              size="lg"
+              className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white px-8 py-6 rounded-full shadow-xl text-lg font-semibold"
+            >
+              <X className="w-6 h-6 mr-2" />
+              Exit Reader
+            </Button>
+          </div>
         </article>
       </div>
+
+      {/* Floating Exit Button - Always Visible */}
+      <Button
+        onClick={onClose}
+        className="fixed bottom-8 right-8 bg-gray-900 hover:bg-gray-800 text-white rounded-full w-14 h-14 shadow-2xl z-50 flex items-center justify-center"
+        title="Exit Fullscreen (ESC)"
+      >
+        <X className="w-6 h-6" />
+      </Button>
     </div>
   );
 };
