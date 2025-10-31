@@ -372,34 +372,7 @@ Lord Ram's teachings remind us that true strength lies not in power or wealth, b
         />
       )}
 
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-orange-50 relative overflow-hidden">
-        {/* Decorative Background Elements */}
-        <div className="absolute inset-0 pointer-events-none">
-          {/* Lotus Patterns */}
-          <div className="absolute top-20 right-10 opacity-5">
-            <svg width="200" height="200" viewBox="0 0 100 100" className="text-orange-600">
-              <path fill="currentColor" d="M50,10 Q60,30 50,50 Q40,30 50,10 M50,10 Q70,20 50,50 Q30,20 50,10 M50,50 Q70,60 50,90 Q30,60 50,50 M50,50 Q80,50 50,90 Q20,50 50,50"/>
-            </svg>
-          </div>
-          <div className="absolute bottom-40 left-10 opacity-5">
-            <svg width="150" height="150" viewBox="0 0 100 100" className="text-orange-500">
-              <path fill="currentColor" d="M50,10 Q60,30 50,50 Q40,30 50,10 M50,10 Q70,20 50,50 Q30,20 50,10 M50,50 Q70,60 50,90 Q30,60 50,50 M50,50 Q80,50 50,90 Q20,50 50,50"/>
-            </svg>
-          </div>
-
-          {/* Om Symbol */}
-          <div className="absolute top-1/3 left-5 opacity-3 text-6xl text-orange-400">ॐ</div>
-          <div className="absolute bottom-1/4 right-5 opacity-3 text-6xl text-orange-400">ॐ</div>
-
-          {/* Decorative Mandala Patterns */}
-          <div className="absolute top-1/2 right-1/4 opacity-5">
-            <div className="w-32 h-32 rounded-full border-4 border-orange-300 border-dashed"></div>
-          </div>
-          <div className="absolute bottom-1/3 left-1/4 opacity-5">
-            <div className="w-24 h-24 rounded-full border-4 border-amber-300 border-dotted"></div>
-          </div>
-        </div>
-
+      <div className="min-h-screen bg-gradient-to-br from-orange-100 via-amber-50 to-red-50">
         {post && <SEOHead post={post} />}
         <Navbar />
 
@@ -511,85 +484,121 @@ Lord Ram's teachings remind us that true strength lies not in power or wealth, b
 
         {/* Article Content */}
         <div className="relative mb-12">
-          {/* Decorative Border */}
-          <div className="absolute -left-4 top-0 bottom-0 w-1 bg-gradient-to-b from-orange-400 via-amber-400 to-orange-400 rounded-full hidden md:block"></div>
+          {/* Decorative Side Border */}
+          <div className="absolute -left-2 md:-left-6 top-0 bottom-0 w-2 bg-gradient-to-b from-orange-500 via-red-500 to-orange-600 rounded-full shadow-lg"></div>
 
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-orange-100 p-6 md:p-12">
+          {/* Main Content Card */}
+          <div className="bg-gradient-to-br from-white via-orange-50/30 to-amber-50/30 rounded-2xl shadow-2xl border-2 border-orange-200 p-6 md:p-12 relative overflow-hidden">
+            {/* Decorative Corner Accent */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-orange-200/40 to-transparent rounded-bl-full"></div>
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-amber-200/40 to-transparent rounded-tr-full"></div>
+
             <style>{`
               .blog-content h1 {
-                font-size: 2.25rem;
-                font-weight: bold;
-                color: #c2410c;
-                border-bottom: 4px solid #fed7aa;
-                padding-bottom: 0.75rem;
-                margin-top: 2rem;
+                font-size: 2.5rem;
+                font-weight: 800;
+                background: linear-gradient(135deg, #dc2626 0%, #ea580c 50%, #f59e0b 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                border-bottom: 5px solid #fb923c;
+                padding-bottom: 1rem;
+                margin-top: 2.5rem;
                 margin-bottom: 1.5rem;
+                text-shadow: 0 2px 10px rgba(251, 146, 60, 0.2);
               }
               .blog-content h2 {
-                font-size: 1.875rem;
-                font-weight: bold;
+                font-size: 2rem;
+                font-weight: 700;
                 color: #ea580c;
-                border-left: 4px solid #fb923c;
-                padding-left: 1rem;
-                margin-top: 1.5rem;
-                margin-bottom: 1rem;
+                background: linear-gradient(90deg, #fed7aa 0%, transparent 100%);
+                border-left: 6px solid #f97316;
+                padding-left: 1.25rem;
+                padding-top: 0.5rem;
+                padding-bottom: 0.5rem;
+                margin-top: 2rem;
+                margin-bottom: 1.25rem;
+                border-radius: 0 8px 8px 0;
               }
               .blog-content h3 {
-                font-size: 1.5rem;
+                font-size: 1.625rem;
                 font-weight: 600;
-                color: #f59e0b;
-                margin-top: 1.25rem;
-                margin-bottom: 0.75rem;
-                display: flex;
-                align-items: center;
+                color: #dc2626;
+                background: linear-gradient(90deg, #fef3c7 0%, transparent 100%);
+                padding: 0.5rem 0.75rem;
+                margin-top: 1.5rem;
+                margin-bottom: 1rem;
+                border-radius: 8px;
+                display: inline-block;
+                border-left: 4px solid #fbbf24;
               }
               .blog-content h3::before {
-                content: '✦';
+                content: '🔸';
                 margin-right: 0.5rem;
-                color: #fb923c;
               }
               .blog-content p {
-                color: #374151;
-                line-height: 1.75;
-                margin-bottom: 1rem;
+                color: #1f2937;
+                line-height: 1.9;
+                margin-bottom: 1.25rem;
+                font-size: 1.125rem;
               }
               .blog-content strong {
-                color: #c2410c;
-                font-weight: 600;
+                color: #dc2626;
+                font-weight: 700;
+                background: linear-gradient(180deg, transparent 60%, #fed7aa 60%);
               }
               .blog-content em {
-                color: #f59e0b;
-                font-style: italic;
-              }
-              .blog-content a {
                 color: #ea580c;
-                text-decoration: none;
+                font-style: italic;
                 font-weight: 500;
               }
-              .blog-content a:hover {
-                color: #c2410c;
+              .blog-content a {
+                color: #dc2626;
                 text-decoration: underline;
+                text-decoration-color: #fb923c;
+                text-decoration-thickness: 2px;
+                font-weight: 600;
+                transition: all 0.2s;
+              }
+              .blog-content a:hover {
+                color: #991b1b;
+                text-decoration-color: #dc2626;
+                background: #fef3c7;
               }
               .blog-content blockquote {
-                border-left: 4px solid #fb923c;
-                background: #ffedd5;
-                padding: 0.5rem 1.5rem;
+                border-left: 6px solid #f97316;
+                background: linear-gradient(90deg, #fed7aa 0%, #ffedd5 100%);
+                padding: 1rem 1.5rem;
                 font-style: italic;
-                color: #374151;
-                margin: 1rem 0;
+                color: #78350f;
+                margin: 1.5rem 0;
+                border-radius: 0 12px 12px 0;
+                box-shadow: 0 4px 6px rgba(251, 146, 60, 0.1);
+                font-size: 1.125rem;
               }
               .blog-content ul, .blog-content ol {
-                margin-left: 1.5rem;
-                color: #374151;
+                margin-left: 2rem;
+                color: #1f2937;
+                font-size: 1.125rem;
               }
               .blog-content li {
-                margin-bottom: 0.5rem;
+                margin-bottom: 0.75rem;
+                line-height: 1.8;
               }
               .blog-content li::marker {
-                color: #fb923c;
+                color: #f97316;
+                font-weight: bold;
+              }
+              .blog-content code {
+                background: #fed7aa;
+                color: #9a3412;
+                padding: 0.25rem 0.5rem;
+                border-radius: 4px;
+                font-family: 'Courier New', monospace;
+                font-size: 0.95em;
               }
             `}</style>
-            <div className="blog-content prose prose-lg max-w-none">
+            <div className="blog-content relative z-10">
               <div dangerouslySetInnerHTML={{ __html: post.content.replace(/\n/g, '<br />') }} />
             </div>
           </div>
