@@ -446,7 +446,7 @@ Lord Ram's teachings remind us that true strength lies not in power or wealth, b
               {post.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+                  className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-orange-100 text-orange-700 hover:bg-orange-200 border border-orange-300 transition-colors"
                 >
                   #{tag}
                 </span>
