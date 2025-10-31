@@ -18,7 +18,7 @@ import { BlogPost } from '@/types/blog';
 import { blogService } from '@/services/blogService';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSpiritualTracking } from '@/hooks/useAnalytics';
-import { useBlogView } from '@/hooks/useBlogView';
+import { useRobustBlogView } from '@/hooks/useRobustBlogView';
 import LikeButton from '@/components/blog/LikeButton';
 import BookmarkButton from '@/components/blog/BookmarkButton';
 import CommentsSection from '@/components/blog/CommentsSection';
@@ -29,14 +29,16 @@ const BlogPostDetail: React.FC = () => {
   const [post, setPost] = useState<BlogPost | null>(null);
   const [relatedPosts, setRelatedPosts] = useState<BlogPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadComments, setLoadComments] = useState(false);
+  const [loadRelated, setLoadRelated] = useState(false);
   const [copied, setCopied] = useState(false);
   const [isReaderOpen, setIsReaderOpen] = useState(false);
 
   const { t } = useLanguage();
   const { trackQuoteView, trackShare } = useSpiritualTracking();
 
-  // Track blog view
-  useBlogView(post?.id || '');
+  // Track blog view with robust tracking
+  const { viewRecorded } = useRobustBlogView(post?.id || '');
 
   // Fetch post from API
   /*
@@ -230,20 +232,15 @@ Lord Ram's teachings remind us that true strength lies not in power or wealth, b
         if (response.success && response.post) {
           setPost(response.post);
 
-          // Get related posts from same category
-          const relatedResponse = await blogService.getPosts({
-            category: response.post.category.id,
-            limit: 3
-          });
-
-          if (relatedResponse.success) {
-            // Filter out current post from related
-            const filtered = relatedResponse.posts.filter(p => p.id !== response.post.id);
-            setRelatedPosts(filtered.slice(0, 3));
-          }
-
           // Track blog post view
           trackQuoteView(`blog_${response.post.id}`, 'blog_post_detail');
+
+          // Lazy load comments and related posts after main content loads
+          setTimeout(() => setLoadComments(true), 1000);
+          setTimeout(() => {
+            setLoadRelated(true);
+            loadRelatedPosts(response.post);
+          }, 1500);
         } else {
           navigate('/blog');
         }
@@ -257,6 +254,23 @@ Lord Ram's teachings remind us that true strength lies not in power or wealth, b
 
     fetchPost();
   }, [slug, navigate, trackQuoteView]);
+
+  // Function to load related posts
+  const loadRelatedPosts = async (currentPost: BlogPost) => {
+    try {
+      const relatedResponse = await blogService.getPosts({
+        category: currentPost.category.id,
+        limit: 3
+      });
+
+      if (relatedResponse.success) {
+        const filtered = relatedResponse.posts.filter(p => p.id !== currentPost.id);
+        setRelatedPosts(filtered.slice(0, 3));
+      }
+    } catch (error) {
+      console.error('Error loading related posts:', error);
+    }
+  };
 
   const handleShare = async (platform: string) => {
     if (!post) return;
@@ -452,13 +466,16 @@ Lord Ram's teachings remind us that true strength lies not in power or wealth, b
             </div>
           </div>
 
-          {/* Featured Image */}
+          {/* Featured Image - Optimized for Mobile */}
           {post.featuredImage && (
             <div className="relative mb-12 rounded-xl overflow-hidden shadow-2xl">
               <img
                 src={post.featuredImage}
                 alt={post.title}
                 className="w-full h-96 object-cover"
+                loading="eager"
+                decoding="async"
+                fetchPriority="high"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
             </div>
@@ -603,13 +620,19 @@ Lord Ram's teachings remind us that true strength lies not in power or wealth, b
           </Button>
         </div>
 
-        {/* Comments Section */}
-        <CommentsSection postId={post.id} className="mb-16" />
+        {/* Comments Section - Lazy Loaded */}
+        {loadComments ? (
+          <CommentsSection postId={post.id} className="mb-16" />
+        ) : (
+          <div className="mb-16 text-center py-8">
+            <div className="animate-pulse text-gray-400">Loading comments...</div>
+          </div>
+        )}
 
         <Separator className="my-12" />
 
-        {/* Related Posts */}
-        {relatedPosts.length > 0 && (
+        {/* Related Posts - Lazy Loaded */}
+        {loadRelated && relatedPosts.length > 0 && (
           <div>
             <h3 className="text-3xl font-bold text-gray-900 mb-8">Related Articles</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -617,6 +640,11 @@ Lord Ram's teachings remind us that true strength lies not in power or wealth, b
                 <BlogCard key={relatedPost.id} post={relatedPost} compact />
               ))}
             </div>
+          </div>
+        )}
+        {loadRelated && relatedPosts.length === 0 && (
+          <div className="text-center py-8 text-gray-400">
+            No related articles found
           </div>
         )}
       </article>
