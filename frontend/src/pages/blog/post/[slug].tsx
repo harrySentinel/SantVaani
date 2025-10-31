@@ -536,11 +536,18 @@ Lord Ram's teachings remind us that true strength lies not in power or wealth, b
                 content: '🔸';
                 margin-right: 0.5rem;
               }
+              .blog-content h1:first-child,
+              .blog-content h2:first-child,
+              .blog-content h3:first-child {
+                margin-top: 0;
+              }
               .blog-content p {
                 color: #1f2937;
                 line-height: 1.9;
-                margin-bottom: 1.25rem;
+                margin-bottom: 1.5rem;
+                margin-top: 0.75rem;
                 font-size: 1.125rem;
+                text-align: justify;
               }
               .blog-content strong {
                 color: #dc2626;
@@ -599,7 +606,7 @@ Lord Ram's teachings remind us that true strength lies not in power or wealth, b
               }
             `}</style>
             <div className="blog-content relative z-10">
-              <div dangerouslySetInnerHTML={{ __html: post.content.replace(/\n/g, '<br />') }} />
+              <div dangerouslySetInnerHTML={{ __html: post.content }} />
             </div>
           </div>
         </div>
