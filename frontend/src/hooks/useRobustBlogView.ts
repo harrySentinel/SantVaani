@@ -99,14 +99,22 @@ export const useRobustBlogView = (postId: string) => {
   useEffect(() => {
     if (!postId || hasTracked.current) return
 
-    // Check if already viewed recently
+    // Check if already viewed recently - this is critical!
     if (hasRecentView(postId)) {
-      console.log('📊 Blog view: Already counted recently')
+      console.log('📊 Blog view: Already counted recently (skipping)')
+      hasTracked.current = true // Mark as tracked to prevent re-runs
       return
     }
 
     const trackView = async () => {
       try {
+        // Double-check before tracking (in case of race conditions)
+        if (hasRecentView(postId)) {
+          console.log('📊 Blog view: Already counted (double-check)')
+          hasTracked.current = true
+          return
+        }
+
         // Get user if logged in
         const { data: { user } } = await supabase.auth.getUser()
 
@@ -121,6 +129,10 @@ export const useRobustBlogView = (postId: string) => {
         }
 
         console.log('📊 Tracking blog view:', { postId, sessionId, timeSpent })
+
+        // Record in localStorage BEFORE making the API call to prevent race conditions
+        recordViewSession(postId, sessionId)
+        hasTracked.current = true
 
         // Insert view record
         const { error: viewError } = await supabase
@@ -151,10 +163,6 @@ export const useRobustBlogView = (postId: string) => {
           console.error('Error incrementing view count:', rpcError)
         }
 
-        // Record in localStorage to prevent duplicate counting
-        recordViewSession(postId, sessionId)
-
-        hasTracked.current = true
         setViewRecorded(true)
 
         console.log('✅ Blog view tracked successfully')
