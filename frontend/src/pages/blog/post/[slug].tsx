@@ -604,6 +604,92 @@ Lord Ram's teachings remind us that true strength lies not in power or wealth, b
                 font-family: 'Courier New', monospace;
                 font-size: 0.95em;
               }
+
+              /* Mobile Responsive Fixes */
+              @media (max-width: 768px) {
+                .blog-content h1 {
+                  font-size: 1.75rem !important;
+                  margin-top: 1.5rem !important;
+                  margin-bottom: 1rem !important;
+                  padding-bottom: 0.5rem !important;
+                  border-bottom-width: 3px !important;
+                  line-height: 1.3 !important;
+                  word-wrap: break-word;
+                  overflow-wrap: break-word;
+                }
+                .blog-content h2 {
+                  font-size: 1.5rem !important;
+                  margin-top: 1.5rem !important;
+                  margin-bottom: 1rem !important;
+                  padding-left: 0.75rem !important;
+                  border-left-width: 4px !important;
+                  line-height: 1.4 !important;
+                  word-wrap: break-word;
+                  overflow-wrap: break-word;
+                }
+                .blog-content h3 {
+                  font-size: 1.25rem !important;
+                  margin-top: 1.25rem !important;
+                  margin-bottom: 0.75rem !important;
+                  padding: 0.4rem 0.6rem !important;
+                  border-left-width: 3px !important;
+                  line-height: 1.4 !important;
+                  word-wrap: break-word;
+                  overflow-wrap: break-word;
+                  display: block !important;
+                }
+                .blog-content p {
+                  font-size: 1rem !important;
+                  line-height: 1.75 !important;
+                  margin-bottom: 1.25rem !important;
+                  text-align: left !important;
+                  word-wrap: break-word;
+                  overflow-wrap: break-word;
+                }
+                .blog-content strong {
+                  word-wrap: break-word;
+                  overflow-wrap: break-word;
+                }
+                .blog-content blockquote {
+                  font-size: 1rem !important;
+                  padding: 0.75rem 1rem !important;
+                  margin: 1rem 0 !important;
+                }
+                .blog-content ul, .blog-content ol {
+                  font-size: 1rem !important;
+                  margin-left: 1.25rem !important;
+                }
+                .blog-content li {
+                  font-size: 1rem !important;
+                  margin-bottom: 0.5rem !important;
+                }
+              }
+
+              /* Extra small mobile screens */
+              @media (max-width: 480px) {
+                .blog-content h1 {
+                  font-size: 1.5rem !important;
+                }
+                .blog-content h2 {
+                  font-size: 1.25rem !important;
+                }
+                .blog-content h3 {
+                  font-size: 1.125rem !important;
+                }
+                .blog-content p {
+                  font-size: 0.95rem !important;
+                }
+                .blog-content ul, .blog-content ol {
+                  font-size: 0.95rem !important;
+                }
+                .blog-content li {
+                  font-size: 0.95rem !important;
+                }
+                .blog-content blockquote {
+                  font-size: 0.95rem !important;
+                  padding: 0.6rem 0.8rem !important;
+                }
+              }
             `}</style>
             <div className="blog-content relative z-10">
               <div dangerouslySetInnerHTML={{ __html: post.content }} />
