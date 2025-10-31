@@ -521,14 +521,14 @@ Lord Ram's teachings remind us that true strength lies not in power or wealth, b
               .blog-content h3 {
                 font-size: 1.625rem;
                 font-weight: 600;
-                color: #dc2626;
-                background: linear-gradient(90deg, #fef3c7 0%, transparent 100%);
+                color: #ea580c;
+                background: linear-gradient(90deg, #fed7aa 0%, transparent 100%);
                 padding: 0.5rem 0.75rem;
                 margin-top: 1.5rem;
                 margin-bottom: 1rem;
                 border-radius: 8px;
                 display: inline-block;
-                border-left: 4px solid #fbbf24;
+                border-left: 4px solid #f97316;
               }
               .blog-content h3::before {
                 content: '🔸';
@@ -566,7 +566,7 @@ Lord Ram's teachings remind us that true strength lies not in power or wealth, b
               .blog-content a:hover {
                 color: #991b1b;
                 text-decoration-color: #dc2626;
-                background: #fef3c7;
+                background: #fed7aa;
               }
               .blog-content blockquote {
                 border-left: 6px solid #f97316;
