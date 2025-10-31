@@ -372,7 +372,34 @@ Lord Ram's teachings remind us that true strength lies not in power or wealth, b
         />
       )}
 
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50">
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-orange-50 relative overflow-hidden">
+        {/* Decorative Background Elements */}
+        <div className="absolute inset-0 pointer-events-none">
+          {/* Lotus Patterns */}
+          <div className="absolute top-20 right-10 opacity-5">
+            <svg width="200" height="200" viewBox="0 0 100 100" className="text-orange-600">
+              <path fill="currentColor" d="M50,10 Q60,30 50,50 Q40,30 50,10 M50,10 Q70,20 50,50 Q30,20 50,10 M50,50 Q70,60 50,90 Q30,60 50,50 M50,50 Q80,50 50,90 Q20,50 50,50"/>
+            </svg>
+          </div>
+          <div className="absolute bottom-40 left-10 opacity-5">
+            <svg width="150" height="150" viewBox="0 0 100 100" className="text-orange-500">
+              <path fill="currentColor" d="M50,10 Q60,30 50,50 Q40,30 50,10 M50,10 Q70,20 50,50 Q30,20 50,10 M50,50 Q70,60 50,90 Q30,60 50,50 M50,50 Q80,50 50,90 Q20,50 50,50"/>
+            </svg>
+          </div>
+
+          {/* Om Symbol */}
+          <div className="absolute top-1/3 left-5 opacity-3 text-6xl text-orange-400">ॐ</div>
+          <div className="absolute bottom-1/4 right-5 opacity-3 text-6xl text-orange-400">ॐ</div>
+
+          {/* Decorative Mandala Patterns */}
+          <div className="absolute top-1/2 right-1/4 opacity-5">
+            <div className="w-32 h-32 rounded-full border-4 border-orange-300 border-dashed"></div>
+          </div>
+          <div className="absolute bottom-1/3 left-1/4 opacity-5">
+            <div className="w-24 h-24 rounded-full border-4 border-amber-300 border-dotted"></div>
+          </div>
+        </div>
+
         {post && <SEOHead post={post} />}
         <Navbar />
 
@@ -412,7 +439,7 @@ Lord Ram's teachings remind us that true strength lies not in power or wealth, b
               </span>
             </div>
 
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-orange-600 via-amber-600 to-orange-600 bg-clip-text text-transparent mb-6 leading-tight drop-shadow-sm">
               {post.title}
             </h1>
 
@@ -483,11 +510,89 @@ Lord Ram's teachings remind us that true strength lies not in power or wealth, b
         </header>
 
         {/* Article Content */}
-        <div className="prose prose-lg max-w-none mb-12">
-          <div
-            className="text-gray-800 leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: post.content.replace(/\n/g, '<br />') }}
-          />
+        <div className="relative mb-12">
+          {/* Decorative Border */}
+          <div className="absolute -left-4 top-0 bottom-0 w-1 bg-gradient-to-b from-orange-400 via-amber-400 to-orange-400 rounded-full hidden md:block"></div>
+
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-orange-100 p-6 md:p-12">
+            <style>{`
+              .blog-content h1 {
+                font-size: 2.25rem;
+                font-weight: bold;
+                color: #c2410c;
+                border-bottom: 4px solid #fed7aa;
+                padding-bottom: 0.75rem;
+                margin-top: 2rem;
+                margin-bottom: 1.5rem;
+              }
+              .blog-content h2 {
+                font-size: 1.875rem;
+                font-weight: bold;
+                color: #ea580c;
+                border-left: 4px solid #fb923c;
+                padding-left: 1rem;
+                margin-top: 1.5rem;
+                margin-bottom: 1rem;
+              }
+              .blog-content h3 {
+                font-size: 1.5rem;
+                font-weight: 600;
+                color: #f59e0b;
+                margin-top: 1.25rem;
+                margin-bottom: 0.75rem;
+                display: flex;
+                align-items: center;
+              }
+              .blog-content h3::before {
+                content: '✦';
+                margin-right: 0.5rem;
+                color: #fb923c;
+              }
+              .blog-content p {
+                color: #374151;
+                line-height: 1.75;
+                margin-bottom: 1rem;
+              }
+              .blog-content strong {
+                color: #c2410c;
+                font-weight: 600;
+              }
+              .blog-content em {
+                color: #f59e0b;
+                font-style: italic;
+              }
+              .blog-content a {
+                color: #ea580c;
+                text-decoration: none;
+                font-weight: 500;
+              }
+              .blog-content a:hover {
+                color: #c2410c;
+                text-decoration: underline;
+              }
+              .blog-content blockquote {
+                border-left: 4px solid #fb923c;
+                background: #ffedd5;
+                padding: 0.5rem 1.5rem;
+                font-style: italic;
+                color: #374151;
+                margin: 1rem 0;
+              }
+              .blog-content ul, .blog-content ol {
+                margin-left: 1.5rem;
+                color: #374151;
+              }
+              .blog-content li {
+                margin-bottom: 0.5rem;
+              }
+              .blog-content li::marker {
+                color: #fb923c;
+              }
+            `}</style>
+            <div className="blog-content prose prose-lg max-w-none">
+              <div dangerouslySetInnerHTML={{ __html: post.content.replace(/\n/g, '<br />') }} />
+            </div>
+          </div>
         </div>
 
         {/* Spiritual Quotes */}
