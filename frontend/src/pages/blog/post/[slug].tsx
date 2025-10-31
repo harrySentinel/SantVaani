@@ -501,8 +501,6 @@ Lord Ram's teachings remind us that true strength lies not in power or wealth, b
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
                 background-clip: text;
-                border-bottom: 5px solid #fb923c;
-                padding-bottom: 1rem;
                 margin-top: 2.5rem;
                 margin-bottom: 1.5rem;
                 text-shadow: 0 2px 10px rgba(251, 146, 60, 0.2);
@@ -611,8 +609,6 @@ Lord Ram's teachings remind us that true strength lies not in power or wealth, b
                   font-size: 1.75rem !important;
                   margin-top: 1.5rem !important;
                   margin-bottom: 1rem !important;
-                  padding-bottom: 0.5rem !important;
-                  border-bottom-width: 3px !important;
                   line-height: 1.3 !important;
                   word-wrap: break-word;
                   overflow-wrap: break-word;
