@@ -250,7 +250,7 @@ export default function Blogs() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => window.open(`/blog/post/${post.slug}`, '_blank')}
+                      onClick={() => window.open(`https://santvaani.com/blog/post/${post.slug}`, '_blank')}
                       title="View Post"
                       className="hidden md:flex"
                     >
@@ -278,7 +278,7 @@ export default function Blogs() {
                       actions={[
                         {
                           label: 'View Post',
-                          onClick: () => window.open(`/blog/post/${post.slug}`, '_blank')
+                          onClick: () => window.open(`https://santvaani.com/blog/post/${post.slug}`, '_blank')
                         },
                         {
                           label: 'Edit Post',
