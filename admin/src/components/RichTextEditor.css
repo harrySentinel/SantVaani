@@ -1,0 +1,166 @@
+/* Rich Text Editor Styling */
+.rich-text-editor-wrapper {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: white;
+}
+
+.rich-text-editor-wrapper .quill {
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+.rich-text-editor-wrapper .ql-container {
+  flex: 1;
+  font-size: 16px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+}
+
+.rich-text-editor-wrapper .ql-editor {
+  min-height: 350px;
+  padding: 1.5rem;
+  line-height: 1.8;
+}
+
+/* Toolbar styling */
+.rich-text-editor-wrapper .ql-toolbar {
+  background: #f9fafb;
+  border: none;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0.75rem;
+}
+
+.rich-text-editor-wrapper .ql-toolbar button {
+  margin: 0 2px;
+}
+
+.rich-text-editor-wrapper .ql-toolbar button:hover {
+  color: #f97316;
+}
+
+.rich-text-editor-wrapper .ql-toolbar .ql-active {
+  color: #f97316;
+}
+
+/* Heading styles in the editor */
+.rich-text-editor-wrapper .ql-editor h1 {
+  font-size: 2em;
+  font-weight: 700;
+  color: #dc2626;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  border-bottom: 3px solid #fb923c;
+  padding-bottom: 0.5rem;
+}
+
+.rich-text-editor-wrapper .ql-editor h2 {
+  font-size: 1.6em;
+  font-weight: 600;
+  color: #ea580c;
+  margin-top: 1.25rem;
+  margin-bottom: 0.75rem;
+  border-left: 4px solid #f97316;
+  padding-left: 0.75rem;
+  background: linear-gradient(90deg, #fed7aa 0%, transparent 100%);
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+
+.rich-text-editor-wrapper .ql-editor h3 {
+  font-size: 1.3em;
+  font-weight: 600;
+  color: #dc2626;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(90deg, #fef3c7 0%, transparent 100%);
+  padding: 0.25rem 0.5rem;
+  border-left: 3px solid #fbbf24;
+}
+
+.rich-text-editor-wrapper .ql-editor h3::before {
+  content: '🔸 ';
+}
+
+/* Paragraph styling */
+.rich-text-editor-wrapper .ql-editor p {
+  margin-bottom: 1rem;
+  color: #1f2937;
+}
+
+/* Strong text */
+.rich-text-editor-wrapper .ql-editor strong {
+  color: #dc2626;
+  font-weight: 700;
+  background: linear-gradient(180deg, transparent 60%, #fed7aa 60%);
+}
+
+/* Blockquote */
+.rich-text-editor-wrapper .ql-editor blockquote {
+  border-left: 4px solid #f97316;
+  background: linear-gradient(90deg, #fed7aa 0%, #ffedd5 100%);
+  padding: 1rem 1.5rem;
+  margin: 1rem 0;
+  font-style: italic;
+  color: #78350f;
+  border-radius: 0 8px 8px 0;
+}
+
+/* Lists */
+.rich-text-editor-wrapper .ql-editor ul,
+.rich-text-editor-wrapper .ql-editor ol {
+  padding-left: 2rem;
+  margin-bottom: 1rem;
+}
+
+.rich-text-editor-wrapper .ql-editor li {
+  margin-bottom: 0.5rem;
+  color: #1f2937;
+}
+
+/* Links */
+.rich-text-editor-wrapper .ql-editor a {
+  color: #f97316;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.rich-text-editor-wrapper .ql-editor a:hover {
+  color: #ea580c;
+}
+
+/* Code block */
+.rich-text-editor-wrapper .ql-editor pre {
+  background: #1f2937;
+  color: #f9fafb;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+
+/* Placeholder */
+.rich-text-editor-wrapper .ql-editor.ql-blank::before {
+  color: #9ca3af;
+  font-style: italic;
+}
+
+/* Support for Hindi text */
+.rich-text-editor-wrapper .ql-editor {
+  direction: ltr;
+  unicode-bidi: embed;
+}
+
+/* Ensure proper rendering of Devanagari script */
+@font-face {
+  font-family: 'Noto Sans Devanagari';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Noto Sans Devanagari'), local('NotoSansDevanagari'),
+       url(https://fonts.gstatic.com/s/notosansdevanagari/v13/TuGOUUFzXI5FBtUq5a8bjKYTZjtRU6Sgv3NaV_SNmI0b8QQCQmHn6B2OHjbL_08AlXQky-AzoFoW4Ow.woff2) format('woff2');
+}
+
+.rich-text-editor-wrapper .ql-editor {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Noto Sans Devanagari', sans-serif;
+}
