@@ -22,8 +22,9 @@ import {
 } from '@/components/ui/card'
 import { useToast } from '@/hooks/use-toast'
 import { supabase, TABLES } from '@/lib/supabase'
-import { Upload, X, Loader2, Image as ImageIcon, Sparkles, CheckCircle, AlertCircle, Languages, Wand2 } from 'lucide-react'
+import { Upload, X, Loader2, Image as ImageIcon, Sparkles, CheckCircle, AlertCircle, Languages, Wand2, FileCode } from 'lucide-react'
 import RichTextEditor from './RichTextEditor'
+import MarkdownConverter from './MarkdownConverter'
 
 interface BlogPost {
   id: string
@@ -68,6 +69,7 @@ export default function BlogForm({ post, isOpen, onClose, onSave }: BlogFormProp
   const [seoSuggestions, setSeoSuggestions] = useState<any>(null)
   const [contentLanguage, setContentLanguage] = useState<'hi' | 'en' | 'both'>('hi')
   const [translating, setTranslating] = useState(false)
+  const [isMarkdownConverterOpen, setIsMarkdownConverterOpen] = useState(false)
 
   const [formData, setFormData] = useState({
     title: '',
@@ -521,6 +523,11 @@ Return ONLY a JSON object:
     }
   }
 
+  // Handle Markdown conversion
+  const handleMarkdownConvert = (html: string) => {
+    setFormData(prev => ({ ...prev, content: html }))
+  }
+
   // Calculate SEO Score
   const calculateSEOScore = () => {
     let score = 0
@@ -896,17 +903,32 @@ Return ONLY a JSON object:
               </div>
 
               <div className="col-span-2">
-                <Label htmlFor="content">
-                  Content *
-                  <span className="ml-2 text-sm text-gray-500">
-                    (Use toolbar to add headings, formatting, etc. Works with Hindi & English!)
-                  </span>
-                </Label>
+                <div className="flex items-center justify-between mb-2">
+                  <Label htmlFor="content">
+                    Content *
+                    <span className="ml-2 text-sm text-gray-500">
+                      (Use toolbar to add headings, formatting, etc. Works with Hindi & English!)
+                    </span>
+                  </Label>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsMarkdownConverterOpen(true)}
+                    className="bg-purple-50 border-purple-200 text-purple-700 hover:bg-purple-100"
+                  >
+                    <FileCode className="w-4 h-4 mr-2" />
+                    Import from Markdown
+                  </Button>
+                </div>
                 <RichTextEditor
                   value={formData.content}
                   onChange={(value) => setFormData(prev => ({ ...prev, content: value }))}
                   placeholder="Write your blog post content here... Use the toolbar above to add headings (H1, H2, H3), bold text, lists, and more!"
                 />
+                <p className="text-xs text-gray-500 mt-2">
+                  💡 <strong>Tip:</strong> You can paste Markdown content from Claude by clicking "Import from Markdown" button above!
+                </p>
               </div>
             </div>
           </div>
@@ -1131,6 +1153,13 @@ Return ONLY a JSON object:
           </DialogFooter>
         </form>
       </DialogContent>
+
+      {/* Markdown Converter Modal */}
+      <MarkdownConverter
+        isOpen={isMarkdownConverterOpen}
+        onClose={() => setIsMarkdownConverterOpen(false)}
+        onConvert={handleMarkdownConvert}
+      />
     </Dialog>
   )
 }
