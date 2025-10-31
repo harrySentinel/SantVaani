@@ -20,7 +20,7 @@ interface ViewSession {
 }
 
 const VIEW_DURATION_MS = 24 * 60 * 60 * 1000 // 24 hours
-const MIN_READ_TIME_MS = 5000 // 5 seconds minimum
+const MIN_READ_TIME_MS = 3000 // 3 seconds minimum
 
 // Generate a simple browser fingerprint for anonymous tracking
 const getBrowserFingerprint = (): string => {
@@ -97,20 +97,25 @@ export const useRobustBlogView = (postId: string) => {
   const [viewRecorded, setViewRecorded] = useState(false)
 
   useEffect(() => {
-    if (!postId || hasTracked.current) return
+    if (!postId || hasTracked.current) {
+      console.log('📊 Blog view: Skipping - no postId or already tracked')
+      return
+    }
 
-    // Check if already viewed recently - this is critical!
+    // CRITICAL CHECK: Already viewed recently?
     if (hasRecentView(postId)) {
-      console.log('📊 Blog view: Already counted recently (skipping)')
+      console.log('📊 Blog view: ✋ BLOCKED - Already counted recently for post:', postId)
       hasTracked.current = true // Mark as tracked to prevent re-runs
       return
     }
 
+    console.log('📊 Blog view: Starting timer for post:', postId)
+
     const trackView = async () => {
       try {
-        // Double-check before tracking (in case of race conditions)
+        // TRIPLE CHECK before tracking (in case of race conditions)
         if (hasRecentView(postId)) {
-          console.log('📊 Blog view: Already counted (double-check)')
+          console.log('📊 Blog view: ✋ BLOCKED at tracking time - Already counted')
           hasTracked.current = true
           return
         }
