@@ -23,6 +23,7 @@ import {
 import { useToast } from '@/hooks/use-toast'
 import { supabase, TABLES } from '@/lib/supabase'
 import { Upload, X, Loader2, Image as ImageIcon, Sparkles, CheckCircle, AlertCircle, Languages, Wand2 } from 'lucide-react'
+import RichTextEditor from './RichTextEditor'
 
 interface BlogPost {
   id: string
@@ -895,15 +896,16 @@ Return ONLY a JSON object:
               </div>
 
               <div className="col-span-2">
-                <Label htmlFor="content">Content * (Markdown supported)</Label>
-                <Textarea
-                  id="content"
+                <Label htmlFor="content">
+                  Content *
+                  <span className="ml-2 text-sm text-gray-500">
+                    (Use toolbar to add headings, formatting, etc. Works with Hindi & English!)
+                  </span>
+                </Label>
+                <RichTextEditor
                   value={formData.content}
-                  onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
-                  placeholder="Write your blog post content here..."
-                  rows={12}
-                  required
-                  className="font-mono text-sm"
+                  onChange={(value) => setFormData(prev => ({ ...prev, content: value }))}
+                  placeholder="Write your blog post content here... Use the toolbar above to add headings (H1, H2, H3), bold text, lists, and more!"
                 />
               </div>
             </div>
