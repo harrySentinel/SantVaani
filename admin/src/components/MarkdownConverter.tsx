@@ -60,6 +60,8 @@ export default function MarkdownConverter({ isOpen, onClose, onConvert }: Markdo
       return
     }
 
+    // IMPORTANT: Pass HTML directly - React Quill will handle it properly
+    // if the parent component sets it as the value prop
     onConvert(preview)
     setMarkdown('')
     setPreview('')
@@ -67,7 +69,8 @@ export default function MarkdownConverter({ isOpen, onClose, onConvert }: Markdo
 
     toast({
       title: 'Success!',
-      description: 'HTML loaded into editor. You can now edit and save!'
+      description: 'HTML loaded into editor. You can now edit and save!',
+      duration: 3000
     })
   }
 
