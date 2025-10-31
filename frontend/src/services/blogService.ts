@@ -22,26 +22,92 @@ export interface CategoryResponse {
   error?: string;
 }
 
+// Simple in-memory cache
+interface CacheEntry<T> {
+  data: T;
+  timestamp: number;
+}
+
 class BlogService {
-  private async makeRequest<T>(endpoint: string, options?: RequestInit): Promise<T> {
-    try {
-      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-        headers: {
-          'Content-Type': 'application/json',
-          ...options?.headers,
-        },
-        ...options,
-      });
+  private cache = new Map<string, CacheEntry<any>>();
+  private readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutes cache
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+  private getCached<T>(key: string): T | null {
+    const entry = this.cache.get(key);
+    if (!entry) return null;
 
-      return await response.json();
-    } catch (error) {
-      console.error(`API Error for ${endpoint}:`, error);
-      throw error;
+    const now = Date.now();
+    if (now - entry.timestamp > this.CACHE_DURATION) {
+      this.cache.delete(key);
+      return null;
     }
+
+    console.log(`📦 Using cached data for: ${key}`);
+    return entry.data as T;
+  }
+
+  private setCache<T>(key: string, data: T): void {
+    this.cache.set(key, { data, timestamp: Date.now() });
+  }
+
+  private async makeRequest<T>(
+    endpoint: string,
+    options?: RequestInit,
+    retries: number = 3
+  ): Promise<T> {
+    // Check cache first for GET requests
+    if (!options?.method || options.method === 'GET') {
+      const cached = this.getCached<T>(endpoint);
+      if (cached) return cached;
+    }
+
+    let lastError: Error | null = null;
+
+    for (let attempt = 0; attempt < retries; attempt++) {
+      try {
+        const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+          headers: {
+            'Content-Type': 'application/json',
+            ...options?.headers,
+          },
+          ...options,
+        });
+
+        // Handle rate limiting with exponential backoff
+        if (response.status === 429) {
+          const retryAfter = parseInt(response.headers.get('Retry-After') || '2', 10);
+          const delay = Math.min(retryAfter * 1000, (attempt + 1) * 2000);
+
+          console.warn(`⚠️ Rate limited (429). Retrying in ${delay}ms...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+          continue;
+        }
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        // Cache successful GET requests
+        if (!options?.method || options.method === 'GET') {
+          this.setCache(endpoint, data);
+        }
+
+        return data;
+      } catch (error) {
+        lastError = error as Error;
+        console.error(`API Error for ${endpoint} (attempt ${attempt + 1}):`, error);
+
+        // Wait before retry (exponential backoff)
+        if (attempt < retries - 1) {
+          const delay = Math.min((attempt + 1) * 1000, 5000);
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
+      }
+    }
+
+    throw lastError || new Error('Request failed after retries');
   }
 
   // Get latest blog posts
