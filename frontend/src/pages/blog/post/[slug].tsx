@@ -606,7 +606,13 @@ Lord Ram's teachings remind us that true strength lies not in power or wealth, b
               }
             `}</style>
             <div className="blog-content relative z-10">
-              <div dangerouslySetInnerHTML={{ __html: post.content }} />
+              <div dangerouslySetInnerHTML={{
+                __html: post.content.includes('<p>') || post.content.includes('<h')
+                  ? post.content
+                  : post.content.split('\n\n').map(para =>
+                      para.trim() ? `<p>${para.replace(/\n/g, '<br>')}</p>` : ''
+                    ).join('\n')
+              }} />
             </div>
           </div>
         </div>
