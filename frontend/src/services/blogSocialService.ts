@@ -259,42 +259,50 @@ export const getPostComments = async (postId: string) => {
   try {
     console.log('🔍 Fetching comments for post:', postId)
 
-    // Get all comments with user profiles
-    const { data, error } = await supabase
+    // Get all comments first
+    const { data: comments, error: commentsError } = await supabase
       .from('blog_comments')
-      .select(`
-        id,
-        blog_post_id,
-        user_id,
-        parent_comment_id,
-        comment_text,
-        created_at,
-        updated_at,
-        user_profiles (
-          id,
-          username,
-          full_name,
-          avatar_url
-        )
-      `)
+      .select('*')
       .eq('blog_post_id', postId)
       .eq('is_approved', true)
       .order('created_at', { ascending: true })
 
-    if (error) {
-      console.error('❌ Error fetching comments:', error)
-      throw error
+    if (commentsError) throw commentsError
+    if (!comments || comments.length === 0) {
+      console.log('📭 No comments found')
+      return { success: true, comments: [] }
     }
+
+    // Get unique user IDs
+    const userIds = [...new Set(comments.map(c => c.user_id).filter(Boolean))]
+
+    // Fetch user profiles separately
+    const { data: profiles, error: profilesError } = await supabase
+      .from('user_profiles')
+      .select('id, username, full_name, avatar_url')
+      .in('id', userIds)
+
+    if (profilesError) {
+      console.warn('⚠️ Could not fetch user profiles, using fallback', profilesError)
+    }
+
+    // Map profiles to comments
+    const profileMap = new Map(profiles?.map(p => [p.id, p]) || [])
+
+    const data = comments.map(comment => ({
+      ...comment,
+      user_profiles: profileMap.get(comment.user_id) || null
+    }))
 
     console.log(`✅ Fetched ${data?.length || 0} comments`)
 
     // Organize comments into parent-child structure with user data
-    const comments = data || []
+    const commentsWithProfiles = data || []
     const commentMap: { [key: string]: any } = {}
     const rootComments: any[] = []
 
     // First pass: create comment objects with user data
-    comments.forEach((comment: any) => {
+    commentsWithProfiles.forEach((comment: any) => {
       const userProfile = comment.user_profiles || {}
       commentMap[comment.id] = {
         ...comment,
@@ -311,7 +319,7 @@ export const getPostComments = async (postId: string) => {
     })
 
     // Second pass: build tree structure
-    comments.forEach((comment: any) => {
+    commentsWithProfiles.forEach((comment: any) => {
       if (comment.parent_comment_id) {
         const parent = commentMap[comment.parent_comment_id]
         if (parent) {

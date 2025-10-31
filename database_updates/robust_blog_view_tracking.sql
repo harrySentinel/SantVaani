@@ -10,9 +10,11 @@ ADD COLUMN IF NOT EXISTS device_type TEXT,
 ADD COLUMN IF NOT EXISTS is_mobile BOOLEAN DEFAULT FALSE;
 
 -- 2. Create unique constraint to prevent duplicate views
--- (One view per session per post within 24 hours)
-CREATE UNIQUE INDEX IF NOT EXISTS idx_blog_views_unique_session
-ON blog_views (blog_post_id, session_id, DATE(viewed_at));
+-- Note: We handle 24-hour deduplication in the application layer
+-- This constraint prevents exact duplicate inserts
+DROP INDEX IF EXISTS idx_blog_views_unique_session;
+CREATE UNIQUE INDEX IF NOT EXISTS idx_blog_views_unique_session_simple
+ON blog_views (blog_post_id, session_id);
 
 -- 3. Create index for faster view count queries
 CREATE INDEX IF NOT EXISTS idx_blog_views_post_id
@@ -116,6 +118,34 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Run sync to fix any existing discrepancies
 SELECT sync_blog_view_counts();
+
+-- 8b. Function to clean up old duplicate sessions (keep only the latest view per session per day)
+CREATE OR REPLACE FUNCTION cleanup_duplicate_sessions()
+RETURNS INTEGER AS $$
+DECLARE
+  deleted_count INTEGER;
+BEGIN
+  -- Delete duplicate views, keeping only the most recent one per session per post per day
+  WITH duplicates AS (
+    SELECT id,
+           ROW_NUMBER() OVER (
+             PARTITION BY blog_post_id, session_id, viewed_at::date
+             ORDER BY viewed_at DESC
+           ) as rn
+    FROM blog_views
+  )
+  DELETE FROM blog_views
+  WHERE id IN (
+    SELECT id FROM duplicates WHERE rn > 1
+  );
+
+  GET DIAGNOSTICS deleted_count = ROW_COUNT;
+  RETURN deleted_count;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Clean up any existing duplicates
+SELECT cleanup_duplicate_sessions() as duplicate_views_removed;
 
 -- 9. Create view for blog analytics dashboard
 CREATE OR REPLACE VIEW blog_post_analytics AS
