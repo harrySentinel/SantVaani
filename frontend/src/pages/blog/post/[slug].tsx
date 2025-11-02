@@ -18,7 +18,7 @@ import { BlogPost } from '@/types/blog';
 import { blogService } from '@/services/blogService';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSpiritualTracking } from '@/hooks/useAnalytics';
-import { useRobustBlogView } from '@/hooks/useRobustBlogView';
+import { useServerBlogView } from '@/hooks/useServerBlogView';
 import LikeButton from '@/components/blog/LikeButton';
 import BookmarkButton from '@/components/blog/BookmarkButton';
 import CommentsSection from '@/components/blog/CommentsSection';
@@ -37,8 +37,8 @@ const BlogPostDetail: React.FC = () => {
   const { t } = useLanguage();
   const { trackQuoteView, trackShare } = useSpiritualTracking();
 
-  // Track blog view with robust tracking
-  const { viewRecorded } = useRobustBlogView(post?.id || '');
+  // Track blog view with server-side IP-based tracking
+  const { viewRecorded } = useServerBlogView(post?.id || '');
 
   // Fetch post from API
   /*

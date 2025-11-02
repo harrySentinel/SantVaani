@@ -26,7 +26,7 @@ const BlogIndex: React.FC = () => {
       setIsLoading(true);
       setError(null);
 
-      const data = await blogService.getPosts({ limit: 3 });
+      const data = await blogService.getPosts({ limit: 100 }); // Show all blogs
 
       if (data.success) {
         setPosts(data.posts);

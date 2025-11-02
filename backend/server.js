@@ -1773,6 +1773,62 @@ app.get('/api/blog/posts', async (req, res) => {
   }
 });
 
+// IP-based blog view tracking endpoint
+app.post('/api/blog/track-view', async (req, res) => {
+  try {
+    const { postId } = req.body;
+
+    if (!postId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Post ID is required'
+      });
+    }
+
+    // Get client IP address
+    const ipAddress = req.headers['x-forwarded-for']?.split(',')[0]?.trim()
+      || req.headers['x-real-ip']
+      || req.connection.remoteAddress
+      || req.socket.remoteAddress
+      || 'unknown';
+
+    // Get user agent
+    const userAgent = req.headers['user-agent'] || 'unknown';
+
+    console.log(`📊 View tracking attempt: Post ${postId} from IP ${ipAddress}`);
+
+    // Call the database function to track the view
+    const { data, error } = await supabase.rpc('track_blog_view', {
+      p_post_id: postId,
+      p_ip_address: ipAddress,
+      p_user_agent: userAgent
+    });
+
+    if (error) {
+      console.error('Error tracking blog view:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to track view'
+      });
+    }
+
+    console.log(`✅ View tracking result:`, data);
+
+    res.json({
+      success: true,
+      viewRecorded: data.view_recorded,
+      message: data.message
+    });
+
+  } catch (error) {
+    console.error('Error in track-view endpoint:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+});
+
 // Get single blog post by slug
 app.get('/api/blog/posts/:slug', async (req, res) => {
   try {
@@ -1801,8 +1857,8 @@ app.get('/api/blog/posts/:slug', async (req, res) => {
       });
     }
 
-    // Increment view count
-    await supabase.rpc('increment_blog_view_count', { post_id: data.id });
+    // NOTE: View counting is now done via the /api/blog/track-view endpoint
+    // This prevents automatic increment on every page load
 
     // Transform data to match frontend interface
     const transformedPost = {
@@ -1832,7 +1888,7 @@ app.get('/api/blog/posts/:slug', async (req, res) => {
       status: data.status,
       spiritualQuotes: data.spiritual_quotes || [],
       relatedSaints: data.related_saints || [],
-      viewCount: data.view_count + 1, // Include the incremented count
+      viewCount: data.view_count, // Use actual count from database
       shareCount: data.share_count || 0,
       metaTitle: data.meta_title,
       metaDescription: data.meta_description,
