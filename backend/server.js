@@ -2082,6 +2082,212 @@ app.post('/api/blog/posts', async (req, res) => {
 console.log('✅ Blog routes registered successfully');
 
 // ============================================
+// DYNAMIC SITEMAP GENERATION
+// ============================================
+
+console.log('🗺️  Registering sitemap endpoint...');
+
+// Generate dynamic XML sitemap
+app.get('/api/sitemap.xml', async (req, res) => {
+  try {
+    console.log('🗺️  Generating dynamic sitemap...');
+
+    // Fetch all published blog posts
+    const { data: posts, error } = await supabase
+      .from('blog_posts')
+      .select('slug, published_at, updated_at')
+      .eq('status', 'published')
+      .order('published_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching posts for sitemap:', error);
+      return res.status(500).send('Error generating sitemap');
+    }
+
+    // Get current date for lastmod
+    const today = new Date().toISOString().split('T')[0];
+
+    // Build XML sitemap
+    let xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Main Pages -->
+  <url>
+    <loc>https://santvaani.com/</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://santvaani.com/about</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Saints Section -->
+  <url>
+    <loc>https://santvaani.com/saints</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://santvaani.com/living-saints</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Divine Forms -->
+  <url>
+    <loc>https://santvaani.com/divine</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Daily Features -->
+  <url>
+    <loc>https://santvaani.com/daily-guide</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://santvaani.com/horoscope</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Bhajans & Media -->
+  <url>
+    <loc>https://santvaani.com/bhajans</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://santvaani.com/live-bhajans</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Community -->
+  <url>
+    <loc>https://santvaani.com/events</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://santvaani.com/donation</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Blog Main Page -->
+  <url>
+    <loc>https://santvaani.com/blog</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Blog Categories -->
+  <url>
+    <loc>https://santvaani.com/blog/category/spiritual-wisdom</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://santvaani.com/blog/category/daily-guidance</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://santvaani.com/blog/category/meditation-practices</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://santvaani.com/blog/category/festival-guides</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://santvaani.com/blog/category/saint-stories</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://santvaani.com/blog/category/spiritual-philosophy</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://santvaani.com/blog/category/modern-spirituality</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://santvaani.com/blog/category/healing-wellness</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Other Pages -->
+  <url>
+    <loc>https://santvaani.com/feedback</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <!-- Dynamic Blog Posts -->`;
+
+    // Add each blog post
+    posts.forEach(post => {
+      const lastmod = post.updated_at || post.published_at;
+      const formattedDate = new Date(lastmod).toISOString().split('T')[0];
+
+      xml += `
+  <url>
+    <loc>https://santvaani.com/blog/post/${post.slug}</loc>
+    <lastmod>${formattedDate}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>`;
+    });
+
+    xml += `
+</urlset>`;
+
+    console.log(`✅ Sitemap generated with ${posts.length} blog posts`);
+
+    // Set content type to XML
+    res.header('Content-Type', 'application/xml');
+    res.send(xml);
+
+  } catch (error) {
+    console.error('Error generating sitemap:', error);
+    res.status(500).send('Error generating sitemap');
+  }
+});
+
+console.log('✅ Sitemap endpoint registered');
+
+// ============================================
 // AI-POWERED BLOG FEATURES
 // ============================================
 
