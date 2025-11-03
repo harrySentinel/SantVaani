@@ -31,6 +31,7 @@ const Signup = lazy(() => import("./pages/auth/signup"));
 const ResetPassword = lazy(() => import("./pages/auth/reset-password"));
 const Dashboard = lazy(() => import("./pages/dashboard/index"));
 const ProfileSettings = lazy(() => import("./pages/profile-settings/index"));
+const BlogLanguageSelector = lazy(() => import("./pages/blog/language-selector"));
 const BlogIndex = lazy(() => import("./pages/blog/index"));
 const BlogPostDetail = lazy(() => import("./pages/blog/post/[slug]"));
 const BlogCategoryPage = lazy(() => import("./pages/blog/category/[slug]"));
@@ -92,7 +93,9 @@ const App = () => {
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/profile-settings" element={<ProfileSettings />} />
-              <Route path="/blog" element={<BlogIndex />} />
+              <Route path="/blog" element={<BlogLanguageSelector />} />
+              <Route path="/blog/hindi" element={<BlogIndex />} />
+              <Route path="/blog/english" element={<BlogIndex />} />
               <Route path="/blog/post/:slug" element={<BlogPostDetail />} />
               <Route path="/blog/category/:slug" element={<BlogCategoryPage />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

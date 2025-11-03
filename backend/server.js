@@ -1695,6 +1695,7 @@ app.get('/api/blog/posts', async (req, res) => {
     const offset = parseInt(req.query.offset) || 0;
     const category = req.query.category;
     const search = req.query.search;
+    const language = req.query.language; // 'hi' or 'en'
 
     let query = supabase
       .from('blog_posts')
@@ -1707,6 +1708,7 @@ app.get('/api/blog/posts', async (req, res) => {
         published_at,
         view_count,
         spiritual_quotes,
+        language,
         blog_categories (
           id,
           name,
@@ -1720,6 +1722,12 @@ app.get('/api/blog/posts', async (req, res) => {
     // Add category filter if specified
     if (category && category !== 'all') {
       query = query.eq('category_id', category);
+    }
+
+    // Add language filter if specified
+    if (language && (language === 'hi' || language === 'en')) {
+      query = query.eq('language', language);
+      console.log(`🌐 Filtering blog posts by language: ${language}`);
     }
 
     // Add search filter if specified
@@ -1755,7 +1763,8 @@ app.get('/api/blog/posts', async (req, res) => {
       readingTime: post.reading_time,
       publishedAt: post.published_at,
       viewCount: post.view_count,
-      spiritualQuotes: post.spiritual_quotes || []
+      spiritualQuotes: post.spiritual_quotes || [],
+      language: post.language || 'hi'
     }));
 
     res.json({
@@ -2191,6 +2200,20 @@ app.get('/api/sitemap.xml', async (req, res) => {
   <!-- Blog Main Page -->
   <url>
     <loc>https://santvaani.com/blog</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Blog Language Pages -->
+  <url>
+    <loc>https://santvaani.com/blog/hindi</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://santvaani.com/blog/english</loc>
     <lastmod>${today}</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>

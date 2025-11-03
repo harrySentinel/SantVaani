@@ -116,6 +116,7 @@ class BlogService {
     offset?: number;
     category?: string;
     search?: string;
+    language?: 'hi' | 'en';
   }): Promise<BlogResponse> {
     const searchParams = new URLSearchParams();
 
@@ -123,6 +124,7 @@ class BlogService {
     if (params?.offset) searchParams.append('offset', params.offset.toString());
     if (params?.category) searchParams.append('category', params.category);
     if (params?.search) searchParams.append('search', params.search);
+    if (params?.language) searchParams.append('language', params.language);
 
     const queryString = searchParams.toString();
     const endpoint = `/api/blog/posts${queryString ? `?${queryString}` : ''}`;

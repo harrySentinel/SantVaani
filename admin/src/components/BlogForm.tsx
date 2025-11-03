@@ -44,6 +44,7 @@ interface BlogPost {
   meta_keywords?: string[]
   status: 'draft' | 'published'
   published_at?: string
+  language?: 'hi' | 'en'
 }
 
 interface BlogFormProps {
@@ -67,7 +68,7 @@ export default function BlogForm({ post, isOpen, onClose, onSave }: BlogFormProp
   // AI Features
   const [aiLoading, setAiLoading] = useState(false)
   const [seoSuggestions, setSeoSuggestions] = useState<any>(null)
-  const [contentLanguage, setContentLanguage] = useState<'hi' | 'en' | 'both'>('hi')
+  const [contentLanguage, setContentLanguage] = useState<'hi' | 'en'>('hi')
   const [translating, setTranslating] = useState(false)
   const [isMarkdownConverterOpen, setIsMarkdownConverterOpen] = useState(false)
 
@@ -86,7 +87,8 @@ export default function BlogForm({ post, isOpen, onClose, onSave }: BlogFormProp
     meta_title: '',
     meta_description: '',
     meta_keywords: [] as string[],
-    status: 'draft' as 'draft' | 'published'
+    status: 'draft' as 'draft' | 'published',
+    language: 'hi' as 'hi' | 'en' // Content language
   })
 
   // Load categories
@@ -112,9 +114,11 @@ export default function BlogForm({ post, isOpen, onClose, onSave }: BlogFormProp
         meta_title: post.meta_title || '',
         meta_description: post.meta_description || '',
         meta_keywords: post.meta_keywords || [],
-        status: post.status || 'draft'
+        status: post.status || 'draft',
+        language: post.language || 'hi'
       })
       setImagePreview(post.featured_image || null)
+      setContentLanguage(post.language || 'hi')
     } else {
       resetForm()
     }
@@ -136,13 +140,15 @@ export default function BlogForm({ post, isOpen, onClose, onSave }: BlogFormProp
       meta_title: '',
       meta_description: '',
       meta_keywords: [],
-      status: 'draft'
+      status: 'draft',
+      language: 'hi'
     })
     setImagePreview(null)
     setTagInput('')
     setQuoteInput('')
     setSaintInput('')
     setKeywordInput('')
+    setContentLanguage('hi')
   }
 
   const loadCategories = async () => {
@@ -332,9 +338,7 @@ export default function BlogForm({ post, isOpen, onClose, onSave }: BlogFormProp
 
       const languageContext = contentLanguage === 'hi'
         ? 'Hindi (हिंदी)'
-        : contentLanguage === 'en'
-        ? 'English'
-        : 'both Hindi and English (bilingual)'
+        : 'English'
 
       const prompt = `You are an SEO expert for a spiritual blog platform called SantVaani. Generate SEO-optimized metadata for this blog post in ${languageContext}.
 
@@ -663,11 +667,14 @@ Return ONLY a JSON object:
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 gap-3">
                 <Button
                   type="button"
                   variant={contentLanguage === 'hi' ? 'default' : 'outline'}
-                  onClick={() => setContentLanguage('hi')}
+                  onClick={() => {
+                    setContentLanguage('hi')
+                    setFormData(prev => ({ ...prev, language: 'hi' }))
+                  }}
                   className={contentLanguage === 'hi' ? 'bg-orange-600' : ''}
                 >
                   <Languages className="w-4 h-4 mr-2" />
@@ -676,20 +683,14 @@ Return ONLY a JSON object:
                 <Button
                   type="button"
                   variant={contentLanguage === 'en' ? 'default' : 'outline'}
-                  onClick={() => setContentLanguage('en')}
+                  onClick={() => {
+                    setContentLanguage('en')
+                    setFormData(prev => ({ ...prev, language: 'en' }))
+                  }}
                   className={contentLanguage === 'en' ? 'bg-orange-600' : ''}
                 >
                   <Languages className="w-4 h-4 mr-2" />
                   English Only
-                </Button>
-                <Button
-                  type="button"
-                  variant={contentLanguage === 'both' ? 'default' : 'outline'}
-                  onClick={() => setContentLanguage('both')}
-                  className={contentLanguage === 'both' ? 'bg-orange-600' : ''}
-                >
-                  <Languages className="w-4 h-4 mr-2" />
-                  Bilingual
                 </Button>
               </div>
 
@@ -713,26 +714,25 @@ Return ONLY a JSON object:
                   )}
                 </Button>
 
-                {contentLanguage === 'both' && (
-                  <Button
-                    type="button"
-                    onClick={() => translateContent(formData.content.match(/[\u0900-\u097F]/) ? 'en' : 'hi')}
-                    disabled={translating || !formData.content}
-                    variant="outline"
-                  >
-                    {translating ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Translating...
-                      </>
-                    ) : (
-                      <>
-                        <Languages className="w-4 h-4 mr-2" />
-                        Auto-Translate
-                      </>
-                    )}
-                  </Button>
-                )}
+                <Button
+                  type="button"
+                  onClick={() => translateContent(formData.content.match(/[\u0900-\u097F]/) ? 'en' : 'hi')}
+                  disabled={translating || !formData.content}
+                  variant="outline"
+                  className="flex-shrink-0"
+                >
+                  {translating ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Translating...
+                    </>
+                  ) : (
+                    <>
+                      <Languages className="w-4 h-4 mr-2" />
+                      Auto-Translate
+                    </>
+                  )}
+                </Button>
               </div>
             </CardContent>
           </Card>

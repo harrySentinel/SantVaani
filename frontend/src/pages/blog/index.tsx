@@ -1,12 +1,12 @@
 // Spiritual Wisdom - SantVaani
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import BlogCard from '@/components/blog/BlogCard';
 import SEOHead from '@/components/blog/SEOHead';
 import { Card, CardContent } from '@/components/ui/card';
-import { BookOpen, Heart, Sparkles } from 'lucide-react';
+import { BookOpen, Heart, Sparkles, Globe } from 'lucide-react';
 import { BlogPost } from '@/types/blog';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSpiritualTracking } from '@/hooks/useAnalytics';
@@ -19,6 +19,12 @@ const BlogIndex: React.FC = () => {
 
   const { t } = useLanguage();
   const { trackVisitorCounter } = useSpiritualTracking();
+  const location = useLocation();
+
+  // Detect language from route
+  const contentLanguage: 'hi' | 'en' | null = location.pathname === '/blog/hindi' ? 'hi' :
+                                               location.pathname === '/blog/english' ? 'en' :
+                                               null;
 
   // Fetch blog posts from API
   const fetchBlogPosts = async () => {
@@ -26,7 +32,10 @@ const BlogIndex: React.FC = () => {
       setIsLoading(true);
       setError(null);
 
-      const data = await blogService.getPosts({ limit: 100 }); // Show all blogs
+      const data = await blogService.getPosts({
+        limit: 100,
+        language: contentLanguage || undefined
+      });
 
       if (data.success) {
         setPosts(data.posts);
@@ -43,7 +52,7 @@ const BlogIndex: React.FC = () => {
 
   useEffect(() => {
     fetchBlogPosts();
-  }, []);
+  }, [contentLanguage]);
 
   // Track page view
   useEffect(() => {
@@ -53,10 +62,10 @@ const BlogIndex: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50">
       <SEOHead
-        title="Spiritual Wisdom | SantVaani - Ancient Teachings for Inner Peace"
-        description="Find peace and guidance through timeless spiritual teachings. Discover meditation, devotion, and daily practices for a more peaceful and meaningful life."
-        keywords={['spiritual wisdom', 'meditation', 'inner peace', 'bhakti', 'devotion', 'daily prayers', 'spiritual guidance', 'ancient teachings']}
-        canonicalUrl="https://santvaani.com/blog"
+        title={contentLanguage === 'hi' ? 'आध्यात्मिक ज्ञान | संत वाणी - प्राचीन शिक्षाएँ' : 'Spiritual Wisdom | SantVaani - Ancient Teachings for Inner Peace'}
+        description={contentLanguage === 'hi' ? 'प्राचीन शिक्षाओं के माध्यम से शांति खोजें। ध्यान, भक्ति, और आंतरिक शांति के लिए दैनिक अभ्यास।' : 'Find peace and guidance through timeless spiritual teachings. Discover meditation, devotion, and daily practices for a more peaceful and meaningful life.'}
+        keywords={contentLanguage === 'hi' ? ['आध्यात्मिक ज्ञान', 'ध्यान', 'भक्ति', 'शांति', 'प्रार्थना'] : ['spiritual wisdom', 'meditation', 'inner peace', 'bhakti', 'devotion', 'daily prayers', 'spiritual guidance', 'ancient teachings']}
+        canonicalUrl={`https://santvaani.com/blog/${contentLanguage}`}
       />
       <Navbar />
 
@@ -70,11 +79,38 @@ const BlogIndex: React.FC = () => {
               <span className="text-4xl animate-pulse">📿</span>
             </div>
             <h1 className="text-3xl md:text-4xl font-light mb-6 text-gray-800">
-              Spiritual Wisdom
+              {contentLanguage === 'hi' ? 'आध्यात्मिक ज्ञान' : 'Spiritual Wisdom'}
             </h1>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed font-light">
-              Find peace through ancient teachings. Simple wisdom for a calmer, more meaningful life.
+              {contentLanguage === 'hi'
+                ? 'प्राचीन शिक्षाओं के माध्यम से शांति प्राप्त करें। सरल ज्ञान जो जीवन को शांत और सार्थक बनाता है।'
+                : 'Find peace through ancient teachings. Simple wisdom for a calmer, more meaningful life.'}
             </p>
+
+            {/* Language Switcher */}
+            <div className="flex justify-center items-center gap-4 pt-4">
+              <Link
+                to="/blog/hindi"
+                className={`px-4 py-2 rounded-full transition-all ${
+                  contentLanguage === 'hi'
+                    ? 'bg-orange-500 text-white shadow-lg'
+                    : 'bg-white text-gray-600 hover:bg-orange-50 border border-gray-200'
+                }`}
+              >
+                🇮🇳 हिंदी
+              </Link>
+              <span className="text-gray-400">|</span>
+              <Link
+                to="/blog/english"
+                className={`px-4 py-2 rounded-full transition-all ${
+                  contentLanguage === 'en'
+                    ? 'bg-orange-500 text-white shadow-lg'
+                    : 'bg-white text-gray-600 hover:bg-orange-50 border border-gray-200'
+                }`}
+              >
+                🌍 English
+              </Link>
+            </div>
           </div>
         </div>
       </section>

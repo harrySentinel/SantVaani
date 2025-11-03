@@ -29,6 +29,7 @@ export interface BlogPost {
   viewCount?: number;
   shareCount?: number;
   seoMeta?: BlogSEOMeta;
+  language?: 'hi' | 'en'; // Content language: Hindi or English
 }
 
 export interface BlogCategory {
