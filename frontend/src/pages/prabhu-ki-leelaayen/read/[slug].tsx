@@ -1,5 +1,5 @@
-// EPIC 3D Book Reader with Realistic Page Flip Animation
-// Users will LOVE this! 📖✨
+// EPIC 3D Book Reader with DRAMATIC Realistic Page Flip
+// Users will SEE and LOVE this! 📖✨
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -66,7 +66,7 @@ const BookReader: React.FC = () => {
     if (!chapter) return [];
 
     const content = language === 'hi' ? chapter.content_hi : chapter.content;
-    const charsPerPage = 1000;
+    const charsPerPage = 1200;
     const pages: string[] = [];
 
     if (chapter.chapter_image) {
@@ -90,7 +90,7 @@ const BookReader: React.FC = () => {
       setTimeout(() => {
         setCurrentPage(currentPage + 1);
         setTimeout(() => setIsFlipping(false), 100);
-      }, 800);
+      }, 1000);
     }
   };
 
@@ -101,7 +101,7 @@ const BookReader: React.FC = () => {
       setTimeout(() => {
         setCurrentPage(currentPage - 1);
         setTimeout(() => setIsFlipping(false), 100);
-      }, 800);
+      }, 1000);
     }
   };
 
@@ -128,7 +128,7 @@ const BookReader: React.FC = () => {
     <div
       className={`min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-amber-50 via-orange-50 to-red-50'} transition-colors duration-500 relative overflow-hidden`}
     >
-      {/* SantVaani Branding (Always Visible) */}
+      {/* SantVaani Branding */}
       <div className={`absolute top-4 left-4 z-50 flex items-center gap-2 ${darkMode ? 'text-white/70' : 'text-gray-600/70'}`}>
         <div className="w-8 h-8 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center">
           <span className="text-white font-bold text-sm">ॐ</span>
@@ -138,7 +138,7 @@ const BookReader: React.FC = () => {
         </span>
       </div>
 
-      {/* Top Controls (Hidden in Fullscreen) */}
+      {/* Top Controls */}
       {!isFullscreen && (
         <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
           <button
@@ -174,7 +174,7 @@ const BookReader: React.FC = () => {
         </div>
       )}
 
-      {/* Fullscreen Toggle (Visible in Fullscreen) */}
+      {/* Fullscreen Exit Button */}
       {isFullscreen && (
         <button
           onClick={() => setIsFullscreen(false)}
@@ -186,27 +186,22 @@ const BookReader: React.FC = () => {
 
       {/* Book Container */}
       <div className="min-h-screen flex items-center justify-center p-4 md:p-8">
-        <div className="relative book-3d-container" style={{ perspective: '2000px' }}>
-          {/* The 3D Book */}
+        <div className="relative" style={{ perspective: '2500px', perspectiveOrigin: 'center center' }}>
+          {/* The Book with Page Flip Effect */}
           <div
-            className={`book relative ${isFlipping ? 'flipping' : ''} ${flipDirection === 'forward' ? 'flip-forward' : 'flip-backward'}`}
+            className="book-container relative"
             style={{
               width: isFullscreen ? 'min(90vw, 1200px)' : 'min(90vw, 900px)',
               height: isFullscreen ? 'min(85vh, 800px)' : 'min(80vh, 700px)',
-              transformStyle: 'preserve-3d',
-              transition: 'all 0.5s ease',
             }}
           >
-            {/* Book Cover/Pages */}
+            {/* Current Page (Always Visible) */}
             <div
-              className={`book-page ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-gradient-to-br from-amber-50 to-orange-100 border-orange-300'} rounded-2xl shadow-2xl border-4 overflow-hidden relative`}
+              className={`book-page current-page ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-gradient-to-br from-amber-50 to-orange-100 border-orange-300'} rounded-2xl shadow-2xl border-4 overflow-hidden absolute inset-0`}
               style={{
-                width: '100%',
-                height: '100%',
-                transformStyle: 'preserve-3d',
+                zIndex: 1,
               }}
             >
-              {/* Page Content */}
               <div className="h-full flex flex-col">
                 {/* Header */}
                 <div className={`px-6 py-4 border-b-2 ${darkMode ? 'border-gray-700 bg-gray-800/50' : 'border-orange-200 bg-white/50'} backdrop-blur-sm flex items-center justify-between`}>
@@ -218,7 +213,7 @@ const BookReader: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Content Area */}
+                {/* Content */}
                 <div className="flex-1 p-6 md:p-10 overflow-y-auto">
                   {isImagePage ? (
                     <div className="h-full flex items-center justify-center">
@@ -241,49 +236,63 @@ const BookReader: React.FC = () => {
                   )}
                 </div>
 
-                {/* Page Turn Buttons (INSIDE THE BOOK!) */}
+                {/* Navigation Buttons (INSIDE BOOK) */}
                 <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between">
-                  {/* Previous Page Button (Bottom Left Corner) */}
                   {currentPage > 0 && (
                     <button
                       onClick={prevPage}
                       disabled={isFlipping}
                       className={`group relative w-16 h-16 rounded-full ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gradient-to-br from-orange-400 to-red-500 hover:from-orange-500 hover:to-red-600'} text-white shadow-2xl transform transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed`}
                     >
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="text-2xl">◀</span>
-                      </div>
-                      {/* Tooltip */}
+                      <span className="text-2xl">◀</span>
                       <div className={`absolute -top-12 left-1/2 -translate-x-1/2 px-3 py-1 rounded-lg ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-lg opacity-0 group-hover:opacity-100 transition whitespace-nowrap text-sm`}>
-                        {language === 'hi' ? 'पिछला पृष्ठ' : 'Previous Page'}
+                        {language === 'hi' ? 'पिछला पृष्ठ' : 'Previous'}
                       </div>
                     </button>
                   )}
 
                   <div className="flex-1" />
 
-                  {/* Next Page Button (Bottom Right Corner) */}
                   {currentPage < totalPages - 1 && (
                     <button
                       onClick={nextPage}
                       disabled={isFlipping}
                       className={`group relative w-16 h-16 rounded-full ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gradient-to-br from-orange-400 to-red-500 hover:from-orange-500 hover:to-red-600'} text-white shadow-2xl transform transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed`}
                     >
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="text-2xl">▶</span>
-                      </div>
-                      {/* Tooltip */}
+                      <span className="text-2xl">▶</span>
                       <div className={`absolute -top-12 left-1/2 -translate-x-1/2 px-3 py-1 rounded-lg ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-lg opacity-0 group-hover:opacity-100 transition whitespace-nowrap text-sm`}>
-                        {language === 'hi' ? 'अगला पृष्ठ' : 'Next Page'}
+                        {language === 'hi' ? 'अगला पृष्ठ' : 'Next'}
                       </div>
                     </button>
                   )}
                 </div>
               </div>
             </div>
+
+            {/* Flipping Page Overlay (Only Visible During Animation) */}
+            {isFlipping && (
+              <div
+                className={`flipping-page absolute inset-0 pointer-events-none ${flipDirection === 'forward' ? 'flip-forward' : 'flip-backward'}`}
+                style={{
+                  zIndex: 10,
+                  transformStyle: 'preserve-3d',
+                  transformOrigin: flipDirection === 'forward' ? 'right center' : 'left center',
+                }}
+              >
+                <div
+                  className={`${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-gradient-to-br from-amber-50 to-orange-100 border-orange-300'} rounded-2xl shadow-2xl border-4 h-full w-full`}
+                  style={{
+                    backfaceVisibility: 'hidden',
+                  }}
+                >
+                  {/* Page curl shadow */}
+                  <div className="absolute inset-0 bg-gradient-to-l from-black/30 via-transparent to-transparent pointer-events-none" />
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Progress Bar (Below Book) */}
+          {/* Progress Bar */}
           <div className="mt-6 max-w-3xl mx-auto">
             <div className={`h-2 ${darkMode ? 'bg-gray-700' : 'bg-orange-200'} rounded-full overflow-hidden shadow-inner`}>
               <div
@@ -303,48 +312,77 @@ const BookReader: React.FC = () => {
         </div>
       </div>
 
-      {/* CSS for 3D Page Flip Animation */}
+      {/* Enhanced CSS for DRAMATIC Page Flip */}
       <style>{`
-        .book {
-          transform-style: preserve-3d;
-        }
-
-        .book.flipping.flip-forward {
-          animation: pageFlipForward 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
-        }
-
-        .book.flipping.flip-backward {
-          animation: pageFlipBackward 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
-        }
-
-        @keyframes pageFlipForward {
-          0% {
-            transform: rotateY(0deg);
-          }
-          50% {
-            transform: rotateY(-15deg) translateX(20px);
-          }
-          100% {
-            transform: rotateY(0deg);
-          }
-        }
-
-        @keyframes pageFlipBackward {
-          0% {
-            transform: rotateY(0deg);
-          }
-          50% {
-            transform: rotateY(15deg) translateX(-20px);
-          }
-          100% {
-            transform: rotateY(0deg);
-          }
-        }
-
         .book-page {
           box-shadow:
             0 20px 60px rgba(0, 0, 0, 0.3),
-            0 0 40px rgba(251, 146, 60, 0.1);
+            0 0 40px rgba(251, 146, 60, 0.1),
+            inset -10px 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .flipping-page.flip-forward {
+          animation: dramaticFlipForward 1s cubic-bezier(0.645, 0.045, 0.355, 1) forwards;
+        }
+
+        .flipping-page.flip-backward {
+          animation: dramaticFlipBackward 1s cubic-bezier(0.645, 0.045, 0.355, 1) forwards;
+        }
+
+        @keyframes dramaticFlipForward {
+          0% {
+            transform: rotateY(0deg) translateZ(0px);
+            opacity: 1;
+          }
+          25% {
+            transform: rotateY(-30deg) translateZ(50px) translateX(-30px);
+            opacity: 0.9;
+          }
+          50% {
+            transform: rotateY(-90deg) translateZ(100px) translateX(-80px) scale(1.05);
+            opacity: 0.7;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+          }
+          75% {
+            transform: rotateY(-150deg) translateZ(50px) translateX(-30px);
+            opacity: 0.4;
+          }
+          100% {
+            transform: rotateY(-180deg) translateZ(0px);
+            opacity: 0;
+          }
+        }
+
+        @keyframes dramaticFlipBackward {
+          0% {
+            transform: rotateY(0deg) translateZ(0px);
+            opacity: 1;
+          }
+          25% {
+            transform: rotateY(30deg) translateZ(50px) translateX(30px);
+            opacity: 0.9;
+          }
+          50% {
+            transform: rotateY(90deg) translateZ(100px) translateX(80px) scale(1.05);
+            opacity: 0.7;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+          }
+          75% {
+            transform: rotateY(150deg) translateZ(50px) translateX(30px);
+            opacity: 0.4;
+          }
+          100% {
+            transform: rotateY(180deg) translateZ(0px);
+            opacity: 0;
+          }
+        }
+
+        /* Add page curl effect on hover */
+        .book-page:hover {
+          box-shadow:
+            0 25px 70px rgba(0, 0, 0, 0.35),
+            0 0 50px rgba(251, 146, 60, 0.15),
+            inset -12px 0 25px rgba(0, 0, 0, 0.12);
         }
       `}</style>
     </div>
