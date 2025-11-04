@@ -236,17 +236,26 @@ const BookReader: React.FC = () => {
                   )}
                 </div>
 
-                {/* Navigation Buttons (INSIDE BOOK) */}
+                {/* Navigation Buttons (INSIDE BOOK) - Beautiful Design */}
                 <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between">
                   {currentPage > 0 && (
                     <button
                       onClick={prevPage}
                       disabled={isFlipping}
-                      className={`group relative w-16 h-16 rounded-full ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gradient-to-br from-orange-400 to-red-500 hover:from-orange-500 hover:to-red-600'} text-white shadow-2xl transform transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed`}
+                      className={`group relative px-6 py-3 rounded-xl ${
+                        darkMode
+                          ? 'bg-gray-700 hover:bg-gray-600 border-2 border-gray-600'
+                          : 'bg-white hover:bg-orange-50 border-2 border-orange-300 hover:border-orange-400'
+                      } shadow-xl transform transition-all duration-300 hover:scale-105 hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2`}
                     >
-                      <span className="text-2xl">◀</span>
-                      <div className={`absolute -top-12 left-1/2 -translate-x-1/2 px-3 py-1 rounded-lg ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-lg opacity-0 group-hover:opacity-100 transition whitespace-nowrap text-sm`}>
-                        {language === 'hi' ? 'पिछला पृष्ठ' : 'Previous'}
+                      <svg className={`w-5 h-5 ${darkMode ? 'text-white' : 'text-orange-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                      </svg>
+                      <span className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-700'}`}>
+                        {language === 'hi' ? 'पिछला' : 'Previous'}
+                      </span>
+                      <div className={`absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1 rounded-lg ${darkMode ? 'bg-gray-800 text-white' : 'bg-gray-800 text-white'} shadow-lg opacity-0 group-hover:opacity-100 transition whitespace-nowrap text-xs`}>
+                        {language === 'hi' ? 'पिछला पृष्ठ' : 'Previous Page'}
                       </div>
                     </button>
                   )}
@@ -257,11 +266,20 @@ const BookReader: React.FC = () => {
                     <button
                       onClick={nextPage}
                       disabled={isFlipping}
-                      className={`group relative w-16 h-16 rounded-full ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gradient-to-br from-orange-400 to-red-500 hover:from-orange-500 hover:to-red-600'} text-white shadow-2xl transform transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed`}
+                      className={`group relative px-6 py-3 rounded-xl ${
+                        darkMode
+                          ? 'bg-gray-700 hover:bg-gray-600 border-2 border-gray-600'
+                          : 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 border-2 border-orange-600'
+                      } text-white shadow-xl transform transition-all duration-300 hover:scale-105 hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2`}
                     >
-                      <span className="text-2xl">▶</span>
-                      <div className={`absolute -top-12 left-1/2 -translate-x-1/2 px-3 py-1 rounded-lg ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-lg opacity-0 group-hover:opacity-100 transition whitespace-nowrap text-sm`}>
-                        {language === 'hi' ? 'अगला पृष्ठ' : 'Next'}
+                      <span className="font-semibold">
+                        {language === 'hi' ? 'अगला' : 'Next'}
+                      </span>
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                      <div className={`absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1 rounded-lg ${darkMode ? 'bg-gray-800 text-white' : 'bg-gray-800 text-white'} shadow-lg opacity-0 group-hover:opacity-100 transition whitespace-nowrap text-xs`}>
+                        {language === 'hi' ? 'अगला पृष्ठ' : 'Next Page'}
                       </div>
                     </button>
                   )}
