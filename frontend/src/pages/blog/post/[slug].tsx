@@ -466,13 +466,13 @@ Lord Ram's teachings remind us that true strength lies not in power or wealth, b
             </div>
           </div>
 
-          {/* Featured Image - Optimized for Mobile */}
+          {/* Featured Image - Fully Responsive for Mobile & Desktop */}
           {post.featuredImage && (
-            <div className="relative mb-12 rounded-xl overflow-hidden shadow-2xl">
+            <div className="relative mb-8 md:mb-12 rounded-xl overflow-hidden shadow-2xl">
               <img
                 src={post.featuredImage}
                 alt={post.title}
-                className="w-full h-96 object-cover"
+                className="w-full h-48 sm:h-64 md:h-80 lg:h-96 object-cover"
                 loading="eager"
                 decoding="async"
                 fetchPriority="high"
