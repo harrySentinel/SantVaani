@@ -532,25 +532,41 @@ Return ONLY a JSON object:
     setFormData(prev => ({ ...prev, content: html }))
   }
 
-  // Calculate SEO Score
+  // Calculate SEO Score (Language-aware!)
   const calculateSEOScore = () => {
     let score = 0
     const checks = []
 
-    // Title length (50-60 chars is ideal)
-    if (formData.meta_title.length >= 50 && formData.meta_title.length <= 60) {
+    // Language-specific SEO requirements
+    // Hindi and English have different optimal character counts
+    const seoConfig = contentLanguage === 'hi' ? {
+      title: { min: 50, max: 60, label: '50-60' },
+      description: { min: 150, max: 160, label: '150-160' }
+    } : {
+      title: { min: 45, max: 65, label: '45-65' },
+      description: { min: 140, max: 170, label: '140-170' }
+    }
+
+    // Title length (language-aware)
+    if (formData.meta_title.length >= seoConfig.title.min && formData.meta_title.length <= seoConfig.title.max) {
       score += 20
       checks.push({ text: 'Title length optimal', passed: true })
     } else {
-      checks.push({ text: 'Title should be 50-60 characters', passed: false })
+      checks.push({
+        text: `Title should be ${seoConfig.title.label} characters (${contentLanguage === 'hi' ? 'Hindi' : 'English'})`,
+        passed: false
+      })
     }
 
-    // Description length (150-160 chars is ideal)
-    if (formData.meta_description.length >= 150 && formData.meta_description.length <= 160) {
+    // Description length (language-aware)
+    if (formData.meta_description.length >= seoConfig.description.min && formData.meta_description.length <= seoConfig.description.max) {
       score += 20
       checks.push({ text: 'Meta description length optimal', passed: true })
     } else {
-      checks.push({ text: 'Meta description should be 150-160 characters', passed: false })
+      checks.push({
+        text: `Meta description should be ${seoConfig.description.label} characters (${contentLanguage === 'hi' ? 'Hindi' : 'English'})`,
+        passed: false
+      })
     }
 
     // Has keywords

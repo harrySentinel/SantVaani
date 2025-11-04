@@ -16,7 +16,12 @@ const LandingBlogSection = () => {
     const fetchFeaturedPosts = async () => {
       try {
         setIsLoading(true)
-        const response = await blogService.getPosts({ limit: 3, featured: true })
+        // Fetch posts matching the UI language
+        const contentLanguage = language === 'hi' ? 'hi' : 'en'
+        const response = await blogService.getPosts({
+          limit: 3,
+          language: contentLanguage
+        })
         if (response.success && response.posts) {
           setFeaturedPosts(response.posts.slice(0, 3))
         }
@@ -28,7 +33,7 @@ const LandingBlogSection = () => {
     }
 
     fetchFeaturedPosts()
-  }, [])
+  }, [language]) // Re-fetch when language changes
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)

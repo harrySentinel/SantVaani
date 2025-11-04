@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useToast } from '@/hooks/use-toast'
 import { supabase, TABLES } from '@/lib/supabase'
 import BlogForm from '@/components/BlogForm'
-import { Edit, Trash2, Eye, Plus, FileText, Search } from 'lucide-react'
+import { Edit, Trash2, Eye, Plus, FileText, Search, Globe } from 'lucide-react'
 import FloatingActionButton from '@/components/ui/floating-action-button'
 import {
   ResponsiveTable,
@@ -36,6 +37,7 @@ interface BlogPost {
   status: 'draft' | 'published'
   published_at?: string
   view_count: number
+  language?: 'hi' | 'en'
   blog_categories?: {
     name: string
     icon: string
@@ -47,6 +49,7 @@ export default function Blogs() {
   const [posts, setPosts] = useState<BlogPost[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
+  const [languageFilter, setLanguageFilter] = useState<'all' | 'hi' | 'en'>('all')
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null)
   const { toast } = useToast()
@@ -124,11 +127,18 @@ export default function Blogs() {
     loadPosts()
   }
 
-  const filteredPosts = posts.filter(post =>
-    post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    post.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    post.tags?.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
-  )
+  const filteredPosts = posts.filter(post => {
+    // Search filter
+    const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      post.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      post.tags?.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+
+    // Language filter
+    const matchesLanguage = languageFilter === 'all' ||
+      (post.language || 'hi') === languageFilter
+
+    return matchesSearch && matchesLanguage
+  })
 
   if (loading) {
     return <LoadingScreen message="Loading blog posts..." />
@@ -167,18 +177,42 @@ export default function Blogs() {
         <Badge variant="outline" className="badge-enhanced">
           Featured: {posts.filter(p => p.featured).length}
         </Badge>
+        <Badge variant="outline" className="badge-enhanced">
+          🇮🇳 Hindi: {posts.filter(p => (p.language || 'hi') === 'hi').length}
+        </Badge>
+        <Badge variant="outline" className="badge-enhanced">
+          🌍 English: {posts.filter(p => p.language === 'en').length}
+        </Badge>
       </div>
 
-      {/* Search */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-        <Input
-          type="text"
-          placeholder="Search blog posts..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-10"
-        />
+      {/* Filters */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        {/* Search */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <Input
+            type="text"
+            placeholder="Search blog posts..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+
+        {/* Language Filter */}
+        <div className="relative">
+          <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 z-10" />
+          <Select value={languageFilter} onValueChange={(value: 'all' | 'hi' | 'en') => setLanguageFilter(value)}>
+            <SelectTrigger className="pl-10">
+              <SelectValue placeholder="Filter by language" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Languages</SelectItem>
+              <SelectItem value="hi">🇮🇳 Hindi Only</SelectItem>
+              <SelectItem value="en">🌍 English Only</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {/* Table */}
@@ -208,7 +242,12 @@ export default function Blogs() {
               <ResponsiveTableRow key={post.id}>
                 <ResponsiveTableCell>
                   <div className="space-y-1">
-                    <div className="font-medium">{post.title}</div>
+                    <div className="flex items-center gap-2">
+                      <div className="font-medium">{post.title}</div>
+                      <Badge variant="outline" className="text-xs shrink-0">
+                        {(post.language || 'hi') === 'hi' ? '🇮🇳' : '🌍'}
+                      </Badge>
+                    </div>
                     <div className="text-xs text-gray-500">/{post.slug}</div>
                   </div>
                 </ResponsiveTableCell>
@@ -223,12 +262,14 @@ export default function Blogs() {
 
                 <ResponsiveTableCell>
                   <div className="space-y-1">
-                    <Badge variant={post.status === 'published' ? 'default' : 'secondary'}>
-                      {post.status}
-                    </Badge>
-                    {post.featured && (
-                      <Badge variant="outline" className="ml-1">✨ Featured</Badge>
-                    )}
+                    <div className="flex gap-1 flex-wrap">
+                      <Badge variant={post.status === 'published' ? 'default' : 'secondary'}>
+                        {post.status}
+                      </Badge>
+                      {post.featured && (
+                        <Badge variant="outline">✨ Featured</Badge>
+                      )}
+                    </div>
                     <div className="text-xs text-gray-500 mt-1">
                       {post.view_count} views
                     </div>
