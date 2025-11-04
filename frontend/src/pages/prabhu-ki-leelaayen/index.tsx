@@ -78,26 +78,35 @@ const PrabhuKiLeelaayen: React.FC = () => {
 
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-8">
-            {/* Sacred Symbols */}
-            <div className="flex justify-center items-center gap-4">
-              <Sparkles className="w-8 h-8 text-orange-500 animate-pulse" />
-              <span className="text-6xl animate-pulse">🕉️</span>
-              <Sparkles className="w-8 h-8 text-orange-500 animate-pulse" />
-            </div>
+            {/* Sacred Design Elements */}
+            <div className="relative">
+              {/* Decorative mandala-like design */}
+              <div className="flex justify-center items-center gap-6 mb-8">
+                <div className="w-16 h-0.5 bg-gradient-to-r from-transparent via-orange-500 to-orange-500"></div>
+                <Sparkles className="w-10 h-10 text-orange-500 animate-pulse" />
+                <span className="text-7xl md:text-8xl animate-pulse drop-shadow-2xl">🕉️</span>
+                <Sparkles className="w-10 h-10 text-orange-500 animate-pulse" />
+                <div className="w-16 h-0.5 bg-gradient-to-l from-transparent via-orange-500 to-orange-500"></div>
+              </div>
 
-            {/* Title */}
-            <div className="space-y-4">
-              <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-orange-600 via-red-600 to-orange-600 bg-clip-text text-transparent">
-                प्रभु की लीलाएँ
-              </h1>
-              <h2 className="text-3xl md:text-4xl font-light text-gray-700">
-                Prabhu Ki Leelaayen
-              </h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                {language === 'hi'
-                  ? 'दिव्य कथाओं की एक अद्भुत यात्रा। प्रभु की अनंत लीलाओं को सुंदर पुस्तक अनुभव के साथ पढ़ें।'
-                  : 'An enchanting journey through divine stories. Experience the eternal pastimes of the Lord with a beautiful book-like interface.'}
-              </p>
+              {/* Epic Title - Hindi Only */}
+              <div className="space-y-6">
+                <h1 className="text-7xl md:text-9xl font-bold bg-gradient-to-r from-orange-600 via-red-600 to-orange-600 bg-clip-text text-transparent drop-shadow-2xl tracking-wide" style={{ fontFamily: "'Noto Sans Devanagari', sans-serif" }}>
+                  लीलाएँ
+                </h1>
+                <div className="flex items-center justify-center gap-3">
+                  <div className="w-12 h-0.5 bg-gradient-to-r from-transparent to-orange-400"></div>
+                  <p className="text-2xl md:text-3xl text-orange-700 font-semibold italic">
+                    {language === 'hi' ? 'दिव्य कथाएँ' : 'Divine Stories'}
+                  </p>
+                  <div className="w-12 h-0.5 bg-gradient-to-l from-transparent to-orange-400"></div>
+                </div>
+                <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed px-4">
+                  {language === 'hi'
+                    ? 'दिव्य कथाओं की एक अद्भुत यात्रा। प्रभु की अनंत लीलाओं को सुंदर पुस्तक अनुभव के साथ पढ़ें।'
+                    : 'An enchanting journey through divine stories. Experience the eternal pastimes of the Lord with a beautiful book-like interface.'}
+                </p>
+              </div>
             </div>
 
             {/* Stats */}

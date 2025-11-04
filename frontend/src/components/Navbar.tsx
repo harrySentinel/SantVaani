@@ -43,7 +43,7 @@ export default function Navbar() {
     { to: '/events', label: 'Events', labelHi: 'कार्यक्रम', icon: CalendarDays },
     { to: '/saints', label: 'Saints', labelHi: 'संत', icon: Users },
     { to: '/blog', label: 'Blog', labelHi: 'ब्लॉग', icon: BookOpen },
-    { to: '/prabhu-ki-leelaayen', label: 'Prabhu Ki Leelaayen', labelHi: 'प्रभु की लीलाएँ', icon: BookMarked },
+    { to: '/prabhu-ki-leelaayen', label: 'Leelaayen', labelHi: 'लीलाएँ', icon: BookMarked },
   ];
 
   // Secondary navigation items (in dropdown/mobile menu)
