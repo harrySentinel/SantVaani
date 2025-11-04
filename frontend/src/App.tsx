@@ -36,6 +36,7 @@ const BlogIndex = lazy(() => import("./pages/blog/index"));
 const BlogPostDetail = lazy(() => import("./pages/blog/post/[slug]"));
 const BlogCategoryPage = lazy(() => import("./pages/blog/category/[slug]"));
 const PrabhuKiLeelaayen = lazy(() => import("./pages/prabhu-ki-leelaayen/index"));
+const PrabhuKiLeelaayen_Book = lazy(() => import("./pages/prabhu-ki-leelaayen/book/[slug]"));
 const PrabhuKiLeelaayen_Read = lazy(() => import("./pages/prabhu-ki-leelaayen/read/[slug]"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -101,6 +102,7 @@ const App = () => {
               <Route path="/blog/post/:slug" element={<BlogPostDetail />} />
               <Route path="/blog/category/:slug" element={<BlogCategoryPage />} />
               <Route path="/prabhu-ki-leelaayen" element={<PrabhuKiLeelaayen />} />
+              <Route path="/prabhu-ki-leelaayen/book/:slug" element={<PrabhuKiLeelaayen_Book />} />
               <Route path="/prabhu-ki-leelaayen/read/:slug" element={<PrabhuKiLeelaayen_Read />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
