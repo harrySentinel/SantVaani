@@ -1,13 +1,13 @@
-// Interactive Book Reader for Prabhu Ki Leelaayen
-// Beautiful page flip animation with chapter images
+// Interactive Book Reader with Card Expansion & Page Flip Animation
+// Beautiful 3D book flip experience that users will LOVE!
 
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
-  ChevronLeft, ChevronRight, Home, BookMarked, Share2,
-  ZoomIn, ZoomOut, Moon, Sun, X, Menu
+  ChevronLeft, ChevronRight, Home, X, Moon, Sun,
+  ZoomIn, ZoomOut, Maximize2, Minimize2
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/lib/supabaseClient';
@@ -31,10 +31,11 @@ const BookReader: React.FC = () => {
 
   const [chapter, setChapter] = useState<Chapter | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
-  const [fontSize, setFontSize] = useState(18);
+  const [fontSize, setFontSize] = useState(16);
   const [darkMode, setDarkMode] = useState(false);
-  const [showControls, setShowControls] = useState(true);
   const [loading, setLoading] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isFlipping, setIsFlipping] = useState(false);
 
   // Fetch chapter data
   useEffect(() => {
@@ -66,7 +67,7 @@ const BookReader: React.FC = () => {
     fetchChapter();
   }, [slug, navigate]);
 
-  // Split content into pages (simple pagination - 800 characters per page)
+  // Split content into pages (800 characters per page)
   const getPages = () => {
     if (!chapter) return [];
 
@@ -92,22 +93,26 @@ const BookReader: React.FC = () => {
 
   const nextPage = () => {
     if (currentPage < totalPages - 1) {
-      setCurrentPage(currentPage + 1);
+      setIsFlipping(true);
+      setTimeout(() => {
+        setCurrentPage(currentPage + 1);
+        setIsFlipping(false);
+      }, 600);
     }
   };
 
   const prevPage = () => {
     if (currentPage > 0) {
-      setCurrentPage(currentPage - 1);
+      setIsFlipping(true);
+      setTimeout(() => {
+        setCurrentPage(currentPage - 1);
+        setIsFlipping(false);
+      }, 600);
     }
   };
 
-  const increaseFontSize = () => {
-    if (fontSize < 24) setFontSize(fontSize + 2);
-  };
-
-  const decreaseFontSize = () => {
-    if (fontSize > 14) setFontSize(fontSize - 2);
+  const toggleExpanded = () => {
+    setIsExpanded(!isExpanded);
   };
 
   if (loading) {
@@ -130,145 +135,231 @@ const BookReader: React.FC = () => {
   const imageUrl = isImagePage ? currentPageContent.replace('IMAGE:', '') : '';
 
   return (
-    <div className={`min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-amber-50 via-orange-50 to-red-50'} transition-colors duration-300`}>
-      {/* Top Controls Bar */}
-      <div className={`fixed top-0 left-0 right-0 z-50 ${showControls ? 'translate-y-0' : '-translate-y-full'} transition-transform duration-300 ${darkMode ? 'bg-gray-800/95' : 'bg-white/95'} backdrop-blur-sm border-b ${darkMode ? 'border-gray-700' : 'border-orange-200'} shadow-lg`}>
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          {/* Left - Navigation */}
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate('/prabhu-ki-leelaayen')}
-              className={`${darkMode ? 'text-white hover:bg-gray-700' : 'hover:bg-orange-50'}`}
-            >
-              <Home className="w-5 h-5 mr-2" />
-              {language === 'hi' ? 'मुख्य' : 'Home'}
-            </Button>
-          </div>
+    <div className={`min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-amber-50 via-orange-50 to-red-50'} transition-colors duration-500 py-8 px-4`}>
+      {/* Top Navigation Bar */}
+      <div className="max-w-7xl mx-auto mb-6 flex items-center justify-between">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => navigate('/prabhu-ki-leelaayen')}
+          className={`${darkMode ? 'text-white hover:bg-gray-800' : 'hover:bg-white'}`}
+        >
+          <Home className="w-4 h-4 mr-2" />
+          {language === 'hi' ? 'मुख्य पृष्ठ' : 'Home'}
+        </Button>
 
-          {/* Center - Chapter Info */}
-          <div className="text-center flex-1 px-4">
-            <h3 className={`text-base md:text-lg font-semibold ${darkMode ? 'text-white' : 'text-gray-800'} truncate`}>
-              {language === 'hi' ? chapter.title_hi : chapter.title}
-            </h3>
-            <p className={`text-xs md:text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-              {language === 'hi' ? 'अध्याय' : 'Chapter'} {chapter.chapter_number}
-            </p>
-          </div>
-
-          {/* Right - Controls */}
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={decreaseFontSize}
-              className={darkMode ? 'text-white hover:bg-gray-700' : ''}
-            >
-              <ZoomOut className="w-5 h-5" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={increaseFontSize}
-              className={darkMode ? 'text-white hover:bg-gray-700' : ''}
-            >
-              <ZoomIn className="w-5 h-5" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setDarkMode(!darkMode)}
-              className={darkMode ? 'text-white hover:bg-gray-700' : ''}
-            >
-              {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-            </Button>
-          </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setFontSize(Math.max(14, fontSize - 2))}
+            className={darkMode ? 'text-white hover:bg-gray-800' : ''}
+          >
+            <ZoomOut className="w-4 h-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setFontSize(Math.min(24, fontSize + 2))}
+            className={darkMode ? 'text-white hover:bg-gray-800' : ''}
+          >
+            <ZoomIn className="w-4 h-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setDarkMode(!darkMode)}
+            className={darkMode ? 'text-white hover:bg-gray-800' : ''}
+          >
+            {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={toggleExpanded}
+            className={darkMode ? 'text-white hover:bg-gray-800' : ''}
+          >
+            {isExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+          </Button>
         </div>
       </div>
 
-      {/* Main Book Container */}
-      <div className="flex items-center justify-center min-h-screen pt-24 pb-20 px-4">
-        <div className="relative max-w-5xl w-full">
-          {/* Book */}
-          <div className={`relative ${darkMode ? 'bg-gray-800' : 'bg-gradient-to-br from-amber-50 to-orange-50'} rounded-2xl shadow-2xl overflow-hidden border-4 ${darkMode ? 'border-gray-700' : 'border-orange-300'}`}
+      {/* Book Container with Card Expansion */}
+      <div className="max-w-7xl mx-auto">
+        <div
+          className={`perspective-1000 transition-all duration-700 ease-out ${
+            isExpanded ? 'scale-100' : 'scale-95'
+          }`}
+        >
+          {/* Book Card */}
+          <div
+            className={`relative mx-auto transition-all duration-700 ${
+              isExpanded ? 'max-w-6xl' : 'max-w-4xl'
+            }`}
             style={{
-              minHeight: '600px',
-              backgroundImage: !darkMode ? `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23f97316' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` : 'none'
+              transformStyle: 'preserve-3d',
             }}
           >
-            {/* Page Content */}
-            <div className="p-8 md:p-16">
-              {isImagePage ? (
-                /* Image Page */
-                <div className="flex items-center justify-center h-96">
-                  <img
-                    src={imageUrl}
-                    alt={language === 'hi' ? chapter.title_hi : chapter.title}
-                    className="max-w-full max-h-full object-contain rounded-lg shadow-xl"
-                  />
+            {/* The Actual Book */}
+            <div
+              className={`relative ${
+                darkMode ? 'bg-gray-800' : 'bg-gradient-to-br from-amber-50 to-orange-100'
+              } rounded-2xl shadow-2xl border-4 ${
+                darkMode ? 'border-gray-700' : 'border-orange-300'
+              } overflow-hidden transition-all duration-500`}
+              style={{
+                minHeight: isExpanded ? '700px' : '600px',
+                backgroundImage: !darkMode
+                  ? `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23f97316' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+                  : 'none',
+              }}
+            >
+              {/* Chapter Header */}
+              <div className={`p-4 border-b-2 ${darkMode ? 'border-gray-700 bg-gray-800/50' : 'border-orange-200 bg-white/50'} backdrop-blur-sm`}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className={`text-lg md:text-xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'} truncate max-w-md`}>
+                      {language === 'hi' ? chapter.title_hi : chapter.title}
+                    </h2>
+                    <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                      {language === 'hi' ? 'अध्याय' : 'Chapter'} {chapter.chapter_number}
+                    </p>
+                  </div>
+                  <Badge className="bg-orange-500 text-white">
+                    {currentPage + 1} / {totalPages}
+                  </Badge>
                 </div>
-              ) : (
-                /* Text Page */
+              </div>
+
+              {/* Book Pages with Flip Animation */}
+              <div className="relative p-6 md:p-12" style={{ minHeight: isExpanded ? '550px' : '450px' }}>
                 <div
-                  className={`prose max-w-none ${darkMode ? 'prose-invert' : ''}`}
-                  style={{ fontSize: `${fontSize}px` }}
-                  dangerouslySetInnerHTML={{ __html: currentPageContent }}
-                />
+                  className={`transition-all duration-600 ${
+                    isFlipping ? 'opacity-0 scale-95 rotate-y-90' : 'opacity-100 scale-100 rotate-y-0'
+                  }`}
+                  style={{
+                    transformStyle: 'preserve-3d',
+                    transition: 'all 0.6s cubic-bezier(0.645, 0.045, 0.355, 1)',
+                  }}
+                >
+                  {isImagePage ? (
+                    /* Image Page */
+                    <div className="flex items-center justify-center" style={{ minHeight: '400px' }}>
+                      <img
+                        src={imageUrl}
+                        alt={language === 'hi' ? chapter.title_hi : chapter.title}
+                        className="max-w-full max-h-96 object-contain rounded-lg shadow-2xl"
+                      />
+                    </div>
+                  ) : (
+                    /* Text Page */
+                    <div
+                      className={`prose max-w-none ${darkMode ? 'prose-invert' : ''}`}
+                      style={{
+                        fontSize: `${fontSize}px`,
+                        lineHeight: '1.8',
+                        fontFamily: language === 'hi' ? "'Noto Sans Devanagari', sans-serif" : 'inherit'
+                      }}
+                      dangerouslySetInnerHTML={{ __html: currentPageContent }}
+                    />
+                  )}
+                </div>
+              </div>
+
+              {/* Page Turn Indicator */}
+              {!isImagePage && (
+                <div className={`absolute bottom-20 right-8 ${darkMode ? 'text-gray-600' : 'text-orange-300'} text-6xl opacity-20 pointer-events-none`}>
+                  📖
+                </div>
               )}
             </div>
 
-            {/* Page Number */}
-            <div className={`absolute bottom-8 right-8 ${darkMode ? 'text-gray-400' : 'text-gray-500'} text-sm`}>
-              {currentPage + 1} / {totalPages}
+            {/* Navigation Controls */}
+            <div className="flex items-center justify-between mt-6 gap-4">
+              <Button
+                onClick={prevPage}
+                disabled={currentPage === 0 || isFlipping}
+                size="lg"
+                className={`flex-1 ${
+                  darkMode
+                    ? 'bg-gray-700 hover:bg-gray-600'
+                    : 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600'
+                } text-white shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:scale-105`}
+              >
+                <ChevronLeft className="w-5 h-5 mr-2" />
+                {language === 'hi' ? 'पिछला पृष्ठ' : 'Previous Page'}
+              </Button>
+
+              <Button
+                onClick={nextPage}
+                disabled={currentPage === totalPages - 1 || isFlipping}
+                size="lg"
+                className={`flex-1 ${
+                  darkMode
+                    ? 'bg-gray-700 hover:bg-gray-600'
+                    : 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600'
+                } text-white shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:scale-105`}
+              >
+                {language === 'hi' ? 'अगला पृष्ठ' : 'Next Page'}
+                <ChevronRight className="w-5 h-5 ml-2" />
+              </Button>
             </div>
-          </div>
 
-          {/* Navigation Buttons */}
-          <div className="flex justify-between items-center mt-8">
-            <Button
-              onClick={prevPage}
-              disabled={currentPage === 0}
-              size="lg"
-              className={`${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600'} text-white shadow-xl`}
-            >
-              <ChevronLeft className="w-6 h-6 mr-2" />
-              {language === 'hi' ? 'पिछला' : 'Previous'}
-            </Button>
-
-            <Button
-              onClick={nextPage}
-              disabled={currentPage === totalPages - 1}
-              size="lg"
-              className={`${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600'} text-white shadow-xl`}
-            >
-              {language === 'hi' ? 'अगला' : 'Next'}
-              <ChevronRight className="w-6 h-6 ml-2" />
-            </Button>
-          </div>
-
-          {/* Progress Bar */}
-          <div className="mt-6">
-            <div className={`h-2 ${darkMode ? 'bg-gray-700' : 'bg-orange-200'} rounded-full overflow-hidden`}>
-              <div
-                className="h-full bg-gradient-to-r from-orange-500 to-red-500 transition-all duration-300"
-                style={{ width: `${((currentPage + 1) / totalPages) * 100}%` }}
-              />
+            {/* Progress Bar */}
+            <div className="mt-6">
+              <div className={`h-3 ${darkMode ? 'bg-gray-700' : 'bg-orange-200'} rounded-full overflow-hidden shadow-inner`}>
+                <div
+                  className="h-full bg-gradient-to-r from-orange-500 via-red-500 to-orange-600 transition-all duration-500 shadow-lg"
+                  style={{ width: `${((currentPage + 1) / totalPages) * 100}%` }}
+                />
+              </div>
+              <div className="flex items-center justify-between mt-2">
+                <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  {Math.round(((currentPage + 1) / totalPages) * 100)}% {language === 'hi' ? 'पूर्ण' : 'Complete'}
+                </p>
+                <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  {chapter.read_time} {language === 'hi' ? 'मिनट पढ़ें' : 'min read'}
+                </p>
+              </div>
             </div>
-            <p className={`text-center mt-2 text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-              {Math.round(((currentPage + 1) / totalPages) * 100)}% {language === 'hi' ? 'पूर्ण' : 'Complete'}
-            </p>
           </div>
         </div>
       </div>
 
-      {/* Toggle Controls Button */}
-      <button
-        onClick={() => setShowControls(!showControls)}
-        className={`fixed top-4 right-4 z-50 p-2 rounded-full ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-lg`}
-      >
-        {showControls ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-      </button>
+      {/* Reading Tips */}
+      <div className="max-w-4xl mx-auto mt-8 text-center">
+        <p className={`text-sm ${darkMode ? 'text-gray-500' : 'text-gray-500'} italic`}>
+          {language === 'hi'
+            ? '💡 युक्ति: पृष्ठों के बीच सुचारु रूप से नेविगेट करने के लिए तीर कुंजी का उपयोग करें'
+            : '💡 Tip: Use arrow keys to smoothly navigate between pages'}
+        </p>
+      </div>
+
+      <style>{`
+        .perspective-1000 {
+          perspective: 1000px;
+        }
+
+        @keyframes pageFlip {
+          0% {
+            transform: rotateY(0deg);
+          }
+          50% {
+            transform: rotateY(90deg);
+          }
+          100% {
+            transform: rotateY(0deg);
+          }
+        }
+
+        .rotate-y-0 {
+          transform: rotateY(0deg);
+        }
+
+        .rotate-y-90 {
+          transform: rotateY(90deg);
+        }
+      `}</style>
     </div>
   );
 };

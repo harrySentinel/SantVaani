@@ -70,14 +70,14 @@ const PrabhuKiLeelaayen: React.FC = () => {
       <Navbar />
 
       {/* Hero Section - Book Cover Design */}
-      <section className="relative py-20 overflow-hidden">
+      <section className="relative py-24 md:py-32 overflow-hidden">
         {/* Decorative Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-orange-100/50 to-red-100/50 backdrop-blur-3xl" />
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-orange-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" />
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-red-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" style={{ animationDelay: '1s' }} />
 
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center space-y-8">
+          <div className="text-center space-y-8 pt-4">
             {/* Sacred Design Elements */}
             <div className="relative">
               {/* Decorative mandala-like design */}
@@ -90,8 +90,8 @@ const PrabhuKiLeelaayen: React.FC = () => {
               </div>
 
               {/* Epic Title - Hindi Only */}
-              <div className="space-y-6">
-                <h1 className="text-7xl md:text-9xl font-bold bg-gradient-to-r from-orange-600 via-red-600 to-orange-600 bg-clip-text text-transparent drop-shadow-2xl tracking-wide" style={{ fontFamily: "'Noto Sans Devanagari', sans-serif" }}>
+              <div className="space-y-6 py-4">
+                <h1 className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-bold bg-gradient-to-r from-orange-600 via-red-600 to-orange-600 bg-clip-text text-transparent drop-shadow-2xl tracking-wide leading-tight" style={{ fontFamily: "'Noto Sans Devanagari', sans-serif" }}>
                   लीलाएँ
                 </h1>
                 <div className="flex items-center justify-center gap-3">
