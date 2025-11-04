@@ -239,9 +239,9 @@ const LivingSaints = () => {
           </div>
           {searchQuery && (
             <p className="mt-2 text-sm text-gray-600 text-center">
-              {pagination.totalItems === 0 
-                ? `No living saints found for "${searchQuery}"`
-                : `Found ${pagination.totalItems} living saint${pagination.totalItems !== 1 ? 's' : ''} matching "${searchQuery}"`
+              {pagination.totalItems === 0
+                ? `No contemporary saints found for "${searchQuery}"`
+                : `Found ${pagination.totalItems} contemporary saint${pagination.totalItems !== 1 ? 's' : ''} matching "${searchQuery}"`
               }
               {pagination.totalPages > 1 && ` • Showing ${pagination.startIndex}-${pagination.endIndex}`}
             </p>
@@ -249,19 +249,19 @@ const LivingSaints = () => {
         </div>
       </section>
 
-      {/* Living Saints Grid */}
+      {/* Contemporary Saints Grid */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {pagination.totalItems === 0 && searchQuery ? (
             <div className="text-center py-16">
               <div className="text-gray-400 text-6xl mb-4">🔍</div>
               <h3 className="text-2xl font-semibold text-gray-700 mb-2">No Results Found</h3>
-              <p className="text-gray-500">No living saints match your search "{searchQuery}". Try different keywords.</p>
+              <p className="text-gray-500">No contemporary saints match your search "{searchQuery}". Try different keywords.</p>
             </div>
           ) : livingSaints.length === 0 ? (
             <div className="text-center py-16">
               <div className="text-gray-400 text-6xl mb-4">🙏</div>
-              <h3 className="text-2xl font-semibold text-gray-700 mb-2">No Living Saints Found</h3>
+              <h3 className="text-2xl font-semibold text-gray-700 mb-2">No Contemporary Saints Found</h3>
               <p className="text-gray-500">Please check back later or contact support.</p>
             </div>
           ) : (

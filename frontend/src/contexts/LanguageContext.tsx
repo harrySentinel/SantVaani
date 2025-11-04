@@ -206,21 +206,21 @@ const translations: Translations = {
     'bhajans.card.author': 'by',
     'bhajans.card.meaning': 'Meaning',
 
-    // Living Saints Page
-    'livingsaints.title': 'Living Saints',
+    // Contemporary Saints Page
+    'livingsaints.title': 'Contemporary Saints',
     'livingsaints.subtitle': 'Connect with contemporary spiritual masters who continue to illuminate the path of devotion, spreading divine wisdom and compassion in our modern world.',
-    'livingsaints.loading': 'Loading living saints...',
+    'livingsaints.loading': 'Loading contemporary saints...',
     'livingsaints.error.title': 'Something went wrong',
     'livingsaints.error.retry': 'Try Again',
     'livingsaints.guides.count': 'Contemporary Guides',
     'livingsaints.search.placeholder': 'Search by name, organization, location, teachings',
     'livingsaints.search.clear': 'Clear',
-    'livingsaints.search.no.results': 'No living saints found for',
+    'livingsaints.search.no.results': 'No contemporary saints found for',
     'livingsaints.search.results': 'Found',
     'livingsaints.search.showing': 'Showing',
     'livingsaints.card.visit': 'Visit Website',
     'livingsaints.card.learn.more': 'Learn More',
-    'livingsaints.empty.title': 'No Living Saints Found',
+    'livingsaints.empty.title': 'No Contemporary Saints Found',
     'livingsaints.empty.subtitle': 'We\'re working on adding contemporary spiritual masters to our collection.',
 
     // Divine Forms Page
@@ -445,21 +445,21 @@ const translations: Translations = {
     'bhajans.card.author': 'द्वारा',
     'bhajans.card.meaning': 'अर्थ',
 
-    // Living Saints Page
-    'livingsaints.title': 'जीवित संत',
+    // Contemporary Saints Page
+    'livingsaints.title': 'समकालीन संत',
     'livingsaints.subtitle': 'समकालीन आध्यात्मिक गुरुओं से जुड़ें जो भक्ति के मार्ग को रोशन करना जारी रखते हैं, हमारी आधुनिक दुनिया में दिव्य ज्ञान और करुणा फैलाते हैं।',
-    'livingsaints.loading': 'जीवित संत लोड हो रहे हैं...',
+    'livingsaints.loading': 'समकालीन संत लोड हो रहे हैं...',
     'livingsaints.error.title': 'कुछ गलत हुआ',
     'livingsaints.error.retry': 'पुनः प्रयास करें',
     'livingsaints.guides.count': 'समकालीन गुरु',
     'livingsaints.search.placeholder': 'नाम, संगठन, स्थान, शिक्षाओं द्वारा खोजें',
     'livingsaints.search.clear': 'साफ़ करें',
-    'livingsaints.search.no.results': 'के लिए कोई जीवित संत नहीं मिले',
+    'livingsaints.search.no.results': 'के लिए कोई समकालीन संत नहीं मिले',
     'livingsaints.search.results': 'मिले',
     'livingsaints.search.showing': 'दिखाया जा रहा',
     'livingsaints.card.visit': 'वेबसाइट पर जाएं',
     'livingsaints.card.learn.more': 'और जानें',
-    'livingsaints.empty.title': 'कोई जीवित संत नहीं मिले',
+    'livingsaints.empty.title': 'कोई समकालीन संत नहीं मिले',
     'livingsaints.empty.subtitle': 'हम अपने संग्रह में समकालीन आध्यात्मिक गुरुओं को जोड़ने पर काम कर रहे हैं।',
 
     // Divine Forms Page

@@ -47,7 +47,7 @@ export default function Navbar() {
 
   // Secondary navigation items (in dropdown/mobile menu)
   const secondaryItems = [
-    { to: '/living-saints', label: 'Living Saints', labelHi: 'जीवित संत', icon: Heart },
+    { to: '/living-saints', label: 'Contemporary Saints', labelHi: 'समकालीन संत', icon: Heart },
     { to: '/divine', label: 'Divine Forms', labelHi: 'दिव्य रूप', icon: Sparkles },
     { to: '/bhajans', label: 'Bhajans', labelHi: 'भजन', icon: Book },
     { to: '/donation', label: 'Donation', labelHi: 'दान', icon: IndianRupee },
