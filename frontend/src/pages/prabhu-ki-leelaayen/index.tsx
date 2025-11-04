@@ -191,7 +191,7 @@ const PrabhuKiLeelaayen: React.FC = () => {
 
                     {/* Chapter Content */}
                     <CardContent className="p-6">
-                      <h4 className="text-2xl font-bold text-gray-800 mb-3 group-hover:text-orange-600 transition-colors">
+                      <h4 className="text-xl md:text-2xl font-bold text-gray-800 mb-3 group-hover:text-orange-600 transition-colors line-clamp-2">
                         {language === 'hi' ? chapter.title_hi : chapter.title}
                       </h4>
                       <p className="text-gray-600 mb-4 line-clamp-3">

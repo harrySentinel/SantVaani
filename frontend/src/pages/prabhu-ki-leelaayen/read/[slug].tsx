@@ -148,11 +148,11 @@ const BookReader: React.FC = () => {
           </div>
 
           {/* Center - Chapter Info */}
-          <div className="text-center flex-1">
-            <h3 className={`text-lg font-semibold ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+          <div className="text-center flex-1 px-4">
+            <h3 className={`text-base md:text-lg font-semibold ${darkMode ? 'text-white' : 'text-gray-800'} truncate`}>
               {language === 'hi' ? chapter.title_hi : chapter.title}
             </h3>
-            <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+            <p className={`text-xs md:text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
               {language === 'hi' ? 'अध्याय' : 'Chapter'} {chapter.chapter_number}
             </p>
           </div>
