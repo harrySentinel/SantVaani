@@ -80,6 +80,11 @@ const BlogIndex: React.FC = () => {
             </div>
             <h1 className="text-3xl md:text-4xl font-light mb-6 text-gray-800">
               {contentLanguage === 'hi' ? 'आध्यात्मिक ज्ञान' : 'Spiritual Wisdom'}
+              {contentLanguage && (
+                <span className="ml-3 text-xl">
+                  {contentLanguage === 'hi' ? '🇮🇳' : '🌍'}
+                </span>
+              )}
             </h1>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed font-light">
               {contentLanguage === 'hi'
@@ -87,28 +92,14 @@ const BlogIndex: React.FC = () => {
                 : 'Find peace through ancient teachings. Simple wisdom for a calmer, more meaningful life.'}
             </p>
 
-            {/* Language Switcher */}
-            <div className="flex justify-center items-center gap-4 pt-4">
+            {/* Small back link to change language */}
+            <div className="pt-4">
               <Link
-                to="/blog/hindi"
-                className={`px-4 py-2 rounded-full transition-all ${
-                  contentLanguage === 'hi'
-                    ? 'bg-orange-500 text-white shadow-lg'
-                    : 'bg-white text-gray-600 hover:bg-orange-50 border border-gray-200'
-                }`}
+                to="/blog"
+                className="text-sm text-gray-500 hover:text-orange-600 transition-colors inline-flex items-center gap-1"
               >
-                🇮🇳 हिंदी
-              </Link>
-              <span className="text-gray-400">|</span>
-              <Link
-                to="/blog/english"
-                className={`px-4 py-2 rounded-full transition-all ${
-                  contentLanguage === 'en'
-                    ? 'bg-orange-500 text-white shadow-lg'
-                    : 'bg-white text-gray-600 hover:bg-orange-50 border border-gray-200'
-                }`}
-              >
-                🌍 English
+                <Globe className="w-4 h-4" />
+                {contentLanguage === 'hi' ? 'भाषा बदलें' : 'Change Language'}
               </Link>
             </div>
           </div>
