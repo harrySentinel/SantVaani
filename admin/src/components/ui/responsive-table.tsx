@@ -34,6 +34,7 @@ interface ResponsiveTableCellProps {
   children: ReactNode
   className?: string
   hideOnMobile?: boolean
+  label?: string
 }
 
 // Main table container - shows table on desktop, cards on mobile
@@ -122,7 +123,8 @@ export function ResponsiveTableRow({
 export function ResponsiveTableCell({
   children,
   className = '',
-  hideOnMobile = false
+  hideOnMobile = false,
+  label
 }: ResponsiveTableCellProps) {
   return (
     <>
@@ -134,6 +136,9 @@ export function ResponsiveTableCell({
       {/* Mobile cell */}
       {!hideOnMobile && (
         <div className="md:hidden text-sm">
+          {label && (
+            <div className="font-medium text-gray-500 text-xs mb-1">{label}</div>
+          )}
           {children}
         </div>
       )}
@@ -143,35 +148,50 @@ export function ResponsiveTableCell({
 
 // Mobile card actions component
 interface MobileCardActionsProps {
-  actions: Array<{
+  children?: ReactNode
+  actions?: Array<{
     label: string
     onClick: () => void
     variant?: 'default' | 'destructive'
   }>
 }
 
-export function MobileCardActions({ actions }: MobileCardActionsProps) {
+export function MobileCardActions({ children, actions }: MobileCardActionsProps) {
+  // Support both old API (actions array) and new API (children)
+  if (actions) {
+    return (
+      <div className="flex justify-end md:hidden">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+              <MoreVertical className="h-4 w-4" />
+              <span className="sr-only">Open menu</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {actions.map((action, index) => (
+              <DropdownMenuItem
+                key={index}
+                onClick={action.onClick}
+                className={action.variant === 'destructive' ? 'text-red-600 focus:text-red-600' : ''}
+              >
+                {action.label}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    )
+  }
+
   return (
-    <div className="flex justify-end md:hidden">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-            <MoreVertical className="h-4 w-4" />
-            <span className="sr-only">Open menu</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          {actions.map((action, index) => (
-            <DropdownMenuItem
-              key={index}
-              onClick={action.onClick}
-              className={action.variant === 'destructive' ? 'text-red-600 focus:text-red-600' : ''}
-            >
-              {action.label}
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
+    <div className="flex gap-1 justify-end">
+      <div className="hidden md:flex gap-1">
+        {children}
+      </div>
+      <div className="md:hidden flex gap-1">
+        {children}
+      </div>
     </div>
   )
 }

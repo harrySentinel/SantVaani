@@ -4,7 +4,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-  Home, X, Moon, Sun, ZoomIn, ZoomOut, Maximize, Minimize, ChevronRight, ChevronLeft
+  Home, X, Moon, Sun, ZoomIn, ZoomOut, Maximize, Minimize, ChevronRight, ChevronLeft, Languages
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/lib/supabaseClient';
@@ -25,7 +25,7 @@ interface Chapter {
 const BookReader: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  const { language } = useLanguage();
+  const { language, toggleLanguage } = useLanguage();
   const containerRef = useRef<HTMLDivElement>(null);
 
   const [chapter, setChapter] = useState<Chapter | null>(null);
@@ -120,7 +120,7 @@ const BookReader: React.FC = () => {
 
   const getPages = () => {
     if (!chapter) return [];
-    const content = language === 'hi' ? chapter.content_hi : chapter.content;
+    const content = language === 'HI' ? chapter.content_hi : chapter.content;
     const charsPerPage = 2400; // Increased for better reading flow
     const pages: string[] = [];
 
@@ -172,7 +172,7 @@ const BookReader: React.FC = () => {
         <div className="text-center">
           <div className="text-6xl mb-4 animate-pulse">📖</div>
           <p className="text-gray-600">
-            {language === 'hi' ? 'पुस्तक खुल रही है...' : 'Opening book...'}
+            {language === 'HI' ? 'पुस्तक खुल रही है...' : 'Opening book...'}
           </p>
         </div>
       </div>
@@ -199,54 +199,61 @@ const BookReader: React.FC = () => {
         }`}
       >
         <div className={`${darkMode ? 'bg-gray-800/95' : 'bg-white/95'} backdrop-blur-sm border-b ${darkMode ? 'border-gray-700' : 'border-orange-200'} shadow-lg`}>
-          <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="max-w-7xl mx-auto px-2 sm:px-4 py-2 sm:py-3 flex items-center justify-between gap-2">
             {/* Left - Branding + Home */}
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">ॐ</span>
+            <div className="flex items-center gap-1 sm:gap-4">
+              <div className="flex items-center gap-1 sm:gap-2">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center">
+                  <span className="text-white font-bold text-xs sm:text-sm">ॐ</span>
                 </div>
-                <span className={`text-lg font-semibold hidden sm:inline ${darkMode ? 'text-white' : 'text-gray-800'}`}>
-                  {language === 'hi' ? 'संतवाणी' : 'SantVaani'}
+                <span className={`text-base sm:text-lg font-semibold hidden sm:inline ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+                  {language === 'HI' ? 'संतवाणी' : 'SantVaani'}
                 </span>
               </div>
               {!isFullscreen && (
                 <button
                   onClick={() => navigate('/prabhu-ki-leelaayen')}
-                  className={`p-2 rounded-lg ${darkMode ? 'hover:bg-gray-700 text-white' : 'hover:bg-orange-50 text-gray-700'} transition`}
+                  className={`p-1.5 sm:p-2 rounded-lg ${darkMode ? 'hover:bg-gray-700 text-white' : 'hover:bg-orange-50 text-gray-700'} transition`}
                 >
-                  <Home className="w-5 h-5" />
+                  <Home className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
               )}
             </div>
 
             {/* Center - Chapter Title */}
-            <div className="flex-1 text-center px-4">
-              <h2 className={`text-sm sm:text-base md:text-lg font-bold ${darkMode ? 'text-white' : 'text-gray-800'} truncate`}>
-                {language === 'hi' ? chapter.title_hi : chapter.title}
+            <div className="flex-1 text-center px-1 sm:px-4 min-w-0 overflow-hidden">
+              <h2 className={`text-xs sm:text-sm md:text-base lg:text-lg font-bold ${darkMode ? 'text-white' : 'text-gray-800'} truncate`}>
+                {language === 'HI' ? chapter.title_hi : chapter.title}
               </h2>
-              <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                {language === 'hi' ? 'अध्याय' : 'Chapter'} {chapter.chapter_number}
+              <p className={`text-[10px] sm:text-xs ${darkMode ? 'text-gray-400' : 'text-gray-600'} truncate`}>
+                {language === 'HI' ? 'अध्याय' : 'Chapter'} {chapter.chapter_number}
               </p>
             </div>
 
             {/* Right - Controls */}
-            <div className="flex items-center gap-2">
-              <button onClick={() => setFontSize(Math.max(14, fontSize - 2))} className={`p-2 rounded-lg ${darkMode ? 'hover:bg-gray-700 text-white' : 'hover:bg-orange-50 text-gray-700'} transition`}>
-                <ZoomOut className="w-5 h-5" />
+            <div className="flex items-center gap-0.5 sm:gap-2 flex-shrink-0">
+              <button
+                onClick={toggleLanguage}
+                className={`p-1.5 sm:p-2 rounded-lg ${darkMode ? 'hover:bg-gray-700 text-white' : 'hover:bg-orange-50 text-gray-700'} transition`}
+                title={language === 'HI' ? 'Switch to English' : 'हिंदी में बदलें'}
+              >
+                <Languages className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
-              <button onClick={() => setFontSize(Math.min(26, fontSize + 2))} className={`p-2 rounded-lg ${darkMode ? 'hover:bg-gray-700 text-white' : 'hover:bg-orange-50 text-gray-700'} transition`}>
-                <ZoomIn className="w-5 h-5" />
+              <button onClick={() => setFontSize(Math.max(14, fontSize - 2))} className={`p-1.5 sm:p-2 rounded-lg ${darkMode ? 'hover:bg-gray-700 text-white' : 'hover:bg-orange-50 text-gray-700'} transition hidden sm:inline-flex`}>
+                <ZoomOut className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
-              <button onClick={() => setDarkMode(!darkMode)} className={`p-2 rounded-lg ${darkMode ? 'hover:bg-gray-700 text-white' : 'hover:bg-orange-50 text-gray-700'} transition`}>
-                {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              <button onClick={() => setFontSize(Math.min(26, fontSize + 2))} className={`p-1.5 sm:p-2 rounded-lg ${darkMode ? 'hover:bg-gray-700 text-white' : 'hover:bg-orange-50 text-gray-700'} transition hidden sm:inline-flex`}>
+                <ZoomIn className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
-              <button onClick={toggleFullscreen} className={`p-2 rounded-lg ${darkMode ? 'hover:bg-gray-700 text-white' : 'hover:bg-orange-50 text-gray-700'} transition`}>
-                {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
+              <button onClick={() => setDarkMode(!darkMode)} className={`p-1.5 sm:p-2 rounded-lg ${darkMode ? 'hover:bg-gray-700 text-white' : 'hover:bg-orange-50 text-gray-700'} transition`}>
+                {darkMode ? <Sun className="w-4 h-4 sm:w-5 sm:h-5" /> : <Moon className="w-4 h-4 sm:w-5 sm:h-5" />}
+              </button>
+              <button onClick={toggleFullscreen} className={`p-1.5 sm:p-2 rounded-lg ${darkMode ? 'hover:bg-gray-700 text-white' : 'hover:bg-orange-50 text-gray-700'} transition`}>
+                {isFullscreen ? <Minimize className="w-4 h-4 sm:w-5 sm:h-5" /> : <Maximize className="w-4 h-4 sm:w-5 sm:h-5" />}
               </button>
               {isFullscreen && (
-                <button onClick={toggleFullscreen} className="p-2 rounded-lg bg-red-500 hover:bg-red-600 text-white transition">
-                  <X className="w-5 h-5" />
+                <button onClick={toggleFullscreen} className="p-1.5 sm:p-2 rounded-lg bg-red-500 hover:bg-red-600 text-white transition">
+                  <X className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
               )}
             </div>
@@ -255,27 +262,27 @@ const BookReader: React.FC = () => {
       </div>
 
       {/* Main Content */}
-      <div className={`${isFullscreen ? 'h-screen pt-16' : 'min-h-screen pt-20'} flex items-center justify-center ${isFullscreen ? 'p-0' : 'p-4'}`}>
+      <div className={`${isFullscreen ? 'h-screen pt-12 sm:pt-16' : 'min-h-screen pt-16 sm:pt-20'} flex items-center justify-center ${isFullscreen ? 'p-0' : 'p-2 sm:p-4'}`}>
         <div className={`w-full ${isFullscreen ? 'h-full' : 'max-w-4xl'}`}>
           {/* Book Page */}
           <div
-            className={`${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} ${isFullscreen ? 'rounded-none h-full' : 'rounded-2xl'} shadow-2xl ${isFullscreen ? 'border-0' : 'border-2'} overflow-hidden`}
+            className={`${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} ${isFullscreen ? 'rounded-none h-full' : 'rounded-xl sm:rounded-2xl'} shadow-2xl ${isFullscreen ? 'border-0' : 'border-2'} overflow-hidden`}
             style={{ minHeight: isFullscreen ? '100%' : '70vh' }}
           >
             <div className="h-full flex flex-col">
               {/* Page Number */}
-              <div className={`px-6 py-3 border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'} flex items-center justify-between`}>
-                <span className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                  {language === 'hi' ? 'पृष्ठ' : 'Page'} {currentPage + 1} / {totalPages}
+              <div className={`px-3 sm:px-6 py-2 sm:py-3 border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'} flex items-center justify-between`}>
+                <span className={`text-xs sm:text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  {language === 'HI' ? 'पृष्ठ' : 'Page'} {currentPage + 1} / {totalPages}
                 </span>
-                <span className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                  {chapter.read_time} {language === 'hi' ? 'मिनट' : 'min'}
+                <span className={`text-xs sm:text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  {chapter.read_time} {language === 'HI' ? 'मिनट' : 'min'}
                 </span>
               </div>
 
               {/* Content - SCROLLABLE */}
               <div className="flex-1 overflow-y-auto custom-scrollbar" style={{ maxHeight: isFullscreen ? 'calc(100vh - 120px)' : '65vh' }}>
-                <div className={`${isFullscreen ? 'p-8 md:p-16' : 'p-6 md:p-12'}`}>
+                <div className={`${isFullscreen ? 'p-4 sm:p-8 md:p-16' : 'p-4 sm:p-6 md:p-12'}`}>
                   {isImagePage ? (
                     <div className="h-full flex items-center justify-center">
                       <img src={imageUrl} alt={chapter.title} className="max-w-full max-h-full object-contain rounded-lg shadow-xl" />
@@ -286,7 +293,7 @@ const BookReader: React.FC = () => {
                       style={{
                         fontSize: `${fontSize}px`,
                         lineHeight: '2',
-                        fontFamily: language === 'hi' ? "'Noto Sans Devanagari', sans-serif" : 'Georgia, serif',
+                        fontFamily: language === 'HI' ? "'Noto Sans Devanagari', sans-serif" : 'Georgia, serif',
                         color: darkMode ? '#e5e7eb' : '#1f2937',
                       }}
                       dangerouslySetInnerHTML={{ __html: currentPageContent }}
@@ -305,12 +312,12 @@ const BookReader: React.FC = () => {
       {(currentPage > 0 || prevChapter) && (
         <button
           onClick={isFirstPage && prevChapter ? goToPrevChapter : prevPageFn}
-          className={`fixed left-4 top-1/2 -translate-y-1/2 z-50 w-12 h-12 rounded-full ${
+          className={`fixed left-2 sm:left-4 top-1/2 -translate-y-1/2 z-50 w-12 h-12 sm:w-14 sm:h-14 rounded-full ${
             darkMode ? 'bg-gray-800 hover:bg-gray-700' : 'bg-white hover:bg-orange-50'
-          } shadow-xl border-2 ${darkMode ? 'border-gray-600' : 'border-orange-300'} flex items-center justify-center transition-all hover:scale-110`}
-          title={isFirstPage && prevChapter ? (language === 'hi' ? 'पिछला अध्याय' : 'Previous Chapter') : (language === 'hi' ? 'पिछला पृष्ठ' : 'Previous')}
+          } shadow-xl border-2 ${darkMode ? 'border-gray-600' : 'border-orange-300'} flex items-center justify-center transition-all hover:scale-110 active:scale-95`}
+          title={isFirstPage && prevChapter ? (language === 'HI' ? 'पिछला अध्याय' : 'Previous Chapter') : (language === 'HI' ? 'पिछला पृष्ठ' : 'Previous')}
         >
-          <ChevronLeft className={`w-6 h-6 ${darkMode ? 'text-white' : 'text-orange-600'}`} />
+          <ChevronLeft className={`w-6 h-6 sm:w-7 sm:h-7 ${darkMode ? 'text-white' : 'text-orange-600'}`} />
         </button>
       )}
 
@@ -318,12 +325,12 @@ const BookReader: React.FC = () => {
       {(currentPage < totalPages - 1 || nextChapter) && (
         <button
           onClick={isLastPage && nextChapter ? goToNextChapter : nextPage}
-          className={`fixed right-4 top-1/2 -translate-y-1/2 z-50 w-12 h-12 rounded-full ${
+          className={`fixed right-2 sm:right-4 top-1/2 -translate-y-1/2 z-50 w-12 h-12 sm:w-14 sm:h-14 rounded-full ${
             darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600'
-          } shadow-xl border-2 border-transparent flex items-center justify-center transition-all hover:scale-110`}
-          title={isLastPage && nextChapter ? (language === 'hi' ? 'अगला अध्याय' : 'Next Chapter') : (language === 'hi' ? 'अगला पृष्ठ' : 'Next')}
+          } shadow-xl border-2 border-transparent flex items-center justify-center transition-all hover:scale-110 active:scale-95`}
+          title={isLastPage && nextChapter ? (language === 'HI' ? 'अगला अध्याय' : 'Next Chapter') : (language === 'HI' ? 'अगला पृष्ठ' : 'Next')}
         >
-          <ChevronRight className="w-6 h-6 text-white" />
+          <ChevronRight className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
         </button>
       )}
 
@@ -337,7 +344,7 @@ const BookReader: React.FC = () => {
             />
           </div>
           <p className={`text-center mt-2 text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-            {Math.round(((currentPage + 1) / totalPages) * 100)}% {language === 'hi' ? 'पूर्ण' : 'Complete'}
+            {Math.round(((currentPage + 1) / totalPages) * 100)}% {language === 'HI' ? 'पूर्ण' : 'Complete'}
           </p>
         </div>
       )}
