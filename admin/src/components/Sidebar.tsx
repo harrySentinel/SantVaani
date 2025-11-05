@@ -11,7 +11,8 @@ import {
   Bell,
   Settings,
   X,
-  FileText
+  FileText,
+  BookMarked
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -88,6 +89,13 @@ const navigation = [
     href: '/blogs',
     icon: FileText,
     description: 'Manage spiritual wisdom articles',
+    count: 0
+  },
+  {
+    name: 'Leelaayen',
+    href: '/leelaayen',
+    icon: BookMarked,
+    description: 'Manage divine stories & books',
     count: 0
   }
 ]

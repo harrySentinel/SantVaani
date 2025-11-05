@@ -121,15 +121,17 @@ const BookReader: React.FC = () => {
   const getPages = () => {
     if (!chapter) return [];
     const content = language === 'hi' ? chapter.content_hi : chapter.content;
-    const charsPerPage = 1800;
+    const charsPerPage = 2400; // Increased for better reading flow
     const pages: string[] = [];
 
-    if (chapter.chapter_image) {
-      pages.push(`IMAGE:${chapter.chapter_image}`);
-    }
-
+    // Content comes FIRST (Chapter 1 on first page)
     for (let i = 0; i < content.length; i += charsPerPage) {
       pages.push(content.substring(i, i + charsPerPage));
+    }
+
+    // Image comes LAST (if exists)
+    if (chapter.chapter_image) {
+      pages.push(`IMAGE:${chapter.chapter_image}`);
     }
 
     return pages;
@@ -271,24 +273,26 @@ const BookReader: React.FC = () => {
                 </span>
               </div>
 
-              {/* Content */}
-              <div className="flex-1 p-6 md:p-12 overflow-y-auto custom-scrollbar">
-                {isImagePage ? (
-                  <div className="h-full flex items-center justify-center">
-                    <img src={imageUrl} alt={chapter.title} className="max-w-full max-h-full object-contain rounded-lg shadow-xl" />
-                  </div>
-                ) : (
-                  <div
-                    className="enhanced-content"
-                    style={{
-                      fontSize: `${fontSize}px`,
-                      lineHeight: '1.9',
-                      fontFamily: language === 'hi' ? "'Noto Sans Devanagari', sans-serif" : 'Georgia, serif',
-                      color: darkMode ? '#e5e7eb' : '#1f2937',
-                    }}
-                    dangerouslySetInnerHTML={{ __html: currentPageContent }}
-                  />
-                )}
+              {/* Content - SCROLLABLE */}
+              <div className="flex-1 overflow-y-auto custom-scrollbar" style={{ maxHeight: isFullscreen ? 'calc(100vh - 160px)' : '65vh' }}>
+                <div className="p-6 md:p-12">
+                  {isImagePage ? (
+                    <div className="h-full flex items-center justify-center">
+                      <img src={imageUrl} alt={chapter.title} className="max-w-full max-h-full object-contain rounded-lg shadow-xl" />
+                    </div>
+                  ) : (
+                    <div
+                      className="enhanced-content"
+                      style={{
+                        fontSize: `${fontSize}px`,
+                        lineHeight: '2',
+                        fontFamily: language === 'hi' ? "'Noto Sans Devanagari', sans-serif" : 'Georgia, serif',
+                        color: darkMode ? '#e5e7eb' : '#1f2937',
+                      }}
+                      dangerouslySetInnerHTML={{ __html: currentPageContent }}
+                    />
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -358,40 +362,105 @@ const BookReader: React.FC = () => {
       </div>
 
       <style>{`
+        /* Beautiful Chapter Headings */
         .enhanced-content h2 {
-          font-size: 1.6em;
-          font-weight: 700;
-          margin: 1.5em 0 0.8em;
+          font-size: 2em;
+          font-weight: 800;
+          margin: 1em 0 1em;
+          padding-bottom: 0.5em;
+          border-bottom: 3px solid ${darkMode ? '#f59e0b' : '#ea580c'};
           color: ${darkMode ? '#fbbf24' : '#ea580c'};
+          text-align: center;
+          letter-spacing: 0.02em;
         }
 
+        /* Elegant Paragraphs */
         .enhanced-content p {
-          margin-bottom: 1.5em;
+          margin-bottom: 1.8em;
           text-align: justify;
-          text-indent: 2em;
+          text-indent: 2.5em;
+          hyphens: auto;
+          word-spacing: 0.05em;
+        }
+
+        /* Magnificent Drop Cap */
+        .enhanced-content p:first-of-type {
+          margin-top: 1.5em;
         }
 
         .enhanced-content p:first-of-type::first-letter {
-          font-size: 3.5em;
-          font-weight: 700;
+          font-size: 4.5em;
+          font-weight: 900;
           float: left;
-          line-height: 0.9;
-          margin: 0.05em 0.1em 0 0;
-          color: ${darkMode ? '#f59e0b' : '#ea580c'};
+          line-height: 0.85;
+          margin: 0.08em 0.12em 0 0;
+          padding: 0.1em 0.15em;
+          background: ${darkMode ? 'linear-gradient(135deg, #f59e0b 0%, #ea580c 100%)' : 'linear-gradient(135deg, #ea580c 0%, #dc2626 100%)'};
+          color: white;
+          border-radius: 8px;
+          box-shadow: 0 4px 12px rgba(234, 88, 12, 0.3);
         }
 
+        /* Blockquotes for Sacred Texts */
+        .enhanced-content blockquote {
+          margin: 2em 0;
+          padding: 1.5em 2em;
+          border-left: 5px solid ${darkMode ? '#f59e0b' : '#ea580c'};
+          background: ${darkMode ? 'rgba(245, 158, 11, 0.1)' : 'rgba(234, 88, 12, 0.05)'};
+          font-style: italic;
+          border-radius: 0 8px 8px 0;
+        }
+
+        /* Strong emphasis */
+        .enhanced-content strong {
+          color: ${darkMode ? '#fbbf24' : '#ea580c'};
+          font-weight: 700;
+        }
+
+        /* Emphasis */
+        .enhanced-content em {
+          color: ${darkMode ? '#fcd34d' : '#f97316'};
+        }
+
+        /* Lists */
+        .enhanced-content ul, .enhanced-content ol {
+          margin: 1.5em 0;
+          padding-left: 3em;
+        }
+
+        .enhanced-content li {
+          margin-bottom: 0.8em;
+          line-height: 1.9;
+        }
+
+        /* Horizontal Rules */
+        .enhanced-content hr {
+          margin: 2.5em auto;
+          border: none;
+          height: 3px;
+          background: ${darkMode ? 'linear-gradient(90deg, transparent, #f59e0b, transparent)' : 'linear-gradient(90deg, transparent, #ea580c, transparent)'};
+          width: 50%;
+        }
+
+        /* Beautiful Scrollbar */
         .custom-scrollbar::-webkit-scrollbar {
-          width: 10px;
+          width: 12px;
         }
 
         .custom-scrollbar::-webkit-scrollbar-track {
           background: ${darkMode ? '#374151' : '#fed7aa'};
-          border-radius: 5px;
+          border-radius: 10px;
+          margin: 8px 0;
         }
 
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: ${darkMode ? '#6b7280' : '#f97316'};
-          border-radius: 5px;
+          background: ${darkMode ? 'linear-gradient(180deg, #f59e0b 0%, #ea580c 100%)' : 'linear-gradient(180deg, #f97316 0%, #dc2626 100%)'};
+          border-radius: 10px;
+          border: 2px solid ${darkMode ? '#374151' : '#fed7aa'};
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: ${darkMode ? 'linear-gradient(180deg, #fbbf24 0%, #f59e0b 100%)' : 'linear-gradient(180deg, #fb923c 0%, #ea580c 100%)'};
         }
       `}</style>
     </div>

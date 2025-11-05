@@ -13,6 +13,7 @@ import SpiritualFactsPage from '@/pages/SpiritualFacts'
 import EventsPage from '@/pages/Events'
 import NoticesPage from '@/pages/Notices'
 import BlogsPage from '@/pages/Blogs'
+import LeelaayanBooksPage from '@/pages/LeelaayanBooks'
 
 // All content management pages are now complete
 
@@ -57,6 +58,9 @@ function App() {
 
               {/* Blog Management */}
               <Route path="blogs" element={<BlogsPage />} />
+
+              {/* Leelaayen (Divine Stories) Management */}
+              <Route path="leelaayen" element={<LeelaayanBooksPage />} />
 
               {/* 404 fallback */}
               <Route path="*" element={<Navigate to="/dashboard" replace />} />
