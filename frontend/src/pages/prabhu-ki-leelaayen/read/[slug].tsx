@@ -188,7 +188,7 @@ const BookReader: React.FC = () => {
   return (
     <div
       ref={containerRef}
-      className={`min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-amber-50 via-orange-50 to-red-50'} transition-colors duration-500`}
+      className={`${isFullscreen ? 'fixed inset-0 z-50' : 'min-h-screen'} ${darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-amber-50 via-orange-50 to-red-50'} transition-colors duration-500`}
       onMouseMove={() => setShowControls(true)}
       onTouchStart={() => setShowControls(true)}
     >
@@ -255,12 +255,12 @@ const BookReader: React.FC = () => {
       </div>
 
       {/* Main Content */}
-      <div className="min-h-screen flex items-center justify-center p-4 pt-20">
-        <div className="w-full max-w-4xl">
+      <div className={`${isFullscreen ? 'h-screen pt-16' : 'min-h-screen pt-20'} flex items-center justify-center ${isFullscreen ? 'p-0' : 'p-4'}`}>
+        <div className={`w-full ${isFullscreen ? 'h-full' : 'max-w-4xl'}`}>
           {/* Book Page */}
           <div
-            className={`${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-2xl shadow-2xl border-2 overflow-hidden`}
-            style={{ minHeight: isFullscreen ? '85vh' : '70vh' }}
+            className={`${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} ${isFullscreen ? 'rounded-none h-full' : 'rounded-2xl'} shadow-2xl ${isFullscreen ? 'border-0' : 'border-2'} overflow-hidden`}
+            style={{ minHeight: isFullscreen ? '100%' : '70vh' }}
           >
             <div className="h-full flex flex-col">
               {/* Page Number */}
@@ -274,8 +274,8 @@ const BookReader: React.FC = () => {
               </div>
 
               {/* Content - SCROLLABLE */}
-              <div className="flex-1 overflow-y-auto custom-scrollbar" style={{ maxHeight: isFullscreen ? 'calc(100vh - 160px)' : '65vh' }}>
-                <div className="p-6 md:p-12">
+              <div className="flex-1 overflow-y-auto custom-scrollbar" style={{ maxHeight: isFullscreen ? 'calc(100vh - 120px)' : '65vh' }}>
+                <div className={`${isFullscreen ? 'p-8 md:p-16' : 'p-6 md:p-12'}`}>
                   {isImagePage ? (
                     <div className="h-full flex items-center justify-center">
                       <img src={imageUrl} alt={chapter.title} className="max-w-full max-h-full object-contain rounded-lg shadow-xl" />
@@ -297,69 +297,50 @@ const BookReader: React.FC = () => {
             </div>
           </div>
 
-          {/* Navigation */}
-          <div className="mt-6 flex items-center justify-between gap-4">
-            {/* Previous */}
-            {(currentPage > 0 || prevChapter) && (
-              <button
-                onClick={isFirstPage && prevChapter ? goToPrevChapter : prevPageFn}
-                className={`flex items-center gap-2 px-4 py-3 rounded-xl ${
-                  darkMode ? 'bg-gray-800 hover:bg-gray-700 border-gray-600' : 'bg-white hover:bg-orange-50 border-orange-300'
-                } border-2 shadow-lg transition`}
-              >
-                <ChevronLeft className={`w-5 h-5 ${darkMode ? 'text-white' : 'text-orange-600'}`} />
-                <div className="text-left">
-                  <div className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                    {isFirstPage && prevChapter ? (language === 'hi' ? 'पिछला अध्याय' : 'Previous Chapter') : (language === 'hi' ? 'पिछला पृष्ठ' : 'Previous Page')}
-                  </div>
-                  {isFirstPage && prevChapter && (
-                    <div className={`text-sm font-semibold ${darkMode ? 'text-white' : 'text-gray-800'}`}>
-                      {language === 'hi' ? prevChapter.title_hi : prevChapter.title}
-                    </div>
-                  )}
-                </div>
-              </button>
-            )}
-
-            <div className="flex-1" />
-
-            {/* Next */}
-            {(currentPage < totalPages - 1 || nextChapter) && (
-              <button
-                onClick={isLastPage && nextChapter ? goToNextChapter : nextPage}
-                className={`flex items-center gap-2 px-4 py-3 rounded-xl ${
-                  darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600'
-                } text-white border-2 border-transparent shadow-lg transition`}
-              >
-                <div className="text-right">
-                  <div className="text-xs opacity-90">
-                    {isLastPage && nextChapter ? (language === 'hi' ? 'अगला अध्याय' : 'Next Chapter') : (language === 'hi' ? 'अगला पृष्ठ' : 'Next Page')}
-                  </div>
-                  {isLastPage && nextChapter && (
-                    <div className="text-sm font-semibold">
-                      {language === 'hi' ? nextChapter.title_hi : nextChapter.title}
-                    </div>
-                  )}
-                </div>
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            )}
-          </div>
-
-          {/* Progress Bar */}
-          <div className="mt-4">
-            <div className={`h-2 ${darkMode ? 'bg-gray-700' : 'bg-orange-200'} rounded-full overflow-hidden`}>
-              <div
-                className="h-full bg-gradient-to-r from-orange-500 via-red-500 to-orange-600 transition-all duration-300"
-                style={{ width: `${((currentPage + 1) / totalPages) * 100}%` }}
-              />
-            </div>
-            <p className={`text-center mt-2 text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-              {Math.round(((currentPage + 1) / totalPages) * 100)}% {language === 'hi' ? 'पूर्ण' : 'Complete'}
-            </p>
-          </div>
         </div>
       </div>
+
+      {/* Simple Floating Navigation Buttons - < > */}
+      {/* Previous Button */}
+      {(currentPage > 0 || prevChapter) && (
+        <button
+          onClick={isFirstPage && prevChapter ? goToPrevChapter : prevPageFn}
+          className={`fixed left-4 top-1/2 -translate-y-1/2 z-50 w-12 h-12 rounded-full ${
+            darkMode ? 'bg-gray-800 hover:bg-gray-700' : 'bg-white hover:bg-orange-50'
+          } shadow-xl border-2 ${darkMode ? 'border-gray-600' : 'border-orange-300'} flex items-center justify-center transition-all hover:scale-110`}
+          title={isFirstPage && prevChapter ? (language === 'hi' ? 'पिछला अध्याय' : 'Previous Chapter') : (language === 'hi' ? 'पिछला पृष्ठ' : 'Previous')}
+        >
+          <ChevronLeft className={`w-6 h-6 ${darkMode ? 'text-white' : 'text-orange-600'}`} />
+        </button>
+      )}
+
+      {/* Next Button */}
+      {(currentPage < totalPages - 1 || nextChapter) && (
+        <button
+          onClick={isLastPage && nextChapter ? goToNextChapter : nextPage}
+          className={`fixed right-4 top-1/2 -translate-y-1/2 z-50 w-12 h-12 rounded-full ${
+            darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600'
+          } shadow-xl border-2 border-transparent flex items-center justify-center transition-all hover:scale-110`}
+          title={isLastPage && nextChapter ? (language === 'hi' ? 'अगला अध्याय' : 'Next Chapter') : (language === 'hi' ? 'अगला पृष्ठ' : 'Next')}
+        >
+          <ChevronRight className="w-6 h-6 text-white" />
+        </button>
+      )}
+
+      {/* Progress Bar - Only show when not in fullscreen */}
+      {!isFullscreen && (
+        <div className="max-w-4xl mx-auto px-4 pb-8">
+          <div className={`h-2 ${darkMode ? 'bg-gray-700' : 'bg-orange-200'} rounded-full overflow-hidden`}>
+            <div
+              className="h-full bg-gradient-to-r from-orange-500 via-red-500 to-orange-600 transition-all duration-300"
+              style={{ width: `${((currentPage + 1) / totalPages) * 100}%` }}
+            />
+          </div>
+          <p className={`text-center mt-2 text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+            {Math.round(((currentPage + 1) / totalPages) * 100)}% {language === 'hi' ? 'पूर्ण' : 'Complete'}
+          </p>
+        </div>
+      )}
 
       <style>{`
         /* Beautiful Chapter Headings */
