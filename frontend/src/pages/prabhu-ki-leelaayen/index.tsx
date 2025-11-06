@@ -81,12 +81,12 @@ const Leelaayen: React.FC = () => {
             <div className="space-y-3">
               <h1
                 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-orange-600 via-red-600 to-orange-600 bg-clip-text text-transparent"
-                style={{ fontFamily: "'Noto Sans Devanagari', sans-serif" }}
+                style={{ fontFamily: language === 'HI' ? "'Noto Sans Devanagari', sans-serif" : "inherit" }}
               >
-                लीलाएँ
+                {language === 'HI' ? 'प्रभु की लीलाएं' : 'Divine Stories'}
               </h1>
               <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
-                {language === 'hi'
+                {language === 'HI'
                   ? 'दिव्य ग्रंथों का सुंदर संग्रह। महाभारत, रामायण और अन्य पवित्र कथाओं को पढ़ें।'
                   : 'Beautiful collection of divine scriptures. Read Mahabharat, Ramayan and other sacred stories.'}
               </p>
@@ -101,7 +101,7 @@ const Leelaayen: React.FC = () => {
           {/* Section Header */}
           <div className="text-center mb-12">
             <h3 className="text-2xl md:text-3xl font-bold text-gray-800 mb-3">
-              {language === 'hi' ? 'पुस्तकालय' : 'Sacred Library'}
+              {language === 'HI' ? 'पुस्तकालय' : 'Sacred Library'}
             </h3>
             <div className="w-20 h-1 bg-gradient-to-r from-orange-500 to-red-500 mx-auto rounded-full" />
           </div>
@@ -111,7 +111,7 @@ const Leelaayen: React.FC = () => {
             <div className="text-center py-20">
               <Loader2 className="w-12 h-12 text-orange-500 animate-spin mx-auto mb-4" />
               <p className="text-gray-600">
-                {language === 'hi' ? 'पुस्तकें लोड हो रही हैं...' : 'Loading books...'}
+                {language === 'HI' ? 'पुस्तकें लोड हो रही हैं...' : 'Loading books...'}
               </p>
             </div>
           )}
@@ -139,18 +139,18 @@ const Leelaayen: React.FC = () => {
                       <div className="relative h-64 overflow-hidden">
                         <img
                           src={book.cover_image}
-                          alt={language === 'hi' ? book.title_hi : book.title}
+                          alt={language === 'HI' ? book.title_hi : book.title}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
                         {/* Book Title Overlay */}
                         <div className="absolute bottom-4 left-4 right-4">
-                          <h4 className="text-3xl font-bold text-white mb-2 drop-shadow-lg" style={{ fontFamily: language === 'hi' ? "'Noto Sans Devanagari', sans-serif" : 'inherit' }}>
-                            {language === 'hi' ? book.title_hi : book.title}
+                          <h4 className="text-3xl font-bold text-white mb-2 drop-shadow-lg" style={{ fontFamily: language === 'HI' ? "'Noto Sans Devanagari', sans-serif" : 'inherit' }}>
+                            {language === 'HI' ? book.title_hi : book.title}
                           </h4>
                           <p className="text-orange-200 text-sm">
-                            {language === 'hi' ? book.author_hi : book.author}
+                            {language === 'HI' ? book.author_hi : book.author}
                           </p>
                         </div>
                       </div>
@@ -159,11 +159,11 @@ const Leelaayen: React.FC = () => {
                       <div className="relative h-64 bg-gradient-to-br from-orange-400 via-red-500 to-orange-600 flex items-center justify-center">
                         <div className="text-center text-white p-6">
                           <BookOpen className="w-16 h-16 mx-auto mb-4 opacity-80" />
-                          <h4 className="text-3xl font-bold mb-2" style={{ fontFamily: language === 'hi' ? "'Noto Sans Devanagari', sans-serif" : 'inherit' }}>
-                            {language === 'hi' ? book.title_hi : book.title}
+                          <h4 className="text-3xl font-bold mb-2" style={{ fontFamily: language === 'HI' ? "'Noto Sans Devanagari', sans-serif" : 'inherit' }}>
+                            {language === 'HI' ? book.title_hi : book.title}
                           </h4>
                           <p className="text-orange-100">
-                            {language === 'hi' ? book.author_hi : book.author}
+                            {language === 'HI' ? book.author_hi : book.author}
                           </p>
                         </div>
                       </div>
@@ -172,7 +172,7 @@ const Leelaayen: React.FC = () => {
                     {/* Book Details */}
                     <CardContent className="p-6">
                       <p className="text-gray-600 mb-4 line-clamp-3">
-                        {language === 'hi' ? book.description_hi : book.description}
+                        {language === 'HI' ? book.description_hi : book.description}
                       </p>
 
                       {/* Meta Info */}
@@ -180,7 +180,7 @@ const Leelaayen: React.FC = () => {
                         <div className="flex items-center gap-3">
                           <div className="flex items-center">
                             <BookOpen className="w-4 h-4 mr-1" />
-                            {book.total_chapters} {language === 'hi' ? 'अध्याय' : 'Chapters'}
+                            {book.total_chapters} {language === 'HI' ? 'अध्याय' : 'Chapters'}
                           </div>
                           <div className="flex items-center">
                             <Eye className="w-4 h-4 mr-1" />
@@ -191,7 +191,7 @@ const Leelaayen: React.FC = () => {
                           size="sm"
                           className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white group-hover:scale-110 transition-transform"
                         >
-                          {language === 'hi' ? 'पढ़ें' : 'Read'}
+                          {language === 'HI' ? 'पढ़ें' : 'Read'}
                           <ChevronRight className="w-4 h-4 ml-1" />
                         </Button>
                       </div>
@@ -207,10 +207,10 @@ const Leelaayen: React.FC = () => {
             <div className="text-center py-20">
               <BookOpen className="w-20 h-20 text-gray-300 mx-auto mb-6" />
               <h3 className="text-2xl font-semibold text-gray-600 mb-2">
-                {language === 'hi' ? 'जल्द आ रहा है' : 'Coming Soon'}
+                {language === 'HI' ? 'जल्द आ रहा है' : 'Coming Soon'}
               </h3>
               <p className="text-gray-500">
-                {language === 'hi'
+                {language === 'HI'
                   ? 'दिव्य ग्रंथों को जल्द ही जोड़ा जाएगा।'
                   : 'Divine scriptures will be added soon.'}
               </p>

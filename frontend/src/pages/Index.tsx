@@ -184,15 +184,15 @@ const Index = () => {
   </div>
 </section>
 
+      {/* Featured Blog Posts Section */}
+      <LandingBlogSection />
+
       {/* Visitor Counter Section - Now fully dynamic */}
       <section className="py-12 bg-gradient-to-br from-white via-orange-25 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <VisitorCounter className="mb-8" />
         </div>
       </section>
-
-      {/* Featured Blog Posts Section */}
-      <LandingBlogSection />
 
       {/* Mission Section */}
       <section className="py-20 bg-white">

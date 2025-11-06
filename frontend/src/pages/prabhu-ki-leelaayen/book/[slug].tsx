@@ -117,7 +117,7 @@ const BookDetail: React.FC = () => {
             className="mb-6"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            {language === 'hi' ? 'वापस' : 'Back'}
+            {language === 'HI' ? 'वापस' : 'Back'}
           </Button>
 
           <div className="flex flex-col md:flex-row gap-8 items-start">
@@ -126,7 +126,7 @@ const BookDetail: React.FC = () => {
               {book.cover_image ? (
                 <img
                   src={book.cover_image}
-                  alt={language === 'hi' ? book.title_hi : book.title}
+                  alt={language === 'HI' ? book.title_hi : book.title}
                   className="w-full rounded-2xl shadow-2xl"
                 />
               ) : (
@@ -138,23 +138,23 @@ const BookDetail: React.FC = () => {
 
             {/* Book Info */}
             <div className="flex-1">
-              <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-3" style={{ fontFamily: language === 'hi' ? "'Noto Sans Devanagari', sans-serif" : 'inherit' }}>
-                {language === 'hi' ? book.title_hi : book.title}
+              <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-3" style={{ fontFamily: language === 'HI' ? "'Noto Sans Devanagari', sans-serif" : 'inherit' }}>
+                {language === 'HI' ? book.title_hi : book.title}
               </h1>
               <p className="text-xl text-gray-600 mb-4">
-                {language === 'hi' ? book.author_hi : book.author}
+                {language === 'HI' ? book.author_hi : book.author}
               </p>
               <p className="text-gray-600 mb-6 leading-relaxed">
-                {language === 'hi' ? book.description_hi : book.description}
+                {language === 'HI' ? book.description_hi : book.description}
               </p>
 
               <div className="flex items-center gap-4">
                 <Badge className="bg-orange-500 text-white px-4 py-2 text-base">
-                  {book.total_chapters} {language === 'hi' ? 'अध्याय' : 'Chapters'}
+                  {book.total_chapters} {language === 'HI' ? 'अध्याय' : 'Chapters'}
                 </Badge>
                 <Badge variant="outline" className="px-4 py-2 text-base">
                   <Eye className="w-4 h-4 mr-2" />
-                  {book.views} {language === 'hi' ? 'बार देखा गया' : 'views'}
+                  {book.views} {language === 'HI' ? 'बार देखा गया' : 'views'}
                 </Badge>
               </div>
             </div>
@@ -166,7 +166,7 @@ const BookDetail: React.FC = () => {
       <section className="py-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-gray-800 mb-8">
-            {language === 'hi' ? 'अध्याय' : 'Chapters'}
+            {language === 'HI' ? 'अध्याय' : 'Chapters'}
           </h2>
 
           <div className="space-y-4">
@@ -181,16 +181,16 @@ const BookDetail: React.FC = () => {
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
                         <Badge className="bg-orange-500 text-white">
-                          {language === 'hi' ? 'अध्याय' : 'Chapter'} {chapter.chapter_number}
+                          {language === 'HI' ? 'अध्याय' : 'Chapter'} {chapter.chapter_number}
                         </Badge>
                         <h3 className="text-xl font-bold text-gray-800">
-                          {language === 'hi' ? chapter.title_hi : chapter.title}
+                          {language === 'HI' ? chapter.title_hi : chapter.title}
                         </h3>
                       </div>
                       <div className="flex items-center gap-4 text-sm text-gray-500">
                         <span className="flex items-center">
                           <Clock className="w-4 h-4 mr-1" />
-                          {chapter.read_time} {language === 'hi' ? 'मिनट' : 'min'}
+                          {chapter.read_time} {language === 'HI' ? 'मिनट' : 'min'}
                         </span>
                         <span className="flex items-center">
                           <Eye className="w-4 h-4 mr-1" />

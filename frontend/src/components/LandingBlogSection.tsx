@@ -17,7 +17,7 @@ const LandingBlogSection = () => {
       try {
         setIsLoading(true)
         // Fetch posts matching the UI language
-        const contentLanguage = language === 'hi' ? 'hi' : 'en'
+        const contentLanguage = language === 'HI' ? 'hi' : 'en'
         const response = await blogService.getPosts({
           limit: 3,
           language: contentLanguage
@@ -37,7 +37,7 @@ const LandingBlogSection = () => {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
-    return date.toLocaleDateString(language === 'hi' ? 'hi-IN' : 'en-US', {
+    return date.toLocaleDateString(language === 'HI' ? 'hi-IN' : 'en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric'
@@ -78,17 +78,17 @@ const LandingBlogSection = () => {
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-100 to-red-100 rounded-full mb-4">
             <Sparkles className="w-4 h-4 text-orange-600" />
             <span className="text-sm font-semibold text-orange-700">
-              {language === 'hi' ? 'आध्यात्मिक ब्लॉग' : 'Spiritual Blog'}
+              {language === 'HI' ? 'आध्यात्मिक ब्लॉग' : 'Spiritual Blog'}
             </span>
           </div>
 
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            {language === 'hi'
+            {language === 'HI'
               ? 'आध्यात्मिक ज्ञान की यात्रा'
               : 'Journey Through Spiritual Wisdom'}
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            {language === 'hi'
+            {language === 'HI'
               ? 'प्राचीन संतों की शिक्षाओं से प्रेरित आधुनिक जीवन के लिए आध्यात्मिक मार्गदर्शन'
               : 'Daily spiritual guidance inspired by ancient teachings of saints for modern life'}
           </p>
@@ -138,7 +138,7 @@ const LandingBlogSection = () => {
                       </div>
                       <div className="flex items-center gap-1">
                         <Clock className="w-3 h-3" />
-                        <span>{post.readingTime} {language === 'hi' ? 'मिनट' : 'min'}</span>
+                        <span>{post.readingTime} {language === 'HI' ? 'मिनट' : 'min'}</span>
                       </div>
                     </div>
                     <ArrowRight className="w-4 h-4 text-orange-500 group-hover:translate-x-1 transition-transform" />
@@ -157,7 +157,7 @@ const LandingBlogSection = () => {
               className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white px-8 py-6 rounded-full shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 text-lg"
             >
               <BookOpen className="w-5 h-5 mr-2" />
-              {language === 'hi' ? 'सभी लेख पढ़ें' : 'Read All Articles'}
+              {language === 'HI' ? 'सभी लेख पढ़ें' : 'Read All Articles'}
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
           </Link>
