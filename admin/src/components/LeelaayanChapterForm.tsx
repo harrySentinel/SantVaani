@@ -6,7 +6,8 @@ import { Switch } from '@/components/ui/switch'
 import { useToast } from '@/hooks/use-toast'
 import { supabase } from '@/lib/supabase'
 import RichTextEditor from './RichTextEditor'
-import { Loader2, BookOpen } from 'lucide-react'
+import MarkdownConverter from './MarkdownConverter'
+import { Loader2, BookOpen, FileCode } from 'lucide-react'
 
 interface Chapter {
   id: string
@@ -31,6 +32,8 @@ interface LeelaayanChapterFormProps {
 
 export default function LeelaayanChapterForm({ chapter, bookId, onSuccess, onCancel }: LeelaayanChapterFormProps) {
   const [loading, setLoading] = useState(false)
+  const [isMarkdownConverterOpen, setIsMarkdownConverterOpen] = useState(false)
+  const [isMarkdownConverterOpenHi, setIsMarkdownConverterOpenHi] = useState(false)
   const [formData, setFormData] = useState({
     chapter_number: 1,
     title: '',
@@ -107,6 +110,20 @@ export default function LeelaayanChapterForm({ chapter, bookId, onSuccess, onCan
       content: value,
       read_time: calculateReadTime(value)
     }))
+  }
+
+  // Handle Markdown conversion for English content
+  const handleMarkdownConvert = (html: string) => {
+    setFormData(prev => ({
+      ...prev,
+      content: html,
+      read_time: calculateReadTime(html)
+    }))
+  }
+
+  // Handle Markdown conversion for Hindi content
+  const handleMarkdownConvertHi = (html: string) => {
+    setFormData(prev => ({ ...prev, content_hi: html }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -192,6 +209,7 @@ export default function LeelaayanChapterForm({ chapter, bookId, onSuccess, onCan
   }
 
   return (
+    <>
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Chapter Number & Read Time */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -279,7 +297,19 @@ export default function LeelaayanChapterForm({ chapter, bookId, onSuccess, onCan
 
       {/* Content Section - English */}
       <div>
-        <Label htmlFor="content">Content (English) *</Label>
+        <div className="flex items-center justify-between mb-2">
+          <Label htmlFor="content">Content (English) *</Label>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setIsMarkdownConverterOpen(true)}
+            className="bg-purple-50 border-purple-200 text-purple-700 hover:bg-purple-100"
+          >
+            <FileCode className="w-4 h-4 mr-2" />
+            Import from Markdown
+          </Button>
+        </div>
         <div className="mt-2 border rounded-lg overflow-hidden">
           <RichTextEditor
             value={formData.content}
@@ -289,12 +319,25 @@ export default function LeelaayanChapterForm({ chapter, bookId, onSuccess, onCan
         </div>
         <p className="text-xs text-gray-500 mt-1">
           Use <strong>&lt;h2&gt;</strong> for chapter titles, <strong>&lt;p&gt;</strong> for paragraphs. Rich formatting supported!
+          Or click "Import from Markdown" to paste Markdown content!
         </p>
       </div>
 
       {/* Content Section - Hindi */}
       <div>
-        <Label htmlFor="content_hi">Content (Hindi) *</Label>
+        <div className="flex items-center justify-between mb-2">
+          <Label htmlFor="content_hi">Content (Hindi) *</Label>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setIsMarkdownConverterOpenHi(true)}
+            className="bg-purple-50 border-purple-200 text-purple-700 hover:bg-purple-100"
+          >
+            <FileCode className="w-4 h-4 mr-2" />
+            Import from Markdown
+          </Button>
+        </div>
         <div className="mt-2 border rounded-lg overflow-hidden">
           <RichTextEditor
             value={formData.content_hi}
@@ -302,6 +345,9 @@ export default function LeelaayanChapterForm({ chapter, bookId, onSuccess, onCan
             placeholder="हिंदी में अध्याय की सामग्री लिखें... शीर्षक, बोल्ड टेक्स्ट, इटैलिक का उपयोग करके इसे सुंदर बनाएं!"
           />
         </div>
+        <p className="text-xs text-gray-500 mt-1">
+          या Markdown सामग्री पेस्ट करने के लिए "Import from Markdown" पर क्लिक करें!
+        </p>
       </div>
 
       {/* Preview Tips */}
@@ -348,5 +394,18 @@ export default function LeelaayanChapterForm({ chapter, bookId, onSuccess, onCan
         </Button>
       </div>
     </form>
+
+    {/* Markdown Converter Modals */}
+    <MarkdownConverter
+      isOpen={isMarkdownConverterOpen}
+      onClose={() => setIsMarkdownConverterOpen(false)}
+      onConvert={handleMarkdownConvert}
+    />
+    <MarkdownConverter
+      isOpen={isMarkdownConverterOpenHi}
+      onClose={() => setIsMarkdownConverterOpenHi(false)}
+      onConvert={handleMarkdownConvertHi}
+    />
+  </>
   )
 }
