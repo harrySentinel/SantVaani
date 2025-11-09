@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
-  BookOpen, Clock, Eye, ChevronRight, Loader2, ArrowLeft
+  BookOpen, Clock, Eye, ChevronRight, Loader2, ArrowLeft, Sparkles, BookMarked
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/lib/supabaseClient';
@@ -163,47 +163,117 @@ const BookDetail: React.FC = () => {
       </section>
 
       {/* Chapters List */}
-      <section className="py-16">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-gray-800 mb-8">
-            {language === 'HI' ? 'अध्याय' : 'Chapters'}
-          </h2>
+      <section className="py-16 relative">
+        {/* Decorative Background Elements */}
+        <div className="absolute top-0 left-0 w-64 h-64 bg-orange-200 rounded-full filter blur-3xl opacity-20"></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-red-200 rounded-full filter blur-3xl opacity-20"></div>
 
-          <div className="space-y-4">
-            {chapters.map((chapter) => (
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Section Header */}
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-100 to-red-100 rounded-full mb-4">
+              <BookMarked className="w-4 h-4 text-orange-600" />
+              <span className="text-sm font-semibold text-orange-700">
+                {language === 'HI' ? 'कहानी की यात्रा' : 'Story Journey'}
+              </span>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
+              {language === 'HI' ? 'अध्याय' : 'Chapters'}
+            </h2>
+            <p className="text-gray-600">
+              {language === 'HI'
+                ? `${chapters.length} अध्यायों में विभाजित यह अद्भुत यात्रा`
+                : `Embark on this beautiful journey of ${chapters.length} chapters`}
+            </p>
+          </div>
+
+          {/* Chapters Grid */}
+          <div className="grid md:grid-cols-2 gap-6">
+            {chapters.map((chapter, index) => (
               <Card
                 key={chapter.id}
                 onClick={() => navigate(`/prabhu-ki-leelaayen/read/${chapter.slug}`)}
-                className="cursor-pointer hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-2 border-orange-200 hover:border-orange-400"
+                className="group cursor-pointer hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border-0 shadow-lg bg-white/80 backdrop-blur-sm overflow-hidden relative"
               >
+                {/* Decorative Top Border */}
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-400 via-red-500 to-orange-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
+
+                {/* Decorative Corner */}
+                <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-orange-100 to-transparent rounded-bl-full opacity-50"></div>
+
                 <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <Badge className="bg-orange-500 text-white">
-                          {language === 'HI' ? 'अध्याय' : 'Chapter'} {chapter.chapter_number}
-                        </Badge>
-                        <h3 className="text-xl font-bold text-gray-800">
-                          {language === 'HI' ? chapter.title_hi : chapter.title}
-                        </h3>
-                      </div>
-                      <div className="flex items-center gap-4 text-sm text-gray-500">
-                        <span className="flex items-center">
-                          <Clock className="w-4 h-4 mr-1" />
-                          {chapter.read_time} {language === 'HI' ? 'मिनट' : 'min'}
-                        </span>
-                        <span className="flex items-center">
-                          <Eye className="w-4 h-4 mr-1" />
-                          {chapter.views}
+                  <div className="flex gap-4">
+                    {/* Chapter Number - Large Decorative */}
+                    <div className="flex-shrink-0">
+                      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-400 to-red-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                        <span className="text-2xl font-bold text-white">
+                          {chapter.chapter_number}
                         </span>
                       </div>
                     </div>
-                    <ChevronRight className="w-6 h-6 text-orange-500" />
+
+                    {/* Chapter Content */}
+                    <div className="flex-1 min-w-0">
+                      {/* Chapter Badge & Sparkle */}
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white border-0">
+                          {language === 'HI' ? 'अध्याय' : 'Chapter'} {chapter.chapter_number}
+                        </Badge>
+                        <Sparkles className="w-4 h-4 text-orange-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      </div>
+
+                      {/* Chapter Title */}
+                      <h3
+                        className="text-xl font-bold text-gray-800 mb-3 group-hover:text-orange-600 transition-colors line-clamp-2"
+                        style={{ fontFamily: language === 'HI' ? "'Noto Sans Devanagari', sans-serif" : 'inherit' }}
+                      >
+                        {language === 'HI' ? chapter.title_hi : chapter.title}
+                      </h3>
+
+                      {/* Meta Information */}
+                      <div className="flex items-center gap-4 text-sm">
+                        <div className="flex items-center gap-1 text-gray-600">
+                          <Clock className="w-4 h-4 text-orange-500" />
+                          <span className="font-medium">
+                            {chapter.read_time} {language === 'HI' ? 'मिनट' : 'min read'}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1 text-gray-600">
+                          <Eye className="w-4 h-4 text-orange-500" />
+                          <span className="font-medium">{chapter.views}</span>
+                        </div>
+                      </div>
+
+                      {/* Progress Bar (decorative) */}
+                      <div className="mt-4 h-1 bg-gray-200 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-orange-400 to-red-500 rounded-full transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-700"></div>
+                      </div>
+                    </div>
+
+                    {/* Arrow Icon */}
+                    <div className="flex-shrink-0 flex items-center">
+                      <div className="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center group-hover:bg-orange-100 transition-colors">
+                        <ChevronRight className="w-5 h-5 text-orange-600 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
             ))}
           </div>
+
+          {/* Empty State */}
+          {chapters.length === 0 && (
+            <div className="text-center py-16">
+              <BookOpen className="w-20 h-20 text-gray-300 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-gray-600 mb-2">
+                {language === 'HI' ? 'अभी कोई अध्याय नहीं' : 'No chapters yet'}
+              </h3>
+              <p className="text-gray-500">
+                {language === 'HI' ? 'जल्द ही अध्याय जोड़े जाएंगे' : 'Chapters will be added soon'}
+              </p>
+            </div>
+          )}
         </div>
       </section>
 
