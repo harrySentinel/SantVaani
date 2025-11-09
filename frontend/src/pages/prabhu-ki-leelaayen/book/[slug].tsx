@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
-  BookOpen, Clock, Eye, ChevronRight, Loader2, ArrowLeft, Sparkles, BookMarked, CheckCircle, Circle, PlayCircle
+  BookOpen, Clock, Eye, ChevronRight, Loader2, ArrowLeft, Sparkles, BookMarked, CheckCircle, Circle, PlayCircle, LogIn, TrendingUp
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -153,6 +153,35 @@ const BookDetail: React.FC = () => {
               <p className="text-gray-600 mb-6 leading-relaxed">
                 {language === 'HI' ? book.description_hi : book.description}
               </p>
+
+              {/* Login CTA for non-logged-in users */}
+              {!user && (
+                <div className="mb-6 p-4 bg-gradient-to-r from-orange-50 to-red-50 border-2 border-orange-200 rounded-xl">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
+                      <TrendingUp className="w-5 h-5 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-bold text-gray-800 mb-1">
+                        {language === 'HI' ? 'अपनी प्रगति ट्रैक करें!' : 'Track Your Reading Progress!'}
+                      </h3>
+                      <p className="text-sm text-gray-600 mb-3">
+                        {language === 'HI'
+                          ? 'लॉगिन करें और अपनी पढ़ाई जारी रखें जहां आपने छोड़ा था। प्रगति देखें, अध्याय पूर्ण करें और अपनी यात्रा ट्रैक करें।'
+                          : 'Login to track your progress, resume where you left off, and never lose your place!'}
+                      </p>
+                      <Button
+                        onClick={() => navigate('/login')}
+                        className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white"
+                        size="sm"
+                      >
+                        <LogIn className="w-4 h-4 mr-2" />
+                        {language === 'HI' ? 'लॉगिन करें' : 'Login to Continue'}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <div className="flex items-center gap-4 flex-wrap">
                 <Badge className="bg-orange-500 text-white px-4 py-2 text-base">

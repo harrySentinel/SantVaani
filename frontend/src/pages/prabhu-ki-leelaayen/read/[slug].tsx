@@ -5,7 +5,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Home, X, Moon, Sun, ZoomIn, ZoomOut, Maximize, Minimize, ChevronRight, ChevronLeft,
-  Languages, CheckCircle, ArrowUp, ChevronDown, Type, Settings, BookOpen
+  Languages, CheckCircle, ArrowUp, ChevronDown, Type, Settings, BookOpen, LogIn, TrendingUp
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -44,6 +44,7 @@ const BookReader: React.FC = () => {
   const [showControls, setShowControls] = useState(true);
   const [showMobileControls, setShowMobileControls] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [showLoginBanner, setShowLoginBanner] = useState(true);
 
   // Reading progress state
   const [readingPercentage, setReadingPercentage] = useState(0);
@@ -581,6 +582,55 @@ const BookReader: React.FC = () => {
                       alt={chapter.title}
                       className="w-full rounded-2xl shadow-2xl"
                     />
+                  </div>
+                )}
+
+                {/* Login Banner for non-logged-in users */}
+                {!user && showLoginBanner && (
+                  <div className="my-12 p-6 bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 border-2 border-orange-300 dark:border-orange-700 rounded-2xl relative">
+                    <button
+                      onClick={() => setShowLoginBanner(false)}
+                      className="absolute top-3 right-3 p-1 rounded-full hover:bg-orange-200 dark:hover:bg-orange-800 transition"
+                      aria-label="Close"
+                    >
+                      <X className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                    </button>
+                    <div className="flex flex-col sm:flex-row items-start gap-4">
+                      <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-orange-500 to-red-600 rounded-full flex items-center justify-center">
+                        <TrendingUp className="w-6 h-6 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                          {language === 'HI' ? '🎯 अपनी पढ़ाई की प्रगति ट्रैक करें' : '🎯 Track Your Reading Progress'}
+                        </h3>
+                        <p className="text-gray-700 dark:text-gray-300 mb-4">
+                          {language === 'HI'
+                            ? 'लॉगिन करें और अपनी पढ़ाई जारी रखें जहां आपने छोड़ा था। हर डिवाइस पर अपनी प्रगति सिंक करें!'
+                            : 'Login to save your reading position, track progress across devices, and never lose your place!'}
+                        </p>
+                        <ul className="text-sm text-gray-600 dark:text-gray-400 mb-4 space-y-1">
+                          <li>✓ {language === 'HI' ? 'स्वचालित प्रगति सहेजना' : 'Auto-save your reading position'}</li>
+                          <li>✓ {language === 'HI' ? 'सभी डिवाइस में सिंक' : 'Sync across all devices'}</li>
+                          <li>✓ {language === 'HI' ? 'पूर्ण अध्यायों को ट्रैक करें' : 'Track completed chapters'}</li>
+                          <li>✓ {language === 'HI' ? 'पढ़ाई की आदतें देखें' : 'View your reading stats'}</li>
+                        </ul>
+                        <div className="flex gap-3">
+                          <button
+                            onClick={() => navigate('/login')}
+                            className="px-6 py-2.5 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all flex items-center gap-2"
+                          >
+                            <LogIn className="w-4 h-4" />
+                            {language === 'HI' ? 'लॉगिन करें' : 'Login'}
+                          </button>
+                          <button
+                            onClick={() => navigate('/signup')}
+                            className="px-6 py-2.5 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-800 dark:text-white font-semibold rounded-lg border-2 border-orange-300 dark:border-orange-700 transition-all"
+                          >
+                            {language === 'HI' ? 'साइन अप करें' : 'Sign Up Free'}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 )}
 
