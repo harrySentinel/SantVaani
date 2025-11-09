@@ -4,10 +4,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-  Home, X, Moon, Sun, ZoomIn, ZoomOut, Maximize, Minimize, ChevronRight, ChevronLeft, Languages
+  Home, X, Moon, Sun, ZoomIn, ZoomOut, Maximize, Minimize, ChevronRight, ChevronLeft, Languages, CheckCircle
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabaseClient';
+import { markChapterReading, markChapterCompleted, calculateReadingPercentage } from '@/lib/readingProgress';
+import { useChapterProgress } from '@/hooks/useReadingProgress';
 
 interface Chapter {
   id: string;
@@ -26,7 +29,9 @@ const BookReader: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { language, toggleLanguage } = useLanguage();
+  const { user } = useAuth();
   const containerRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   const [chapter, setChapter] = useState<Chapter | null>(null);
   const [nextChapter, setNextChapter] = useState<Chapter | null>(null);
@@ -37,6 +42,10 @@ const BookReader: React.FC = () => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showControls, setShowControls] = useState(true);
+
+  // Reading progress state
+  const [readingPercentage, setReadingPercentage] = useState(0);
+  const { progress: chapterProgress, refreshProgress } = useChapterProgress(chapter?.id);
 
   useEffect(() => {
     const fetchChapter = async () => {
@@ -90,6 +99,64 @@ const BookReader: React.FC = () => {
 
     fetchChapter();
   }, [slug, navigate]);
+
+  // Mark chapter as reading when loaded (for logged-in users)
+  useEffect(() => {
+    if (!user || !chapter) return;
+
+    const markAsReading = async () => {
+      await markChapterReading(user.id, chapter.id, chapter.book_id, 0, 0);
+      refreshProgress();
+    };
+
+    markAsReading();
+  }, [user, chapter, refreshProgress]);
+
+  // Track scroll progress and auto-save
+  useEffect(() => {
+    if (!user || !chapter || !contentRef.current) return;
+
+    const handleScroll = () => {
+      const element = contentRef.current;
+      if (!element) return;
+
+      const scrollTop = element.scrollTop;
+      const scrollHeight = element.scrollHeight;
+      const clientHeight = element.clientHeight;
+
+      const percentage = calculateReadingPercentage(scrollTop, scrollHeight, clientHeight);
+      setReadingPercentage(percentage);
+
+      // Auto-mark as completed when reaching 95% or more
+      if (percentage >= 95 && chapterProgress?.status !== 'completed') {
+        markChapterCompleted(user.id, chapter.id, chapter.book_id).then(() => {
+          refreshProgress();
+        });
+      }
+    };
+
+    const saveInterval = setInterval(() => {
+      if (contentRef.current) {
+        const scrollPos = contentRef.current.scrollTop;
+        markChapterReading(user.id, chapter.id, chapter.book_id, scrollPos, readingPercentage);
+      }
+    }, 10000); // Save every 10 seconds
+
+    contentRef.current.addEventListener('scroll', handleScroll);
+    const currentContent = contentRef.current;
+
+    return () => {
+      clearInterval(saveInterval);
+      currentContent?.removeEventListener('scroll', handleScroll);
+    };
+  }, [user, chapter, readingPercentage, chapterProgress, refreshProgress]);
+
+  // Manually mark as completed
+  const handleMarkCompleted = async () => {
+    if (!user || !chapter) return;
+    await markChapterCompleted(user.id, chapter.id, chapter.book_id);
+    refreshProgress();
+  };
 
   // Fullscreen handling
   const toggleFullscreen = async () => {
@@ -232,6 +299,17 @@ const BookReader: React.FC = () => {
 
             {/* Right - Controls */}
             <div className="flex items-center gap-0.5 sm:gap-2 flex-shrink-0">
+              {/* Mark as Completed Button (for logged-in users) */}
+              {user && chapterProgress?.status !== 'completed' && (
+                <button
+                  onClick={handleMarkCompleted}
+                  className={`p-1.5 sm:p-2 rounded-lg ${darkMode ? 'bg-green-600 hover:bg-green-700' : 'bg-green-500 hover:bg-green-600'} text-white transition`}
+                  title={language === 'HI' ? 'पूर्ण करें' : 'Mark as Completed'}
+                >
+                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                </button>
+              )}
+
               <button
                 onClick={toggleLanguage}
                 className={`p-1.5 sm:p-2 rounded-lg ${darkMode ? 'hover:bg-gray-700 text-white' : 'hover:bg-orange-50 text-gray-700'} transition`}
@@ -281,7 +359,7 @@ const BookReader: React.FC = () => {
               </div>
 
               {/* Content - SCROLLABLE */}
-              <div className="flex-1 overflow-y-auto custom-scrollbar" style={{ maxHeight: isFullscreen ? 'calc(100vh - 120px)' : '65vh' }}>
+              <div ref={contentRef} className="flex-1 overflow-y-auto custom-scrollbar" style={{ maxHeight: isFullscreen ? 'calc(100vh - 120px)' : '65vh' }}>
                 <div className={`${isFullscreen ? 'p-4 sm:p-8 md:p-16' : 'p-4 sm:p-6 md:p-12'}`}>
                   {isImagePage ? (
                     <div className="h-full flex items-center justify-center">

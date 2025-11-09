@@ -7,10 +7,12 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
-  BookOpen, Clock, Eye, ChevronRight, Loader2, ArrowLeft, Sparkles, BookMarked
+  BookOpen, Clock, Eye, ChevronRight, Loader2, ArrowLeft, Sparkles, BookMarked, CheckCircle, Circle, PlayCircle
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabaseClient';
+import { useBookProgress } from '@/hooks/useReadingProgress';
 
 interface Book {
   id: string;
@@ -41,10 +43,14 @@ const BookDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { language } = useLanguage();
+  const { user } = useAuth();
 
   const [book, setBook] = useState<Book | null>(null);
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Reading progress tracking
+  const { progress, getChapterStatus, isChapterCompleted } = useBookProgress(book?.id);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -148,7 +154,7 @@ const BookDetail: React.FC = () => {
                 {language === 'HI' ? book.description_hi : book.description}
               </p>
 
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 flex-wrap">
                 <Badge className="bg-orange-500 text-white px-4 py-2 text-base">
                   {book.total_chapters} {language === 'HI' ? 'अध्याय' : 'Chapters'}
                 </Badge>
@@ -156,7 +162,51 @@ const BookDetail: React.FC = () => {
                   <Eye className="w-4 h-4 mr-2" />
                   {book.views} {language === 'HI' ? 'बार देखा गया' : 'views'}
                 </Badge>
+
+                {/* Reading Progress Badge (only for logged-in users) */}
+                {user && progress.summary && progress.summary.chapters_read > 0 && (
+                  <Badge className="bg-green-500 text-white px-4 py-2 text-base">
+                    <CheckCircle className="w-4 h-4 mr-2" />
+                    {progress.summary.progress_percentage}% {language === 'HI' ? 'पूर्ण' : 'Complete'}
+                  </Badge>
+                )}
               </div>
+
+              {/* Progress Bar (only for logged-in users with progress) */}
+              {user && progress.summary && progress.summary.chapters_read > 0 && (
+                <div className="mt-4">
+                  <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
+                    <span>
+                      {progress.summary.chapters_completed} / {book.total_chapters} {language === 'HI' ? 'अध्याय पूर्ण' : 'chapters completed'}
+                    </span>
+                    <span>{progress.summary.progress_percentage}%</span>
+                  </div>
+                  <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-green-400 to-green-600 transition-all duration-500"
+                      style={{ width: `${progress.summary.progress_percentage}%` }}
+                    ></div>
+                  </div>
+                </div>
+              )}
+
+              {/* Continue Reading Button */}
+              {user && progress.summary && progress.summary.chapters_read > 0 && progress.summary.progress_percentage < 100 && (
+                <Button
+                  onClick={() => {
+                    // Find first incomplete chapter
+                    const nextChapter = chapters.find(ch => !isChapterCompleted(ch.id))
+                    if (nextChapter) {
+                      navigate(`/prabhu-ki-leelaayen/read/${nextChapter.slug}`)
+                    }
+                  }}
+                  className="mt-4 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white"
+                  size="lg"
+                >
+                  <PlayCircle className="w-5 h-5 mr-2" />
+                  {language === 'HI' ? 'पढ़ना जारी रखें' : 'Continue Reading'}
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -214,11 +264,30 @@ const BookDetail: React.FC = () => {
 
                     {/* Chapter Content */}
                     <div className="flex-1 min-w-0">
-                      {/* Chapter Badge & Sparkle */}
+                      {/* Chapter Badge & Status */}
                       <div className="flex items-center gap-2 mb-2">
                         <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white border-0">
                           {language === 'HI' ? 'अध्याय' : 'Chapter'} {chapter.chapter_number}
                         </Badge>
+
+                        {/* Status Indicator (only for logged-in users) */}
+                        {user && (
+                          <>
+                            {isChapterCompleted(chapter.id) && (
+                              <Badge className="bg-green-500 text-white border-0">
+                                <CheckCircle className="w-3 h-3 mr-1" />
+                                {language === 'HI' ? 'पूर्ण' : 'Completed'}
+                              </Badge>
+                            )}
+                            {getChapterStatus(chapter.id) === 'reading' && (
+                              <Badge className="bg-blue-500 text-white border-0">
+                                <Circle className="w-3 h-3 mr-1 fill-current" />
+                                {language === 'HI' ? 'पढ़ रहे हैं' : 'Reading'}
+                              </Badge>
+                            )}
+                          </>
+                        )}
+
                         <Sparkles className="w-4 h-4 text-orange-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                       </div>
 
