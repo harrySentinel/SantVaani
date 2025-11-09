@@ -1,10 +1,11 @@
-// Simple, Beautiful Book Reader with Chapter Navigation
-// Clean reading experience without complex animations! 📖
+// Enterprise-Level Story Reader
+// Continuous scroll, progress tracking, mobile gestures, keyboard shortcuts
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-  Home, X, Moon, Sun, ZoomIn, ZoomOut, Maximize, Minimize, ChevronRight, ChevronLeft, Languages, CheckCircle
+  Home, X, Moon, Sun, ZoomIn, ZoomOut, Maximize, Minimize, ChevronRight, ChevronLeft,
+  Languages, CheckCircle, ArrowUp, ChevronDown, Type, Settings, BookOpen
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -36,16 +37,22 @@ const BookReader: React.FC = () => {
   const [chapter, setChapter] = useState<Chapter | null>(null);
   const [nextChapter, setNextChapter] = useState<Chapter | null>(null);
   const [prevChapter, setPrevChapter] = useState<Chapter | null>(null);
-  const [currentPage, setCurrentPage] = useState(0);
   const [fontSize, setFontSize] = useState(18);
   const [darkMode, setDarkMode] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showControls, setShowControls] = useState(true);
+  const [showMobileControls, setShowMobileControls] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   // Reading progress state
   const [readingPercentage, setReadingPercentage] = useState(0);
+  const [timeRemaining, setTimeRemaining] = useState(0);
   const { progress: chapterProgress, refreshProgress } = useChapterProgress(chapter?.id);
+
+  // Touch gesture handling
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
 
   useEffect(() => {
     const fetchChapter = async () => {
@@ -88,7 +95,6 @@ const BookReader: React.FC = () => {
         setPrevChapter(prevData);
 
         await supabase.rpc('increment_chapter_views', { chapter_slug: slug });
-        setCurrentPage(0);
       } catch (err) {
         console.error('Error:', err);
         navigate('/prabhu-ki-leelaayen');
@@ -100,7 +106,7 @@ const BookReader: React.FC = () => {
     fetchChapter();
   }, [slug, navigate]);
 
-  // Mark chapter as reading when loaded (for logged-in users)
+  // Mark chapter as reading when loaded
   useEffect(() => {
     if (!user || !chapter) return;
 
@@ -112,9 +118,21 @@ const BookReader: React.FC = () => {
     markAsReading();
   }, [user, chapter, refreshProgress]);
 
+  // Scroll to saved position
+  useEffect(() => {
+    if (!chapterProgress || !contentRef.current) return;
+
+    const scrollPosition = chapterProgress.scroll_position || 0;
+    if (scrollPosition > 0) {
+      setTimeout(() => {
+        contentRef.current?.scrollTo({ top: scrollPosition, behavior: 'smooth' });
+      }, 500);
+    }
+  }, [chapterProgress]);
+
   // Track scroll progress and auto-save
   useEffect(() => {
-    if (!user || !chapter || !contentRef.current) return;
+    if (!chapter || !contentRef.current) return;
 
     const handleScroll = () => {
       const element = contentRef.current;
@@ -127,16 +145,31 @@ const BookReader: React.FC = () => {
       const percentage = calculateReadingPercentage(scrollTop, scrollHeight, clientHeight);
       setReadingPercentage(percentage);
 
+      // Calculate time remaining (assuming 200 words per minute)
+      if (chapter.read_time) {
+        const remainingPercentage = 100 - percentage;
+        const remaining = Math.ceil((chapter.read_time * remainingPercentage) / 100);
+        setTimeRemaining(remaining);
+      }
+
+      // Show scroll-to-top button after 20% scroll
+      setShowScrollTop(percentage > 20);
+
       // Auto-mark as completed when reaching 95% or more
-      if (percentage >= 95 && chapterProgress?.status !== 'completed') {
+      if (user && percentage >= 95 && chapterProgress?.status !== 'completed') {
         markChapterCompleted(user.id, chapter.id, chapter.book_id).then(() => {
           refreshProgress();
         });
       }
+
+      // Auto-save progress
+      if (user) {
+        markChapterReading(user.id, chapter.id, chapter.book_id, scrollTop, percentage);
+      }
     };
 
     const saveInterval = setInterval(() => {
-      if (contentRef.current) {
+      if (user && contentRef.current) {
         const scrollPos = contentRef.current.scrollTop;
         markChapterReading(user.id, chapter.id, chapter.book_id, scrollPos, readingPercentage);
       }
@@ -181,56 +214,89 @@ const BookReader: React.FC = () => {
 
   // Auto-hide controls
   useEffect(() => {
+    if (!showControls) return;
     const timer = setTimeout(() => setShowControls(false), 3000);
     return () => clearTimeout(timer);
   }, [showControls]);
 
-  const getPages = () => {
-    if (!chapter) return [];
-    const content = language === 'HI' ? chapter.content_hi : chapter.content;
-    const charsPerPage = 2400; // Increased for better reading flow
-    const pages: string[] = [];
-
-    // Content comes FIRST (Chapter 1 on first page)
-    for (let i = 0; i < content.length; i += charsPerPage) {
-      pages.push(content.substring(i, i + charsPerPage));
-    }
-
-    // Image comes LAST (if exists)
-    if (chapter.chapter_image) {
-      pages.push(`IMAGE:${chapter.chapter_image}`);
-    }
-
-    return pages;
+  // Touch gesture handling
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
   };
 
-  const pages = getPages();
-  const totalPages = pages.length;
-  const isLastPage = currentPage === totalPages - 1;
-  const isFirstPage = currentPage === 0;
-
-  const nextPage = () => {
-    if (currentPage < totalPages - 1) {
-      setCurrentPage(currentPage + 1);
-    }
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    touchEndX.current = e.changedTouches[0].clientX;
+    handleGesture();
   };
 
-  const prevPageFn = () => {
-    if (currentPage > 0) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
+  const handleGesture = () => {
+    const swipeThreshold = 75;
+    const diff = touchStartX.current - touchEndX.current;
 
-  const goToNextChapter = () => {
-    if (nextChapter) {
+    if (Math.abs(diff) < swipeThreshold) return;
+
+    if (diff > 0 && nextChapter) {
+      // Swipe left - next chapter
       navigate(`/prabhu-ki-leelaayen/read/${nextChapter.slug}`);
-    }
-  };
-
-  const goToPrevChapter = () => {
-    if (prevChapter) {
+    } else if (diff < 0 && prevChapter) {
+      // Swipe right - previous chapter
       navigate(`/prabhu-ki-leelaayen/read/${prevChapter.slug}`);
     }
+  };
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+
+      switch (e.key) {
+        case 'ArrowLeft':
+          if (prevChapter) navigate(`/prabhu-ki-leelaayen/read/${prevChapter.slug}`);
+          break;
+        case 'ArrowRight':
+          if (nextChapter) navigate(`/prabhu-ki-leelaayen/read/${nextChapter.slug}`);
+          break;
+        case ' ':
+        case 'ArrowDown':
+          e.preventDefault();
+          contentRef.current?.scrollBy({ top: 400, behavior: 'smooth' });
+          break;
+        case 'ArrowUp':
+          e.preventDefault();
+          contentRef.current?.scrollBy({ top: -400, behavior: 'smooth' });
+          break;
+        case 'Home':
+          e.preventDefault();
+          contentRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+          break;
+        case 'End':
+          e.preventDefault();
+          contentRef.current?.scrollTo({ top: contentRef.current.scrollHeight, behavior: 'smooth' });
+          break;
+        case 'f':
+        case 'F':
+          toggleFullscreen();
+          break;
+        case 'd':
+        case 'D':
+          setDarkMode(!darkMode);
+          break;
+        case '+':
+        case '=':
+          setFontSize(Math.min(26, fontSize + 2));
+          break;
+        case '-':
+          setFontSize(Math.max(14, fontSize - 2));
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [fontSize, darkMode, prevChapter, nextChapter, navigate]);
+
+  const scrollToTop = () => {
+    contentRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   if (loading) {
@@ -248,16 +314,20 @@ const BookReader: React.FC = () => {
 
   if (!chapter) return null;
 
-  const currentPageContent = pages[currentPage] || '';
-  const isImagePage = currentPageContent.startsWith('IMAGE:');
-  const imageUrl = isImagePage ? currentPageContent.replace('IMAGE:', '') : '';
+  const content = language === 'HI' ? chapter.content_hi : chapter.content;
 
   return (
     <div
       ref={containerRef}
-      className={`${isFullscreen ? 'fixed inset-0 z-50' : 'min-h-screen'} ${darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-amber-50 via-orange-50 to-red-50'} transition-colors duration-500`}
+      className={`${isFullscreen ? 'fixed inset-0 z-50' : 'min-h-screen'} ${
+        darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-amber-50 via-orange-50 to-red-50'
+      } transition-colors duration-500`}
       onMouseMove={() => setShowControls(true)}
-      onTouchStart={() => setShowControls(true)}
+      onTouchStart={(e) => {
+        setShowControls(true);
+        handleTouchStart(e);
+      }}
+      onTouchEnd={handleTouchEnd}
     >
       {/* Top Controls */}
       <div
@@ -265,72 +335,158 @@ const BookReader: React.FC = () => {
           showControls ? 'translate-y-0' : '-translate-y-full'
         }`}
       >
-        <div className={`${darkMode ? 'bg-gray-800/95' : 'bg-white/95'} backdrop-blur-sm border-b ${darkMode ? 'border-gray-700' : 'border-orange-200'} shadow-lg`}>
-          <div className="max-w-7xl mx-auto px-2 sm:px-4 py-2 sm:py-3 flex items-center justify-between gap-2">
+        <div
+          className={`${darkMode ? 'bg-gray-800/95' : 'bg-white/95'} backdrop-blur-sm border-b ${
+            darkMode ? 'border-gray-700' : 'border-orange-200'
+          } shadow-lg`}
+        >
+          <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between gap-2">
             {/* Left - Branding + Home */}
-            <div className="flex items-center gap-1 sm:gap-4">
-              <div className="flex items-center gap-1 sm:gap-2">
-                <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center">
-                  <span className="text-white font-bold text-xs sm:text-sm">ॐ</span>
-                </div>
-                <span className={`text-base sm:text-lg font-semibold hidden sm:inline ${darkMode ? 'text-white' : 'text-gray-800'}`}>
-                  {language === 'HI' ? 'संतवाणी' : 'SantVaani'}
-                </span>
+            <div className="flex items-center gap-1 sm:gap-3">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center">
+                <span className="text-white font-bold text-xs sm:text-sm">ॐ</span>
               </div>
               {!isFullscreen && (
                 <button
                   onClick={() => navigate('/prabhu-ki-leelaayen')}
-                  className={`p-1.5 sm:p-2 rounded-lg ${darkMode ? 'hover:bg-gray-700 text-white' : 'hover:bg-orange-50 text-gray-700'} transition`}
+                  className={`p-1.5 sm:p-2 rounded-lg ${
+                    darkMode ? 'hover:bg-gray-700 text-white' : 'hover:bg-orange-50 text-gray-700'
+                  } transition`}
+                  aria-label="Go home"
                 >
                   <Home className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
               )}
             </div>
 
-            {/* Center - Chapter Title */}
-            <div className="flex-1 text-center px-1 sm:px-4 min-w-0 overflow-hidden">
-              <h2 className={`text-xs sm:text-sm md:text-base lg:text-lg font-bold ${darkMode ? 'text-white' : 'text-gray-800'} truncate`}>
+            {/* Center - Chapter Title + Progress */}
+            <div className="flex-1 text-center px-2 min-w-0">
+              <h1 className={`text-xs sm:text-sm md:text-base font-bold ${darkMode ? 'text-white' : 'text-gray-800'} truncate`}>
                 {language === 'HI' ? chapter.title_hi : chapter.title}
-              </h2>
-              <p className={`text-[10px] sm:text-xs ${darkMode ? 'text-gray-400' : 'text-gray-600'} truncate`}>
-                {language === 'HI' ? 'अध्याय' : 'Chapter'} {chapter.chapter_number}
-              </p>
+              </h1>
+              <div className="flex items-center justify-center gap-2 mt-1">
+                {/* Progress Ring */}
+                <div className="relative w-8 h-8 hidden sm:flex">
+                  <svg className="w-full h-full transform -rotate-90">
+                    <circle
+                      cx="16"
+                      cy="16"
+                      r="14"
+                      stroke={darkMode ? '#374151' : '#fed7aa'}
+                      strokeWidth="2"
+                      fill="none"
+                    />
+                    <circle
+                      cx="16"
+                      cy="16"
+                      r="14"
+                      stroke={darkMode ? '#f59e0b' : '#ea580c'}
+                      strokeWidth="2"
+                      fill="none"
+                      strokeDasharray={`${2 * Math.PI * 14}`}
+                      strokeDashoffset={`${2 * Math.PI * 14 * (1 - readingPercentage / 100)}`}
+                      strokeLinecap="round"
+                      className="transition-all duration-300"
+                    />
+                  </svg>
+                  <span className={`absolute inset-0 flex items-center justify-center text-[10px] font-bold ${darkMode ? 'text-orange-400' : 'text-orange-600'}`}>
+                    {Math.round(readingPercentage)}
+                  </span>
+                </div>
+                <div className={`text-[10px] sm:text-xs ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  {timeRemaining > 0 && (
+                    <span>{timeRemaining} {language === 'HI' ? 'मिनट बाकी' : 'min left'}</span>
+                  )}
+                  {timeRemaining === 0 && readingPercentage >= 95 && (
+                    <span className="text-green-500">✓ {language === 'HI' ? 'पूर्ण' : 'Complete'}</span>
+                  )}
+                </div>
+              </div>
             </div>
 
             {/* Right - Controls */}
-            <div className="flex items-center gap-0.5 sm:gap-2 flex-shrink-0">
-              {/* Mark as Completed Button (for logged-in users) */}
+            <div className="flex items-center gap-0.5 sm:gap-1.5 flex-shrink-0">
+              {/* Mark as Completed */}
               {user && chapterProgress?.status !== 'completed' && (
                 <button
                   onClick={handleMarkCompleted}
-                  className={`p-1.5 sm:p-2 rounded-lg ${darkMode ? 'bg-green-600 hover:bg-green-700' : 'bg-green-500 hover:bg-green-600'} text-white transition`}
+                  className={`p-1.5 sm:p-2 rounded-lg ${
+                    darkMode ? 'bg-green-600 hover:bg-green-700' : 'bg-green-500 hover:bg-green-600'
+                  } text-white transition`}
                   title={language === 'HI' ? 'पूर्ण करें' : 'Mark as Completed'}
+                  aria-label="Mark as completed"
                 >
                   <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
               )}
 
+              {/* Mobile Settings Button */}
               <button
-                onClick={toggleLanguage}
-                className={`p-1.5 sm:p-2 rounded-lg ${darkMode ? 'hover:bg-gray-700 text-white' : 'hover:bg-orange-50 text-gray-700'} transition`}
-                title={language === 'HI' ? 'Switch to English' : 'हिंदी में बदलें'}
+                onClick={() => setShowMobileControls(!showMobileControls)}
+                className={`sm:hidden p-1.5 rounded-lg ${
+                  darkMode ? 'hover:bg-gray-700 text-white' : 'hover:bg-orange-50 text-gray-700'
+                } transition`}
+                aria-label="Settings"
               >
-                <Languages className="w-4 h-4 sm:w-5 sm:h-5" />
+                <Settings className="w-4 h-4" />
               </button>
-              <button onClick={() => setFontSize(Math.max(14, fontSize - 2))} className={`p-1.5 sm:p-2 rounded-lg ${darkMode ? 'hover:bg-gray-700 text-white' : 'hover:bg-orange-50 text-gray-700'} transition hidden sm:inline-flex`}>
-                <ZoomOut className="w-4 h-4 sm:w-5 sm:h-5" />
-              </button>
-              <button onClick={() => setFontSize(Math.min(26, fontSize + 2))} className={`p-1.5 sm:p-2 rounded-lg ${darkMode ? 'hover:bg-gray-700 text-white' : 'hover:bg-orange-50 text-gray-700'} transition hidden sm:inline-flex`}>
-                <ZoomIn className="w-4 h-4 sm:w-5 sm:h-5" />
-              </button>
-              <button onClick={() => setDarkMode(!darkMode)} className={`p-1.5 sm:p-2 rounded-lg ${darkMode ? 'hover:bg-gray-700 text-white' : 'hover:bg-orange-50 text-gray-700'} transition`}>
-                {darkMode ? <Sun className="w-4 h-4 sm:w-5 sm:h-5" /> : <Moon className="w-4 h-4 sm:w-5 sm:h-5" />}
-              </button>
-              <button onClick={toggleFullscreen} className={`p-1.5 sm:p-2 rounded-lg ${darkMode ? 'hover:bg-gray-700 text-white' : 'hover:bg-orange-50 text-gray-700'} transition`}>
-                {isFullscreen ? <Minimize className="w-4 h-4 sm:w-5 sm:h-5" /> : <Maximize className="w-4 h-4 sm:w-5 sm:h-5" />}
-              </button>
+
+              {/* Desktop Controls */}
+              <div className="hidden sm:flex items-center gap-1.5">
+                <button
+                  onClick={toggleLanguage}
+                  className={`p-2 rounded-lg ${
+                    darkMode ? 'hover:bg-gray-700 text-white' : 'hover:bg-orange-50 text-gray-700'
+                  } transition`}
+                  title={language === 'HI' ? 'Switch to English' : 'हिंदी में बदलें'}
+                  aria-label="Toggle language"
+                >
+                  <Languages className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => setFontSize(Math.max(14, fontSize - 2))}
+                  className={`p-2 rounded-lg ${
+                    darkMode ? 'hover:bg-gray-700 text-white' : 'hover:bg-orange-50 text-gray-700'
+                  } transition`}
+                  aria-label="Decrease font size"
+                >
+                  <ZoomOut className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => setFontSize(Math.min(26, fontSize + 2))}
+                  className={`p-2 rounded-lg ${
+                    darkMode ? 'hover:bg-gray-700 text-white' : 'hover:bg-orange-50 text-gray-700'
+                  } transition`}
+                  aria-label="Increase font size"
+                >
+                  <ZoomIn className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => setDarkMode(!darkMode)}
+                  className={`p-2 rounded-lg ${
+                    darkMode ? 'hover:bg-gray-700 text-white' : 'hover:bg-orange-50 text-gray-700'
+                  } transition`}
+                  aria-label={darkMode ? 'Light mode' : 'Dark mode'}
+                >
+                  {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                </button>
+                <button
+                  onClick={toggleFullscreen}
+                  className={`p-2 rounded-lg ${
+                    darkMode ? 'hover:bg-gray-700 text-white' : 'hover:bg-orange-50 text-gray-700'
+                  } transition`}
+                  aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+                >
+                  {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
+                </button>
+              </div>
+
               {isFullscreen && (
-                <button onClick={toggleFullscreen} className="p-1.5 sm:p-2 rounded-lg bg-red-500 hover:bg-red-600 text-white transition">
+                <button
+                  onClick={toggleFullscreen}
+                  className="p-1.5 sm:p-2 rounded-lg bg-red-500 hover:bg-red-600 text-white transition"
+                  aria-label="Exit fullscreen"
+                >
                   <X className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
               )}
@@ -339,100 +495,208 @@ const BookReader: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className={`${isFullscreen ? 'h-screen pt-12 sm:pt-16' : 'min-h-screen pt-16 sm:pt-20'} flex items-center justify-center ${isFullscreen ? 'p-0' : 'p-2 sm:p-4'}`}>
-        <div className={`w-full ${isFullscreen ? 'h-full' : 'max-w-4xl'}`}>
-          {/* Book Page */}
-          <div
-            className={`${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} ${isFullscreen ? 'rounded-none h-full' : 'rounded-xl sm:rounded-2xl'} shadow-2xl ${isFullscreen ? 'border-0' : 'border-2'} overflow-hidden`}
-            style={{ minHeight: isFullscreen ? '100%' : '70vh' }}
-          >
-            <div className="h-full flex flex-col">
-              {/* Page Number */}
-              <div className={`px-3 sm:px-6 py-2 sm:py-3 border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'} flex items-center justify-between`}>
-                <span className={`text-xs sm:text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                  {language === 'HI' ? 'पृष्ठ' : 'Page'} {currentPage + 1} / {totalPages}
-                </span>
-                <span className={`text-xs sm:text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                  {chapter.read_time} {language === 'HI' ? 'मिनट' : 'min'}
-                </span>
-              </div>
-
-              {/* Content - SCROLLABLE */}
-              <div ref={contentRef} className="flex-1 overflow-y-auto custom-scrollbar" style={{ maxHeight: isFullscreen ? 'calc(100vh - 120px)' : '65vh' }}>
-                <div className={`${isFullscreen ? 'p-4 sm:p-8 md:p-16' : 'p-4 sm:p-6 md:p-12'}`}>
-                  {isImagePage ? (
-                    <div className="h-full flex items-center justify-center">
-                      <img src={imageUrl} alt={chapter.title} className="max-w-full max-h-full object-contain rounded-lg shadow-xl" />
-                    </div>
-                  ) : (
-                    <div
-                      className="enhanced-content"
-                      style={{
-                        fontSize: `${fontSize}px`,
-                        lineHeight: '2',
-                        fontFamily: language === 'HI' ? "'Noto Sans Devanagari', sans-serif" : 'Georgia, serif',
-                        color: darkMode ? '#e5e7eb' : '#1f2937',
-                      }}
-                      dangerouslySetInnerHTML={{ __html: currentPageContent }}
-                    />
-                  )}
-                </div>
-              </div>
+      {/* Mobile Controls Drawer */}
+      {showMobileControls && (
+        <div className="sm:hidden fixed inset-x-0 bottom-0 z-50 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm border-t border-gray-200 dark:border-gray-700 shadow-2xl p-4 animate-slide-up">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-semibold text-gray-800 dark:text-white">
+              {language === 'HI' ? 'सेटिंग्स' : 'Settings'}
+            </h3>
+            <button
+              onClick={() => setShowMobileControls(false)}
+              className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+            >
+              <ChevronDown className="w-5 h-5" />
+            </button>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              onClick={toggleLanguage}
+              className="flex items-center gap-2 p-3 rounded-lg bg-orange-50 dark:bg-gray-700 text-gray-800 dark:text-white hover:bg-orange-100 dark:hover:bg-gray-600"
+            >
+              <Languages className="w-5 h-5" />
+              <span className="text-sm">{language === 'HI' ? 'English' : 'हिंदी'}</span>
+            </button>
+            <button
+              onClick={() => setDarkMode(!darkMode)}
+              className="flex items-center gap-2 p-3 rounded-lg bg-orange-50 dark:bg-gray-700 text-gray-800 dark:text-white hover:bg-orange-100 dark:hover:bg-gray-600"
+            >
+              {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              <span className="text-sm">{darkMode ? 'Light' : 'Dark'}</span>
+            </button>
+            <div className="col-span-2 flex items-center gap-3">
+              <Type className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              <input
+                type="range"
+                min="14"
+                max="26"
+                step="2"
+                value={fontSize}
+                onChange={(e) => setFontSize(Number(e.target.value))}
+                className="flex-1"
+              />
+              <span className="text-sm text-gray-600 dark:text-gray-400">{fontSize}px</span>
             </div>
           </div>
+        </div>
+      )}
 
+      {/* Main Content - Continuous Scroll */}
+      <div
+        className={`${isFullscreen ? 'h-screen pt-20' : 'min-h-screen pt-24 sm:pt-20'} flex items-start justify-center ${
+          isFullscreen ? 'p-0' : 'p-2 sm:p-4 pb-20'
+        }`}
+      >
+        <div className={`w-full ${isFullscreen ? 'h-full' : 'max-w-4xl'}`}>
+          {/* Book Container */}
+          <div
+            className={`${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} ${
+              isFullscreen ? 'rounded-none h-full' : 'rounded-xl sm:rounded-2xl'
+            } shadow-2xl ${isFullscreen ? 'border-0' : 'border-2'} overflow-hidden`}
+            style={{ minHeight: isFullscreen ? '100%' : '70vh' }}
+          >
+            {/* Content - Continuous Scroll */}
+            <div
+              ref={contentRef}
+              className="h-full overflow-y-auto custom-scrollbar"
+              style={{ maxHeight: isFullscreen ? 'calc(100vh - 80px)' : '80vh' }}
+            >
+              <article className={`${isFullscreen ? 'p-6 sm:p-12 md:p-20' : 'p-6 sm:p-8 md:p-16'} max-w-3xl mx-auto`}>
+                <div
+                  className="enhanced-content"
+                  style={{
+                    fontSize: `${fontSize}px`,
+                    lineHeight: '1.9',
+                    fontFamily: language === 'HI' ? "'Noto Sans Devanagari', sans-serif" : 'Georgia, serif',
+                    color: darkMode ? '#e5e7eb' : '#1f2937',
+                  }}
+                  dangerouslySetInnerHTML={{ __html: content }}
+                />
+
+                {/* Chapter Image */}
+                {chapter.chapter_image && (
+                  <div className="mt-12 mb-8">
+                    <img
+                      src={chapter.chapter_image}
+                      alt={chapter.title}
+                      className="w-full rounded-2xl shadow-2xl"
+                    />
+                  </div>
+                )}
+
+                {/* Chapter Navigation */}
+                <div className="mt-16 pt-8 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                  {prevChapter ? (
+                    <button
+                      onClick={() => navigate(`/prabhu-ki-leelaayen/read/${prevChapter.slug}`)}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
+                        darkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-orange-50 hover:bg-orange-100 text-gray-800'
+                      } transition`}
+                    >
+                      <ChevronLeft className="w-5 h-5" />
+                      <div className="text-left">
+                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                          {language === 'HI' ? 'पिछला' : 'Previous'}
+                        </div>
+                        <div className="text-sm font-semibold truncate max-w-32">
+                          {language === 'HI' ? prevChapter.title_hi : prevChapter.title}
+                        </div>
+                      </div>
+                    </button>
+                  ) : (
+                    <div></div>
+                  )}
+
+                  {nextChapter && (
+                    <button
+                      onClick={() => navigate(`/prabhu-ki-leelaayen/read/${nextChapter.slug}`)}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
+                        darkMode
+                          ? 'bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700'
+                          : 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600'
+                      } text-white transition`}
+                    >
+                      <div className="text-right">
+                        <div className="text-xs text-orange-100">
+                          {language === 'HI' ? 'अगला' : 'Next'}
+                        </div>
+                        <div className="text-sm font-semibold truncate max-w-32">
+                          {language === 'HI' ? nextChapter.title_hi : nextChapter.title}
+                        </div>
+                      </div>
+                      <ChevronRight className="w-5 h-5" />
+                    </button>
+                  )}
+                </div>
+              </article>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Simple Floating Navigation Buttons - < > */}
-      {/* Previous Button */}
-      {(currentPage > 0 || prevChapter) && (
+      {/* Scroll to Top Button */}
+      {showScrollTop && (
         <button
-          onClick={isFirstPage && prevChapter ? goToPrevChapter : prevPageFn}
-          className={`fixed left-2 sm:left-4 top-1/2 -translate-y-1/2 z-50 w-12 h-12 sm:w-14 sm:h-14 rounded-full ${
-            darkMode ? 'bg-gray-800 hover:bg-gray-700' : 'bg-white hover:bg-orange-50'
-          } shadow-xl border-2 ${darkMode ? 'border-gray-600' : 'border-orange-300'} flex items-center justify-center transition-all hover:scale-110 active:scale-95`}
-          title={isFirstPage && prevChapter ? (language === 'HI' ? 'पिछला अध्याय' : 'Previous Chapter') : (language === 'HI' ? 'पिछला पृष्ठ' : 'Previous')}
+          onClick={scrollToTop}
+          className={`fixed bottom-6 right-6 z-40 w-12 h-12 rounded-full ${
+            darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-white hover:bg-orange-50'
+          } shadow-xl border-2 ${
+            darkMode ? 'border-gray-600' : 'border-orange-300'
+          } flex items-center justify-center transition-all hover:scale-110 active:scale-95`}
+          aria-label="Scroll to top"
         >
-          <ChevronLeft className={`w-6 h-6 sm:w-7 sm:h-7 ${darkMode ? 'text-white' : 'text-orange-600'}`} />
+          <ArrowUp className={`w-6 h-6 ${darkMode ? 'text-orange-400' : 'text-orange-600'}`} />
         </button>
       )}
 
-      {/* Next Button */}
-      {(currentPage < totalPages - 1 || nextChapter) && (
-        <button
-          onClick={isLastPage && nextChapter ? goToNextChapter : nextPage}
-          className={`fixed right-2 sm:right-4 top-1/2 -translate-y-1/2 z-50 w-12 h-12 sm:w-14 sm:h-14 rounded-full ${
-            darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600'
-          } shadow-xl border-2 border-transparent flex items-center justify-center transition-all hover:scale-110 active:scale-95`}
-          title={isLastPage && nextChapter ? (language === 'HI' ? 'अगला अध्याय' : 'Next Chapter') : (language === 'HI' ? 'अगला पृष्ठ' : 'Next')}
-        >
-          <ChevronRight className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
-        </button>
-      )}
+      {/* Floating Navigation Buttons (only on desktop) */}
+      <div className="hidden lg:block">
+        {prevChapter && (
+          <button
+            onClick={() => navigate(`/prabhu-ki-leelaayen/read/${prevChapter.slug}`)}
+            className={`fixed left-4 top-1/2 -translate-y-1/2 z-40 w-14 h-14 rounded-full ${
+              darkMode ? 'bg-gray-800 hover:bg-gray-700' : 'bg-white hover:bg-orange-50'
+            } shadow-xl border-2 ${
+              darkMode ? 'border-gray-600' : 'border-orange-300'
+            } flex items-center justify-center transition-all hover:scale-110 active:scale-95`}
+            title={language === 'HI' ? 'पिछला अध्याय' : 'Previous Chapter'}
+            aria-label="Previous chapter"
+          >
+            <ChevronLeft className={`w-7 h-7 ${darkMode ? 'text-white' : 'text-orange-600'}`} />
+          </button>
+        )}
 
-      {/* Progress Bar - Only show when not in fullscreen */}
+        {nextChapter && (
+          <button
+            onClick={() => navigate(`/prabhu-ki-leelaayen/read/${nextChapter.slug}`)}
+            className={`fixed right-4 top-1/2 -translate-y-1/2 z-40 w-14 h-14 rounded-full ${
+              darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600'
+            } shadow-xl border-2 border-transparent flex items-center justify-center transition-all hover:scale-110 active:scale-95`}
+            title={language === 'HI' ? 'अगला अध्याय' : 'Next Chapter'}
+            aria-label="Next chapter"
+          >
+            <ChevronRight className="w-7 h-7 text-white" />
+          </button>
+        )}
+      </div>
+
+      {/* Progress Bar at Bottom */}
       {!isFullscreen && (
-        <div className="max-w-4xl mx-auto px-4 pb-8">
-          <div className={`h-2 ${darkMode ? 'bg-gray-700' : 'bg-orange-200'} rounded-full overflow-hidden`}>
-            <div
-              className="h-full bg-gradient-to-r from-orange-500 via-red-500 to-orange-600 transition-all duration-300"
-              style={{ width: `${((currentPage + 1) / totalPages) * 100}%` }}
-            />
-          </div>
-          <p className={`text-center mt-2 text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-            {Math.round(((currentPage + 1) / totalPages) * 100)}% {language === 'HI' ? 'पूर्ण' : 'Complete'}
-          </p>
+        <div className="fixed bottom-0 left-0 right-0 z-30 h-1 bg-gray-200 dark:bg-gray-800">
+          <div
+            className="h-full bg-gradient-to-r from-orange-500 via-red-500 to-orange-600 transition-all duration-300"
+            style={{ width: `${readingPercentage}%` }}
+          />
         </div>
       )}
 
       <style>{`
         /* Beautiful Chapter Headings */
+        .enhanced-content h1,
         .enhanced-content h2 {
           font-size: 2em;
           font-weight: 800;
-          margin: 1em 0 1em;
+          margin: 1.5em 0 1em;
           padding-bottom: 0.5em;
           border-bottom: 3px solid ${darkMode ? '#f59e0b' : '#ea580c'};
           color: ${darkMode ? '#fbbf24' : '#ea580c'};
@@ -440,11 +704,18 @@ const BookReader: React.FC = () => {
           letter-spacing: 0.02em;
         }
 
+        .enhanced-content h3 {
+          font-size: 1.5em;
+          font-weight: 700;
+          margin: 1.2em 0 0.8em;
+          color: ${darkMode ? '#fcd34d' : '#f97316'};
+        }
+
         /* Elegant Paragraphs */
         .enhanced-content p {
-          margin-bottom: 1.8em;
+          margin-bottom: 1.5em;
           text-align: justify;
-          text-indent: 2.5em;
+          text-indent: 2em;
           hyphens: auto;
           word-spacing: 0.05em;
         }
@@ -455,7 +726,7 @@ const BookReader: React.FC = () => {
         }
 
         .enhanced-content p:first-of-type::first-letter {
-          font-size: 4.5em;
+          font-size: 4em;
           font-weight: 900;
           float: left;
           line-height: 0.85;
@@ -489,9 +760,10 @@ const BookReader: React.FC = () => {
         }
 
         /* Lists */
-        .enhanced-content ul, .enhanced-content ol {
+        .enhanced-content ul,
+        .enhanced-content ol {
           margin: 1.5em 0;
-          padding-left: 3em;
+          padding-left: 2.5em;
         }
 
         .enhanced-content li {
@@ -516,7 +788,6 @@ const BookReader: React.FC = () => {
         .custom-scrollbar::-webkit-scrollbar-track {
           background: ${darkMode ? '#374151' : '#fed7aa'};
           border-radius: 10px;
-          margin: 8px 0;
         }
 
         .custom-scrollbar::-webkit-scrollbar-thumb {
@@ -527,6 +798,19 @@ const BookReader: React.FC = () => {
 
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
           background: ${darkMode ? 'linear-gradient(180deg, #fbbf24 0%, #f59e0b 100%)' : 'linear-gradient(180deg, #fb923c 0%, #ea580c 100%)'};
+        }
+
+        @keyframes slide-up {
+          from {
+            transform: translateY(100%);
+          }
+          to {
+            transform: translateY(0);
+          }
+        }
+
+        .animate-slide-up {
+          animation: slide-up 0.3s ease-out;
         }
       `}</style>
     </div>
