@@ -13,6 +13,7 @@ import SpiritualFactBox from '@/components/SpiritualFactBox';
 import FeedbackForm from '@/components/FeedbackForm';
 import NoticeBoard from '@/components/NoticeBoard';
 import LandingBlogSection from '@/components/LandingBlogSection';
+import LandingStoriesSection from '@/components/LandingStoriesSection';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 // Lazy load ChatBot for better performance
@@ -186,6 +187,9 @@ const Index = () => {
 
       {/* Featured Blog Posts Section */}
       <LandingBlogSection />
+
+      {/* Featured Divine Stories Section */}
+      <LandingStoriesSection />
 
       {/* Visitor Counter Section - Now fully dynamic */}
       <section className="py-12 bg-gradient-to-br from-white via-orange-25 to-white">
