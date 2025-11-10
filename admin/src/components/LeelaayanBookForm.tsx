@@ -21,6 +21,7 @@ interface Book {
   total_chapters: number
   views: number
   published: boolean
+  is_santvaani_original?: boolean
 }
 
 interface LeelaayanBookFormProps {
