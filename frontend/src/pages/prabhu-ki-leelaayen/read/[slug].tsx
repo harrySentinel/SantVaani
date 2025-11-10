@@ -583,7 +583,7 @@ const BookReader: React.FC = () => {
               className="h-full overflow-y-auto custom-scrollbar"
               style={{ maxHeight: isFullscreen ? 'calc(100vh - 80px)' : '80vh' }}
             >
-              <article className={`${isFullscreen ? 'p-6 sm:p-12 md:p-20' : 'p-6 sm:p-8 md:p-16'} max-w-3xl mx-auto`}>
+              <article className={`${isFullscreen ? 'p-6 sm:p-12 md:p-20 max-w-5xl' : 'p-6 sm:p-8 md:p-16 max-w-3xl'} mx-auto`}>
                 <div
                   className="enhanced-content"
                   style={{
