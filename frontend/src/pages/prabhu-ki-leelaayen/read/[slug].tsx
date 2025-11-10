@@ -4,7 +4,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-  Home, X, Moon, Sun, ZoomIn, ZoomOut, Maximize, Minimize, ChevronRight, ChevronLeft,
+  Home, X, Moon, Sun, ZoomIn, ZoomOut, Maximize, Minimize, Maximize2, Minimize2, ChevronRight, ChevronLeft,
   Languages, CheckCircle, ArrowUp, ChevronDown, Type, Settings, BookOpen, LogIn, TrendingUp
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -510,22 +510,31 @@ const BookReader: React.FC = () => {
               <ChevronDown className="w-5 h-5" />
             </button>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              onClick={toggleLanguage}
-              className="flex items-center justify-center gap-2 p-3.5 rounded-xl bg-gradient-to-br from-orange-50 to-red-50 dark:from-gray-700 dark:to-gray-800 text-gray-800 dark:text-white hover:from-orange-100 hover:to-red-100 dark:hover:from-gray-600 dark:hover:to-gray-700 border border-orange-200 dark:border-gray-600 transition-all shadow-sm hover:shadow-md"
-            >
-              <Languages className="w-5 h-5" />
-              <span className="text-sm font-semibold">{language === 'HI' ? 'English' : 'हिंदी'}</span>
-            </button>
-            <button
-              onClick={() => setDarkMode(!darkMode)}
-              className="flex items-center justify-center gap-2 p-3.5 rounded-xl bg-gradient-to-br from-orange-50 to-red-50 dark:from-gray-700 dark:to-gray-800 text-gray-800 dark:text-white hover:from-orange-100 hover:to-red-100 dark:hover:from-gray-600 dark:hover:to-gray-700 border border-orange-200 dark:border-gray-600 transition-all shadow-sm hover:shadow-md"
-            >
-              {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-              <span className="text-sm font-semibold">{darkMode ? 'Light' : 'Dark'}</span>
-            </button>
-            <div className="col-span-2 bg-gradient-to-br from-gray-50 to-orange-50 dark:from-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-4 shadow-sm">
+          <div className="space-y-3">
+            <div className="grid grid-cols-3 gap-2">
+              <button
+                onClick={toggleLanguage}
+                className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl bg-gradient-to-br from-orange-50 to-red-50 dark:from-gray-700 dark:to-gray-800 text-gray-800 dark:text-white hover:from-orange-100 hover:to-red-100 dark:hover:from-gray-600 dark:hover:to-gray-700 border border-orange-200 dark:border-gray-600 transition-all shadow-sm hover:shadow-md"
+              >
+                <Languages className="w-5 h-5" />
+                <span className="text-xs font-semibold">{language === 'HI' ? 'English' : 'हिंदी'}</span>
+              </button>
+              <button
+                onClick={() => setDarkMode(!darkMode)}
+                className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl bg-gradient-to-br from-orange-50 to-red-50 dark:from-gray-700 dark:to-gray-800 text-gray-800 dark:text-white hover:from-orange-100 hover:to-red-100 dark:hover:from-gray-600 dark:hover:to-gray-700 border border-orange-200 dark:border-gray-600 transition-all shadow-sm hover:shadow-md"
+              >
+                {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                <span className="text-xs font-semibold">{darkMode ? 'Light' : 'Dark'}</span>
+              </button>
+              <button
+                onClick={toggleFullscreen}
+                className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl bg-gradient-to-br from-orange-50 to-red-50 dark:from-gray-700 dark:to-gray-800 text-gray-800 dark:text-white hover:from-orange-100 hover:to-red-100 dark:hover:from-gray-600 dark:hover:to-gray-700 border border-orange-200 dark:border-gray-600 transition-all shadow-sm hover:shadow-md"
+              >
+                {isFullscreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
+                <span className="text-xs font-semibold">{isFullscreen ? (language === 'HI' ? 'बाहर निकलें' : 'Exit') : (language === 'HI' ? 'फुल स्क्रीन' : 'Fullscreen')}</span>
+              </button>
+            </div>
+            <div className="bg-gradient-to-br from-gray-50 to-orange-50 dark:from-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-4 shadow-sm">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <Type className="w-5 h-5 text-orange-600 dark:text-orange-400" />
