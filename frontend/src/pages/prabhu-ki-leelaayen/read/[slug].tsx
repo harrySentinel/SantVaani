@@ -498,14 +498,14 @@ const BookReader: React.FC = () => {
 
       {/* Mobile Controls Drawer */}
       {showMobileControls && (
-        <div className="sm:hidden fixed inset-x-0 bottom-0 z-50 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm border-t border-gray-200 dark:border-gray-700 shadow-2xl p-4 animate-slide-up">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-gray-800 dark:text-white">
+        <div className="sm:hidden fixed inset-x-0 bottom-0 z-50 bg-white dark:bg-gray-900 backdrop-blur-sm border-t-2 border-gray-200 dark:border-gray-700 shadow-2xl p-5 animate-slide-up">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-bold text-gray-800 dark:text-white uppercase tracking-wide">
               {language === 'HI' ? 'सेटिंग्स' : 'Settings'}
             </h3>
             <button
               onClick={() => setShowMobileControls(false)}
-              className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+              className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 transition-colors"
             >
               <ChevronDown className="w-5 h-5" />
             </button>
@@ -513,20 +513,28 @@ const BookReader: React.FC = () => {
           <div className="grid grid-cols-2 gap-3">
             <button
               onClick={toggleLanguage}
-              className="flex items-center gap-2 p-3 rounded-lg bg-orange-50 dark:bg-gray-700 text-gray-800 dark:text-white hover:bg-orange-100 dark:hover:bg-gray-600"
+              className="flex items-center justify-center gap-2 p-3.5 rounded-xl bg-gradient-to-br from-orange-50 to-red-50 dark:from-gray-700 dark:to-gray-800 text-gray-800 dark:text-white hover:from-orange-100 hover:to-red-100 dark:hover:from-gray-600 dark:hover:to-gray-700 border border-orange-200 dark:border-gray-600 transition-all shadow-sm hover:shadow-md"
             >
               <Languages className="w-5 h-5" />
-              <span className="text-sm">{language === 'HI' ? 'English' : 'हिंदी'}</span>
+              <span className="text-sm font-semibold">{language === 'HI' ? 'English' : 'हिंदी'}</span>
             </button>
             <button
               onClick={() => setDarkMode(!darkMode)}
-              className="flex items-center gap-2 p-3 rounded-lg bg-orange-50 dark:bg-gray-700 text-gray-800 dark:text-white hover:bg-orange-100 dark:hover:bg-gray-600"
+              className="flex items-center justify-center gap-2 p-3.5 rounded-xl bg-gradient-to-br from-orange-50 to-red-50 dark:from-gray-700 dark:to-gray-800 text-gray-800 dark:text-white hover:from-orange-100 hover:to-red-100 dark:hover:from-gray-600 dark:hover:to-gray-700 border border-orange-200 dark:border-gray-600 transition-all shadow-sm hover:shadow-md"
             >
               {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-              <span className="text-sm">{darkMode ? 'Light' : 'Dark'}</span>
+              <span className="text-sm font-semibold">{darkMode ? 'Light' : 'Dark'}</span>
             </button>
-            <div className="col-span-2 flex items-center gap-3">
-              <Type className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+            <div className="col-span-2 bg-gradient-to-br from-gray-50 to-orange-50 dark:from-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-4 shadow-sm">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <Type className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+                  <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">
+                    {language === 'HI' ? 'फ़ॉन्ट साइज़' : 'Font Size'}
+                  </span>
+                </div>
+                <span className="text-sm font-bold text-orange-600 dark:text-orange-400 bg-white dark:bg-gray-700 px-2 py-0.5 rounded-lg border border-orange-200 dark:border-orange-900">{fontSize}px</span>
+              </div>
               <input
                 type="range"
                 min="14"
@@ -534,9 +542,13 @@ const BookReader: React.FC = () => {
                 step="2"
                 value={fontSize}
                 onChange={(e) => setFontSize(Number(e.target.value))}
-                className="flex-1"
+                className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer slider-thumb"
+                style={{
+                  background: darkMode
+                    ? `linear-gradient(to right, #f97316 0%, #f97316 ${((fontSize - 14) / 12) * 100}%, #374151 ${((fontSize - 14) / 12) * 100}%, #374151 100%)`
+                    : `linear-gradient(to right, #f97316 0%, #f97316 ${((fontSize - 14) / 12) * 100}%, #e5e7eb ${((fontSize - 14) / 12) * 100}%, #e5e7eb 100%)`
+                }}
               />
-              <span className="text-sm text-gray-600 dark:text-gray-400">{fontSize}px</span>
             </div>
           </div>
         </div>
@@ -861,6 +873,57 @@ const BookReader: React.FC = () => {
 
         .animate-slide-up {
           animation: slide-up 0.3s ease-out;
+        }
+
+        /* Beautiful Range Slider */
+        input[type="range"].slider-thumb {
+          -webkit-appearance: none;
+          appearance: none;
+          height: 8px;
+          border-radius: 8px;
+          outline: none;
+        }
+
+        input[type="range"].slider-thumb::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          appearance: none;
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          background: ${darkMode ? 'linear-gradient(135deg, #fb923c 0%, #f97316 100%)' : 'linear-gradient(135deg, #f97316 0%, #dc2626 100%)'};
+          cursor: pointer;
+          box-shadow: 0 2px 8px rgba(249, 115, 22, 0.4);
+          border: 2px solid ${darkMode ? '#1f2937' : 'white'};
+          transition: all 0.2s ease;
+        }
+
+        input[type="range"].slider-thumb::-webkit-slider-thumb:hover {
+          transform: scale(1.15);
+          box-shadow: 0 4px 12px rgba(249, 115, 22, 0.6);
+        }
+
+        input[type="range"].slider-thumb::-webkit-slider-thumb:active {
+          transform: scale(1.05);
+        }
+
+        input[type="range"].slider-thumb::-moz-range-thumb {
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          background: ${darkMode ? 'linear-gradient(135deg, #fb923c 0%, #f97316 100%)' : 'linear-gradient(135deg, #f97316 0%, #dc2626 100%)'};
+          cursor: pointer;
+          box-shadow: 0 2px 8px rgba(249, 115, 22, 0.4);
+          border: 2px solid ${darkMode ? '#1f2937' : 'white'};
+          transition: all 0.2s ease;
+        }
+
+        input[type="range"].slider-thumb::-moz-range-thumb:hover {
+          transform: scale(1.15);
+          box-shadow: 0 4px 12px rgba(249, 115, 22, 0.6);
+        }
+
+        input[type="range"].slider-thumb::-moz-range-thumb:active {
+          transform: scale(1.05);
         }
       `}</style>
     </div>
