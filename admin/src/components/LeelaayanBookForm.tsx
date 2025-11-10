@@ -40,7 +40,8 @@ export default function LeelaayanBookForm({ book, onSuccess, onCancel }: Leelaay
     cover_image: '',
     author: '',
     author_hi: '',
-    published: false
+    published: false,
+    is_santvaani_original: false
   })
   const { toast } = useToast()
 
@@ -55,7 +56,8 @@ export default function LeelaayanBookForm({ book, onSuccess, onCancel }: Leelaay
         cover_image: book.cover_image || '',
         author: book.author,
         author_hi: book.author_hi,
-        published: book.published
+        published: book.published,
+        is_santvaani_original: book.is_santvaani_original || false
       })
     }
   }, [book])
@@ -95,6 +97,7 @@ export default function LeelaayanBookForm({ book, onSuccess, onCancel }: Leelaay
         author: formData.author,
         author_hi: formData.author_hi,
         published: formData.published,
+        is_santvaani_original: formData.is_santvaani_original,
         updated_at: new Date().toISOString()
       }
 
@@ -249,6 +252,23 @@ export default function LeelaayanBookForm({ book, onSuccess, onCancel }: Leelaay
         <Label htmlFor="published" className="cursor-pointer">
           Publish this book (make it visible to users)
         </Label>
+      </div>
+
+      {/* SantVaani Original Toggle */}
+      <div className="p-4 bg-gradient-to-r from-orange-50 to-red-50 border-2 border-orange-200 rounded-lg">
+        <div className="flex items-center space-x-2">
+          <Switch
+            id="santvaani_original"
+            checked={formData.is_santvaani_original}
+            onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_santvaani_original: checked }))}
+          />
+          <Label htmlFor="santvaani_original" className="cursor-pointer flex items-center gap-2">
+            <span className="text-base font-semibold">⭐ SantVaani Original</span>
+          </Label>
+        </div>
+        <p className="text-sm text-gray-600 mt-2 ml-11">
+          Mark this as exclusive content created by SantVaani. A special badge will be displayed on the book.
+        </p>
       </div>
 
       {/* Action Buttons */}

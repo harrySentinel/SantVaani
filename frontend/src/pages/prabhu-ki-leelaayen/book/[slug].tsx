@@ -26,6 +26,7 @@ interface Book {
   author_hi: string;
   total_chapters: number;
   views: number;
+  is_santvaani_original?: boolean;
 }
 
 interface Chapter {
@@ -144,6 +145,19 @@ const BookDetail: React.FC = () => {
 
             {/* Book Info */}
             <div className="flex-1">
+              {/* SantVaani Original Badge */}
+              {book.is_santvaani_original && (
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full mb-3 shadow-lg">
+                  <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center">
+                    <span className="text-orange-600 font-bold text-xs">ॐ</span>
+                  </div>
+                  <span className="text-white font-bold text-sm tracking-wide">
+                    {language === 'HI' ? 'संतवाणी ओरिजिनल' : 'SANTVAANI ORIGINAL'}
+                  </span>
+                  <span className="text-white text-xs">⭐</span>
+                </div>
+              )}
+
               <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-3" style={{ fontFamily: language === 'HI' ? "'Noto Sans Devanagari', sans-serif" : 'inherit' }}>
                 {language === 'HI' ? book.title_hi : book.title}
               </h1>
@@ -201,20 +215,65 @@ const BookDetail: React.FC = () => {
                 )}
               </div>
 
-              {/* Progress Bar (only for logged-in users with progress) */}
+              {/* Cute Progress Indicator (only for logged-in users with progress) */}
               {user && progress.summary && progress.summary.chapters_read > 0 && (
-                <div className="mt-4">
-                  <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
-                    <span>
-                      {progress.summary.chapters_completed} / {book.total_chapters} {language === 'HI' ? 'अध्याय पूर्ण' : 'chapters completed'}
-                    </span>
-                    <span>{progress.summary.progress_percentage}%</span>
-                  </div>
-                  <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-gradient-to-r from-green-400 to-green-600 transition-all duration-500"
-                      style={{ width: `${progress.summary.progress_percentage}%` }}
-                    ></div>
+                <div className="mt-6 p-4 bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-2xl">
+                  <div className="flex items-center gap-4">
+                    {/* Circular Progress */}
+                    <div className="relative flex-shrink-0">
+                      <svg className="w-20 h-20 transform -rotate-90">
+                        <circle
+                          cx="40"
+                          cy="40"
+                          r="32"
+                          stroke="#d1fae5"
+                          strokeWidth="6"
+                          fill="none"
+                        />
+                        <circle
+                          cx="40"
+                          cy="40"
+                          r="32"
+                          stroke="url(#gradient)"
+                          strokeWidth="6"
+                          fill="none"
+                          strokeDasharray={`${2 * Math.PI * 32}`}
+                          strokeDashoffset={`${2 * Math.PI * 32 * (1 - progress.summary.progress_percentage / 100)}`}
+                          strokeLinecap="round"
+                          className="transition-all duration-700"
+                        />
+                        <defs>
+                          <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stopColor="#10b981" />
+                            <stop offset="100%" stopColor="#059669" />
+                          </linearGradient>
+                        </defs>
+                      </svg>
+                      <div className="absolute inset-0 flex flex-col items-center justify-center">
+                        <span className="text-2xl font-bold text-green-600">{progress.summary.progress_percentage}%</span>
+                      </div>
+                    </div>
+
+                    {/* Progress Details */}
+                    <div className="flex-1">
+                      <h3 className="font-bold text-gray-800 mb-1 flex items-center gap-2">
+                        <span className="text-lg">{language === 'HI' ? '📚 आपकी प्रगति' : '📚 Your Progress'}</span>
+                      </h3>
+                      <p className="text-sm text-gray-600 mb-2">
+                        <span className="font-semibold text-green-600">{progress.summary.chapters_completed}</span> {language === 'HI' ? 'में से' : 'of'} {book.total_chapters} {language === 'HI' ? 'अध्याय पूर्ण' : 'chapters completed'}
+                      </p>
+                      <div className="flex items-center gap-2 text-xs text-gray-500">
+                        {progress.summary.progress_percentage === 100 ? (
+                          <span className="text-green-600 font-semibold flex items-center gap-1">
+                            ✅ {language === 'HI' ? 'पुस्तक पूर्ण!' : 'Book Completed!'}
+                          </span>
+                        ) : (
+                          <span>
+                            {book.total_chapters - progress.summary.chapters_completed} {language === 'HI' ? 'अध्याय बाकी हैं' : 'chapters to go'}
+                          </span>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
