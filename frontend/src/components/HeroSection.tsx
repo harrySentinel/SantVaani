@@ -1,40 +1,20 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowDown, Sparkles, Heart, Shield, Users, Unlock } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function HeroSection() {
-  const [currentQuote, setCurrentQuote] = useState(0);
   const { t, language } = useLanguage();
 
-  const spiritualQuotes = [
-    {
-      text: "The guru's grace illuminates the path to divine truth",
-      textHi: "गुरु की कृपा दिव्य सत्य का मार्ग प्रकाशित करती है",
-      author: "- Ancient Wisdom"
-    },
-    {
-      text: "In devotion, the soul finds its eternal home",
-      textHi: "भक्ति में आत्मा को अपना शाश्वत घर मिलता है",
-      author: "- Spiritual Teaching"
-    },
-    {
-      text: "Love is the bridge between the seeker and the divine",
-      textHi: "प्रेम साधक और परमात्मा के बीच का सेतु है",
-      author: "- Sacred Text"
-    }
-  ];
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentQuote((prev) => (prev + 1) % spiritualQuotes.length);
-    }, 4000);
-    return () => clearInterval(timer);
-  }, [spiritualQuotes.length]);
+  const spiritualQuote = {
+    text: "In truth, this world is not separate at all — everywhere, in every form, it is only Lord Shri Krishna who plays His divine lila.",
+    textHi: "वस्तुतः यह प्रपंच है ही नहीं। सदा, सर्वत्र, सर्वरूपों में एकमात्र श्रीकृष्ण ही लीलायमान हैं।",
+    author: "— साईं जी",
+    authorEn: "— Sai Ji"
+  };
 
   return (
     <section className="relative min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50 overflow-hidden">
@@ -87,27 +67,18 @@ export default function HeroSection() {
           </div>
 
 
-          {/* Rotating Quotes */}
-          <div className="max-w-2xl mx-auto bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-orange-100">
-            <div className="space-y-3 min-h-[100px] flex flex-col justify-center">
-              <p className="text-lg text-gray-700 italic leading-relaxed">
-                "{language === 'EN' ? spiritualQuotes[currentQuote].text : spiritualQuotes[currentQuote].textHi}"
-              </p>
-              <p className="text-sm text-orange-600 font-medium">
-                {spiritualQuotes[currentQuote].author}
-              </p>
+          {/* Spiritual Quote */}
+          <div className="max-w-3xl mx-auto bg-gradient-to-br from-white/90 to-orange-50/50 backdrop-blur-sm rounded-2xl p-8 shadow-xl border-2 border-orange-200">
+            <div className="flex items-center justify-center mb-4">
+              <span className="text-4xl">🪔</span>
             </div>
-            
-            {/* Quote indicators */}
-            <div className="flex justify-center space-x-2 mt-4">
-              {spiritualQuotes.map((_, index) => (
-                <div
-                  key={index}
-                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                    index === currentQuote ? 'bg-orange-500' : 'bg-orange-200'
-                  }`}
-                />
-              ))}
+            <div className="space-y-4">
+              <p className="text-lg md:text-xl text-gray-800 italic leading-relaxed font-medium">
+                "{language === 'EN' ? spiritualQuote.text : spiritualQuote.textHi}"
+              </p>
+              <p className="text-base text-orange-600 font-semibold text-right">
+                {language === 'EN' ? spiritualQuote.authorEn : spiritualQuote.author}
+              </p>
             </div>
           </div>
 
