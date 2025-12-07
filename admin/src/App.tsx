@@ -3,6 +3,7 @@ import { Toaster } from '@/components/ui/toaster'
 import { AdminAuthProvider } from '@/contexts/AdminAuthContext'
 import AdminProtectedRoute from '@/components/AdminProtectedRoute'
 import Layout from '@/components/Layout'
+import SplashScreen from '@/components/SplashScreen'
 import Dashboard from '@/pages/Dashboard'
 import SaintsPage from '@/pages/Saints'
 import LivingSaintsPage from '@/pages/LivingSaints'
@@ -23,6 +24,7 @@ function App() {
 
   return (
     <AdminAuthProvider>
+      <SplashScreen />
       <AdminProtectedRoute>
         <div className="min-h-screen bg-gray-50">
           <Routes>

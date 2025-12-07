@@ -6,6 +6,7 @@ import './index.css'
 import './styles/mobile.css'
 import './styles/enhanced.css'
 import './styles/desktop.css'
+import './styles/mobile-app.css'
 
 // Register Service Worker for PWA
 if ('serviceWorker' in navigator) {
