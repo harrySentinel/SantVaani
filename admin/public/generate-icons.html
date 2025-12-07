@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Icon Generator for SantVaani Admin PWA</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+      min-height: 100vh;
+    }
+    .container {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    h1 {
+      color: #f97316;
+      margin-bottom: 10px;
+    }
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+    }
+    canvas {
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      margin: 20px 0;
+      display: block;
+    }
+    button {
+      background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      font-size: 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      margin: 10px 5px;
+      box-shadow: 0 4px 15px rgba(249, 115, 22, 0.4);
+      transition: all 0.3s;
+    }
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(249, 115, 22, 0.6);
+    }
+    .instructions {
+      background: #fef3c7;
+      border-left: 4px solid #f59e0b;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 5px;
+    }
+    .success {
+      background: #d1fae5;
+      border-left: 4px solid #10b981;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 5px;
+      display: none;
+    }
+    .icon-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+    .icon-item {
+      text-align: center;
+      padding: 10px;
+      background: #f9fafb;
+      border-radius: 10px;
+    }
+    .icon-item canvas {
+      margin: 0 auto;
+    }
+    .icon-size {
+      font-size: 12px;
+      color: #666;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🕉️ SantVaani Admin PWA Icons</h1>
+    <p class="subtitle">Generate all required icons for your Progressive Web App</p>
+
+    <div class="instructions">
+      <strong>📱 Instructions:</strong>
+      <ol>
+        <li>Click "Generate All Icons" button below</li>
+        <li>Right-click each icon and "Save image as..."</li>
+        <li>Save them in <code>admin/public/</code> folder with exact names shown</li>
+        <li>Icons will be used when installing the app on mobile</li>
+      </ol>
+    </div>
+
+    <button onclick="generateAllIcons()" style="font-size: 18px; padding: 20px 40px;">
+      ✨ Generate All Icons
+    </button>
+
+    <div class="success" id="success">
+      ✅ Icons generated! Right-click each icon below and save with the exact filename shown.
+    </div>
+
+    <div class="icon-grid" id="iconGrid"></div>
+  </div>
+
+  <script>
+    const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
+
+    function generateIcon(size) {
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+
+      // Background gradient
+      const gradient = ctx.createLinearGradient(0, 0, size, size);
+      gradient.addColorStop(0, '#f97316');
+      gradient.addColorStop(1, '#ea580c');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, size, size);
+
+      // Om symbol
+      ctx.fillStyle = 'white';
+      ctx.font = `bold ${size * 0.5}px Arial`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('🕉️', size / 2, size / 2);
+
+      // Border
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+      ctx.lineWidth = size * 0.02;
+      ctx.strokeRect(0, 0, size, size);
+
+      return canvas;
+    }
+
+    function generateAllIcons() {
+      const grid = document.getElementById('iconGrid');
+      grid.innerHTML = '';
+
+      sizes.forEach(size => {
+        const canvas = generateIcon(size);
+
+        const item = document.createElement('div');
+        item.className = 'icon-item';
+
+        const sizeLabel = document.createElement('div');
+        sizeLabel.className = 'icon-size';
+        sizeLabel.innerHTML = `<strong>icon-${size}x${size}.png</strong><br>${size}×${size}px`;
+
+        item.appendChild(canvas);
+        item.appendChild(sizeLabel);
+        grid.appendChild(item);
+      });
+
+      document.getElementById('success').style.display = 'block';
+    }
+
+    // Generate on page load
+    window.onload = () => {
+      generateAllIcons();
+    };
+  </script>
+</body>
+</html>

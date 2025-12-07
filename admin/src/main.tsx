@@ -7,6 +7,25 @@ import './styles/mobile.css'
 import './styles/enhanced.css'
 import './styles/desktop.css'
 
+// Register Service Worker for PWA
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker
+      .register('/sw.js')
+      .then((registration) => {
+        console.log('✅ PWA: Service Worker registered successfully:', registration.scope)
+
+        // Check for updates periodically
+        setInterval(() => {
+          registration.update()
+        }, 60000) // Check every minute
+      })
+      .catch((error) => {
+        console.log('❌ PWA: Service Worker registration failed:', error)
+      })
+  })
+}
+
 const root = document.getElementById('root')
 
 if (!root) {

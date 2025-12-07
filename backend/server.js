@@ -2522,6 +2522,382 @@ Return ONLY a JSON object:
 
 console.log('✅ AI blog features registered successfully');
 
+// ============================================
+// ORGANIZATION SUBMISSIONS API
+// ============================================
+
+console.log('🏛️ Registering organization submission endpoints...');
+
+// Submit a new organization
+app.post('/api/organizations/submit', async (req, res) => {
+  try {
+    const {
+      organizationName,
+      organizationNameHi,
+      organizationType,
+      contactPerson,
+      phone,
+      email,
+      city,
+      state,
+      address,
+      pincode,
+      description,
+      descriptionHi,
+      establishedYear
+    } = req.body;
+
+    // Validate required fields
+    if (!organizationName || !organizationType || !contactPerson || !phone || !email || !city || !state) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required fields: organizationName, organizationType, contactPerson, phone, email, city, state'
+      });
+    }
+
+    // Insert organization submission
+    const { data, error } = await supabase
+      .from('organization_submissions')
+      .insert({
+        organization_name: organizationName,
+        organization_name_hi: organizationNameHi,
+        organization_type: organizationType,
+        contact_person: contactPerson,
+        phone,
+        email,
+        city,
+        state,
+        address,
+        pincode,
+        description,
+        description_hi: descriptionHi,
+        established_year: establishedYear,
+        status: 'pending'
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error submitting organization:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to submit organization'
+      });
+    }
+
+    res.status(201).json({
+      success: true,
+      message: 'Organization submitted successfully! We will review it shortly.',
+      submission: data
+    });
+  } catch (error) {
+    console.error('Error in organization submission endpoint:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+});
+
+// Get all approved organizations (public)
+app.get('/api/organizations/approved', async (req, res) => {
+  try {
+    const { type } = req.query;
+
+    let query = supabase
+      .from('organization_submissions')
+      .select('*')
+      .eq('status', 'approved')
+      .order('created_at', { ascending: false });
+
+    // Filter by type if provided
+    if (type && type !== 'all') {
+      query = query.eq('organization_type', type);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error('Error fetching approved organizations:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to fetch organizations'
+      });
+    }
+
+    res.json({
+      success: true,
+      organizations: data
+    });
+  } catch (error) {
+    console.error('Error in approved organizations endpoint:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+});
+
+// Get all pending submissions (admin only - using service role key)
+app.get('/api/organizations/pending', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('organization_submissions')
+      .select('*')
+      .eq('status', 'pending')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching pending organizations:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to fetch pending organizations'
+      });
+    }
+
+    res.json({
+      success: true,
+      submissions: data
+    });
+  } catch (error) {
+    console.error('Error in pending organizations endpoint:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+});
+
+// Get all submissions (admin only - all statuses)
+app.get('/api/organizations/all', async (req, res) => {
+  try {
+    const { status } = req.query;
+
+    let query = supabase
+      .from('organization_submissions')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    // Filter by status if provided
+    if (status && ['pending', 'approved', 'rejected'].includes(status)) {
+      query = query.eq('status', status);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error('Error fetching all organizations:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to fetch organizations'
+      });
+    }
+
+    res.json({
+      success: true,
+      submissions: data
+    });
+  } catch (error) {
+    console.error('Error in all organizations endpoint:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+});
+
+// Approve an organization (admin only)
+app.put('/api/organizations/:id/approve', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { adminNotes, capacity, needs, upiId } = req.body;
+
+    const { data, error } = await supabase
+      .from('organization_submissions')
+      .update({
+        status: 'approved',
+        admin_notes: adminNotes,
+        capacity,
+        needs,
+        upi_id: upiId,
+        reviewed_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error approving organization:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to approve organization'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Organization approved successfully',
+      organization: data
+    });
+  } catch (error) {
+    console.error('Error in approve organization endpoint:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+});
+
+// Reject an organization (admin only)
+app.put('/api/organizations/:id/reject', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { adminNotes } = req.body;
+
+    const { data, error } = await supabase
+      .from('organization_submissions')
+      .update({
+        status: 'rejected',
+        admin_notes: adminNotes,
+        reviewed_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error rejecting organization:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to reject organization'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Organization rejected',
+      organization: data
+    });
+  } catch (error) {
+    console.error('Error in reject organization endpoint:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+});
+
+// Update organization details (admin only)
+app.put('/api/organizations/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      organizationName,
+      organizationNameHi,
+      organizationType,
+      contactPerson,
+      phone,
+      email,
+      city,
+      state,
+      address,
+      pincode,
+      description,
+      descriptionHi,
+      establishedYear,
+      capacity,
+      needs,
+      upiId,
+      status
+    } = req.body;
+
+    const updateData = {
+      updated_at: new Date().toISOString()
+    };
+
+    // Only update fields that are provided
+    if (organizationName) updateData.organization_name = organizationName;
+    if (organizationNameHi) updateData.organization_name_hi = organizationNameHi;
+    if (organizationType) updateData.organization_type = organizationType;
+    if (contactPerson) updateData.contact_person = contactPerson;
+    if (phone) updateData.phone = phone;
+    if (email) updateData.email = email;
+    if (city) updateData.city = city;
+    if (state) updateData.state = state;
+    if (address) updateData.address = address;
+    if (pincode) updateData.pincode = pincode;
+    if (description) updateData.description = description;
+    if (descriptionHi) updateData.description_hi = descriptionHi;
+    if (establishedYear) updateData.established_year = establishedYear;
+    if (capacity) updateData.capacity = capacity;
+    if (needs) updateData.needs = needs;
+    if (upiId) updateData.upi_id = upiId;
+    if (status) updateData.status = status;
+
+    const { data, error } = await supabase
+      .from('organization_submissions')
+      .update(updateData)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating organization:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to update organization'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Organization updated successfully',
+      organization: data
+    });
+  } catch (error) {
+    console.error('Error in update organization endpoint:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+});
+
+// Delete organization (admin only)
+app.delete('/api/organizations/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const { error } = await supabase
+      .from('organization_submissions')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error deleting organization:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to delete organization'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Organization deleted successfully'
+    });
+  } catch (error) {
+    console.error('Error in delete organization endpoint:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+});
+
+console.log('✅ Organization submission routes registered successfully');
+
 // 404 handler (MUST be last)
 app.use((req, res) => {
   res.status(404).json({

@@ -12,7 +12,8 @@ import {
   Settings,
   X,
   FileText,
-  BookMarked
+  BookMarked,
+  Building2
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -96,6 +97,13 @@ const navigation = [
     href: '/leelaayen',
     icon: BookMarked,
     description: 'Manage divine stories & books',
+    count: 0
+  },
+  {
+    name: 'Organizations',
+    href: '/organizations',
+    icon: Building2,
+    description: 'Review donation page submissions',
     count: 0
   }
 ]
