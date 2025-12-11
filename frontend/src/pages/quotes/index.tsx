@@ -100,11 +100,15 @@ const Quotes = () => {
     if (!quoteElement) return;
 
     try {
-      // Capture the quote card as image
+      // Capture the quote card as image with proper dimensions
       const canvas = await html2canvas(quoteElement, {
         scale: 2,
         backgroundColor: null,
         logging: false,
+        width: window.innerWidth,
+        height: window.innerHeight,
+        windowWidth: window.innerWidth,
+        windowHeight: window.innerHeight,
       });
 
       canvas.toBlob(async (blob) => {
@@ -138,7 +142,7 @@ const Quotes = () => {
           URL.revokeObjectURL(url);
           toast({ title: '✅ Image downloaded!' });
         }
-      });
+      }, 'image/png', 1.0);
     } catch (err) {
       console.error('Error sharing quote:', err);
       toast({ title: '❌ Failed to share', variant: 'destructive' });
@@ -267,8 +271,7 @@ const Quotes = () => {
                 transition={{ delay: 0.7 }}
                 className="pt-8"
               >
-                <div className="inline-flex items-center space-x-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
-                  <span className="text-2xl">🕉️</span>
+                <div className="inline-block px-6 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/30">
                   <span className="text-sm text-white font-bold tracking-widest">
                     SANTVAANI
                   </span>
@@ -309,28 +312,28 @@ const Quotes = () => {
           <div className="w-9" /> {/* Spacer for centering */}
         </div>
 
-        {/* Action Buttons - Right Side */}
-        <div className="absolute right-4 sm:right-6 top-1/2 transform -translate-y-1/2 flex flex-col space-y-4 pointer-events-auto">
+        {/* Action Buttons - Bottom Right */}
+        <div className="absolute right-4 sm:right-6 bottom-32 flex flex-col space-y-3 pointer-events-auto">
           {/* Share Button */}
           <motion.button
             whileTap={{ scale: 0.9 }}
             onClick={() => shareQuote(quotes[currentIndex], currentIndex)}
             disabled={isSharing}
-            className="p-4 bg-white/90 backdrop-blur-sm rounded-full text-gray-800 hover:bg-white transition-all shadow-lg disabled:opacity-50"
+            className="p-3 bg-white/90 backdrop-blur-sm rounded-full text-gray-800 hover:bg-white transition-all shadow-lg disabled:opacity-50"
           >
             {isSharing ? (
-              <Loader2 className="w-6 h-6 animate-spin" />
+              <Loader2 className="w-5 h-5 animate-spin" />
             ) : (
-              <Share2 className="w-6 h-6" />
+              <Share2 className="w-5 h-5" />
             )}
           </motion.button>
 
           {/* Heart Button (Favorite - optional) */}
           <motion.button
             whileTap={{ scale: 0.9 }}
-            className="p-4 bg-white/90 backdrop-blur-sm rounded-full text-red-500 hover:bg-white transition-all shadow-lg"
+            className="p-3 bg-white/90 backdrop-blur-sm rounded-full text-red-500 hover:bg-white transition-all shadow-lg"
           >
-            <Heart className="w-6 h-6" />
+            <Heart className="w-5 h-5" />
           </motion.button>
         </div>
 
