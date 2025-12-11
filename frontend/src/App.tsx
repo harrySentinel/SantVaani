@@ -20,6 +20,7 @@ const Saints = lazy(() => import("./pages/saints/index"));
 const LivingSaints = lazy(() => import("./pages/living-saints/index"));
 const Divine = lazy(() => import("./pages/divine/index"));
 const Bhajans = lazy(() => import("./pages/bhajans/index"));
+const Quotes = lazy(() => import("./pages/quotes/index"));
 const LiveBhajan = lazy(() => import("./pages/live-bhajans/index"));
 const DailyGuide = lazy(() => import("./pages/daily-guide/index"));
 const Horoscope = lazy(() => import("./pages/horoscope/index"));
@@ -85,7 +86,8 @@ const App = () => {
               <Route path="/living-saints" element={<LivingSaints />} />
               <Route path="/divine" element={<Divine />} />
               <Route path="/bhajans" element={<Bhajans />} />
-               <Route path="/live-bhajans" element={<LiveBhajan />} />
+              <Route path="/quotes" element={<Quotes />} />
+              <Route path="/live-bhajans" element={<LiveBhajan />} />
               <Route path="/daily-guide" element={<DailyGuide />} />
               <Route path="/horoscope" element={<Horoscope />} />
               <Route path="/events" element={<Events />} />

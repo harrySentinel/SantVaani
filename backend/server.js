@@ -874,6 +874,415 @@ app.get('/api/validate-channels', async (req, res) => {
   }
 });
 
+// =====================================================
+// BHAJAN ENGAGEMENT ENDPOINTS
+// =====================================================
+
+// Toggle favorite for a bhajan
+app.post('/api/bhajans/:id/favorite', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    // Get user from Supabase auth token
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+
+    if (authError || !user) {
+      return res.status(401).json({ error: 'Invalid authentication' });
+    }
+
+    // Check if already favorited
+    const { data: existing } = await supabase
+      .from('bhajan_favorites')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('bhajan_id', id)
+      .single();
+
+    if (existing) {
+      // Remove favorite
+      await supabase
+        .from('bhajan_favorites')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('bhajan_id', id);
+
+      return res.json({ success: true, favorited: false, message: 'Removed from favorites' });
+    } else {
+      // Add favorite
+      await supabase
+        .from('bhajan_favorites')
+        .insert({ user_id: user.id, bhajan_id: id });
+
+      // Check for "First Favorite" achievement
+      const { count } = await supabase
+        .from('bhajan_favorites')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id);
+
+      if (count === 1) {
+        // Award achievement
+        await supabase
+          .from('bhajan_achievements')
+          .insert({
+            user_id: user.id,
+            achievement_type: 'first_favorite',
+            achievement_data: { bhajan_id: id }
+          })
+          .onConflict('user_id, achievement_type')
+          .ignoreDuplicates();
+      }
+
+      return res.json({ success: true, favorited: true, message: 'Added to favorites' });
+    }
+  } catch (error) {
+    console.error('Error toggling favorite:', error);
+    res.status(500).json({ error: 'Failed to toggle favorite' });
+  }
+});
+
+// Get user's favorites
+app.get('/api/bhajans/favorites/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const { data, error } = await supabase
+      .from('bhajan_favorites')
+      .select('bhajan_id, created_at, bhajans(*)')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    res.json({ success: true, favorites: data });
+  } catch (error) {
+    console.error('Error fetching favorites:', error);
+    res.status(500).json({ error: 'Failed to fetch favorites' });
+  }
+});
+
+// Get favorite count for a bhajan
+app.get('/api/bhajans/:id/favorite-count', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const { count, error } = await supabase
+      .from('bhajan_favorites')
+      .select('*', { count: 'exact', head: true })
+      .eq('bhajan_id', id);
+
+    if (error) throw error;
+
+    res.json({ success: true, count: count || 0 });
+  } catch (error) {
+    console.error('Error fetching favorite count:', error);
+    res.status(500).json({ error: 'Failed to fetch favorite count' });
+  }
+});
+
+// Record a play event
+app.post('/api/bhajans/:id/play', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { duration_seconds, completed, source = 'web' } = req.body;
+    const authHeader = req.headers.authorization;
+
+    let userId = null;
+    if (authHeader) {
+      const token = authHeader.replace('Bearer ', '');
+      const { data: { user } } = await supabase.auth.getUser(token);
+      userId = user?.id;
+    }
+
+    // Insert play record
+    await supabase
+      .from('bhajan_plays')
+      .insert({
+        bhajan_id: id,
+        user_id: userId,
+        duration_seconds,
+        completed,
+        source
+      });
+
+    // Refresh materialized view in background (don't wait)
+    supabase.rpc('refresh_bhajan_stats').then().catch(err => {
+      console.log('Stats refresh will happen on next scheduled run');
+    });
+
+    res.json({ success: true, message: 'Play recorded' });
+  } catch (error) {
+    console.error('Error recording play:', error);
+    res.status(500).json({ error: 'Failed to record play' });
+  }
+});
+
+// Get statistics for a bhajan
+app.get('/api/bhajans/:id/stats', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const { data, error } = await supabase
+      .from('bhajan_stats')
+      .select('*')
+      .eq('bhajan_id', id)
+      .single();
+
+    if (error && error.code !== 'PGRST116') throw error; // PGRST116 = no rows
+
+    res.json({
+      success: true,
+      stats: data || {
+        total_plays: 0,
+        unique_listeners: 0,
+        plays_this_week: 0,
+        plays_this_month: 0,
+        completed_plays: 0
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching stats:', error);
+    res.status(500).json({ error: 'Failed to fetch stats' });
+  }
+});
+
+// Get trending bhajans
+app.get('/api/bhajans/trending', async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 10;
+
+    const { data, error } = await supabase
+      .from('bhajan_stats')
+      .select('bhajan_id, plays_this_week, total_plays, bhajans(*)')
+      .order('plays_this_week', { ascending: false })
+      .limit(limit);
+
+    if (error) throw error;
+
+    res.json({ success: true, trending: data });
+  } catch (error) {
+    console.error('Error fetching trending:', error);
+    res.status(500).json({ error: 'Failed to fetch trending bhajans' });
+  }
+});
+
+// Get popular bhajans (all-time)
+app.get('/api/bhajans/popular', async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 10;
+
+    const { data, error } = await supabase
+      .from('bhajan_stats')
+      .select('bhajan_id, total_plays, unique_listeners, bhajans(*)')
+      .order('total_plays', { ascending: false })
+      .limit(limit);
+
+    if (error) throw error;
+
+    res.json({ success: true, popular: data });
+  } catch (error) {
+    console.error('Error fetching popular:', error);
+    res.status(500).json({ error: 'Failed to fetch popular bhajans' });
+  }
+});
+
+// Update learning progress
+app.post('/api/bhajans/:id/learning', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { memorization_level, practice_count, notes, mastered } = req.body;
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+
+    if (authError || !user) {
+      return res.status(401).json({ error: 'Invalid authentication' });
+    }
+
+    // Upsert learning progress
+    const { data, error } = await supabase
+      .from('bhajan_learning')
+      .upsert({
+        user_id: user.id,
+        bhajan_id: id,
+        memorization_level,
+        practice_count,
+        notes,
+        mastered,
+        last_practiced_at: new Date().toISOString()
+      }, {
+        onConflict: 'user_id,bhajan_id'
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    // Check for mastery achievement
+    if (mastered) {
+      const { count } = await supabase
+        .from('bhajan_learning')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .eq('mastered', true);
+
+      if (count >= 5) {
+        await supabase
+          .from('bhajan_achievements')
+          .insert({
+            user_id: user.id,
+            achievement_type: 'bhajan_scholar',
+            achievement_data: { mastered_count: count }
+          })
+          .onConflict('user_id, achievement_type')
+          .ignoreDuplicates();
+      }
+    }
+
+    res.json({ success: true, learning: data });
+  } catch (error) {
+    console.error('Error updating learning:', error);
+    res.status(500).json({ error: 'Failed to update learning progress' });
+  }
+});
+
+// Get user's learning progress
+app.get('/api/bhajans/learning/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const { data, error } = await supabase
+      .from('bhajan_learning')
+      .select('*, bhajans(*)')
+      .eq('user_id', userId)
+      .order('last_practiced_at', { ascending: false });
+
+    if (error) throw error;
+
+    res.json({ success: true, learning: data });
+  } catch (error) {
+    console.error('Error fetching learning:', error);
+    res.status(500).json({ error: 'Failed to fetch learning progress' });
+  }
+});
+
+// Mark bhajan as mastered
+app.post('/api/bhajans/:id/mark-mastered', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+
+    if (authError || !user) {
+      return res.status(401).json({ error: 'Invalid authentication' });
+    }
+
+    // Update or create learning record
+    await supabase
+      .from('bhajan_learning')
+      .upsert({
+        user_id: user.id,
+        bhajan_id: id,
+        mastered: true,
+        memorization_level: 100,
+        last_practiced_at: new Date().toISOString()
+      }, {
+        onConflict: 'user_id,bhajan_id'
+      });
+
+    res.json({ success: true, message: 'Bhajan marked as mastered!' });
+  } catch (error) {
+    console.error('Error marking mastered:', error);
+    res.status(500).json({ error: 'Failed to mark as mastered' });
+  }
+});
+
+// Get user achievements
+app.get('/api/bhajans/achievements/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const { data, error } = await supabase
+      .from('bhajan_achievements')
+      .select('*')
+      .eq('user_id', userId)
+      .order('earned_at', { ascending: false });
+
+    if (error) throw error;
+
+    res.json({ success: true, achievements: data });
+  } catch (error) {
+    console.error('Error fetching achievements:', error);
+    res.status(500).json({ error: 'Failed to fetch achievements' });
+  }
+});
+
+// Check and award achievements
+app.post('/api/bhajans/check-achievements', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+
+    if (authError || !user) {
+      return res.status(401).json({ error: 'Invalid authentication' });
+    }
+
+    const newAchievements = [];
+
+    // Check for various achievements
+    // 1. Hanuman Devotee (10 Hanuman bhajans)
+    const { count: hanumanPlays } = await supabase
+      .from('bhajan_plays')
+      .select('bhajans!inner(category)', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+      .ilike('bhajans.category', '%hanuman%');
+
+    if (hanumanPlays >= 10) {
+      const { error } = await supabase
+        .from('bhajan_achievements')
+        .insert({
+          user_id: user.id,
+          achievement_type: 'hanuman_devotee',
+          achievement_data: { play_count: hanumanPlays }
+        })
+        .onConflict('user_id, achievement_type')
+        .ignoreDuplicates();
+
+      if (!error) newAchievements.push('hanuman_devotee');
+    }
+
+    // 2. Daily Listener (7 days in a row)
+    // This would require more complex date logic - simplified for now
+
+    res.json({ success: true, newAchievements });
+  } catch (error) {
+    console.error('Error checking achievements:', error);
+    res.status(500).json({ error: 'Failed to check achievements' });
+  }
+});
+
 // Existing chat endpoint (keeping your spiritual guidance feature)
 app.post('/api/chat', async (req, res) => {
   try {

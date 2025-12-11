@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, Users, Heart, Sparkles, Book, Info, IndianRupee, Calendar, Star, ChevronDown, CalendarDays, LogIn, UserPlus, User, LogOut, BookOpen, BookMarked } from 'lucide-react';
+import { Menu, X, Users, Heart, Sparkles, Book, Info, IndianRupee, Calendar, Star, ChevronDown, CalendarDays, LogIn, UserPlus, User, LogOut, BookOpen, BookMarked, Quote } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -51,6 +51,7 @@ export default function Navbar() {
     { to: '/living-saints', label: 'Contemporary Saints', labelHi: 'समकालीन संत', icon: Heart },
     { to: '/divine', label: 'Divine Forms', labelHi: 'दिव्य रूप', icon: Sparkles },
     { to: '/bhajans', label: 'Bhajans', labelHi: 'भजन', icon: Book },
+    { to: '/quotes', label: 'Quotes', labelHi: 'उद्धरण', icon: Quote },
     { to: '/donation', label: 'Donation', labelHi: 'दान', icon: IndianRupee },
     { to: '/about', label: 'About', labelHi: 'हमारे बारे में', icon: Info },
   ];

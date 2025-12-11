@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Plus, Search, Edit, Trash2, Eye, Music, Upload, Download } from 'lucide-react'
+import { Plus, Search, Edit, Trash2, Eye, Music, Upload, Download, BarChart3 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/hooks/use-toast'
 import { supabase, TABLES } from '@/lib/supabase'
@@ -7,6 +7,8 @@ import { formatDate } from '@/lib/utils'
 import BhajanForm from '@/components/BhajanForm'
 import BhajanViewModal from '@/components/BhajanViewModal'
 import BulkImport from '@/components/BulkImport'
+import BhajanAnalytics from '@/components/BhajanAnalytics'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 // Bhajan interface matching your database schema
 interface Bhajan {
@@ -207,6 +209,21 @@ export default function BhajansPage() {
           </Button>
         </div>
       </div>
+
+      {/* Tabs for Management and Analytics */}
+      <Tabs defaultValue="manage" className="space-y-6">
+        <TabsList className="grid w-full max-w-md grid-cols-2">
+          <TabsTrigger value="manage" className="flex items-center space-x-2">
+            <Music className="w-4 h-4" />
+            <span>Manage Bhajans</span>
+          </TabsTrigger>
+          <TabsTrigger value="analytics" className="flex items-center space-x-2">
+            <BarChart3 className="w-4 h-4" />
+            <span>Analytics</span>
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="manage" className="space-y-6">
 
       {/* Stats Bar */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
@@ -506,6 +523,15 @@ export default function BhajansPage() {
   }
 ]`}
       />
+
+      </TabsContent>
+
+      {/* Analytics Tab */}
+      <TabsContent value="analytics">
+        <BhajanAnalytics />
+      </TabsContent>
+
+      </Tabs>
     </div>
   )
 }
