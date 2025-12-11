@@ -60,21 +60,33 @@ const Quotes = () => {
     fetchQuotes();
   }, []);
 
-  // Handle scroll to update current index
+  // Handle scroll to update current index using Intersection Observer
   useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
+    if (quoteRefs.current.length === 0) return;
 
-    const handleScroll = () => {
-      const scrollPosition = container.scrollTop;
-      const windowHeight = window.innerHeight;
-      const index = Math.round(scrollPosition / windowHeight);
-      setCurrentIndex(index);
-    };
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const index = quoteRefs.current.findIndex((ref) => ref === entry.target);
+            if (index !== -1) {
+              setCurrentIndex(index);
+            }
+          }
+        });
+      },
+      {
+        root: containerRef.current,
+        threshold: 0.5, // Trigger when 50% of the element is visible
+      }
+    );
 
-    container.addEventListener('scroll', handleScroll);
-    return () => container.removeEventListener('scroll', handleScroll);
-  }, []);
+    quoteRefs.current.forEach((ref) => {
+      if (ref) observer.observe(ref);
+    });
+
+    return () => observer.disconnect();
+  }, [quotes]);
 
   // Get gradient for quote based on index
   const getGradient = (index: number) => {
@@ -255,9 +267,12 @@ const Quotes = () => {
                 transition={{ delay: 0.7 }}
                 className="pt-8"
               >
-                <p className="text-sm text-white/60 font-medium tracking-wider">
-                  SANTVAANI
-                </p>
+                <div className="inline-flex items-center space-x-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
+                  <span className="text-2xl">🕉️</span>
+                  <span className="text-sm text-white font-bold tracking-widest">
+                    SANTVAANI
+                  </span>
+                </div>
               </motion.div>
             </div>
 
