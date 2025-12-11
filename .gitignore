@@ -48,3 +48,6 @@ database/nuclear_cleanup.sql
 
 # Blog gamification implementation doc (context only)
 BLOG_GAMIFICATION_IMPLEMENTATION.md
+
+# Claude context and development notes (context only)
+CLAUDE_CONTEXT.md
