@@ -3453,10 +3453,10 @@ app.post('/api/quotes/generate-ai', async (req, res) => {
       return res.status(400).json({ error: 'Count must be between 1 and 10' });
     }
 
-    const openaiApiKey = process.env.OPENAI_API_KEY;
-    if (!openaiApiKey) {
+    const GROQ_API_KEY = process.env.GROQ_API_KEY;
+    if (!GROQ_API_KEY) {
       return res.status(500).json({
-        error: 'OpenAI API key not configured. Please add OPENAI_API_KEY to your environment variables.'
+        error: 'Groq API key not configured. Please add GROQ_API_KEY to your environment variables.'
       });
     }
 
@@ -3485,11 +3485,15 @@ Return ONLY a valid JSON array with this exact structure:
 
 Make sure the response is valid JSON that can be parsed directly.`;
 
-    // Call OpenAI API
-    const response = await axios.post(
-      'https://api.openai.com/v1/chat/completions',
-      {
-        model: 'gpt-4o-mini', // Using the cheaper model for cost-effectiveness
+    // Call Groq API
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${GROQ_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
         messages: [
           {
             role: 'system',
@@ -3502,24 +3506,41 @@ Make sure the response is valid JSON that can be parsed directly.`;
         ],
         temperature: 0.9,
         max_tokens: 2000
-      },
-      {
-        headers: {
-          'Authorization': `Bearer ${openaiApiKey}`,
-          'Content-Type': 'application/json'
-        }
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      console.error('Groq API error:', errorData);
+
+      if (response.status === 401) {
+        return res.status(500).json({
+          error: 'Invalid Groq API key. Please check your configuration.'
+        });
       }
-    );
+
+      if (response.status === 429) {
+        return res.status(429).json({
+          error: 'Rate limit exceeded. Please try again in a moment.'
+        });
+      }
+
+      return res.status(500).json({
+        error: 'Failed to generate quotes. Please try again.'
+      });
+    }
+
+    const data = await response.json();
 
     let quotes;
     try {
-      const content = response.data.choices[0].message.content;
+      const content = data.choices[0].message.content;
       // Remove markdown code blocks if present
       const jsonContent = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
       quotes = JSON.parse(jsonContent);
     } catch (parseError) {
       console.error('Error parsing AI response:', parseError);
-      console.error('Raw response:', response.data.choices[0].message.content);
+      console.error('Raw response:', data.choices[0]?.message?.content);
       return res.status(500).json({
         error: 'Failed to parse AI response. Please try again.'
       });
@@ -3551,18 +3572,6 @@ Make sure the response is valid JSON that can be parsed directly.`;
 
   } catch (error) {
     console.error('Error generating AI quotes:', error);
-
-    if (error.response?.status === 401) {
-      return res.status(500).json({
-        error: 'Invalid OpenAI API key. Please check your configuration.'
-      });
-    }
-
-    if (error.response?.status === 429) {
-      return res.status(429).json({
-        error: 'Rate limit exceeded. Please try again in a moment.'
-      });
-    }
 
     res.status(500).json({
       error: 'Failed to generate quotes. Please try again.',
