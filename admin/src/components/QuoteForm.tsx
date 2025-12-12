@@ -99,8 +99,6 @@ export default function QuoteForm({ quote, isOpen, onClose, onSave }: QuoteFormP
         text_hi: formData.text_hi.trim() || '',
         author: formData.author.trim() || '',
         category: formData.category.trim() || '',
-        source: formData.source.trim() || '',
-        context: formData.context.trim() || '',
         tags: tagsArray.length > 0 ? tagsArray : null,
       }
 
