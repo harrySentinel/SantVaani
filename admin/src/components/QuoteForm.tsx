@@ -90,16 +90,11 @@ export default function QuoteForm({ quote, isOpen, onClose, onSave }: QuoteFormP
     setLoading(true)
     
     try {
-      // Process tags from comma-separated string
-      const tagsArray = formData.tags ? 
-        formData.tags.split(',').map(t => t.trim()).filter(t => t) : []
-
       const dataToSave = {
         text: formData.text.trim(),
         text_hi: formData.text_hi.trim() || '',
         author: formData.author.trim() || '',
-        category: formData.category.trim() || '',
-        tags: tagsArray.length > 0 ? tagsArray : null,
+        category: formData.category.trim() || ''
       }
 
       console.log('💾 Saving quote data:', dataToSave)

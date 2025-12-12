@@ -88,8 +88,7 @@ export default function AIQuoteGenerator({ onQuotesPublished }: AIQuoteGenerator
           text: quote.text,
           text_hi: quote.text_hi,
           author: quote.author,
-          category: quote.category,
-          tags: [selectedCategory, 'AI Generated']
+          category: quote.category
         })
 
       if (error) throw error
