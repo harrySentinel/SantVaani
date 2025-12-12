@@ -92,6 +92,7 @@ const corsOptions = {
       'https://santvaani.vercel.app',
       'https://santvaani.com',
       'https://www.santvaani.com',
+      'https://santvaani-admin-panel.vercel.app',
       process.env.FRONTEND_URL
     ].filter(Boolean);
 
