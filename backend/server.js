@@ -3440,6 +3440,137 @@ app.post('/api/user/profile/:userId/welcome-letter', async (req, res) => {
   }
 });
 
+// ==========================================
+// AI QUOTE GENERATION ENDPOINT
+// ==========================================
+
+app.post('/api/quotes/generate-ai', async (req, res) => {
+  try {
+    const { count = 5, category = 'Wisdom', theme } = req.body;
+
+    // Validate inputs
+    if (count < 1 || count > 10) {
+      return res.status(400).json({ error: 'Count must be between 1 and 10' });
+    }
+
+    const openaiApiKey = process.env.OPENAI_API_KEY;
+    if (!openaiApiKey) {
+      return res.status(500).json({
+        error: 'OpenAI API key not configured. Please add OPENAI_API_KEY to your environment variables.'
+      });
+    }
+
+    // Construct prompt
+    const themeText = theme ? ` about ${theme}` : '';
+    const prompt = `Generate ${count} spiritual quotes in the ${category} category${themeText}. Each quote should be:
+1. Profound and meaningful
+2. Suitable for spiritual/religious context
+3. Timeless wisdom
+4. Suitable for daily inspiration
+
+For each quote, provide:
+- English text (concise, meaningful)
+- Hindi translation (accurate and poetic)
+- Author attribution (can be "Ancient Wisdom", "Spiritual Teaching", or specific saint names like "Kabir", "Rumi", "Buddha", etc.)
+
+Return ONLY a valid JSON array with this exact structure:
+[
+  {
+    "text": "English quote here",
+    "text_hi": "Hindi translation here",
+    "author": "Author name",
+    "category": "${category}"
+  }
+]
+
+Make sure the response is valid JSON that can be parsed directly.`;
+
+    // Call OpenAI API
+    const response = await axios.post(
+      'https://api.openai.com/v1/chat/completions',
+      {
+        model: 'gpt-4o-mini', // Using the cheaper model for cost-effectiveness
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a spiritual wisdom generator that creates profound quotes in both English and Hindi. Always respond with valid JSON only, no markdown or extra text.'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.9,
+        max_tokens: 2000
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${openaiApiKey}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    let quotes;
+    try {
+      const content = response.data.choices[0].message.content;
+      // Remove markdown code blocks if present
+      const jsonContent = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      quotes = JSON.parse(jsonContent);
+    } catch (parseError) {
+      console.error('Error parsing AI response:', parseError);
+      console.error('Raw response:', response.data.choices[0].message.content);
+      return res.status(500).json({
+        error: 'Failed to parse AI response. Please try again.'
+      });
+    }
+
+    // Validate quotes array
+    if (!Array.isArray(quotes) || quotes.length === 0) {
+      return res.status(500).json({
+        error: 'AI did not return valid quotes. Please try again.'
+      });
+    }
+
+    // Ensure all quotes have required fields
+    const validQuotes = quotes.filter(q =>
+      q.text && q.text_hi && q.author && q.category
+    );
+
+    if (validQuotes.length === 0) {
+      return res.status(500).json({
+        error: 'No valid quotes generated. Please try again.'
+      });
+    }
+
+    res.json({
+      success: true,
+      quotes: validQuotes,
+      count: validQuotes.length
+    });
+
+  } catch (error) {
+    console.error('Error generating AI quotes:', error);
+
+    if (error.response?.status === 401) {
+      return res.status(500).json({
+        error: 'Invalid OpenAI API key. Please check your configuration.'
+      });
+    }
+
+    if (error.response?.status === 429) {
+      return res.status(429).json({
+        error: 'Rate limit exceeded. Please try again in a moment.'
+      });
+    }
+
+    res.status(500).json({
+      error: 'Failed to generate quotes. Please try again.',
+      details: error.message
+    });
+  }
+});
+
 
 // Initialize on startup
 initializeServer();

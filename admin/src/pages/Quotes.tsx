@@ -6,6 +6,7 @@ import { supabase, TABLES } from '@/lib/supabase'
 import { formatDate } from '@/lib/utils'
 import QuoteForm from '@/components/QuoteForm'
 import QuoteViewModal from '@/components/QuoteViewModal'
+import AIQuoteGenerator from '@/components/AIQuoteGenerator'
 
 // Quote interface matching your database schema
 interface QuoteItem {
@@ -160,6 +161,7 @@ export default function QuotesPage() {
           <p className="text-gray-600 mt-1">Manage spiritual wisdom and divine sayings</p>
         </div>
         <div className="flex space-x-3">
+          <AIQuoteGenerator onQuotesPublished={fetchQuotes} />
           <Button
             onClick={() => setIsAddModalOpen(true)}
             className="bg-orange-600 hover:bg-orange-700 w-full sm:w-auto"
