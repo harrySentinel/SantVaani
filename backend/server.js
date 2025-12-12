@@ -3308,139 +3308,6 @@ app.delete('/api/organizations/:id', async (req, res) => {
 
 console.log('✅ Organization submission routes registered successfully');
 
-// 404 handler (MUST be last)
-app.use((req, res) => {
-  res.status(404).json({
-    error: 'Not Found',
-    message: 'The requested endpoint does not exist'
-  });
-});
-
-// Global error handler
-app.use((error, req, res, next) => {
-  console.error('Global error handler:', error);
-  res.status(500).json({
-    error: 'Internal Server Error',
-    message: 'Something went wrong on our end'
-  });
-});
-
-// Initialize cache on startup and validate channels in development
-async function initializeServer() {
-  try {
-    // Load initial bhajan data
-    await fetchBhajanData();
-    console.log('🎵 Initial bhajan data loaded successfully');
-    
-    // Validate channels in development mode
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('🔧 Development mode detected - validating channels...');
-      await validateChannelIds();
-    }
-  } catch (error) {
-    console.error('❌ Failed to initialize server:', error);
-  }
-}
-
-// User Profile API endpoints
-app.get('/api/user/profile/:userId', async (req, res) => {
-  try {
-    const { userId } = req.params;
-
-    // Query user profile from database
-    const { data: profile, error } = await supabase
-      .from('user_profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
-
-    if (error && error.code !== 'PGRST116') { // PGRST116 is "not found"
-      console.error('Error fetching user profile:', error);
-      return res.status(500).json({
-        success: false,
-        error: 'Failed to fetch user profile'
-      });
-    }
-
-    // If no profile exists, create one (first login)
-    if (!profile) {
-      const { data: newProfile, error: createError } = await supabase
-        .from('user_profiles')
-        .insert({
-          id: userId,
-          first_login_at: new Date().toISOString(),
-          welcome_letter_downloaded: false
-        })
-        .select()
-        .single();
-
-      if (createError) {
-        console.error('Error creating user profile:', createError);
-        return res.status(500).json({
-          success: false,
-          error: 'Failed to create user profile'
-        });
-      }
-
-      return res.json({
-        success: true,
-        profile: newProfile,
-        isFirstLogin: true
-      });
-    }
-
-    res.json({
-      success: true,
-      profile,
-      isFirstLogin: false
-    });
-  } catch (error) {
-    console.error('Error in user profile endpoint:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Internal server error'
-    });
-  }
-});
-
-app.post('/api/user/profile/:userId/welcome-letter', async (req, res) => {
-  try {
-    const { userId } = req.params;
-
-    // Update welcome letter status
-    const { data, error } = await supabase
-      .from('user_profiles')
-      .update({
-        welcome_letter_downloaded: true,
-        welcome_letter_generated_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', userId)
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error updating welcome letter status:', error);
-      return res.status(500).json({
-        success: false,
-        error: 'Failed to update welcome letter status'
-      });
-    }
-
-    res.json({
-      success: true,
-      message: 'Welcome letter status updated successfully',
-      profile: data
-    });
-  } catch (error) {
-    console.error('Error in welcome letter update endpoint:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Internal server error'
-    });
-  }
-});
-
 // ==========================================
 // AI QUOTE GENERATION ENDPOINT
 // ==========================================
@@ -3581,6 +3448,140 @@ Make sure the response is valid JSON that can be parsed directly.`;
   }
 });
 
+console.log('✅ AI Quote Generation endpoint registered');
+
+// 404 handler (MUST be last)
+app.use((req, res) => {
+  res.status(404).json({
+    error: 'Not Found',
+    message: 'The requested endpoint does not exist'
+  });
+});
+
+// Global error handler
+app.use((error, req, res, next) => {
+  console.error('Global error handler:', error);
+  res.status(500).json({
+    error: 'Internal Server Error',
+    message: 'Something went wrong on our end'
+  });
+});
+
+// Initialize cache on startup and validate channels in development
+async function initializeServer() {
+  try {
+    // Load initial bhajan data
+    await fetchBhajanData();
+    console.log('🎵 Initial bhajan data loaded successfully');
+    
+    // Validate channels in development mode
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('🔧 Development mode detected - validating channels...');
+      await validateChannelIds();
+    }
+  } catch (error) {
+    console.error('❌ Failed to initialize server:', error);
+  }
+}
+
+// User Profile API endpoints
+app.get('/api/user/profile/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Query user profile from database
+    const { data: profile, error } = await supabase
+      .from('user_profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+
+    if (error && error.code !== 'PGRST116') { // PGRST116 is "not found"
+      console.error('Error fetching user profile:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to fetch user profile'
+      });
+    }
+
+    // If no profile exists, create one (first login)
+    if (!profile) {
+      const { data: newProfile, error: createError } = await supabase
+        .from('user_profiles')
+        .insert({
+          id: userId,
+          first_login_at: new Date().toISOString(),
+          welcome_letter_downloaded: false
+        })
+        .select()
+        .single();
+
+      if (createError) {
+        console.error('Error creating user profile:', createError);
+        return res.status(500).json({
+          success: false,
+          error: 'Failed to create user profile'
+        });
+      }
+
+      return res.json({
+        success: true,
+        profile: newProfile,
+        isFirstLogin: true
+      });
+    }
+
+    res.json({
+      success: true,
+      profile,
+      isFirstLogin: false
+    });
+  } catch (error) {
+    console.error('Error in user profile endpoint:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+});
+
+app.post('/api/user/profile/:userId/welcome-letter', async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Update welcome letter status
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .update({
+        welcome_letter_downloaded: true,
+        welcome_letter_generated_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', userId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating welcome letter status:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to update welcome letter status'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Welcome letter status updated successfully',
+      profile: data
+    });
+  } catch (error) {
+    console.error('Error in welcome letter update endpoint:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error'
+    });
+  }
+});
 
 // Initialize on startup
 initializeServer();
