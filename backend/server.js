@@ -3330,28 +3330,48 @@ app.post('/api/quotes/generate-ai', async (req, res) => {
 
     // Construct prompt
     const themeText = theme ? ` about ${theme}` : '';
-    const prompt = `Generate ${count} spiritual quotes in the ${category} category${themeText}. Each quote should be:
-1. Profound and meaningful
-2. Suitable for spiritual/religious context
-3. Timeless wisdom
-4. Suitable for daily inspiration
+    const prompt = `Generate ${count} spiritual quotes in the ${category} category${themeText}.
 
-For each quote, provide:
-- English text (concise, meaningful)
-- Hindi translation (accurate and poetic)
-- Author attribution (can be "Ancient Wisdom", "Spiritual Teaching", or specific saint names like "Kabir", "Rumi", "Buddha", etc.)
+IMPORTANT INSTRUCTIONS:
+
+For ENGLISH quotes:
+- Keep them concise (1-2 sentences max)
+- Make them profound and meaningful
+- Use simple, powerful language
+- Suitable for spiritual/religious context
+
+For HINDI quotes:
+- DO NOT just translate the English word-by-word
+- Create a NATURAL, POETIC Hindi quote that conveys the same spiritual meaning
+- Use beautiful Hindi/Urdu spiritual vocabulary (like: आत्मा, ज्ञान, शांति, प्रेम, भक्ति, धर्म, कर्म, मोक्ष, साधना)
+- Make it flow naturally like Hindi poetry or dohas
+- Use phrases that sound authentic in Hindi spiritual context
+- Think like Sant Kabir, Tulsidas, or Rahim - natural Hindi wisdom
+- The Hindi should stand on its own as a beautiful quote, not just a translation
+
+Examples of GOOD Hindi (natural and poetic):
+❌ BAD: "जीवन एक यात्रा है जो हमें सिखाती है" (word-by-word translation)
+✅ GOOD: "जीवन की राह में हर पल एक सीख छुपी है, बस देखने की नज़र चाहिए"
+
+❌ BAD: "खुशी अंदर से आती है बाहर से नहीं"
+✅ GOOD: "सच्ची खुशी तो मन के मंदिर में बसती है, बाहर की दुनिया में नहीं"
+
+For AUTHOR:
+- Use authentic spiritual names: "Kabir", "Rumi", "Buddha", "Swami Vivekananda", "Sant Tulsidas", "Rahim", "Guru Nanak"
+- Or use: "Ancient Wisdom", "Spiritual Teaching", "Vedic Wisdom"
+- Match the author to the style of the quote
 
 Return ONLY a valid JSON array with this exact structure:
 [
   {
-    "text": "English quote here",
-    "text_hi": "Hindi translation here",
+    "text": "Beautiful English quote here",
+    "text_hi": "प्राकृतिक और काव्यात्मक हिंदी उद्धरण यहाँ",
     "author": "Author name",
     "category": "${category}"
   }
 ]
 
-Make sure the response is valid JSON that can be parsed directly.`;
+Make sure the response is valid JSON that can be parsed directly. Focus on making the Hindi natural and poetic!`;
 
     // Call Groq API
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -3365,7 +3385,7 @@ Make sure the response is valid JSON that can be parsed directly.`;
         messages: [
           {
             role: 'system',
-            content: 'You are a spiritual wisdom generator that creates profound quotes in both English and Hindi. Always respond with valid JSON only, no markdown or extra text.'
+            content: 'You are a spiritual wisdom generator inspired by Sant Kabir, Tulsidas, and Rumi. You create profound quotes in both English and natural, poetic Hindi. Your Hindi should flow like traditional dohas and shayari - never literal translations. Use authentic spiritual Hindi vocabulary. Always respond with valid JSON only, no markdown or extra text.'
           },
           {
             role: 'user',
