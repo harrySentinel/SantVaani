@@ -89,7 +89,6 @@ export default function AIQuoteGenerator({ onQuotesPublished }: AIQuoteGenerator
           text_hi: quote.text_hi,
           author: quote.author,
           category: quote.category,
-          source: 'AI Generated',
           tags: [selectedCategory, 'AI Generated']
         })
 
