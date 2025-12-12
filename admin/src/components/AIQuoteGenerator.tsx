@@ -90,7 +90,6 @@ export default function AIQuoteGenerator({ onQuotesPublished }: AIQuoteGenerator
           author: quote.author,
           category: quote.category,
           source: 'AI Generated',
-          context: theme || null,
           tags: [selectedCategory, 'AI Generated']
         })
 
