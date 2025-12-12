@@ -43,6 +43,7 @@ export default function AIQuoteGenerator({ onQuotesPublished }: AIQuoteGenerator
   const [editingIndex, setEditingIndex] = useState<number | null>(null)
   const [editForm, setEditForm] = useState<GeneratedQuote | null>(null)
   const [publishingIds, setPublishingIds] = useState<Set<string>>(new Set())
+  const [selectedQuotes, setSelectedQuotes] = useState<Set<string>>(new Set())
 
   const { toast } = useToast()
 
@@ -117,10 +118,89 @@ export default function AIQuoteGenerator({ onQuotesPublished }: AIQuoteGenerator
 
   const discardQuote = (quoteId: string) => {
     setGeneratedQuotes(prev => prev.filter(q => q.id !== quoteId))
+    setSelectedQuotes(prev => {
+      const next = new Set(prev)
+      next.delete(quoteId)
+      return next
+    })
     toast({
       title: 'Quote Discarded',
       description: 'Quote removed from preview'
     })
+  }
+
+  const publishSelectedQuotes = async () => {
+    if (selectedQuotes.size === 0) {
+      toast({
+        title: 'No quotes selected',
+        description: 'Please select quotes to publish',
+        variant: 'destructive'
+      })
+      return
+    }
+
+    const quotesToPublish = generatedQuotes.filter(q => selectedQuotes.has(q.id!))
+    let successCount = 0
+    let failCount = 0
+
+    for (const quote of quotesToPublish) {
+      try {
+        const { error } = await supabase
+          .from(TABLES.QUOTES)
+          .insert({
+            text: quote.text,
+            text_hi: quote.text_hi,
+            author: quote.author,
+            category: quote.category
+          })
+
+        if (error) throw error
+        successCount++
+      } catch (error) {
+        console.error('Error publishing quote:', error)
+        failCount++
+      }
+    }
+
+    // Remove published quotes from the list
+    setGeneratedQuotes(prev => prev.filter(q => !selectedQuotes.has(q.id!)))
+    setSelectedQuotes(new Set())
+
+    if (successCount > 0) {
+      toast({
+        title: `✅ ${successCount} quote${successCount > 1 ? 's' : ''} published!`,
+        description: 'Quotes added to your collection'
+      })
+      onQuotesPublished()
+    }
+
+    if (failCount > 0) {
+      toast({
+        title: `⚠️ ${failCount} quote${failCount > 1 ? 's' : ''} failed`,
+        description: 'Some quotes could not be published',
+        variant: 'destructive'
+      })
+    }
+  }
+
+  const toggleQuoteSelection = (quoteId: string) => {
+    setSelectedQuotes(prev => {
+      const next = new Set(prev)
+      if (next.has(quoteId)) {
+        next.delete(quoteId)
+      } else {
+        next.add(quoteId)
+      }
+      return next
+    })
+  }
+
+  const toggleSelectAll = () => {
+    if (selectedQuotes.size === generatedQuotes.length) {
+      setSelectedQuotes(new Set())
+    } else {
+      setSelectedQuotes(new Set(generatedQuotes.map(q => q.id!)))
+    }
   }
 
   const startEditing = (index: number) => {
@@ -261,16 +341,42 @@ export default function AIQuoteGenerator({ onQuotesPublished }: AIQuoteGenerator
               {generatedQuotes.length > 0 && (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      Generated Quotes ({generatedQuotes.length})
-                    </h3>
-                    <Button
-                      variant="outline"
-                      onClick={() => setGeneratedQuotes([])}
-                      size="sm"
-                    >
-                      Generate New
-                    </Button>
+                    <div className="flex items-center space-x-4">
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        Generated Quotes ({generatedQuotes.length})
+                      </h3>
+                      <label className="flex items-center space-x-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={selectedQuotes.size === generatedQuotes.length && generatedQuotes.length > 0}
+                          onChange={toggleSelectAll}
+                          className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                        />
+                        <span className="text-sm text-gray-600">Select All</span>
+                      </label>
+                    </div>
+                    <div className="flex space-x-2">
+                      {selectedQuotes.size > 0 && (
+                        <Button
+                          onClick={publishSelectedQuotes}
+                          className="bg-green-600 hover:bg-green-700"
+                          size="sm"
+                        >
+                          <Check className="h-4 w-4 mr-1" />
+                          Publish Selected ({selectedQuotes.size})
+                        </Button>
+                      )}
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setGeneratedQuotes([])
+                          setSelectedQuotes(new Set())
+                        }}
+                        size="sm"
+                      >
+                        Generate New
+                      </Button>
+                    </div>
                   </div>
 
                   {generatedQuotes.map((quote, index) => (
@@ -343,7 +449,13 @@ export default function AIQuoteGenerator({ onQuotesPublished }: AIQuoteGenerator
                           // View Mode
                           <div>
                             <div className="flex items-start justify-between mb-3">
-                              <div className="flex items-center space-x-2">
+                              <div className="flex items-center space-x-3">
+                                <input
+                                  type="checkbox"
+                                  checked={selectedQuotes.has(quote.id!)}
+                                  onChange={() => toggleQuoteSelection(quote.id!)}
+                                  className="rounded border-gray-300 text-purple-600 focus:ring-purple-500 w-4 h-4 cursor-pointer"
+                                />
                                 <QuoteIcon className="h-5 w-5 text-purple-600" />
                                 <span className="text-xs font-medium px-2 py-1 bg-purple-100 text-purple-700 rounded">
                                   {quote.category}
