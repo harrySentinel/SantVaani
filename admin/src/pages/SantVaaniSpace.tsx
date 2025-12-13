@@ -138,8 +138,7 @@ export default function SantVaaniSpacePage() {
     post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     post.title_hi?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     post.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    post.content_hi?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    post.category.toLowerCase().includes(searchQuery.toLowerCase())
+    post.content_hi?.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
   const handleEditPost = (post: SpiritualPost) => {
@@ -210,7 +209,7 @@ export default function SantVaaniSpacePage() {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 z-10" />
           <input
             type="text"
-            placeholder="Search by title, content, category..."
+            placeholder="Search by title or content..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
@@ -226,9 +225,6 @@ export default function SantVaaniSpacePage() {
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3">
                   Post
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Category
                 </th>
                 <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                   <Heart className="h-4 w-4 inline-block" />
@@ -280,11 +276,6 @@ export default function SantVaaniSpacePage() {
                           </div>
                         </div>
                       </div>
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                        {post.category}
-                      </span>
                     </td>
                     <td className="px-4 py-4 text-center whitespace-nowrap">
                       <span className="text-pink-600 font-medium">{post.likes_count}</span>
