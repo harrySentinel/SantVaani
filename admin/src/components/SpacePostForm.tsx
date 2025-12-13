@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { X, Upload, Image as ImageIcon } from 'lucide-react'
+import { X, Upload, Image as ImageIcon, Loader2 } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { supabase } from '@/lib/supabase'
 
@@ -51,6 +51,7 @@ export default function SpacePostForm({ post, onClose, onSuccess }: SpacePostFor
   })
 
   const [loading, setLoading] = useState(false)
+  const [uploading, setUploading] = useState(false)
   const { toast } = useToast()
 
   // Update form data when post prop changes
@@ -158,6 +159,75 @@ export default function SpacePostForm({ post, onClose, onSuccess }: SpacePostFor
     setFormData(prev => ({ ...prev, [field]: value }))
   }
 
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      const file = event.target.files?.[0]
+      if (!file) return
+
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Invalid file",
+          description: "Please upload an image file (JPG, PNG, WebP)",
+          variant: "destructive"
+        })
+        return
+      }
+
+      // Validate file size (max 2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        toast({
+          title: "File too large",
+          description: "Please upload an image smaller than 2MB",
+          variant: "destructive"
+        })
+        return
+      }
+
+      setUploading(true)
+
+      // Create unique filename
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`
+      const filePath = `${fileName}`
+
+      // Upload to Supabase Storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('spiritual-posts')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        })
+
+      if (uploadError) {
+        console.error('Upload error:', uploadError)
+        throw uploadError
+      }
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('spiritual-posts')
+        .getPublicUrl(filePath)
+
+      // Update form with image URL
+      setFormData(prev => ({ ...prev, image_url: publicUrl }))
+
+      toast({
+        title: "Success",
+        description: "Image uploaded successfully"
+      })
+    } catch (error) {
+      console.error('Error uploading image:', error)
+      toast({
+        title: "Upload failed",
+        description: "Failed to upload image. Please try again.",
+        variant: "destructive"
+      })
+    } finally {
+      setUploading(false)
+    }
+  }
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
       <div className="bg-white rounded-lg max-w-3xl w-full my-8">
@@ -242,31 +312,76 @@ export default function SpacePostForm({ post, onClose, onSuccess }: SpacePostFor
             />
           </div>
 
-          {/* Image URL */}
+          {/* Image Upload */}
           <div>
-            <Label htmlFor="image_url" className="text-sm font-medium text-gray-700">
-              Image URL
+            <Label className="text-sm font-medium text-gray-700 mb-2 block">
+              Post Image
             </Label>
+
+            {/* Upload Button */}
             <div className="mt-1">
-              <Input
-                id="image_url"
-                value={formData.image_url}
-                onChange={(e) => handleChange('image_url', e.target.value)}
-                placeholder="https://example.com/image.jpg"
-                type="url"
+              <label
+                htmlFor="image-upload"
+                className={`flex items-center justify-center px-4 py-3 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
+                  uploading
+                    ? 'border-orange-300 bg-orange-50'
+                    : 'border-gray-300 hover:border-orange-500 hover:bg-orange-50'
+                }`}
+              >
+                {uploading ? (
+                  <>
+                    <Loader2 className="h-5 w-5 text-orange-600 animate-spin mr-2" />
+                    <span className="text-sm text-orange-600">Uploading...</span>
+                  </>
+                ) : (
+                  <>
+                    <Upload className="h-5 w-5 text-gray-400 mr-2" />
+                    <span className="text-sm text-gray-600">
+                      Click to upload image or drag & drop
+                    </span>
+                  </>
+                )}
+              </label>
+              <input
+                id="image-upload"
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                disabled={uploading}
+                className="hidden"
               />
               <p className="text-xs text-gray-500 mt-1">
                 Recommended: 1200x630px, Max 2MB (JPG, PNG, WebP)
               </p>
             </div>
 
+            {/* OR divider */}
+            <div className="flex items-center my-3">
+              <div className="flex-1 border-t border-gray-200"></div>
+              <span className="px-3 text-xs text-gray-500">OR</span>
+              <div className="flex-1 border-t border-gray-200"></div>
+            </div>
+
+            {/* Manual URL Input */}
+            <div>
+              <Input
+                id="image_url"
+                value={formData.image_url}
+                onChange={(e) => handleChange('image_url', e.target.value)}
+                placeholder="Paste image URL here"
+                type="url"
+                disabled={uploading}
+              />
+            </div>
+
             {/* Image Preview */}
             {formData.image_url && (
               <div className="mt-3">
+                <p className="text-xs text-gray-600 mb-2">Preview:</p>
                 <img
                   src={formData.image_url}
                   alt="Preview"
-                  className="rounded-lg max-h-48 object-cover"
+                  className="rounded-lg max-h-48 object-cover w-full"
                   onError={(e) => {
                     e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="100"%3E%3Crect fill="%23ddd" width="200" height="100"/%3E%3Ctext fill="%23999" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EInvalid Image%3C/text%3E%3C/svg%3E'
                   }}
