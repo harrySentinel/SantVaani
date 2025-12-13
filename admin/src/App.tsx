@@ -16,6 +16,7 @@ import NoticesPage from '@/pages/Notices'
 import BlogsPage from '@/pages/Blogs'
 import LeelaayanBooksPage from '@/pages/LeelaayanBooks'
 import OrganizationsPage from '@/pages/Organizations'
+import SantVaaniSpacePage from '@/pages/SantVaaniSpace'
 
 // All content management pages are now complete
 
@@ -67,6 +68,9 @@ function App() {
 
               {/* Organizations (Donation) Management */}
               <Route path="organizations" element={<OrganizationsPage />} />
+
+              {/* SantVaani Space Management */}
+              <Route path="santvaani-space" element={<SantVaaniSpacePage />} />
 
               {/* 404 fallback */}
               <Route path="*" element={<Navigate to="/dashboard" replace />} />

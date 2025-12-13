@@ -3603,6 +3603,516 @@ app.post('/api/user/profile/:userId/welcome-letter', async (req, res) => {
   }
 });
 
+// =====================================================
+// SANTVAANI SPACE API ROUTES
+// =====================================================
+
+// ============ POSTS ENDPOINTS ============
+
+// Get all published posts (with pagination)
+app.get('/api/santvaani-space/posts', async (req, res) => {
+  try {
+    const { page = 1, limit = 10, category } = req.query;
+    const offset = (page - 1) * limit;
+
+    let query = supabase
+      .from('spiritual_posts')
+      .select('*', { count: 'exact' })
+      .eq('is_published', true)
+      .order('created_at', { ascending: false })
+      .range(offset, offset + parseInt(limit) - 1);
+
+    if (category && category !== 'All') {
+      query = query.eq('category', category);
+    }
+
+    const { data, error, count } = await query;
+
+    if (error) {
+      console.error('Error fetching posts:', error);
+      return res.status(500).json({ error: 'Failed to fetch posts' });
+    }
+
+    res.json({
+      posts: data,
+      total: count,
+      page: parseInt(page),
+      totalPages: Math.ceil(count / limit)
+    });
+  } catch (error) {
+    console.error('Error in get posts endpoint:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Get single post by ID
+app.get('/api/santvaani-space/posts/:postId', async (req, res) => {
+  try {
+    const { postId } = req.params;
+
+    const { data, error } = await supabase
+      .from('spiritual_posts')
+      .select('*')
+      .eq('id', postId)
+      .single();
+
+    if (error) {
+      console.error('Error fetching post:', error);
+      return res.status(404).json({ error: 'Post not found' });
+    }
+
+    res.json(data);
+  } catch (error) {
+    console.error('Error in get post endpoint:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Get all posts (Admin - includes unpublished)
+app.get('/api/santvaani-space/admin/posts', async (req, res) => {
+  try {
+    const { page = 1, limit = 20, search } = req.query;
+    const offset = (page - 1) * limit;
+
+    let query = supabase
+      .from('spiritual_posts')
+      .select('*', { count: 'exact' })
+      .order('created_at', { ascending: false });
+
+    if (search) {
+      query = query.or(`title.ilike.%${search}%,content.ilike.%${search}%`);
+    }
+
+    const { data, error, count } = await query.range(offset, offset + parseInt(limit) - 1);
+
+    if (error) {
+      console.error('Error fetching admin posts:', error);
+      return res.status(500).json({ error: 'Failed to fetch posts' });
+    }
+
+    res.json({
+      posts: data,
+      total: count,
+      page: parseInt(page),
+      totalPages: Math.ceil(count / limit)
+    });
+  } catch (error) {
+    console.error('Error in admin get posts endpoint:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Create new post (Admin only)
+app.post('/api/santvaani-space/posts', async (req, res) => {
+  try {
+    const { title, title_hi, content, content_hi, image_url, category, is_published = true } = req.body;
+
+    // Validate required fields
+    if (!title || !content) {
+      return res.status(400).json({ error: 'Title and content are required' });
+    }
+
+    const { data, error } = await supabase
+      .from('spiritual_posts')
+      .insert([{
+        title,
+        title_hi,
+        content,
+        content_hi,
+        image_url,
+        category: category || 'General',
+        is_published
+      }])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating post:', error);
+      return res.status(500).json({ error: 'Failed to create post' });
+    }
+
+    res.status(201).json(data);
+  } catch (error) {
+    console.error('Error in create post endpoint:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Update post (Admin only)
+app.put('/api/santvaani-space/posts/:postId', async (req, res) => {
+  try {
+    const { postId } = req.params;
+    const { title, title_hi, content, content_hi, image_url, category, is_published } = req.body;
+
+    const updateData = {};
+    if (title !== undefined) updateData.title = title;
+    if (title_hi !== undefined) updateData.title_hi = title_hi;
+    if (content !== undefined) updateData.content = content;
+    if (content_hi !== undefined) updateData.content_hi = content_hi;
+    if (image_url !== undefined) updateData.image_url = image_url;
+    if (category !== undefined) updateData.category = category;
+    if (is_published !== undefined) updateData.is_published = is_published;
+
+    const { data, error } = await supabase
+      .from('spiritual_posts')
+      .update(updateData)
+      .eq('id', postId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating post:', error);
+      return res.status(500).json({ error: 'Failed to update post' });
+    }
+
+    res.json(data);
+  } catch (error) {
+    console.error('Error in update post endpoint:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Delete post (Admin only)
+app.delete('/api/santvaani-space/posts/:postId', async (req, res) => {
+  try {
+    const { postId } = req.params;
+
+    const { error } = await supabase
+      .from('spiritual_posts')
+      .delete()
+      .eq('id', postId);
+
+    if (error) {
+      console.error('Error deleting post:', error);
+      return res.status(500).json({ error: 'Failed to delete post' });
+    }
+
+    res.json({ success: true, message: 'Post deleted successfully' });
+  } catch (error) {
+    console.error('Error in delete post endpoint:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Get post stats
+app.get('/api/santvaani-space/posts/:postId/stats', async (req, res) => {
+  try {
+    const { postId } = req.params;
+
+    const { data, error } = await supabase
+      .from('spiritual_posts')
+      .select('likes_count, comments_count')
+      .eq('id', postId)
+      .single();
+
+    if (error) {
+      console.error('Error fetching post stats:', error);
+      return res.status(404).json({ error: 'Post not found' });
+    }
+
+    res.json(data);
+  } catch (error) {
+    console.error('Error in get post stats endpoint:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Get overall analytics (Admin)
+app.get('/api/santvaani-space/analytics', async (req, res) => {
+  try {
+    // Get total posts count
+    const { count: totalPosts } = await supabase
+      .from('spiritual_posts')
+      .select('*', { count: 'exact', head: true });
+
+    // Get total published posts
+    const { count: publishedPosts } = await supabase
+      .from('spiritual_posts')
+      .select('*', { count: 'exact', head: true })
+      .eq('is_published', true);
+
+    // Get total likes
+    const { count: totalLikes } = await supabase
+      .from('post_likes')
+      .select('*', { count: 'exact', head: true });
+
+    // Get total comments
+    const { count: totalComments } = await supabase
+      .from('post_comments')
+      .select('*', { count: 'exact', head: true });
+
+    // Get posts by category
+    const { data: postsByCategory } = await supabase
+      .from('spiritual_posts')
+      .select('category')
+      .eq('is_published', true);
+
+    const categoryCounts = postsByCategory?.reduce((acc, post) => {
+      acc[post.category] = (acc[post.category] || 0) + 1;
+      return acc;
+    }, {});
+
+    res.json({
+      totalPosts: totalPosts || 0,
+      publishedPosts: publishedPosts || 0,
+      totalLikes: totalLikes || 0,
+      totalComments: totalComments || 0,
+      postsByCategory: categoryCounts || {}
+    });
+  } catch (error) {
+    console.error('Error in analytics endpoint:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ============ LIKES ENDPOINTS ============
+
+// Like a post
+app.post('/api/santvaani-space/posts/:postId/like', async (req, res) => {
+  try {
+    const { postId } = req.params;
+    const { userId } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({ error: 'User ID is required' });
+    }
+
+    // Check if already liked
+    const { data: existingLike } = await supabase
+      .from('post_likes')
+      .select('id')
+      .eq('post_id', postId)
+      .eq('user_id', userId)
+      .single();
+
+    if (existingLike) {
+      return res.status(400).json({ error: 'Post already liked' });
+    }
+
+    // Add like
+    const { data, error } = await supabase
+      .from('post_likes')
+      .insert([{ post_id: postId, user_id: userId }])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error adding like:', error);
+      return res.status(500).json({ error: 'Failed to like post' });
+    }
+
+    res.status(201).json({ success: true, like: data });
+  } catch (error) {
+    console.error('Error in like post endpoint:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Unlike a post
+app.delete('/api/santvaani-space/posts/:postId/like', async (req, res) => {
+  try {
+    const { postId } = req.params;
+    const { userId } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({ error: 'User ID is required' });
+    }
+
+    const { error } = await supabase
+      .from('post_likes')
+      .delete()
+      .eq('post_id', postId)
+      .eq('user_id', userId);
+
+    if (error) {
+      console.error('Error removing like:', error);
+      return res.status(500).json({ error: 'Failed to unlike post' });
+    }
+
+    res.json({ success: true, message: 'Post unliked successfully' });
+  } catch (error) {
+    console.error('Error in unlike post endpoint:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Check if user liked a post
+app.get('/api/santvaani-space/posts/:postId/liked', async (req, res) => {
+  try {
+    const { postId } = req.params;
+    const { userId } = req.query;
+
+    if (!userId) {
+      return res.json({ liked: false });
+    }
+
+    const { data, error } = await supabase
+      .from('post_likes')
+      .select('id')
+      .eq('post_id', postId)
+      .eq('user_id', userId)
+      .single();
+
+    if (error && error.code !== 'PGRST116') {
+      console.error('Error checking like status:', error);
+      return res.status(500).json({ error: 'Failed to check like status' });
+    }
+
+    res.json({ liked: !!data });
+  } catch (error) {
+    console.error('Error in check liked endpoint:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ============ COMMENTS ENDPOINTS ============
+
+// Get comments for a post
+app.get('/api/santvaani-space/posts/:postId/comments', async (req, res) => {
+  try {
+    const { postId } = req.params;
+    const { page = 1, limit = 20 } = req.query;
+    const offset = (page - 1) * limit;
+
+    const { data, error, count } = await supabase
+      .from('post_comments')
+      .select('*', { count: 'exact' })
+      .eq('post_id', postId)
+      .order('created_at', { ascending: false })
+      .range(offset, offset + parseInt(limit) - 1);
+
+    if (error) {
+      console.error('Error fetching comments:', error);
+      return res.status(500).json({ error: 'Failed to fetch comments' });
+    }
+
+    res.json({
+      comments: data,
+      total: count,
+      page: parseInt(page),
+      totalPages: Math.ceil(count / limit)
+    });
+  } catch (error) {
+    console.error('Error in get comments endpoint:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Add comment
+app.post('/api/santvaani-space/posts/:postId/comments', async (req, res) => {
+  try {
+    const { postId } = req.params;
+    const { userId, userName, comment } = req.body;
+
+    if (!userId || !userName || !comment) {
+      return res.status(400).json({ error: 'User ID, user name, and comment are required' });
+    }
+
+    if (comment.trim().length === 0) {
+      return res.status(400).json({ error: 'Comment cannot be empty' });
+    }
+
+    const { data, error } = await supabase
+      .from('post_comments')
+      .insert([{
+        post_id: postId,
+        user_id: userId,
+        user_name: userName,
+        comment: comment.trim()
+      }])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error adding comment:', error);
+      return res.status(500).json({ error: 'Failed to add comment' });
+    }
+
+    res.status(201).json(data);
+  } catch (error) {
+    console.error('Error in add comment endpoint:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Update comment
+app.put('/api/santvaani-space/posts/:postId/comments/:commentId', async (req, res) => {
+  try {
+    const { commentId } = req.params;
+    const { comment, userId } = req.body;
+
+    if (!comment || !userId) {
+      return res.status(400).json({ error: 'Comment and user ID are required' });
+    }
+
+    // Verify ownership
+    const { data: existingComment } = await supabase
+      .from('post_comments')
+      .select('user_id')
+      .eq('id', commentId)
+      .single();
+
+    if (!existingComment || existingComment.user_id !== userId) {
+      return res.status(403).json({ error: 'Unauthorized to update this comment' });
+    }
+
+    const { data, error } = await supabase
+      .from('post_comments')
+      .update({ comment: comment.trim() })
+      .eq('id', commentId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating comment:', error);
+      return res.status(500).json({ error: 'Failed to update comment' });
+    }
+
+    res.json(data);
+  } catch (error) {
+    console.error('Error in update comment endpoint:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Delete comment
+app.delete('/api/santvaani-space/posts/:postId/comments/:commentId', async (req, res) => {
+  try {
+    const { commentId } = req.params;
+    const { userId } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({ error: 'User ID is required' });
+    }
+
+    // Verify ownership
+    const { data: existingComment } = await supabase
+      .from('post_comments')
+      .select('user_id')
+      .eq('id', commentId)
+      .single();
+
+    if (!existingComment || existingComment.user_id !== userId) {
+      return res.status(403).json({ error: 'Unauthorized to delete this comment' });
+    }
+
+    const { error } = await supabase
+      .from('post_comments')
+      .delete()
+      .eq('id', commentId);
+
+    if (error) {
+      console.error('Error deleting comment:', error);
+      return res.status(500).json({ error: 'Failed to delete comment' });
+    }
+
+    res.json({ success: true, message: 'Comment deleted successfully' });
+  } catch (error) {
+    console.error('Error in delete comment endpoint:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Initialize on startup
 initializeServer();
 
