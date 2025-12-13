@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, Users, Heart, Sparkles, Book, Info, IndianRupee, Calendar, Star, ChevronDown, CalendarDays, LogIn, UserPlus, User, LogOut, BookOpen, BookMarked, Quote } from 'lucide-react';
+import { Menu, X, Users, Heart, Sparkles, Book, Info, IndianRupee, Calendar, Star, ChevronDown, CalendarDays, LogIn, UserPlus, User, LogOut, BookOpen, BookMarked, Quote, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -42,6 +42,7 @@ export default function Navbar() {
     { to: '/horoscope', label: 'Horoscope', labelHi: 'राशिफल', icon: Star },
     { to: '/events', label: 'Events', labelHi: 'कार्यक्रम', icon: CalendarDays },
     { to: '/saints', label: 'Saints', labelHi: 'संत', icon: Users },
+    { to: '/santvaani-space', label: 'Space', labelHi: 'स्पेस', icon: Share2 },
     { to: '/blog', label: 'Blog', labelHi: 'ब्लॉग', icon: BookOpen },
     { to: '/prabhu-ki-leelaayen', label: 'Divine Stories', labelHi: 'दिव्य कथाएं', icon: BookMarked },
   ];

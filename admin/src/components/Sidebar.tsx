@@ -13,7 +13,8 @@ import {
   X,
   FileText,
   BookMarked,
-  Building2
+  Building2,
+  Share2
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -63,6 +64,13 @@ const navigation = [
     icon: Quote,
     description: 'Spiritual wisdom and sayings',
     count: 45
+  },
+  {
+    name: 'SantVaani Space',
+    href: '/santvaani-space',
+    icon: Share2,
+    description: 'Social spiritual feed & community',
+    count: 0
   },
   {
     name: 'Spiritual Facts',
