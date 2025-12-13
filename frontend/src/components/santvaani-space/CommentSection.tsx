@@ -31,15 +31,9 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId, userId }) => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [newComment, setNewComment] = useState('');
-  const [userName, setUserName] = useState('');
 
   useEffect(() => {
     fetchComments();
-    // Get user name from localStorage
-    const storedUserName = localStorage.getItem('userName');
-    if (storedUserName) {
-      setUserName(storedUserName);
-    }
   }, [postId]);
 
   const fetchComments = async () => {
@@ -74,33 +68,19 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId, userId }) => {
       return;
     }
 
-    if (!userName.trim()) {
-      toast({
-        title: language === 'hi' ? 'नाम आवश्यक है' : 'Name Required',
-        description: language === 'hi'
-          ? 'कृपया अपना नाम दर्ज करें'
-          : 'Please enter your name',
-        variant: 'destructive'
-      });
-      return;
-    }
-
     try {
       setSubmitting(true);
       const response = await axios.post(
         `${API_URL}/api/santvaani-space/posts/${postId}/comments`,
         {
           userId,
-          userName: userName.trim(),
+          userName: language === 'hi' ? 'संतवाणी उपयोगकर्ता' : 'SantVaani User',
           comment: newComment.trim()
         }
       );
 
       setComments(prev => [response.data, ...prev]);
       setNewComment('');
-
-      // Save userName to localStorage for future comments
-      localStorage.setItem('userName', userName.trim());
 
       toast({
         title: language === 'hi' ? 'सफलता' : 'Success',
@@ -176,17 +156,6 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId, userId }) => {
       {/* Add Comment Form */}
       <form onSubmit={handleSubmitComment} className="mb-8">
         <div className="space-y-4">
-          {/* Name Input (if not logged in or name not saved) */}
-          {!userName && (
-            <input
-              type="text"
-              value={userName}
-              onChange={(e) => setUserName(e.target.value)}
-              placeholder={language === 'hi' ? 'आपका नाम' : 'Your Name'}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none"
-            />
-          )}
-
           {/* Comment Input */}
           <div className="relative">
             <textarea
