@@ -13,7 +13,7 @@ interface SpiritualPost {
   content: string;
   content_hi: string | null;
   image_url: string | null;
-  category: string;
+  profile_photo_url: string | null;
   likes_count: number;
   comments_count: number;
   created_at: string;
@@ -55,11 +55,23 @@ const PostCard: React.FC<PostCardProps> = ({ post, onClick }) => {
       transition={{ duration: 0.3 }}
       className="bg-white rounded-lg shadow-md overflow-hidden mb-4 border border-gray-200"
     >
-      {/* Post Header - Like Instagram */}
+      {/* Post Header - Instagram Style */}
       <div className="px-4 py-3 flex items-center justify-between border-b border-gray-100">
         <div className="flex items-center space-x-3">
-          {/* Profile Avatar */}
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-purple-600 flex items-center justify-center flex-shrink-0">
+          {/* Profile Avatar - Custom or Default */}
+          {post.profile_photo_url ? (
+            <img
+              src={post.profile_photo_url}
+              alt="Profile"
+              className="w-10 h-10 rounded-full object-cover border-2 border-gray-100"
+              onError={(e) => {
+                // Fallback to gradient if image fails
+                e.currentTarget.style.display = 'none';
+                e.currentTarget.nextElementSibling?.classList.remove('hidden');
+              }}
+            />
+          ) : null}
+          <div className={`w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-purple-600 flex items-center justify-center flex-shrink-0 ${post.profile_photo_url ? 'hidden' : ''}`}>
             <span className="text-white text-lg">🕉️</span>
           </div>
 
@@ -69,7 +81,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onClick }) => {
               {language === 'hi' ? 'संतवाणी' : 'SantVaani'}
             </h3>
             <p className="text-xs text-gray-500">
-              {formatDate(post.created_at)} • {post.category}
+              {formatDate(post.created_at)}
             </p>
           </div>
         </div>

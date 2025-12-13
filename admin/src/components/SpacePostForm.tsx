@@ -14,7 +14,7 @@ interface SpiritualPost {
   content: string
   content_hi: string | null
   image_url: string | null
-  category: string
+  profile_photo_url: string | null
   is_published: boolean
   created_at: string
   updated_at: string
@@ -26,18 +26,7 @@ interface SpacePostFormProps {
   onSuccess: () => void
 }
 
-const CATEGORIES = [
-  'Daily Wisdom',
-  'Bhagavad Gita',
-  'Festivals',
-  'Stories',
-  'Teachings',
-  'Meditation',
-  'Prayer',
-  'Saints',
-  'Devotional',
-  'General'
-]
+// Categories removed - this is now a personal social feed
 
 export default function SpacePostForm({ post, onClose, onSuccess }: SpacePostFormProps) {
   const [formData, setFormData] = useState({
@@ -46,7 +35,7 @@ export default function SpacePostForm({ post, onClose, onSuccess }: SpacePostFor
     content: '',
     content_hi: '',
     image_url: '',
-    category: 'General',
+    profile_photo_url: '',
     is_published: true
   })
 
@@ -63,7 +52,7 @@ export default function SpacePostForm({ post, onClose, onSuccess }: SpacePostFor
         content: post.content || '',
         content_hi: post.content_hi || '',
         image_url: post.image_url || '',
-        category: post.category || 'General',
+        profile_photo_url: post.profile_photo_url || '',
         is_published: post.is_published !== undefined ? post.is_published : true
       })
     } else {
@@ -74,7 +63,7 @@ export default function SpacePostForm({ post, onClose, onSuccess }: SpacePostFor
         content: '',
         content_hi: '',
         image_url: '',
-        category: 'General',
+        profile_photo_url: '',
         is_published: true
       })
     }
@@ -111,7 +100,7 @@ export default function SpacePostForm({ post, onClose, onSuccess }: SpacePostFor
         content: formData.content.trim(),
         content_hi: formData.content_hi.trim() || null,
         image_url: formData.image_url.trim() || null,
-        category: formData.category,
+        profile_photo_url: formData.profile_photo_url.trim() || null,
         is_published: formData.is_published
       }
 
@@ -221,6 +210,75 @@ export default function SpacePostForm({ post, onClose, onSuccess }: SpacePostFor
       toast({
         title: "Upload failed",
         description: "Failed to upload image. Please try again.",
+        variant: "destructive"
+      })
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  const handleProfilePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      const file = event.target.files?.[0]
+      if (!file) return
+
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Invalid file",
+          description: "Please upload an image file (JPG, PNG, WebP)",
+          variant: "destructive"
+        })
+        return
+      }
+
+      // Validate file size (max 1MB for profile photos)
+      if (file.size > 1 * 1024 * 1024) {
+        toast({
+          title: "File too large",
+          description: "Please upload a profile photo smaller than 1MB",
+          variant: "destructive"
+        })
+        return
+      }
+
+      setUploading(true)
+
+      // Create unique filename for profile photo
+      const fileExt = file.name.split('.').pop()
+      const fileName = `profile-${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`
+      const filePath = `${fileName}`
+
+      // Upload to Supabase Storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('spiritual-posts')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        })
+
+      if (uploadError) {
+        console.error('Upload error:', uploadError)
+        throw uploadError
+      }
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('spiritual-posts')
+        .getPublicUrl(filePath)
+
+      // Update form with profile photo URL
+      setFormData(prev => ({ ...prev, profile_photo_url: publicUrl }))
+
+      toast({
+        title: "Success",
+        description: "Profile photo uploaded successfully"
+      })
+    } catch (error) {
+      console.error('Error uploading profile photo:', error)
+      toast({
+        title: "Upload failed",
+        description: "Failed to upload profile photo. Please try again.",
         variant: "destructive"
       })
     } finally {
@@ -390,23 +448,82 @@ export default function SpacePostForm({ post, onClose, onSuccess }: SpacePostFor
             )}
           </div>
 
-          {/* Category */}
+          {/* Profile Photo Upload */}
           <div>
-            <Label htmlFor="category" className="text-sm font-medium text-gray-700">
-              Category
+            <Label className="text-sm font-medium text-gray-700 mb-2 block">
+              Profile Photo (Your Display Picture)
             </Label>
-            <select
-              id="category"
-              value={formData.category}
-              onChange={(e) => handleChange('category', e.target.value)}
-              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-            >
-              {CATEGORIES.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
-                </option>
-              ))}
-            </select>
+
+            {/* Upload Button */}
+            <div className="mt-1">
+              <label
+                htmlFor="profile-photo-upload"
+                className={`flex items-center justify-center px-4 py-3 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
+                  uploading
+                    ? 'border-purple-300 bg-purple-50'
+                    : 'border-gray-300 hover:border-purple-500 hover:bg-purple-50'
+                }`}
+              >
+                {uploading ? (
+                  <>
+                    <Loader2 className="h-5 w-5 text-purple-600 animate-spin mr-2" />
+                    <span className="text-sm text-purple-600">Uploading...</span>
+                  </>
+                ) : (
+                  <>
+                    <Upload className="h-5 w-5 text-gray-400 mr-2" />
+                    <span className="text-sm text-gray-600">
+                      Click to upload your profile photo
+                    </span>
+                  </>
+                )}
+              </label>
+              <input
+                id="profile-photo-upload"
+                type="file"
+                accept="image/*"
+                onChange={handleProfilePhotoUpload}
+                disabled={uploading}
+                className="hidden"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Recommended: Square image (500x500px), Max 1MB
+              </p>
+            </div>
+
+            {/* OR divider */}
+            <div className="flex items-center my-3">
+              <div className="flex-1 border-t border-gray-200"></div>
+              <span className="px-3 text-xs text-gray-500">OR</span>
+              <div className="flex-1 border-t border-gray-200"></div>
+            </div>
+
+            {/* Manual URL Input */}
+            <div>
+              <Input
+                id="profile_photo_url"
+                value={formData.profile_photo_url}
+                onChange={(e) => handleChange('profile_photo_url', e.target.value)}
+                placeholder="Paste profile photo URL here"
+                type="url"
+                disabled={uploading}
+              />
+            </div>
+
+            {/* Profile Photo Preview */}
+            {formData.profile_photo_url && (
+              <div className="mt-3 flex items-center space-x-3">
+                <img
+                  src={formData.profile_photo_url}
+                  alt="Profile preview"
+                  className="w-16 h-16 rounded-full object-cover border-2 border-purple-200"
+                  onError={(e) => {
+                    e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="64" height="64"%3E%3Crect fill="%23ddd" width="64" height="64"/%3E%3Ctext fill="%23999" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3E?%3C/text%3E%3C/svg%3E'
+                  }}
+                />
+                <span className="text-xs text-gray-600">This is how you'll appear in posts</span>
+              </div>
+            )}
           </div>
 
           {/* Published Status */}

@@ -3605,9 +3605,7 @@ app.get('/api/santvaani-space/posts', async (req, res) => {
       .order('created_at', { ascending: false })
       .range(offset, offset + parseInt(limit) - 1);
 
-    if (category && category !== 'All') {
-      query = query.eq('category', category);
-    }
+    // Category filter removed - this is now a personal social feed
 
     const { data, error, count } = await query;
 
@@ -3688,7 +3686,7 @@ app.get('/api/santvaani-space/admin/posts', async (req, res) => {
 // Create new post (Admin only)
 app.post('/api/santvaani-space/posts', async (req, res) => {
   try {
-    const { title, title_hi, content, content_hi, image_url, category, is_published = true } = req.body;
+    const { title, title_hi, content, content_hi, image_url, profile_photo_url, is_published = true } = req.body;
 
     // Validate required fields
     if (!title || !content) {
@@ -3703,7 +3701,7 @@ app.post('/api/santvaani-space/posts', async (req, res) => {
         content,
         content_hi,
         image_url,
-        category: category || 'General',
+        profile_photo_url,
         is_published
       }])
       .select()
@@ -3725,7 +3723,7 @@ app.post('/api/santvaani-space/posts', async (req, res) => {
 app.put('/api/santvaani-space/posts/:postId', async (req, res) => {
   try {
     const { postId } = req.params;
-    const { title, title_hi, content, content_hi, image_url, category, is_published } = req.body;
+    const { title, title_hi, content, content_hi, image_url, profile_photo_url, is_published } = req.body;
 
     const updateData = {};
     if (title !== undefined) updateData.title = title;
@@ -3733,7 +3731,7 @@ app.put('/api/santvaani-space/posts/:postId', async (req, res) => {
     if (content !== undefined) updateData.content = content;
     if (content_hi !== undefined) updateData.content_hi = content_hi;
     if (image_url !== undefined) updateData.image_url = image_url;
-    if (category !== undefined) updateData.category = category;
+    if (profile_photo_url !== undefined) updateData.profile_photo_url = profile_photo_url;
     if (is_published !== undefined) updateData.is_published = is_published;
 
     const { data, error } = await supabase
