@@ -3470,23 +3470,6 @@ Make sure the response is valid JSON that can be parsed directly. Focus on makin
 
 console.log('✅ AI Quote Generation endpoint registered');
 
-// 404 handler (MUST be last)
-app.use((req, res) => {
-  res.status(404).json({
-    error: 'Not Found',
-    message: 'The requested endpoint does not exist'
-  });
-});
-
-// Global error handler
-app.use((error, req, res, next) => {
-  console.error('Global error handler:', error);
-  res.status(500).json({
-    error: 'Internal Server Error',
-    message: 'Something went wrong on our end'
-  });
-});
-
 // Initialize cache on startup and validate channels in development
 async function initializeServer() {
   try {
@@ -4111,6 +4094,23 @@ app.delete('/api/santvaani-space/posts/:postId/comments/:commentId', async (req,
     console.error('Error in delete comment endpoint:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
+});
+
+// 404 handler (MUST be last)
+app.use((req, res) => {
+  res.status(404).json({
+    error: 'Not Found',
+    message: 'The requested endpoint does not exist'
+  });
+});
+
+// Global error handler
+app.use((error, req, res, next) => {
+  console.error('Global error handler:', error);
+  res.status(500).json({
+    error: 'Internal Server Error',
+    message: 'Something went wrong on our end'
+  });
 });
 
 // Initialize on startup
