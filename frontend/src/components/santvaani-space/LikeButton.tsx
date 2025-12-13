@@ -94,11 +94,7 @@ const LikeButton: React.FC<LikeButtonProps> = ({
     <div className="relative inline-block">
       <motion.button
         onClick={handleLike}
-        className={`flex items-center space-x-2 px-4 py-2 rounded-full transition-all ${
-          liked
-            ? 'bg-pink-100 text-pink-600'
-            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-        }`}
+        className="flex items-center space-x-1 text-gray-700 hover:text-pink-600 transition-colors"
         whileTap={{ scale: 0.9 }}
       >
         <motion.div
@@ -109,7 +105,7 @@ const LikeButton: React.FC<LikeButtonProps> = ({
           transition={{ duration: 0.3 }}
         >
           <Heart
-            className={`h-5 w-5 ${liked ? 'fill-current' : ''}`}
+            className={`h-6 w-6 ${liked ? 'fill-pink-600 text-pink-600' : ''}`}
           />
         </motion.div>
         <span className="text-sm font-medium">{likesCount}</span>

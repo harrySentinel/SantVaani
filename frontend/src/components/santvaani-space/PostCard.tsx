@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Heart, MessageCircle, Calendar, Tag } from 'lucide-react';
+import { Heart, MessageCircle, Share2, MoreHorizontal } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
+import LikeButton from './LikeButton';
 
 interface SpiritualPost {
   id: string;
@@ -24,6 +26,9 @@ interface PostCardProps {
 
 const PostCard: React.FC<PostCardProps> = ({ post, onClick }) => {
   const { language } = useLanguage();
+  const navigate = useNavigate();
+  const [expanded, setExpanded] = useState(false);
+  const [userId] = useState(localStorage.getItem('userId') || undefined);
 
   const title = language === 'hi' && post.title_hi ? post.title_hi : post.title;
   const content = language === 'hi' && post.content_hi ? post.content_hi : post.content;
@@ -31,80 +36,127 @@ const PostCard: React.FC<PostCardProps> = ({ post, onClick }) => {
   const formatDate = (dateString: string) => {
     try {
       const date = new Date(dateString);
-      return format(date, 'MMM dd, yyyy');
+      return format(date, 'MMMM dd, yyyy');
     } catch (error) {
       return dateString;
     }
   };
 
-  // Truncate content for preview
-  const truncateContent = (text: string, maxLength: number = 200) => {
-    if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength).trim() + '...';
-  };
+  // Check if content is long (more than 150 characters)
+  const isLongContent = content.length > 150;
+  const displayContent = expanded || !isLongContent
+    ? content
+    : content.substring(0, 150) + '...';
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      onClick={onClick}
-      className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all cursor-pointer overflow-hidden border border-gray-100"
+      className="bg-white rounded-lg shadow-md overflow-hidden mb-4 border border-gray-200"
     >
-      {/* Image */}
+      {/* Post Header - Like Instagram */}
+      <div className="px-4 py-3 flex items-center justify-between border-b border-gray-100">
+        <div className="flex items-center space-x-3">
+          {/* Profile Avatar */}
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-purple-600 flex items-center justify-center flex-shrink-0">
+            <span className="text-white text-lg">🕉️</span>
+          </div>
+
+          {/* Post Info */}
+          <div>
+            <h3 className="font-semibold text-gray-900 text-sm">
+              {language === 'hi' ? 'संतवाणी' : 'SantVaani'}
+            </h3>
+            <p className="text-xs text-gray-500">
+              {formatDate(post.created_at)} • {post.category}
+            </p>
+          </div>
+        </div>
+
+        {/* More Options */}
+        <button className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100">
+          <MoreHorizontal className="h-5 w-5" />
+        </button>
+      </div>
+
+      {/* Post Title */}
+      <div className="px-4 pt-3">
+        <h2 className="text-lg font-bold text-gray-900 mb-2">
+          {title}
+        </h2>
+      </div>
+
+      {/* Post Image - Full Width like Instagram */}
       {post.image_url && (
-        <div className="relative w-full h-64 overflow-hidden">
+        <div className="w-full">
           <img
             src={post.image_url}
             alt={title}
-            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+            className="w-full object-cover"
+            style={{ maxHeight: '600px' }}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
         </div>
       )}
 
-      {/* Content */}
-      <div className="p-6">
-        {/* Category Badge */}
-        <div className="flex items-center justify-between mb-3">
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-orange-100 to-purple-100 text-orange-800">
-            <Tag className="h-3 w-3 mr-1" />
-            {post.category}
-          </span>
-          <div className="flex items-center text-xs text-gray-500">
-            <Calendar className="h-3 w-3 mr-1" />
-            {formatDate(post.created_at)}
-          </div>
-        </div>
+      {/* Action Buttons - Like Instagram */}
+      <div className="px-4 py-3 flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <LikeButton
+            postId={post.id}
+            initialLikes={post.likes_count}
+            userId={userId}
+          />
 
-        {/* Title */}
-        <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-3 line-clamp-2 hover:text-orange-600 transition-colors">
-          {title}
-        </h2>
+          <button
+            onClick={onClick}
+            className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 transition-colors"
+          >
+            <MessageCircle className="h-6 w-6" />
+            <span className="text-sm font-medium">{post.comments_count}</span>
+          </button>
 
-        {/* Content Preview */}
-        <p className="text-gray-700 mb-4 line-clamp-3 leading-relaxed">
-          {truncateContent(content)}
-        </p>
-
-        {/* Engagement Stats */}
-        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-          <div className="flex items-center space-x-4">
-            <button className="flex items-center space-x-1 text-pink-600 hover:text-pink-700 transition-colors">
-              <Heart className="h-5 w-5" />
-              <span className="text-sm font-medium">{post.likes_count}</span>
-            </button>
-            <button className="flex items-center space-x-1 text-blue-600 hover:text-blue-700 transition-colors">
-              <MessageCircle className="h-5 w-5" />
-              <span className="text-sm font-medium">{post.comments_count}</span>
-            </button>
-          </div>
-
-          <button className="text-orange-600 hover:text-orange-700 text-sm font-medium">
-            {language === 'hi' ? 'और पढ़ें →' : 'Read More →'}
+          <button className="text-gray-700 hover:text-green-600 transition-colors">
+            <Share2 className="h-6 w-6" />
           </button>
         </div>
       </div>
+
+      {/* Post Caption/Content */}
+      <div className="px-4 pb-3">
+        <div className="text-gray-800">
+          <span className="font-semibold">
+            {language === 'hi' ? 'संतवाणी' : 'SantVaani'}
+          </span>
+          {' '}
+          <span className="whitespace-pre-wrap">{displayContent}</span>
+
+          {isLongContent && (
+            <button
+              onClick={() => setExpanded(!expanded)}
+              className="text-gray-500 hover:text-gray-700 ml-1 font-medium"
+            >
+              {expanded
+                ? (language === 'hi' ? 'कम देखें' : 'See less')
+                : (language === 'hi' ? 'और देखें' : 'See more')
+              }
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* View Comments Link */}
+      {post.comments_count > 0 && (
+        <button
+          onClick={onClick}
+          className="px-4 pb-3 text-sm text-gray-500 hover:text-gray-700"
+        >
+          {language === 'hi'
+            ? `सभी ${post.comments_count} टिप्पणियां देखें`
+            : `View all ${post.comments_count} comments`
+          }
+        </button>
+      )}
     </motion.div>
   );
 };

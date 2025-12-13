@@ -179,18 +179,24 @@ const SantVaaniSpace = () => {
         </div>
       </div>
 
-      {/* Posts Feed */}
-      <div className="max-w-4xl mx-auto px-4 py-6">
+      {/* Posts Feed - Instagram Style */}
+      <div className="max-w-2xl mx-auto px-4 py-6">
         {posts.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-gray-600">
+          <div className="text-center py-12 bg-white rounded-lg shadow-md">
+            <div className="text-6xl mb-4">📱</div>
+            <p className="text-gray-600 text-lg">
               {language === 'hi'
                 ? 'कोई पोस्ट नहीं मिली'
                 : 'No posts found'}
             </p>
+            <p className="text-gray-400 text-sm mt-2">
+              {language === 'hi'
+                ? 'जल्द ही आध्यात्मिक सामग्री आ रही है'
+                : 'Spiritual content coming soon'}
+            </p>
           </div>
         ) : (
-          <div className="space-y-6">
+          <div>
             {posts.map((post) => (
               <PostCard
                 key={post.id}
