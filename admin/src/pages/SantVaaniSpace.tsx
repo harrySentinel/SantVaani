@@ -13,7 +13,7 @@ interface SpiritualPost {
   content: string
   content_hi: string | null
   image_url: string | null
-  category: string
+  profile_photo_url: string | null
   likes_count: number
   comments_count: number
   is_published: boolean
