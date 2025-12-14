@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Heart, MessageCircle, Share2, MoreHorizontal } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import LikeButton from './LikeButton';
@@ -26,9 +27,10 @@ interface PostCardProps {
 
 const PostCard: React.FC<PostCardProps> = ({ post, onClick }) => {
   const { language } = useLanguage();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [expanded, setExpanded] = useState(false);
-  const [userId] = useState(localStorage.getItem('userId') || undefined);
+  const userId = user?.id;
 
   const title = language === 'hi' && post.title_hi ? post.title_hi : post.title;
   const content = language === 'hi' && post.content_hi ? post.content_hi : post.content;

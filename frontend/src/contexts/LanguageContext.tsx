@@ -25,12 +25,12 @@ type Translations = {
 const translations: Translations = {
   EN: {
     // Header
-    'site.name': 'SantVaani',
+    'site.name': 'Santvaani',
     'beta.banner': '✨ Beta Version - Your feedback helps us improve',
     'beta.badge': 'Beta',
 
     // Hero Section
-    'hero.welcome': 'Welcome to SantVaani',
+    'hero.welcome': 'Welcome to Santvaani',
     'hero.subtitle': 'Discover Divine Wisdom',
     'hero.description': 'Journey through the sacred teachings of India\'s greatest spiritual masters',
     'hero.tagline': 'Where Ancient Wisdom Meets Modern Hearts',
@@ -61,8 +61,8 @@ const translations: Translations = {
 
     // Mission Section
     'mission.title': 'Our Sacred Mission',
-    'mission.description': 'SantVaani is dedicated to preserving and sharing the timeless wisdom of India\'s greatest spiritual masters. We believe that in today\'s fast-paced world, the teachings of these enlightened souls can provide guidance, peace, and direction to seekers on their spiritual journey.',
-    'mission.beta.notice': '🛠️ Beta Version Notice: We are continuously improving SantVaani. Your feedback and suggestions help us enhance your spiritual journey experience.',
+    'mission.description': 'Santvaani is dedicated to preserving and sharing the timeless wisdom of India\'s greatest spiritual masters. We believe that in today\'s fast-paced world, the teachings of these enlightened souls can provide guidance, peace, and direction to seekers on their spiritual journey.',
+    'mission.beta.notice': '🛠️ Beta Version Notice: We are continuously improving Santvaani. Your feedback and suggestions help us enhance your spiritual journey experience.',
     'mission.quote.sanskrit': '"जहाँ भक्ति है, वहाँ शक्ति है"',
     'mission.quote.english': '"Where there is devotion, there is divine power"',
     'mission.learn.more': 'Learn More About Us',

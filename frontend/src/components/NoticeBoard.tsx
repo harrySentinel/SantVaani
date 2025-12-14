@@ -244,7 +244,7 @@ const NoticeBoard: React.FC = () => {
                         {currentNotice.title}
                       </h3>
                       <p className="text-white/90 text-sm">
-                        A message from SantVaani
+                        A message from Santvaani
                       </p>
                     </div>
                   </div>
@@ -349,7 +349,7 @@ const NoticeBoard: React.FC = () => {
                         <div className="absolute right-0 top-1/2 w-8 h-px bg-gradient-to-l from-orange-200/50 to-transparent transform -translate-y-1/2"></div>
 
                         <span className="text-sm font-medium text-orange-500/70 relative">
-                          🌸 SantVaani 🌸
+                          🌸 Santvaani 🌸
                           {/* Small sparkles around text */}
                           <div className="absolute -top-1 -left-2 w-1 h-1 bg-orange-300/40 rounded-full animate-ping delay-100"></div>
                           <div className="absolute -top-1 -right-2 w-1 h-1 bg-amber-300/40 rounded-full animate-ping delay-400"></div>

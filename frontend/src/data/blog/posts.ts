@@ -1,4 +1,4 @@
-// Sample Blog Posts for SantVaani
+// Sample Blog Posts for Santvaani
 import { BlogPost } from '@/types/blog';
 import { blogCategories } from './categories';
 
@@ -142,7 +142,7 @@ May your practice bring you the peace, wisdom, and joy that are your true nature
     tags: ['meditation', 'inner peace', 'mindfulness', 'spiritual practice', 'vipassana', 'trataka', 'pranayama'],
     author: {
       id: '1',
-      name: 'SantVaani Team',
+      name: 'Santvaani Team',
       bio: 'Dedicated to sharing ancient spiritual wisdom for modern seekers',
       role: 'Spiritual Guide',
       avatar: '/api/placeholder/100/100'
@@ -161,7 +161,7 @@ May your practice bring you the peace, wisdom, and joy that are your true nature
     shareCount: 89,
     featuredImage: '/api/placeholder/1200/600',
     seoMeta: {
-      title: 'Ancient Meditation Techniques for Inner Peace | SantVaani',
+      title: 'Ancient Meditation Techniques for Inner Peace | Santvaani',
       description: 'Discover powerful ancient meditation techniques including Vipassana, Trataka, and Pranayama. Learn how to find lasting inner peace and spiritual awakening.',
       keywords: ['meditation techniques', 'inner peace', 'vipassana', 'trataka', 'pranayama', 'spiritual practice', 'mindfulness', 'ancient wisdom'],
       canonicalUrl: 'https://santvaani.com/blog/post/finding-inner-peace-through-meditation'
@@ -354,7 +354,7 @@ Let us walk the path that Lord Ram illuminated, making each day an opportunity t
     tags: ['lord ram', 'dharma', 'righteousness', 'moral guidance', 'ramayana', 'leadership', 'ethics'],
     author: {
       id: '1',
-      name: 'SantVaani Team',
+      name: 'Santvaani Team',
       bio: 'Dedicated to sharing ancient spiritual wisdom',
       role: 'Spiritual Guide',
     },
@@ -372,7 +372,7 @@ Let us walk the path that Lord Ram illuminated, making each day an opportunity t
     shareCount: 156,
     featuredImage: '/api/placeholder/1200/600',
     seoMeta: {
-      title: 'Lord Ram\'s Teachings for Modern Life | SantVaani Spiritual Wisdom',
+      title: 'Lord Ram\'s Teachings for Modern Life | Santvaani Spiritual Wisdom',
       description: 'Discover how Lord Ram\'s timeless teachings from the Ramayana can guide modern life decisions. Learn dharmic principles for work, relationships, and personal growth.',
       keywords: ['lord ram teachings', 'ramayana wisdom', 'dharma in modern life', 'spiritual leadership', 'hindu values', 'moral guidance'],
       canonicalUrl: 'https://santvaani.com/blog/post/lord-rams-teachings-modern-life'
@@ -593,7 +593,7 @@ May the lights of Diwali awaken the eternal light within your heart and guide yo
     tags: ['diwali', 'festivals', 'light', 'spiritual celebration', 'lakshmi', 'dharma', 'hindu festivals'],
     author: {
       id: '1',
-      name: 'SantVaani Team',
+      name: 'Santvaani Team',
       bio: 'Dedicated to sharing ancient spiritual wisdom',
       role: 'Spiritual Guide',
     },
@@ -611,7 +611,7 @@ May the lights of Diwali awaken the eternal light within your heart and guide yo
     shareCount: 67,
     featuredImage: '/api/placeholder/1200/600',
     seoMeta: {
-      title: 'Diwali Spiritual Significance - Beyond Lights | SantVaani Festival Guide',
+      title: 'Diwali Spiritual Significance - Beyond Lights | Santvaani Festival Guide',
       description: 'Discover the deeper spiritual meaning of Diwali beyond celebrations. Learn about inner light, spiritual practices, and transformative wisdom of the Festival of Lights.',
       keywords: ['diwali spiritual meaning', 'festival of lights', 'diwali significance', 'hindu festivals', 'spiritual celebration', 'inner light', 'lakshmi puja'],
       canonicalUrl: 'https://santvaani.com/blog/post/diwali-spiritual-significance-celebration'

@@ -28,7 +28,7 @@ const StructuredData = (props: StructuredDataProps) => {
     schema = {
       '@context': 'https://schema.org',
       '@type': 'Organization',
-      name: 'SantVaani',
+      name: 'Santvaani',
       url: 'https://santvaani.com',
       logo: 'https://santvaani.com/android-chrome-512x512.png',
       description: 'A digital sanctuary dedicated to preserving and sharing the profound wisdom of India\'s greatest spiritual masters with seekers around the world.',
@@ -48,12 +48,12 @@ const StructuredData = (props: StructuredDataProps) => {
     schema = {
       '@context': 'https://schema.org',
       '@type': 'WebSite',
-      name: 'SantVaani',
+      name: 'Santvaani',
       url: 'https://santvaani.com',
       description: 'Discover the profound teachings and divine wisdom of India\'s greatest saints. A digital sanctuary for spiritual seekers.',
       publisher: {
         '@type': 'Organization',
-        name: 'SantVaani',
+        name: 'Santvaani',
         logo: {
           '@type': 'ImageObject',
           url: 'https://santvaani.com/android-chrome-512x512.png'
@@ -81,7 +81,7 @@ const StructuredData = (props: StructuredDataProps) => {
       },
       publisher: {
         '@type': 'Organization',
-        name: 'SantVaani',
+        name: 'Santvaani',
         logo: {
           '@type': 'ImageObject',
           url: 'https://santvaani.com/android-chrome-512x512.png'

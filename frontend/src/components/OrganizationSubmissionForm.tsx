@@ -71,7 +71,7 @@ const OrganizationSubmissionForm = () => {
         </div>
         <h3 className="text-2xl font-bold text-green-800 mb-2">Submission Received!</h3>
         <p className="text-green-700 mb-4 text-lg">
-          Thank you for registering your organization with SantVaani.
+          Thank you for registering your organization with Santvaani.
         </p>
         <div className="bg-white p-6 rounded-lg border border-green-200 shadow-sm mb-6">
           <p className="text-sm text-gray-700 mb-4">
@@ -115,7 +115,7 @@ const OrganizationSubmissionForm = () => {
           <h2 className="text-3xl font-bold">List Your Organization</h2>
         </div>
         <p className="text-orange-100 text-lg">
-          Get listed on SantVaani and receive donations from caring hearts
+          Get listed on Santvaani and receive donations from caring hearts
         </p>
       </div>
 

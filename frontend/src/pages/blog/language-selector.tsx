@@ -19,7 +19,7 @@ const BlogLanguageSelector: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50">
       <SEOHead
-        title="Spiritual Wisdom | SantVaani - Ancient Teachings in Hindi & English"
+        title="Spiritual Wisdom | Santvaani - Ancient Teachings in Hindi & English"
         description="Choose your preferred language to explore timeless spiritual teachings. Available in both Hindi and English for seekers worldwide."
         keywords={['spiritual wisdom', 'meditation', 'inner peace', 'bhakti', 'devotion', 'Hindi', 'English', 'spiritual guidance']}
         canonicalUrl="https://santvaani.com/blog"

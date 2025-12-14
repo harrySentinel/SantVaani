@@ -132,7 +132,7 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
       targetElement.style.height = '';
 
       // Save the PDF
-      const fileName = `SantVaani_Welcome_${userName.replace(/\s+/g, '_')}_${new Date().getTime()}.pdf`;
+      const fileName = `Santvaani_Welcome_${userName.replace(/\s+/g, '_')}_${new Date().getTime()}.pdf`;
       pdf.save(fileName);
 
       // Update backend that welcome letter was downloaded
@@ -259,7 +259,7 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
             {/* Header */}
             <div className="text-center mb-6">
               <h1 className="text-3xl font-bold text-orange-700 mb-2">
-                SantVaani Digital Ashram
+                Santvaani Digital Ashram
               </h1>
               <p className="text-lg text-gray-600 font-medium">Divine Welcome Letter</p>
             </div>
@@ -280,14 +280,14 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
                   Dear {userName} 💫
                 </h2>
                 <p className="text-lg md:text-2xl text-gray-700 font-medium leading-relaxed">
-                  Welcome to the SantVaani Family!
+                  Welcome to the Santvaani Family!
                 </p>
               </div>
 
               {/* Heartfelt Message */}
               <div className="space-y-4 md:space-y-6 max-w-4xl mx-auto px-2 md:px-0">
                 <p className="text-base md:text-xl text-gray-700 leading-relaxed">
-                  From the bottom of our hearts, we want you to know how blessed we feel to have you join our spiritual community. Your decision to be part of SantVaani fills us with immense joy and gratitude.
+                  From the bottom of our hearts, we want you to know how blessed we feel to have you join our spiritual community. Your decision to be part of Santvaani fills us with immense joy and gratitude.
                 </p>
 
                 <p className="text-base md:text-xl text-gray-700 leading-relaxed">
@@ -317,7 +317,7 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
                   With infinite love and warmest wishes
                 </p>
                 <p className="text-sm md:text-lg text-orange-600 font-semibold">
-                  The SantVaani Family ❤️
+                  The Santvaani Family ❤️
                 </p>
               </div>
             </div>
@@ -359,7 +359,7 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
               {/* Header */}
               <div className="text-center mb-4">
                 <h1 className="text-lg font-bold text-orange-700 mb-1">
-                  SantVaani Digital Ashram
+                  Santvaani Digital Ashram
                 </h1>
                 <p className="text-sm text-gray-600 font-medium">Divine Welcome Letter</p>
               </div>
@@ -377,7 +377,7 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
                   Dear {userName} 💫
                 </h2>
                 <p className="text-lg text-gray-700 font-medium">
-                  Welcome to the SantVaani Family!
+                  Welcome to the Santvaani Family!
                 </p>
 
                 <p className="text-sm text-gray-700 leading-relaxed px-2">
@@ -401,7 +401,7 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
                   Welcome Home, Beautiful Soul! 🌸
                 </p>
                 <p className="text-sm text-gray-600">
-                  With infinite love - The SantVaani Family ❤️
+                  With infinite love - The Santvaani Family ❤️
                 </p>
               </div>
 
@@ -460,7 +460,7 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
           {/* Header */}
           <div className="text-center mb-6">
             <h1 className="text-3xl font-bold text-orange-700 mb-2">
-              SantVaani Digital Ashram
+              Santvaani Digital Ashram
             </h1>
             <p className="text-lg text-gray-600 font-medium">Divine Welcome Letter</p>
           </div>
@@ -480,14 +480,14 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
                 Dear {userName} 💫
               </h2>
               <p className="text-2xl text-gray-700 font-medium leading-relaxed">
-                Welcome to the SantVaani Family!
+                Welcome to the Santvaani Family!
               </p>
             </div>
 
             {/* Heartfelt Message */}
             <div className="space-y-6 max-w-4xl mx-auto">
               <p className="text-xl text-gray-700 leading-relaxed">
-                From the bottom of our hearts, we want you to know how blessed we feel to have you join our spiritual community. Your decision to be part of SantVaani fills us with immense joy and gratitude.
+                From the bottom of our hearts, we want you to know how blessed we feel to have you join our spiritual community. Your decision to be part of Santvaani fills us with immense joy and gratitude.
               </p>
 
               <p className="text-xl text-gray-700 leading-relaxed">
@@ -517,7 +517,7 @@ const DivineWelcomeLetter: React.FC<DivineWelcomeLetterProps> = ({
                 With infinite love and warmest wishes
               </p>
               <p className="text-lg text-orange-600 font-semibold">
-                The SantVaani Family ❤️
+                The Santvaani Family ❤️
               </p>
             </div>
           </div>

@@ -1,4 +1,4 @@
-// Blog Category Page for SantVaani
+// Blog Category Page for Santvaani
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -41,7 +41,7 @@ const BlogCategoryPage: React.FC = () => {
       tags: ['meditation', 'inner peace', 'mindfulness', 'spiritual practice'],
       author: {
         id: '1',
-        name: 'SantVaani Team',
+        name: 'Santvaani Team',
         bio: 'Dedicated to sharing ancient spiritual wisdom',
         role: 'Spiritual Guide',
       },
@@ -65,7 +65,7 @@ const BlogCategoryPage: React.FC = () => {
       tags: ['lord ram', 'dharma', 'righteousness', 'moral guidance'],
       author: {
         id: '1',
-        name: 'SantVaani Team',
+        name: 'Santvaani Team',
         bio: 'Dedicated to sharing ancient spiritual wisdom',
         role: 'Spiritual Guide',
       },
@@ -89,7 +89,7 @@ const BlogCategoryPage: React.FC = () => {
       tags: ['pranayama', 'breathing', 'stress relief', 'yoga'],
       author: {
         id: '1',
-        name: 'SantVaani Team',
+        name: 'Santvaani Team',
         bio: 'Dedicated to sharing ancient spiritual wisdom',
         role: 'Spiritual Guide',
       },
@@ -113,7 +113,7 @@ const BlogCategoryPage: React.FC = () => {
       tags: ['walking meditation', 'mindfulness', 'nature', 'present moment'],
       author: {
         id: '1',
-        name: 'SantVaani Team',
+        name: 'Santvaani Team',
         bio: 'Dedicated to sharing ancient spiritual wisdom',
         role: 'Spiritual Guide',
       },
@@ -137,7 +137,7 @@ const BlogCategoryPage: React.FC = () => {
       tags: ['lord krishna', 'love', 'relationships', 'bhakti'],
       author: {
         id: '1',
-        name: 'SantVaani Team',
+        name: 'Santvaani Team',
         bio: 'Dedicated to sharing ancient spiritual wisdom',
         role: 'Spiritual Guide',
       },

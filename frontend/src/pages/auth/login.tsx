@@ -136,7 +136,7 @@ const Login = () => {
               <span className="text-white font-bold">ॐ</span>
             </div>
             <span className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent">
-              SantVaani
+              Santvaani
             </span>
           </Link>
           <h1 className="text-3xl font-bold text-gray-800 mb-2">Welcome Back</h1>

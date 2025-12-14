@@ -72,7 +72,7 @@ export class CopyToClipboard {
     const lines = [];
     
     // Add decorative header
-    lines.push('✨ Sacred Wisdom from SantVaani ✨');
+    lines.push('✨ Sacred Wisdom from Santvaani ✨');
     lines.push('');
     
     // Add quote in English
@@ -94,7 +94,7 @@ export class CopyToClipboard {
     }
     
     lines.push('');
-    lines.push('🙏 Shared from SantVaani Digital Ashram');
+    lines.push('🙏 Shared from Santvaani Digital Ashram');
     lines.push('Preserving and sharing timeless spiritual wisdom');
     
     return lines.join('\n');
@@ -115,7 +115,7 @@ export class CopyToClipboard {
     const lines = [];
     
     // Add decorative header
-    lines.push('🎵 Sacred Bhajan from SantVaani 🎵');
+    lines.push('🎵 Sacred Bhajan from Santvaani 🎵');
     lines.push('');
     
     // Title in both languages
@@ -146,7 +146,7 @@ export class CopyToClipboard {
     lines.push(`— ${bhajan.author}`);
     lines.push('');
     
-    lines.push('🙏 Shared from SantVaani Digital Ashram');
+    lines.push('🙏 Shared from Santvaani Digital Ashram');
     lines.push('Experience divine melodies and sacred wisdom');
     
     return lines.join('\n');
@@ -164,7 +164,7 @@ export class CopyToClipboard {
    * Quick copy method for simple text with minimal formatting
    */
   static async copySimpleQuote(text: string, author: string): Promise<boolean> {
-    const formattedText = `"${text}"\n\n— ${author}\n\n🙏 Shared from SantVaani Digital Ashram`;
+    const formattedText = `"${text}"\n\n— ${author}\n\n🙏 Shared from Santvaani Digital Ashram`;
     return await this.copyText(formattedText);
   }
 

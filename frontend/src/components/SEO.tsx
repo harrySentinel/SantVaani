@@ -14,19 +14,19 @@ interface SEOProps {
 }
 
 const SEO = ({
-  title = 'SantVaani - Where Ancient Wisdom Meets Modern Hearts',
+  title = 'Santvaani - Where Ancient Wisdom Meets Modern Hearts',
   description = 'Discover the profound teachings and divine wisdom of India\'s greatest saints. A digital sanctuary for spiritual seekers on their journey to enlightenment.',
   canonical,
   ogImage = 'https://santvaani.com/android-chrome-512x512.png',
   ogType = 'website',
   keywords = 'saints, spirituality, bhajans, Indian spirituality, meditation, spiritual wisdom, divine teachings, Hindu saints, spiritual guidance',
-  author = 'SantVaani',
+  author = 'Santvaani',
   publishedTime,
   modifiedTime,
   noindex = false
 }: SEOProps) => {
   const url = canonical || `https://santvaani.com${window.location.pathname}`;
-  const fullTitle = title.includes('SantVaani') ? title : `${title} | SantVaani`;
+  const fullTitle = title.includes('Santvaani') ? title : `${title} | Santvaani`;
 
   return (
     <Helmet>
@@ -44,11 +44,11 @@ const SEO = ({
       <meta property="og:description" content={description} />
       <meta property="og:type" content={ogType} />
       <meta property="og:url" content={url} />
-      <meta property="og:site_name" content="SantVaani" />
+      <meta property="og:site_name" content="Santvaani" />
       <meta property="og:image" content={ogImage} />
       <meta property="og:image:width" content="512" />
       <meta property="og:image:height" content="512" />
-      <meta property="og:image:alt" content="SantVaani - Spiritual Wisdom Platform" />
+      <meta property="og:image:alt" content="Santvaani - Spiritual Wisdom Platform" />
       <meta property="og:locale" content="en_US" />
       <meta property="og:locale:alternate" content="hi_IN" />
 
@@ -72,7 +72,7 @@ const SEO = ({
       <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={ogImage} />
-      <meta name="twitter:image:alt" content="SantVaani - Spiritual Wisdom Platform" />
+      <meta name="twitter:image:alt" content="Santvaani - Spiritual Wisdom Platform" />
 
       {/* Additional SEO Meta Tags */}
       <meta name="robots" content={noindex ? 'noindex, nofollow' : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'} />

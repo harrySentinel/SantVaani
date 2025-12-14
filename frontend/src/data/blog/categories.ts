@@ -9,7 +9,7 @@ export const blogCategories: BlogCategory[] = [
     description: 'Ancient teachings and timeless wisdom from great saints and spiritual masters',
     color: '#ff6b35',
     icon: '🙏',
-    seoTitle: 'Spiritual Wisdom - Ancient Teachings for Modern Life | SantVaani',
+    seoTitle: 'Spiritual Wisdom - Ancient Teachings for Modern Life | Santvaani',
     seoDescription: 'Discover profound spiritual wisdom from Hindu saints and masters. Timeless teachings for finding peace, purpose, and enlightenment in modern life.',
   },
   {

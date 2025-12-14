@@ -46,7 +46,7 @@ export default function LivingSaintShareButton({
     title: `${saint.name} ${saint.nameHi ? `(${saint.nameHi})` : ''} - Living Saint`,
     description: `${saint.specialtyHi || saint.specialty} | ${saint.organization} | ${saint.currentLocationHi || saint.currentLocation}`,
     url: saintUrl,
-    hashtags: ['LivingSaint', saint.name.replace(/\s+/g, ''), 'SantVaani', 'Spirituality']
+    hashtags: ['LivingSaint', saint.name.replace(/\s+/g, ''), 'Santvaani', 'Spirituality']
   };
 
   const handleWhatsAppShare = () => {

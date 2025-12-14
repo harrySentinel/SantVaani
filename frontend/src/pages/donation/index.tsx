@@ -311,7 +311,7 @@ const Donation = () => {
             </h2>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
               {getText(
-                'Are you running an ashram, orphanage, or religious organization? Join our network and receive donations through SantVaani platform.',
+                'Are you running an ashram, orphanage, or religious organization? Join our network and receive donations through Santvaani platform.',
                 'क्या आप आश्रम, अनाथालय या धार्मिक संगठन चला रहे हैं? हमारे नेटवर्क में शामिल हों और संतवाणी प्लेटफॉर्म के माध्यम से दान प्राप्त करें।'
               )}
             </p>

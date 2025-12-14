@@ -121,7 +121,7 @@ const Quotes = () => {
           try {
             await navigator.share({
               files: [file],
-              title: 'SantVaani Quote',
+              title: 'Santvaani Quote',
               text: `${quote.text}\n- ${quote.author}`,
             });
             toast({ title: '✅ Shared successfully!' });
@@ -264,7 +264,7 @@ const Quotes = () => {
                 </p>
               </motion.div>
 
-              {/* SantVaani Branding */}
+              {/* Santvaani Branding */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}

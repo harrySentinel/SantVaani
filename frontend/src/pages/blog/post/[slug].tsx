@@ -1,4 +1,4 @@
-// Individual Blog Post Page for SantVaani
+// Individual Blog Post Page for Santvaani
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -123,7 +123,7 @@ Start today, even if just for a few minutes. Your future self will thank you for
       tags: ['meditation', 'inner peace', 'mindfulness', 'spiritual practice'],
       author: {
         id: '1',
-        name: 'SantVaani Team',
+        name: 'Santvaani Team',
         bio: 'Dedicated to sharing ancient spiritual wisdom for modern seekers',
         role: 'Spiritual Guide',
         avatar: '/api/placeholder/100/100'
@@ -142,7 +142,7 @@ Start today, even if just for a few minutes. Your future self will thank you for
       shareCount: 89,
       featuredImage: '/api/placeholder/1200/600',
       seoMeta: {
-        title: 'Finding Inner Peace Through Ancient Meditation Techniques | SantVaani',
+        title: 'Finding Inner Peace Through Ancient Meditation Techniques | Santvaani',
         description: 'Discover timeless meditation practices from ancient masters. Learn Vipassana, Trataka, and Mantra meditation for lasting inner peace and spiritual growth.',
         keywords: ['meditation techniques', 'inner peace', 'vipassana', 'spiritual practice', 'mindfulness', 'ancient wisdom'],
         canonicalUrl: 'https://santvaani.com/blog/post/finding-inner-peace-through-meditation'
@@ -204,7 +204,7 @@ Lord Ram's teachings remind us that true strength lies not in power or wealth, b
       tags: ['lord ram', 'dharma', 'righteousness', 'moral guidance'],
       author: {
         id: '1',
-        name: 'SantVaani Team',
+        name: 'Santvaani Team',
         bio: 'Dedicated to sharing ancient spiritual wisdom',
         role: 'Spiritual Guide',
       },

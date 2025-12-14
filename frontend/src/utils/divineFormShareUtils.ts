@@ -28,8 +28,8 @@ ${form.description_hi ? form.description_hi.substring(0, 100) + '...' : form.des
 
 🔗 पूर्ण विवरण पढ़ें: ${formUrl}
 
-_SantVaani पर दिव्य रूपों के बारे में और जानें_ 🔱
-#DivineForm #${form.name.replace(/\s+/g, '')} #SantVaani #Spirituality`;
+_Santvaani पर दिव्य रूपों के बारे में और जानें_ 🔱
+#DivineForm #${form.name.replace(/\s+/g, '')} #Santvaani #Spirituality`;
 
   return encodeURIComponent(message);
 }

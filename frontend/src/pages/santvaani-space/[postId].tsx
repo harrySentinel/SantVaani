@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { ArrowLeft, Loader2, Calendar, Tag, Share2 } from 'lucide-react';
 import { Toaster } from '@/components/ui/toaster';
 import { useToast } from '@/hooks/use-toast';
@@ -29,22 +30,21 @@ const PostDetail = () => {
   const { postId } = useParams<{ postId: string }>();
   const navigate = useNavigate();
   const { language } = useLanguage();
+  const { user } = useAuth();
   const { toast } = useToast();
 
   const [post, setPost] = useState<SpiritualPost | null>(null);
   const [loading, setLoading] = useState(true);
   const [liked, setLiked] = useState(false);
-  const [userId, setUserId] = useState<string | undefined>(undefined);
+  const userId = user?.id;
 
   useEffect(() => {
     fetchPost();
-    // Get user ID from localStorage/auth context
-    const storedUserId = localStorage.getItem('userId');
-    if (storedUserId) {
-      setUserId(storedUserId);
-      checkLikeStatus(storedUserId);
+    // Check like status if user is logged in
+    if (userId) {
+      checkLikeStatus(userId);
     }
-  }, [postId]);
+  }, [postId, userId]);
 
   const fetchPost = async () => {
     try {

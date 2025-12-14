@@ -1,4 +1,4 @@
-// Share utilities for SantVaani content
+// Share utilities for Santvaani content
 export interface ShareContent {
   title: string;
   description: string;
@@ -29,8 +29,8 @@ ${saint.descriptionHi ? saint.descriptionHi.substring(0, 100) + '...' : saint.de
 
 🔗 पूरी जीवन गाथा पढ़ें: ${saintUrl}
 
-_SantVaani पर और भी संतों की कहानियां खोजें_ ✨
-#Bhakti #${saint.name.replace(/\s+/g, '')} #SantVaani`;
+_Santvaani पर और भी संतों की कहानियां खोजें_ ✨
+#Bhakti #${saint.name.replace(/\s+/g, '')} #Santvaani`;
 
   return encodeURIComponent(message);
 }

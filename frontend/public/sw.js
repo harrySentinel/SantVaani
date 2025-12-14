@@ -1,4 +1,4 @@
-// Service Worker for SantVaani Firebase FCM Notifications
+// Service Worker for Santvaani Firebase FCM Notifications
 // This handles background notifications, Firebase messaging, and caching
 
 // Import Firebase messaging for background notifications
@@ -55,7 +55,7 @@ self.addEventListener('fetch', (event) => {
 messaging.onBackgroundMessage((payload) => {
   console.log('🔥 Background FCM message received:', payload);
 
-  const notificationTitle = payload.notification?.title || '🕉️ SantVaani Daily Blessing';
+  const notificationTitle = payload.notification?.title || '🕉️ Santvaani Daily Blessing';
   const notificationOptions = {
     body: payload.notification?.body || 'New spiritual guidance available!',
     icon: payload.notification?.icon || '/favicon.ico',
@@ -69,7 +69,7 @@ messaging.onBackgroundMessage((payload) => {
     actions: [
       {
         action: 'open',
-        title: 'Open SantVaani',
+        title: 'Open Santvaani',
         icon: '/favicon.ico'
       },
       {
@@ -95,7 +95,7 @@ self.addEventListener('push', (event) => {
     actions: [
       {
         action: 'open',
-        title: 'Open SantVaani',
+        title: 'Open Santvaani',
         icon: '/favicon.ico'
       },
       {
@@ -106,7 +106,7 @@ self.addEventListener('push', (event) => {
   };
 
   event.waitUntil(
-    self.registration.showNotification('🕉️ SantVaani Daily Blessing', options)
+    self.registration.showNotification('🕉️ Santvaani Daily Blessing', options)
   );
 });
 

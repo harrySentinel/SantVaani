@@ -69,7 +69,7 @@ export default function Navbar() {
               <span className="text-white font-bold text-sm">ॐ</span>
             </div>
             <span className="text-xl font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent">
-              {language === 'EN' ? 'SantVaani' : 'संतवाणी'}
+              {language === 'EN' ? 'Santvaani' : 'संतवाणी'}
             </span>
           </Link>
 

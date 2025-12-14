@@ -1,4 +1,4 @@
-// Blog Types for SantVaani Spiritual Content Platform
+// Blog Types for Santvaani Spiritual Content Platform
 
 export interface BlogSEOMeta {
   title?: string;

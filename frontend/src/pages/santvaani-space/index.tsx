@@ -24,7 +24,7 @@ export interface SpiritualPost {
 
 // Categories removed - this is now a personal spiritual social feed
 
-const SantVaaniSpace = () => {
+const SantvaaniSpace = () => {
   const { t, language } = useLanguage();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -222,4 +222,4 @@ const SantVaaniSpace = () => {
   );
 };
 
-export default SantVaaniSpace;
+export default SantvaaniSpace;

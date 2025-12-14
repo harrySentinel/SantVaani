@@ -39,8 +39,8 @@ const BlogCategoryPage = lazy(() => import("./pages/blog/category/[slug]"));
 const PrabhuKiLeelaayen = lazy(() => import("./pages/prabhu-ki-leelaayen/index"));
 const PrabhuKiLeelaayen_Book = lazy(() => import("./pages/prabhu-ki-leelaayen/book/[slug]"));
 const PrabhuKiLeelaayen_Read = lazy(() => import("./pages/prabhu-ki-leelaayen/read/[slug]"));
-const SantVaaniSpace = lazy(() => import("./pages/santvaani-space/index"));
-const SantVaaniSpacePost = lazy(() => import("./pages/santvaani-space/[postId]"));
+const SantvaaniSpace = lazy(() => import("./pages/santvaani-space/index"));
+const SantvaaniSpacePost = lazy(() => import("./pages/santvaani-space/[postId]"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -81,7 +81,7 @@ const App = () => {
                 <Sonner />
                 <BrowserRouter>
                   <AnalyticsProvider>
-          <Suspense fallback={<LoadingPage text="Loading SantVaani..." />}>
+          <Suspense fallback={<LoadingPage text="Loading Santvaani..." />}>
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/saints" element={<Saints />} />
@@ -108,8 +108,8 @@ const App = () => {
               <Route path="/prabhu-ki-leelaayen" element={<PrabhuKiLeelaayen />} />
               <Route path="/prabhu-ki-leelaayen/book/:slug" element={<PrabhuKiLeelaayen_Book />} />
               <Route path="/prabhu-ki-leelaayen/read/:slug" element={<PrabhuKiLeelaayen_Read />} />
-              <Route path="/santvaani-space" element={<SantVaaniSpace />} />
-              <Route path="/santvaani-space/:postId" element={<SantVaaniSpacePost />} />
+              <Route path="/santvaani-space" element={<SantvaaniSpace />} />
+              <Route path="/santvaani-space/:postId" element={<SantvaaniSpacePost />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

@@ -46,7 +46,7 @@ export default function DivineFormShareButton({
     title: `${form.name} ${form.name_hi ? `(${form.name_hi})` : ''} - Divine Form`,
     description: `${form.domain_hi || form.domain} | ${form.mantra} | ${form.attributes.join(', ')}`,
     url: formUrl,
-    hashtags: ['DivineForm', form.name.replace(/\s+/g, ''), 'SantVaani', 'Spirituality']
+    hashtags: ['DivineForm', form.name.replace(/\s+/g, ''), 'Santvaani', 'Spirituality']
   };
 
   const handleWhatsAppShare = () => {

@@ -1,4 +1,4 @@
-// Blog Service for SantVaani API calls
+// Blog Service for Santvaani API calls
 import { BlogPost, BlogCategory } from '@/types/blog';
 
 const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';

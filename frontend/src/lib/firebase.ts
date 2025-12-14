@@ -1,4 +1,4 @@
-// Firebase configuration for SantVaani Production
+// Firebase configuration for Santvaani Production
 import { initializeApp } from 'firebase/app';
 import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 import { getAnalytics } from 'firebase/analytics';
@@ -94,7 +94,7 @@ export const onFCMMessage = (callback: (payload: any) => void) => {
     if (payload.notification) {
       console.log('📱 Creating browser notification:', payload.notification);
       try {
-        const notification = new Notification(payload.notification.title || 'SantVaani', {
+        const notification = new Notification(payload.notification.title || 'Santvaani', {
           body: payload.notification.body,
           icon: '/favicon.ico',
           badge: '/favicon.ico',

@@ -1,4 +1,4 @@
-// Google Analytics 4 Integration for SantVaani
+// Google Analytics 4 Integration for Santvaani
 // This module provides comprehensive tracking for spiritual content engagement
 // Integrated with Firebase Analytics (santvaani-production)
 
@@ -16,7 +16,7 @@ export const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID || 'G-ZH
 
 // Initialize Google Analytics (Firebase Analytics is already initialized in firebase.ts)
 export const initGA = () => {
-  console.log('🔥 Firebase Analytics already initialized for SantVaani Production');
+  console.log('🔥 Firebase Analytics already initialized for Santvaani Production');
 
   // Also set up gtag for additional tracking if needed
   if (GA_MEASUREMENT_ID) {
@@ -194,7 +194,7 @@ export const trackEcommerce = {
       items: [
         {
           item_id: 'donation',
-          item_name: 'SantVaani Donation',
+          item_name: 'Santvaani Donation',
           category: 'donation',
           quantity: 1,
           price: amount,
@@ -212,7 +212,7 @@ export const trackEcommerce = {
       items: [
         {
           item_id: 'donation',
-          item_name: 'SantVaani Donation',
+          item_name: 'Santvaani Donation',
           category: 'donation',
           quantity: 1,
           price: amount,

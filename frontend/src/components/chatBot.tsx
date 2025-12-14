@@ -15,7 +15,7 @@ interface ChatBotProps {
 }
 
 const INITIAL_MESSAGES = {
-  en: 'Namaste 🙏\n\nI am SantVaani, your spiritual guide powered by the wisdom of the Bhagavad Gita.\n\nIf your heart feels heavy or things don\'t make sense right now, I am here to listen and help.\n\nAsk me anything about life, relationships, purpose, or spiritual guidance.',
+  en: 'Namaste 🙏\n\nI am Santvaani, your spiritual guide powered by the wisdom of the Bhagavad Gita.\n\nIf your heart feels heavy or things don\'t make sense right now, I am here to listen and help.\n\nAsk me anything about life, relationships, purpose, or spiritual guidance.',
   hi: 'नमस्ते 🙏\n\nमैं संतवाणी हूं, भगवद गीता के ज्ञान से संचालित आपका आध्यात्मिक मार्गदर्शक।\n\nयदि आपका मन भारी है या जीवन में कुछ समझ नहीं आ रहा है, तो मैं यहां हूं सुनने और मदद करने के लिए।\n\nजीवन, रिश्ते, उद्देश्य या आध्यात्मिक मार्गदर्शन के बारे में कुछ भी पूछें।'
 };
 
@@ -66,7 +66,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ className = '' }) => {
       const isGreetingMessage =
         firstMessage.content.includes('Namaste') ||
         firstMessage.content.includes('नमस्ते') ||
-        firstMessage.content.includes('SantVaani') ||
+        firstMessage.content.includes('Santvaani') ||
         firstMessage.content.includes('संतवाणी');
 
       if (isGreetingMessage) {
@@ -323,7 +323,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ className = '' }) => {
                   </div>
                   <div>
                     <h2 className="text-white font-bold text-2xl flex items-center drop-shadow-md">
-                      SantVaani Guide
+                      Santvaani Guide
                     </h2>
                     <p className="text-white/95 text-sm flex items-center mt-1">
                       <span className={`w-2 h-2 ${getStatusColor()} rounded-full mr-2 shadow-lg ${backendStatus === 'connected' ? 'animate-pulse' : ''}`}></span>
@@ -360,7 +360,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ className = '' }) => {
                           <div className="w-6 h-6 bg-gradient-to-r from-orange-400 to-red-400 rounded-full flex items-center justify-center">
                             <Sparkles className="w-3 h-3 text-white" />
                           </div>
-                          <span className="font-semibold text-orange-600">SantVaani</span>
+                          <span className="font-semibold text-orange-600">Santvaani</span>
                         </div>
                       )}
                       <p className={`text-base leading-relaxed whitespace-pre-line ${
@@ -389,7 +389,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ className = '' }) => {
                           <Sparkles className="w-3 h-3 text-white" />
                         </div>
                         <div className="flex items-center space-x-2">
-                          <span className="text-sm text-gray-600">SantVaani is thinking</span>
+                          <span className="text-sm text-gray-600">Santvaani is thinking</span>
                           <div className="flex space-x-1">
                             <div className="w-2 h-2 bg-orange-400 rounded-full animate-bounce"></div>
                             <div className="w-2 h-2 bg-orange-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>

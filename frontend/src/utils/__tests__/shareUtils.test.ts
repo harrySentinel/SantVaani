@@ -36,7 +36,7 @@ describe('shareUtils', () => {
       
       expect(result).toContain('Test Saint');
       expect(result).toContain('Devotion');
-      expect(result).toContain('SantVaani');
+      expect(result).toContain('Santvaani');
     });
 
     it('should generate share text for quote', () => {
@@ -49,7 +49,7 @@ describe('shareUtils', () => {
       
       expect(result).toContain('Test quote');
       expect(result).toContain('Test Author');
-      expect(result).toContain('SantVaani');
+      expect(result).toContain('Santvaani');
     });
   });
 

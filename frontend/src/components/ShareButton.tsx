@@ -44,7 +44,7 @@ export default function ShareButton({
     title: `${saint.name} ${saint.nameHi ? `(${saint.nameHi})` : ''}`,
     description: saint.descriptionHi?.substring(0, 150) + '...' || saint.description.substring(0, 150) + '...',
     url: saintUrl,
-    hashtags: ['Bhakti', saint.name.replace(/\s+/g, ''), 'SantVaani']
+    hashtags: ['Bhakti', saint.name.replace(/\s+/g, ''), 'Santvaani']
   };
 
   const handleWhatsAppShare = () => {

@@ -60,8 +60,8 @@ const About = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-orange-50">
       <SEO
-        title="About SantVaani - Our Mission & Vision"
-        description="Learn about SantVaani's mission to preserve and share the profound wisdom of India's greatest spiritual masters. Meet our team and discover our vision for a global spiritual community."
+        title="About Santvaani - Our Mission & Vision"
+        description="Learn about Santvaani's mission to preserve and share the profound wisdom of India's greatest spiritual masters. Meet our team and discover our vision for a global spiritual community."
         canonical="https://santvaani.com/about"
         keywords="about santvaani, spiritual platform, Indian saints, spiritual wisdom, our mission, spiritual community, digital ashram"
       />
@@ -84,7 +84,7 @@ const About = () => {
               <span className="text-3xl">📿</span>
             </div>
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-orange-600 bg-clip-text text-transparent">
-              {language === 'HI' ? 'संतवाणी के बारे में' : 'About SantVaani'}
+              {language === 'HI' ? 'संतवाणी के बारे में' : 'About Santvaani'}
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
               {language === 'HI'
@@ -111,7 +111,7 @@ const About = () => {
                 <p className="text-lg text-gray-600 leading-relaxed">
                   {language === 'HI'
                     ? 'संतवाणी का जन्म भारत की आध्यात्मिक विरासत के प्रति गहरी श्रद्धा और इन कालातीत शिक्षाओं को आधुनिक साधकों के लिए सुलभ बनाने की इच्छा से हुआ। हम मानते हैं कि आज की तेज़-तर्रार दुनिया में, हमारे संतों का ज्ञान मार्गदर्शन, शांति और दिशा प्रदान कर सकता है।'
-                    : 'SantVaani was born from a deep reverence for the spiritual heritage of India and a desire to make these timeless teachings accessible to modern seekers. We believe that in today\'s fast-paced world, the wisdom of our saints can provide guidance, peace, and direction.'
+                    : 'Santvaani was born from a deep reverence for the spiritual heritage of India and a desire to make these timeless teachings accessible to modern seekers. We believe that in today\'s fast-paced world, the wisdom of our saints can provide guidance, peace, and direction.'
                   }
                 </p>
               </div>
@@ -206,7 +206,7 @@ const About = () => {
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               {language === 'HI'
                 ? 'संतवाणी एक समर्पित टीम द्वारा बनाई गई है जो आध्यात्मिक ज्ञान के प्रामाणिक संरक्षण और साझाकरण को सुनिश्चित करने के लिए श्रद्धा के साथ काम कर रही है।'
-                : 'SantVaani is built by a dedicated team working with reverence to ensure the authentic preservation and sharing of spiritual wisdom.'
+                : 'Santvaani is built by a dedicated team working with reverence to ensure the authentic preservation and sharing of spiritual wisdom.'
               }
             </p>
           </div>
@@ -258,7 +258,7 @@ const About = () => {
             <p className="text-lg text-gray-600 leading-relaxed">
               {language === 'HI'
                 ? 'चाहे आप अपने आध्यात्मिक पथ की शुरुआत कर रहे हों या अपने अभ्यास को गहरा कर रहे हों, संतवाणी आपका स्वागत करता है अन्वेषण, सीखने और बढ़ने के लिए। साथ मिलकर, हम आने वाली पीढ़ियों के लिए दिव्य ज्ञान की ज्योति को उज्ज्वल रख सकते हैं।'
-                : 'Whether you are beginning your spiritual path or deepening your practice, SantVaani welcomes you to explore, learn, and grow. Together, we can keep the flame of divine wisdom burning bright for generations to come.'
+                : 'Whether you are beginning your spiritual path or deepening your practice, Santvaani welcomes you to explore, learn, and grow. Together, we can keep the flame of divine wisdom burning bright for generations to come.'
               }
             </p>
           </div>

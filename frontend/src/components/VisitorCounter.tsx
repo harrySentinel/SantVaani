@@ -314,7 +314,7 @@ const VisitorCounter: React.FC<VisitorCounterProps> = ({ className = '' }) => {
                 🙏 <span className="text-orange-600 font-bold">{displayCount.toLocaleString()}</span> souls have found
               </p>
               <p className="text-gray-600 text-base font-medium">
-                their way to <span className="bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent font-bold">SantVaani</span>
+                their way to <span className="bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent font-bold">Santvaani</span>
               </p>
             </div>
 

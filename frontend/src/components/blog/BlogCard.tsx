@@ -1,4 +1,4 @@
-// Beautiful Blog Card Component for SantVaani
+// Beautiful Blog Card Component for Santvaani
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';

@@ -30,8 +30,8 @@ ${lyricsPreview}...
 
 🔗 पूरे भजन और अर्थ के लिए: ${bhajanUrl}
 
-_SantVaani पर आध्यात्मिक भजनों का आनंद लें_ 🎼
-#Bhajan #${bhajan.title.replace(/\s+/g, '')} #SantVaani #Devotion`;
+_Santvaani पर आध्यात्मिक भजनों का आनंद लें_ 🎼
+#Bhajan #${bhajan.title.replace(/\s+/g, '')} #Santvaani #Devotion`;
 
   return encodeURIComponent(message);
 }

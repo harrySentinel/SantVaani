@@ -31,7 +31,7 @@ const SEOHead: React.FC<SEOHeadProps> = ({
   post,
   category,
   image,
-  siteName = 'SantVaani - Digital Ashram',
+  siteName = 'Santvaani - Digital Ashram',
   author,
   publishedDate,
   modifiedDate
@@ -41,7 +41,7 @@ const SEOHead: React.FC<SEOHeadProps> = ({
     if (post) {
       // Blog post SEO
       return {
-        title: post.seoMeta?.title || `${post.title} | SantVaani Blog`,
+        title: post.seoMeta?.title || `${post.title} | Santvaani Blog`,
         description: post.seoMeta?.description || post.excerpt,
         keywords: post.seoMeta?.keywords || post.tags,
         canonicalUrl: post.seoMeta?.canonicalUrl || `https://santvaani.com/blog/post/${post.slug}`,
@@ -55,8 +55,8 @@ const SEOHead: React.FC<SEOHeadProps> = ({
     if (category) {
       // Blog category SEO
       return {
-        title: category.seoMeta?.title || category.seoTitle || `${category.name} Articles | SantVaani Blog`,
-        description: category.seoMeta?.description || category.seoDescription || `Explore ${category.name.toLowerCase()} articles on SantVaani. ${category.description}`,
+        title: category.seoMeta?.title || category.seoTitle || `${category.name} Articles | Santvaani Blog`,
+        description: category.seoMeta?.description || category.seoDescription || `Explore ${category.name.toLowerCase()} articles on Santvaani. ${category.description}`,
         keywords: category.seoMeta?.keywords || [category.name.toLowerCase(), 'spiritual wisdom', 'hinduism', 'spirituality'],
         canonicalUrl: category.seoMeta?.canonicalUrl || `https://santvaani.com/blog/category/${category.slug}`,
         image: 'https://santvaani.com/og-blog-category.jpg',
@@ -66,7 +66,7 @@ const SEOHead: React.FC<SEOHeadProps> = ({
 
     // Default page SEO
     return {
-      title: title || 'SantVaani - Digital Ashram for Spiritual Wisdom',
+      title: title || 'Santvaani - Digital Ashram for Spiritual Wisdom',
       description: description || 'Discover ancient spiritual wisdom, saint teachings, and practical guidance for modern living. Join thousands on their spiritual journey.',
       keywords: keywords.length > 0 ? keywords : ['spiritual wisdom', 'hinduism', 'spirituality', 'meditation', 'saints', 'spiritual guidance'],
       canonicalUrl: canonicalUrl || 'https://santvaani.com',
@@ -95,7 +95,7 @@ const SEOHead: React.FC<SEOHeadProps> = ({
         },
         "publisher": {
           "@type": "Organization",
-          "name": "SantVaani",
+          "name": "Santvaani",
           "logo": {
             "@type": "ImageObject",
             "url": "https://santvaani.com/logo.png"
@@ -127,7 +127,7 @@ const SEOHead: React.FC<SEOHeadProps> = ({
         "url": seoData.canonicalUrl,
         "isPartOf": {
           "@type": "WebSite",
-          "name": "SantVaani",
+          "name": "Santvaani",
           "@id": "https://santvaani.com"
         },
         "about": {
@@ -140,7 +140,7 @@ const SEOHead: React.FC<SEOHeadProps> = ({
     return {
       "@context": "https://schema.org",
       "@type": "WebSite",
-      "name": "SantVaani",
+      "name": "Santvaani",
       "description": seoData.description,
       "url": "https://santvaani.com",
       "potentialAction": {

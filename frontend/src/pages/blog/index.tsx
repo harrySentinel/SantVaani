@@ -1,4 +1,4 @@
-// Spiritual Wisdom - SantVaani
+// Spiritual Wisdom - Santvaani
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -62,7 +62,7 @@ const BlogIndex: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50">
       <SEOHead
-        title={contentLanguage === 'hi' ? 'आध्यात्मिक ज्ञान | संत वाणी - प्राचीन शिक्षाएँ' : 'Spiritual Wisdom | SantVaani - Ancient Teachings for Inner Peace'}
+        title={contentLanguage === 'hi' ? 'आध्यात्मिक ज्ञान | संत वाणी - प्राचीन शिक्षाएँ' : 'Spiritual Wisdom | Santvaani - Ancient Teachings for Inner Peace'}
         description={contentLanguage === 'hi' ? 'प्राचीन शिक्षाओं के माध्यम से शांति खोजें। ध्यान, भक्ति, और आंतरिक शांति के लिए दैनिक अभ्यास।' : 'Find peace and guidance through timeless spiritual teachings. Discover meditation, devotion, and daily practices for a more peaceful and meaningful life.'}
         keywords={contentLanguage === 'hi' ? ['आध्यात्मिक ज्ञान', 'ध्यान', 'भक्ति', 'शांति', 'प्रार्थना'] : ['spiritual wisdom', 'meditation', 'inner peace', 'bhakti', 'devotion', 'daily prayers', 'spiritual guidance', 'ancient teachings']}
         canonicalUrl={`https://santvaani.com/blog/${contentLanguage}`}

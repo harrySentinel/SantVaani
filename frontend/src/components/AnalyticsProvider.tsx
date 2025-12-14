@@ -10,7 +10,7 @@ interface AnalyticsProviderProps {
 const AnalyticsProvider: React.FC<AnalyticsProviderProps> = ({ children }) => {
   // Initialize Google Analytics on mount
   useEffect(() => {
-    console.log('🎯 Initializing Google Analytics for SantVaani...');
+    console.log('🎯 Initializing Google Analytics for Santvaani...');
     initGA();
   }, []);
 

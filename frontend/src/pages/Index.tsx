@@ -64,7 +64,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-white">
       <SEO
-        title="SantVaani - Where Ancient Wisdom Meets Modern Hearts"
+        title="Santvaani - Where Ancient Wisdom Meets Modern Hearts"
         description="Discover the profound teachings and divine wisdom of India's greatest saints. Explore bhajans, spiritual quotes, daily horoscopes, and connect with a global community of seekers."
         canonical="https://santvaani.com"
         keywords="Indian saints, spirituality, bhajans, spiritual quotes, meditation, Hindu spirituality, daily horoscope, spiritual community, divine wisdom, sant vaani"

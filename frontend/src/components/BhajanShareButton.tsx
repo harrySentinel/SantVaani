@@ -46,7 +46,7 @@ export default function BhajanShareButton({
     title: `${bhajan.title} ${bhajan.title_hi ? `(${bhajan.title_hi})` : ''} - Bhajan`,
     description: `${bhajan.category} | ${bhajan.author} | ${bhajan.meaning.substring(0, 100)}...`,
     url: bhajanUrl,
-    hashtags: ['Bhajan', bhajan.title.replace(/\s+/g, ''), 'SantVaani', 'Devotion']
+    hashtags: ['Bhajan', bhajan.title.replace(/\s+/g, ''), 'Santvaani', 'Devotion']
   };
 
   const handleWhatsAppShare = () => {

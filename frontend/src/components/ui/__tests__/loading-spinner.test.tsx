@@ -23,8 +23,8 @@ describe('LoadingSpinner', () => {
 
 describe('LoadingPage', () => {
   it('renders full page loading with spiritual message', () => {
-    render(<LoadingPage text="Loading SantVaani..." />);
-    expect(screen.getByText('Loading SantVaani...')).toBeInTheDocument();
+    render(<LoadingPage text="Loading Santvaani..." />);
+    expect(screen.getByText('Loading Santvaani...')).toBeInTheDocument();
     expect(screen.getByText('धैर्य रखें... Please wait')).toBeInTheDocument();
   });
 });

@@ -145,7 +145,7 @@ const BookDetail: React.FC = () => {
 
             {/* Book Info */}
             <div className="flex-1">
-              {/* SantVaani Original Badge */}
+              {/* Santvaani Original Badge */}
               {book.is_santvaani_original && (
                 <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full mb-3 shadow-lg">
                   <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center">

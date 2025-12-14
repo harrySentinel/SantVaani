@@ -97,7 +97,7 @@ const AshramContactForm = () => {
           <h2 className="text-2xl font-bold">Partner With Us</h2>
         </div>
         <p className="text-orange-100">
-          Register your ashram, orphanage, or religious organization to receive donations through SantVaani
+          Register your ashram, orphanage, or religious organization to receive donations through Santvaani
         </p>
       </div>
 

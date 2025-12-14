@@ -64,7 +64,7 @@ export const useNotifications = () => {
 
   const showWelcomeNotification = () => {
     if (permission === 'granted') {
-      new Notification('🕉️ Welcome to SantVaani Daily Guide!', {
+      new Notification('🕉️ Welcome to Santvaani Daily Guide!', {
         body: 'You will receive spiritual guidance every morning and evening. Om Shanti! 🙏',
         icon: '/favicon.ico',
         badge: '/favicon.ico',
@@ -246,7 +246,7 @@ export const useNotifications = () => {
   const showPreviewNotification = () => {
     const previews = [
       {
-        title: '🕉️ SantVaani Morning Blessing',
+        title: '🕉️ Santvaani Morning Blessing',
         body: 'Good morning! Today\'s mantra: Om Namah Shivaya. Have a blessed day! 🙏'
       },
       {

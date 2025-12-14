@@ -603,7 +603,7 @@ const HoroscopeDisplay = ({
                 url: window.location.href
               });
             } else {
-              navigator.clipboard.writeText(`${horoscope.prediction}\n\n- ${zodiac?.name} ${period} Horoscope from SantVaani`);
+              navigator.clipboard.writeText(`${horoscope.prediction}\n\n- ${zodiac?.name} ${period} Horoscope from Santvaani`);
             }
           }}
         >

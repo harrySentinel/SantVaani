@@ -25,7 +25,7 @@ export const CopyButton: React.FC<CopyButtonProps> = ({
   textHi,
   author,
   category,
-  source = 'SantVaani',
+  source = 'Santvaani',
   variant = 'ghost',
   size = 'sm',
   className,

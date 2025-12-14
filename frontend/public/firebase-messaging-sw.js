@@ -22,7 +22,7 @@ const messaging = firebase.messaging();
 messaging.onBackgroundMessage((payload) => {
   console.log('🔥 Background FCM message received:', payload);
 
-  const notificationTitle = payload.notification?.title || '🕉️ SantVaani Daily Blessing';
+  const notificationTitle = payload.notification?.title || '🕉️ Santvaani Daily Blessing';
   const notificationOptions = {
     body: payload.notification?.body || 'New spiritual guidance available!',
     icon: payload.notification?.icon || '/favicon.ico',
@@ -36,7 +36,7 @@ messaging.onBackgroundMessage((payload) => {
     actions: [
       {
         action: 'open',
-        title: 'Open SantVaani',
+        title: 'Open Santvaani',
         icon: '/favicon.ico'
       },
       {

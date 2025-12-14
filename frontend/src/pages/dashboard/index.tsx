@@ -114,7 +114,7 @@ const Dashboard = () => {
         // Show special welcome message for first-time users
         if (data.isFirstLogin) {
           toast({
-            title: "🙏 Welcome to SantVaani!",
+            title: "🙏 Welcome to Santvaani!",
             description: "Your divine journey begins today. Check out your special welcome gift below!",
             duration: 6000,
           });
@@ -133,7 +133,7 @@ const Dashboard = () => {
 
       // Show welcome toast
       toast({
-        title: "🙏 Welcome to SantVaani!",
+        title: "🙏 Welcome to Santvaani!",
         description: "Check out your special divine welcome letter below!",
         duration: 6000,
       });

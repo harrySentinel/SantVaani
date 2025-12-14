@@ -27,8 +27,8 @@ ${saint.descriptionHi ? saint.descriptionHi.substring(0, 120) + '...' : saint.de
 
 🔗 पूर्ण जानकारी पढ़ें: ${saintUrl}
 
-_SantVaani पर समसामयिक आध्यात्मिक गुरुओं से जुड़ें_ ✨
-#LivingSaint #${saint.name.replace(/\s+/g, '')} #SantVaani #Spirituality`;
+_Santvaani पर समसामयिक आध्यात्मिक गुरुओं से जुड़ें_ ✨
+#LivingSaint #${saint.name.replace(/\s+/g, '')} #Santvaani #Spirituality`;
 
   return encodeURIComponent(message);
 }
