@@ -114,34 +114,37 @@ const SantVaaniSpace = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-orange-50 via-white to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-pink-50 to-purple-50">
       <Toaster />
 
-      {/* Premium Header - Modern & Clean */}
-      <div className="sticky top-0 z-30 bg-white border-b border-gray-100 shadow-sm">
+      {/* Premium Header - Modern & Clean with Blur Effect */}
+      <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-200/50 shadow-sm">
         <div className="max-w-2xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             {/* Logo and Title */}
             <div className="flex items-center space-x-3">
               <button
                 onClick={() => navigate('/')}
-                className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
+                className="p-2 hover:bg-gray-100 rounded-full transition-all duration-200 hover:scale-105"
                 title={language === 'hi' ? 'होम पर जाएं' : 'Go Home'}
               >
                 <Home className="h-5 w-5 text-gray-700" />
               </button>
 
-              <h1 className="text-2xl font-bold">
-                <span className="bg-gradient-to-r from-orange-600 to-purple-600 bg-clip-text text-transparent">
+              <h1 className="text-2xl font-black tracking-tight">
+                <span className="bg-gradient-to-r from-orange-500 via-pink-500 to-purple-600 bg-clip-text text-transparent">
                   {language === 'hi' ? 'संतवाणी स्पेस' : 'SantVaani Space'}
                 </span>
               </h1>
             </div>
 
             {/* Subtitle on larger screens */}
-            <p className="hidden md:block text-sm text-gray-500">
-              {language === 'hi' ? 'आध्यात्मिक सोशल फीड' : 'Spiritual Social Feed'}
-            </p>
+            <div className="hidden md:flex items-center space-x-2">
+              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+              <p className="text-sm text-gray-600 font-medium">
+                {language === 'hi' ? 'आध्यात्मिक सोशल फीड' : 'Spiritual Social Feed'}
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -149,22 +152,24 @@ const SantVaaniSpace = () => {
       {/* Posts Feed - Clean & Centered */}
       <div className="max-w-2xl mx-auto px-4 py-8">
         {posts.length === 0 ? (
-          <div className="text-center py-16 bg-white rounded-2xl shadow-md">
-            <div className="text-7xl mb-6">🌸</div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+          <div className="text-center py-20 bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-gray-100">
+            <div className="text-8xl mb-8 animate-bounce">🌸</div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">
               {language === 'hi' ? 'कोई पोस्ट नहीं' : 'No Posts Yet'}
             </h3>
-            <p className="text-gray-500 mb-6">
+            <p className="text-gray-600 text-lg mb-6">
               {language === 'hi'
                 ? 'जल्द ही आध्यात्मिक सामग्री आ रही है'
                 : 'Spiritual content coming soon'}
             </p>
-            <div className="text-sm text-gray-400">
-              {language === 'hi' ? 'शांति से प्रतीक्षा करें' : 'Stay peaceful, stay connected'}
+            <div className="inline-block px-6 py-3 bg-gradient-to-r from-orange-100 to-purple-100 rounded-full">
+              <p className="text-sm text-gray-700 font-medium">
+                {language === 'hi' ? 'शांति से प्रतीक्षा करें' : 'Stay peaceful, stay connected'}
+              </p>
             </div>
           </div>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-7">
             {posts.map((post) => (
               <PostCard
                 key={post.id}
@@ -177,32 +182,38 @@ const SantVaaniSpace = () => {
 
         {/* Load More Button */}
         {hasMore && posts.length > 0 && (
-          <div className="text-center mt-10">
+          <div className="text-center mt-12">
             <button
               onClick={handleLoadMore}
               disabled={loading}
-              className="bg-gradient-to-r from-orange-500 to-purple-600 text-white px-10 py-3 rounded-full font-medium hover:shadow-xl hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              className="group relative bg-gradient-to-r from-orange-500 via-pink-500 to-purple-600 text-white px-12 py-4 rounded-full font-bold text-base hover:shadow-2xl hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
-              {loading ? (
-                <>
-                  <Loader2 className="h-5 w-5 animate-spin inline-block mr-2" />
-                  {language === 'hi' ? 'लोड हो रहा है...' : 'Loading...'}
-                </>
-              ) : (
-                language === 'hi' ? 'और देखें' : 'Load More'
-              )}
+              <span className="relative z-10">
+                {loading ? (
+                  <>
+                    <Loader2 className="h-5 w-5 animate-spin inline-block mr-2" />
+                    {language === 'hi' ? 'लोड हो रहा है...' : 'Loading...'}
+                  </>
+                ) : (
+                  language === 'hi' ? 'और देखें' : 'Load More'
+                )}
+              </span>
+              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-orange-600 via-pink-600 to-purple-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </button>
           </div>
         )}
 
         {/* Footer Message */}
         {!hasMore && posts.length > 0 && (
-          <div className="text-center mt-10 py-8">
-            <div className="text-4xl mb-3">🙏</div>
-            <p className="text-gray-500 text-sm">
+          <div className="text-center mt-12 py-10 bg-white/60 backdrop-blur-sm rounded-2xl">
+            <div className="text-5xl mb-4 animate-pulse">🙏</div>
+            <p className="text-gray-600 font-medium">
               {language === 'hi'
-                ? 'आपने सभी पोस्ट देख लिए हैं • शांति बनी रहे'
-                : "You've reached the end • Stay blessed"}
+                ? 'आपने सभी पोस्ट देख लिए हैं'
+                : "You've reached the end"}
+            </p>
+            <p className="text-orange-500 text-sm mt-2 font-semibold">
+              {language === 'hi' ? 'शांति बनी रहे' : 'Stay blessed'}
             </p>
           </div>
         )}

@@ -48,6 +48,12 @@ const About = () => {
       title: "Co-Founder & Developer",
       role: "Spiritual developer and tech visionary dedicated to building divine technology solutions",
       image: "/founder2.jpg"
+    },
+    {
+      name: "Arpita Patwa",
+      title: "Admin",
+      role: "Dedicated administrator ensuring smooth operations and community engagement",
+      image: ""
     }
   ];
 
@@ -205,15 +211,23 @@ const About = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {team.map((member, index) => (
               <Card key={index} className="group hover:shadow-xl transition-all duration-300 border-0 shadow-lg bg-white/90 backdrop-blur-sm">
                 <CardContent className="p-8 text-center space-y-4">
-                  <img
-                    src={member.image}
-                    alt={member.name}
-                    className="w-24 h-24 rounded-full mx-auto object-cover group-hover:scale-110 transition-transform duration-300 border-4 border-gradient-to-br from-blue-200 to-orange-200"
-                  />
+                  {member.image ? (
+                    <img
+                      src={member.image}
+                      alt={member.name}
+                      className="w-24 h-24 rounded-full mx-auto object-cover group-hover:scale-110 transition-transform duration-300 border-4 border-gradient-to-br from-blue-200 to-orange-200"
+                    />
+                  ) : (
+                    <div className="w-24 h-24 rounded-full mx-auto bg-gradient-to-br from-blue-400 to-orange-400 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 border-4 border-blue-200">
+                      <span className="text-white text-3xl font-bold">
+                        {member.name.split(' ').map(n => n[0]).join('')}
+                      </span>
+                    </div>
+                  )}
 
                   <div className="space-y-2">
                     <h3 className="text-xl font-semibold text-gray-800">

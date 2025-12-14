@@ -31,9 +31,7 @@ interface SpacePostFormProps {
 export default function SpacePostForm({ post, onClose, onSuccess }: SpacePostFormProps) {
   const [formData, setFormData] = useState({
     title: '',
-    title_hi: '',
     content: '',
-    content_hi: '',
     image_url: '',
     profile_photo_url: '',
     is_published: true
@@ -48,9 +46,7 @@ export default function SpacePostForm({ post, onClose, onSuccess }: SpacePostFor
     if (post) {
       setFormData({
         title: post.title || '',
-        title_hi: post.title_hi || '',
         content: post.content || '',
-        content_hi: post.content_hi || '',
         image_url: post.image_url || '',
         profile_photo_url: post.profile_photo_url || '',
         is_published: post.is_published !== undefined ? post.is_published : true
@@ -59,9 +55,7 @@ export default function SpacePostForm({ post, onClose, onSuccess }: SpacePostFor
       // Reset form for new post
       setFormData({
         title: '',
-        title_hi: '',
         content: '',
-        content_hi: '',
         image_url: '',
         profile_photo_url: '',
         is_published: true
@@ -96,9 +90,9 @@ export default function SpacePostForm({ post, onClose, onSuccess }: SpacePostFor
     try {
       const dataToSave = {
         title: formData.title.trim(),
-        title_hi: formData.title_hi.trim() || null,
+        title_hi: null,
         content: formData.content.trim(),
-        content_hi: formData.content_hi.trim() || null,
+        content_hi: null,
         image_url: formData.image_url.trim() || null,
         profile_photo_url: formData.profile_photo_url.trim() || null,
         is_published: formData.is_published
@@ -309,46 +303,107 @@ export default function SpacePostForm({ post, onClose, onSuccess }: SpacePostFor
         </div>
 
         <form onSubmit={handleSubmit} className="px-6 py-4 space-y-6">
-          {/* Title (English) */}
+          {/* Profile Photo Upload - Instagram Style (First) */}
+          <div>
+            <Label className="text-sm font-medium text-gray-700 mb-2 block">
+              Your Profile Photo
+            </Label>
+
+            <div className="flex items-center space-x-4">
+              {/* Profile Photo Preview */}
+              <div className="flex-shrink-0">
+                {formData.profile_photo_url ? (
+                  <img
+                    src={formData.profile_photo_url}
+                    alt="Profile preview"
+                    className="w-20 h-20 rounded-full object-cover border-2 border-gray-200"
+                    onError={(e) => {
+                      e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="80" height="80"%3E%3Ccircle fill="%23ddd" cx="40" cy="40" r="40"/%3E%3Ctext fill="%23999" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="24"%3E🕉️%3C/text%3E%3C/svg%3E'
+                    }}
+                  />
+                ) : (
+                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-orange-400 to-purple-600 flex items-center justify-center">
+                    <span className="text-3xl">🕉️</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Upload Button */}
+              <div className="flex-1">
+                <label
+                  htmlFor="profile-photo-upload"
+                  className={`inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer transition-colors ${
+                    uploading
+                      ? 'bg-gray-100 text-gray-400'
+                      : 'bg-white hover:bg-gray-50 text-gray-700'
+                  }`}
+                >
+                  {uploading ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      <span className="text-sm">Uploading...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="h-4 w-4 mr-2" />
+                      <span className="text-sm font-medium">Change Photo</span>
+                    </>
+                  )}
+                </label>
+                <input
+                  id="profile-photo-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleProfilePhotoUpload}
+                  disabled={uploading}
+                  className="hidden"
+                />
+                <p className="text-xs text-gray-500 mt-2">
+                  Square image recommended (500x500px), Max 1MB
+                </p>
+              </div>
+            </div>
+
+            {/* Optional: Manual URL Input */}
+            <div className="mt-3">
+              <Input
+                id="profile_photo_url"
+                value={formData.profile_photo_url}
+                onChange={(e) => handleChange('profile_photo_url', e.target.value)}
+                placeholder="Or paste image URL"
+                type="url"
+                disabled={uploading}
+                className="text-sm"
+              />
+            </div>
+          </div>
+
+          {/* Caption/Title - Instagram Style */}
           <div>
             <Label htmlFor="title" className="text-sm font-medium text-gray-700">
-              Title (English) <span className="text-red-500">*</span>
+              Title <span className="text-red-500">*</span>
             </Label>
             <Input
               id="title"
               value={formData.title}
               onChange={(e) => handleChange('title', e.target.value)}
-              placeholder="Enter post title in English"
-              className="mt-1"
+              placeholder="Write a title..."
+              className="mt-1 text-base"
               required
             />
           </div>
 
-          {/* Title (Hindi) */}
-          <div>
-            <Label htmlFor="title_hi" className="text-sm font-medium text-gray-700">
-              Title (Hindi)
-            </Label>
-            <Input
-              id="title_hi"
-              value={formData.title_hi}
-              onChange={(e) => handleChange('title_hi', e.target.value)}
-              placeholder="हिंदी में शीर्षक दर्ज करें"
-              className="mt-1"
-            />
-          </div>
-
-          {/* Content (English) */}
+          {/* Caption - Instagram Style */}
           <div>
             <Label htmlFor="content" className="text-sm font-medium text-gray-700">
-              Content (English) <span className="text-red-500">*</span>
+              Caption <span className="text-red-500">*</span>
             </Label>
             <Textarea
               id="content"
               value={formData.content}
               onChange={(e) => handleChange('content', e.target.value)}
-              placeholder="Enter post content in English..."
-              className="mt-1 min-h-[150px]"
+              placeholder="Write a caption... (You can write in English, Hindi, or both)"
+              className="mt-1 min-h-[120px] text-base resize-none"
               required
             />
             <p className="text-xs text-gray-500 mt-1">
@@ -356,47 +411,45 @@ export default function SpacePostForm({ post, onClose, onSuccess }: SpacePostFor
             </p>
           </div>
 
-          {/* Content (Hindi) */}
-          <div>
-            <Label htmlFor="content_hi" className="text-sm font-medium text-gray-700">
-              Content (Hindi)
-            </Label>
-            <Textarea
-              id="content_hi"
-              value={formData.content_hi}
-              onChange={(e) => handleChange('content_hi', e.target.value)}
-              placeholder="हिंदी में सामग्री दर्ज करें..."
-              className="mt-1 min-h-[150px]"
-            />
-          </div>
-
-          {/* Image Upload */}
+          {/* Post Image Upload - Instagram Style */}
           <div>
             <Label className="text-sm font-medium text-gray-700 mb-2 block">
-              Post Image
+              Post Image (Optional)
             </Label>
 
+            {/* Image Preview */}
+            {formData.image_url && (
+              <div className="mb-4">
+                <img
+                  src={formData.image_url}
+                  alt="Preview"
+                  className="rounded-lg max-h-64 object-cover w-full border-2 border-gray-200"
+                  onError={(e) => {
+                    e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="100"%3E%3Crect fill="%23ddd" width="200" height="100"/%3E%3Ctext fill="%23999" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EInvalid Image%3C/text%3E%3C/svg%3E'
+                  }}
+                />
+              </div>
+            )}
+
             {/* Upload Button */}
-            <div className="mt-1">
+            <div className="flex items-center space-x-3">
               <label
                 htmlFor="image-upload"
-                className={`flex items-center justify-center px-4 py-3 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
+                className={`inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer transition-colors ${
                   uploading
-                    ? 'border-orange-300 bg-orange-50'
-                    : 'border-gray-300 hover:border-orange-500 hover:bg-orange-50'
+                    ? 'bg-gray-100 text-gray-400'
+                    : 'bg-white hover:bg-gray-50 text-gray-700'
                 }`}
               >
                 {uploading ? (
                   <>
-                    <Loader2 className="h-5 w-5 text-orange-600 animate-spin mr-2" />
-                    <span className="text-sm text-orange-600">Uploading...</span>
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    <span className="text-sm">Uploading...</span>
                   </>
                 ) : (
                   <>
-                    <Upload className="h-5 w-5 text-gray-400 mr-2" />
-                    <span className="text-sm text-gray-600">
-                      Click to upload image or drag & drop
-                    </span>
+                    <ImageIcon className="h-4 w-4 mr-2" />
+                    <span className="text-sm font-medium">Add Photo</span>
                   </>
                 )}
               </label>
@@ -408,122 +461,34 @@ export default function SpacePostForm({ post, onClose, onSuccess }: SpacePostFor
                 disabled={uploading}
                 className="hidden"
               />
-              <p className="text-xs text-gray-500 mt-1">
-                Recommended: 1200x630px, Max 2MB (JPG, PNG, WebP)
-              </p>
-            </div>
 
-            {/* OR divider */}
-            <div className="flex items-center my-3">
-              <div className="flex-1 border-t border-gray-200"></div>
-              <span className="px-3 text-xs text-gray-500">OR</span>
-              <div className="flex-1 border-t border-gray-200"></div>
+              {formData.image_url && (
+                <button
+                  type="button"
+                  onClick={() => handleChange('image_url', '')}
+                  className="text-sm text-red-600 hover:text-red-700"
+                >
+                  Remove
+                </button>
+              )}
             </div>
 
             {/* Manual URL Input */}
-            <div>
+            <div className="mt-3">
               <Input
                 id="image_url"
                 value={formData.image_url}
                 onChange={(e) => handleChange('image_url', e.target.value)}
-                placeholder="Paste image URL here"
+                placeholder="Or paste image URL"
                 type="url"
                 disabled={uploading}
+                className="text-sm"
               />
             </div>
 
-            {/* Image Preview */}
-            {formData.image_url && (
-              <div className="mt-3">
-                <p className="text-xs text-gray-600 mb-2">Preview:</p>
-                <img
-                  src={formData.image_url}
-                  alt="Preview"
-                  className="rounded-lg max-h-48 object-cover w-full"
-                  onError={(e) => {
-                    e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="100"%3E%3Crect fill="%23ddd" width="200" height="100"/%3E%3Ctext fill="%23999" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EInvalid Image%3C/text%3E%3C/svg%3E'
-                  }}
-                />
-              </div>
-            )}
-          </div>
-
-          {/* Profile Photo Upload */}
-          <div>
-            <Label className="text-sm font-medium text-gray-700 mb-2 block">
-              Profile Photo (Your Display Picture)
-            </Label>
-
-            {/* Upload Button */}
-            <div className="mt-1">
-              <label
-                htmlFor="profile-photo-upload"
-                className={`flex items-center justify-center px-4 py-3 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
-                  uploading
-                    ? 'border-purple-300 bg-purple-50'
-                    : 'border-gray-300 hover:border-purple-500 hover:bg-purple-50'
-                }`}
-              >
-                {uploading ? (
-                  <>
-                    <Loader2 className="h-5 w-5 text-purple-600 animate-spin mr-2" />
-                    <span className="text-sm text-purple-600">Uploading...</span>
-                  </>
-                ) : (
-                  <>
-                    <Upload className="h-5 w-5 text-gray-400 mr-2" />
-                    <span className="text-sm text-gray-600">
-                      Click to upload your profile photo
-                    </span>
-                  </>
-                )}
-              </label>
-              <input
-                id="profile-photo-upload"
-                type="file"
-                accept="image/*"
-                onChange={handleProfilePhotoUpload}
-                disabled={uploading}
-                className="hidden"
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                Recommended: Square image (500x500px), Max 1MB
-              </p>
-            </div>
-
-            {/* OR divider */}
-            <div className="flex items-center my-3">
-              <div className="flex-1 border-t border-gray-200"></div>
-              <span className="px-3 text-xs text-gray-500">OR</span>
-              <div className="flex-1 border-t border-gray-200"></div>
-            </div>
-
-            {/* Manual URL Input */}
-            <div>
-              <Input
-                id="profile_photo_url"
-                value={formData.profile_photo_url}
-                onChange={(e) => handleChange('profile_photo_url', e.target.value)}
-                placeholder="Paste profile photo URL here"
-                type="url"
-                disabled={uploading}
-              />
-            </div>
-
-            {/* Profile Photo Preview */}
-            {formData.profile_photo_url && (
-              <div className="mt-3 flex items-center space-x-3">
-                <img
-                  src={formData.profile_photo_url}
-                  alt="Profile preview"
-                  className="w-16 h-16 rounded-full object-cover border-2 border-purple-200"
-                  onError={(e) => {
-                    e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="64" height="64"%3E%3Crect fill="%23ddd" width="64" height="64"/%3E%3Ctext fill="%23999" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3E?%3C/text%3E%3C/svg%3E'
-                  }}
-                />
-                <span className="text-xs text-gray-600">This is how you'll appear in posts</span>
-              </div>
-            )}
+            <p className="text-xs text-gray-500 mt-2">
+              Max 2MB • JPG, PNG, WebP
+            </p>
           </div>
 
           {/* Published Status */}

@@ -52,32 +52,49 @@ const PostCard: React.FC<PostCardProps> = ({ post, onClick }) => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className="bg-white rounded-lg shadow-md overflow-hidden mb-4 border border-gray-200"
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      whileHover={{ y: -2, boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)" }}
+      className="bg-white rounded-xl shadow-lg overflow-hidden mb-6 border border-gray-100 hover:border-orange-200 transition-all duration-300"
     >
       {/* Post Header - Instagram Style */}
-      <div className="px-4 py-3 flex items-center justify-between border-b border-gray-100">
+      <div className="px-5 py-4 flex items-center justify-between border-b border-gray-50">
         <div className="flex items-center space-x-3">
-          {/* Profile Avatar - Custom or Default */}
+          {/* Profile Avatar - Custom or Default with ring effect */}
           {post.profile_photo_url ? (
-            <img
-              src={post.profile_photo_url}
-              alt="Profile"
-              className="w-10 h-10 rounded-full object-cover border-2 border-gray-100"
-              onError={(e) => {
-                // Fallback to gradient if image fails
-                e.currentTarget.style.display = 'none';
-                e.currentTarget.nextElementSibling?.classList.remove('hidden');
-              }}
-            />
-          ) : null}
-          <div className={`w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-purple-600 flex items-center justify-center flex-shrink-0 ${post.profile_photo_url ? 'hidden' : ''}`}>
-            <span className="text-white text-lg">🕉️</span>
-          </div>
+            <div className="relative">
+              <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-orange-400 via-pink-500 to-purple-600 p-0.5">
+                <div className="bg-white rounded-full p-0.5">
+                  <img
+                    src={post.profile_photo_url}
+                    alt="Profile"
+                    className="w-11 h-11 rounded-full object-cover"
+                    onError={(e) => {
+                      // Fallback to gradient if image fails
+                      e.currentTarget.style.display = 'none';
+                      e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                    }}
+                  />
+                  <div className="hidden w-11 h-11 rounded-full bg-gradient-to-br from-orange-400 to-purple-600 flex items-center justify-center">
+                    <span className="text-white text-lg">🕉️</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="relative">
+              <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-orange-400 via-pink-500 to-purple-600 p-0.5">
+                <div className="bg-white rounded-full p-0.5">
+                  <div className="w-11 h-11 rounded-full bg-gradient-to-br from-orange-400 to-purple-600 flex items-center justify-center">
+                    <span className="text-white text-lg">🕉️</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Post Info */}
           <div>
-            <h3 className="font-semibold text-gray-900 text-sm">
+            <h3 className="font-bold text-gray-900 text-sm">
               {language === 'hi' ? 'संतवाणी' : 'SantVaani'}
             </h3>
             <p className="text-xs text-gray-500">
@@ -87,57 +104,75 @@ const PostCard: React.FC<PostCardProps> = ({ post, onClick }) => {
         </div>
 
         {/* More Options */}
-        <button className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100">
+        <button className="text-gray-400 hover:text-gray-700 p-2 rounded-full hover:bg-gray-50 transition-colors">
           <MoreHorizontal className="h-5 w-5" />
         </button>
       </div>
 
       {/* Post Title */}
-      <div className="px-4 pt-3">
-        <h2 className="text-lg font-bold text-gray-900 mb-2">
+      <div className="px-5 pt-3 pb-2">
+        <h2 className="text-xl font-bold text-gray-900 leading-tight">
           {title}
         </h2>
       </div>
 
       {/* Post Image - Full Width like Instagram */}
       {post.image_url && (
-        <div className="w-full">
+        <div className="w-full relative overflow-hidden bg-gray-50">
           <img
             src={post.image_url}
             alt={title}
-            className="w-full object-cover"
+            className="w-full object-cover transition-transform duration-300 hover:scale-105"
             style={{ maxHeight: '600px' }}
           />
         </div>
       )}
 
       {/* Action Buttons - Like Instagram */}
-      <div className="px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center space-x-4">
+      <div className="px-5 py-3 flex items-center justify-between">
+        <div className="flex items-center space-x-5">
           <LikeButton
             postId={post.id}
             initialLikes={post.likes_count}
             userId={userId}
           />
 
-          <button
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
             onClick={onClick}
-            className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 transition-colors"
+            className="flex items-center space-x-1.5 text-gray-600 hover:text-blue-600 transition-colors"
           >
             <MessageCircle className="h-6 w-6" />
-            <span className="text-sm font-medium">{post.comments_count}</span>
-          </button>
+            <span className="text-sm font-semibold">{post.comments_count}</span>
+          </motion.button>
 
-          <button className="text-gray-700 hover:text-green-600 transition-colors">
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            className="text-gray-600 hover:text-green-600 transition-colors"
+          >
             <Share2 className="h-6 w-6" />
-          </button>
+          </motion.button>
         </div>
       </div>
 
+      {/* Likes Count */}
+      {post.likes_count > 0 && (
+        <div className="px-5 pb-2">
+          <p className="text-sm font-semibold text-gray-900">
+            {post.likes_count} {post.likes_count === 1
+              ? (language === 'hi' ? 'पसंद' : 'like')
+              : (language === 'hi' ? 'पसंद' : 'likes')
+            }
+          </p>
+        </div>
+      )}
+
       {/* Post Caption/Content */}
-      <div className="px-4 pb-3">
-        <div className="text-gray-800">
-          <span className="font-semibold">
+      <div className="px-5 pb-2">
+        <div className="text-gray-800 text-sm leading-relaxed">
+          <span className="font-bold">
             {language === 'hi' ? 'संतवाणी' : 'SantVaani'}
           </span>
           {' '}
@@ -149,8 +184,8 @@ const PostCard: React.FC<PostCardProps> = ({ post, onClick }) => {
               className="text-gray-500 hover:text-gray-700 ml-1 font-medium"
             >
               {expanded
-                ? (language === 'hi' ? 'कम देखें' : 'See less')
-                : (language === 'hi' ? 'और देखें' : 'See more')
+                ? (language === 'hi' ? 'कम देखें' : 'less')
+                : (language === 'hi' ? 'और देखें' : 'more')
               }
             </button>
           )}
@@ -161,7 +196,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onClick }) => {
       {post.comments_count > 0 && (
         <button
           onClick={onClick}
-          className="px-4 pb-3 text-sm text-gray-500 hover:text-gray-700"
+          className="px-5 pb-4 text-sm text-gray-400 hover:text-gray-600 transition-colors"
         >
           {language === 'hi'
             ? `सभी ${post.comments_count} टिप्पणियां देखें`
