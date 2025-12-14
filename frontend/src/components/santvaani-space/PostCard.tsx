@@ -61,30 +61,31 @@ const PostCard: React.FC<PostCardProps> = ({ post, onClick }) => {
         <div className="flex items-center space-x-3">
           {/* Profile Avatar - Custom or Default with ring effect */}
           {post.profile_photo_url ? (
-            <div className="relative">
-              <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-orange-400 via-pink-500 to-purple-600 p-0.5">
-                <div className="bg-white rounded-full p-0.5">
+            <div className="relative w-12 h-12">
+              <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-orange-400 via-pink-500 to-purple-600 p-[2px]">
+                <div className="bg-white rounded-full w-full h-full p-[2px]">
                   <img
                     src={post.profile_photo_url}
                     alt="Profile"
-                    className="w-11 h-11 rounded-full object-cover"
+                    className="w-full h-full rounded-full object-cover"
                     onError={(e) => {
                       // Fallback to gradient if image fails
                       e.currentTarget.style.display = 'none';
-                      e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                      const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                      if (fallback) fallback.classList.remove('hidden');
                     }}
                   />
-                  <div className="hidden w-11 h-11 rounded-full bg-gradient-to-br from-orange-400 to-purple-600 flex items-center justify-center">
+                  <div className="hidden w-full h-full rounded-full bg-gradient-to-br from-orange-400 to-purple-600 flex items-center justify-center">
                     <span className="text-white text-lg">🕉️</span>
                   </div>
                 </div>
               </div>
             </div>
           ) : (
-            <div className="relative">
-              <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-orange-400 via-pink-500 to-purple-600 p-0.5">
-                <div className="bg-white rounded-full p-0.5">
-                  <div className="w-11 h-11 rounded-full bg-gradient-to-br from-orange-400 to-purple-600 flex items-center justify-center">
+            <div className="relative w-12 h-12">
+              <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-orange-400 via-pink-500 to-purple-600 p-[2px]">
+                <div className="bg-white rounded-full w-full h-full p-[2px] flex items-center justify-center">
+                  <div className="w-full h-full rounded-full bg-gradient-to-br from-orange-400 to-purple-600 flex items-center justify-center">
                     <span className="text-white text-lg">🕉️</span>
                   </div>
                 </div>
@@ -95,7 +96,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onClick }) => {
           {/* Post Info */}
           <div>
             <h3 className="font-bold text-gray-900 text-sm">
-              {language === 'hi' ? 'संतवाणी' : 'SantVaani'}
+              {language === 'hi' ? 'संतवाणी' : 'Santvaani'}
             </h3>
             <p className="text-xs text-gray-500">
               {formatDate(post.created_at)}
@@ -116,14 +117,14 @@ const PostCard: React.FC<PostCardProps> = ({ post, onClick }) => {
         </h2>
       </div>
 
-      {/* Post Image - Full Width like Instagram */}
+      {/* Post Image - Instagram/Facebook Style */}
       {post.image_url && (
         <div className="w-full relative overflow-hidden bg-gray-50">
           <img
             src={post.image_url}
             alt={title}
-            className="w-full object-cover transition-transform duration-300 hover:scale-105"
-            style={{ maxHeight: '600px' }}
+            className="w-full h-auto object-contain transition-transform duration-300 hover:scale-105"
+            style={{ maxHeight: '500px' }}
           />
         </div>
       )}
@@ -173,7 +174,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onClick }) => {
       <div className="px-5 pb-2">
         <div className="text-gray-800 text-sm leading-relaxed">
           <span className="font-bold">
-            {language === 'hi' ? 'संतवाणी' : 'SantVaani'}
+            {language === 'hi' ? 'संतवाणी' : 'Santvaani'}
           </span>
           {' '}
           <span className="whitespace-pre-wrap">{displayContent}</span>

@@ -74,7 +74,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId, userId }) => {
         `${API_URL}/api/santvaani-space/posts/${postId}/comments`,
         {
           userId,
-          userName: language === 'hi' ? 'संतवाणी उपयोगकर्ता' : 'SantVaani User',
+          userName: language === 'hi' ? 'संतवाणी उपयोगकर्ता' : 'Santvaani User',
           comment: newComment.trim()
         }
       );

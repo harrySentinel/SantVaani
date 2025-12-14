@@ -133,7 +133,7 @@ const SantVaaniSpace = () => {
 
               <h1 className="text-2xl font-black tracking-tight">
                 <span className="bg-gradient-to-r from-orange-500 via-pink-500 to-purple-600 bg-clip-text text-transparent">
-                  {language === 'hi' ? 'संतवाणी स्पेस' : 'SantVaani Space'}
+                  {language === 'hi' ? 'संतवाणी स्पेस' : 'Santvaani Space'}
                 </span>
               </h1>
             </div>

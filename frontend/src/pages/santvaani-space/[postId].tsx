@@ -76,7 +76,7 @@ const PostDetail = () => {
 
   const handleShare = async () => {
     const shareData = {
-      title: post?.title || 'SantVaani Space',
+      title: post?.title || 'Santvaani Space',
       text: post?.content?.substring(0, 100) + '...' || '',
       url: window.location.href
     };
