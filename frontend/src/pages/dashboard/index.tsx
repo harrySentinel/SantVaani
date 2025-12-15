@@ -22,8 +22,7 @@ import {
   Bookmark,
   BookOpen,
   List,
-  Settings,
-  Mail
+  Settings
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
@@ -396,22 +395,6 @@ const Dashboard = () => {
                 <p className="text-xs text-gray-500 mt-1">View your events</p>
               </CardContent>
             </Card>
-
-            {/* Admin Email Broadcast - Show for admin users */}
-            {user?.email?.includes('admin') || user?.email === 'adityasrivastav9721057380@gmail.com' ? (
-              <Card
-                className="bg-white shadow-lg border-0 hover:shadow-xl transition-all cursor-pointer group"
-                onClick={() => navigate('/admin/email-broadcast')}
-              >
-                <CardContent className="p-6 text-center">
-                  <div className="w-14 h-14 bg-gradient-to-br from-red-500 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
-                    <Mail className="w-7 h-7 text-white" />
-                  </div>
-                  <p className="font-semibold text-gray-800">Send Email</p>
-                  <p className="text-xs text-gray-500 mt-1">Broadcast to users</p>
-                </CardContent>
-              </Card>
-            ) : null}
           </div>
         </div>
       </section>

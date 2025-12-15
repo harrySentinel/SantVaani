@@ -1,11 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Send, Users, Mail, Sparkles, CheckCircle, AlertCircle } from 'lucide-react';
+import { Send, Users, Mail, Sparkles, CheckCircle, AlertCircle, ShieldAlert } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { useAuth } from '@/contexts/AuthContext';
 
 const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+
+// Admin emails - only these users can access this page
+const ADMIN_EMAILS = [
+  'adityasrivastav9721057380@gmail.com',
+  'santvaani.digitalashram@gmail.com'
+];
 
 interface User {
   id: string;
@@ -15,6 +23,8 @@ interface User {
 }
 
 const EmailBroadcast = () => {
+  const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [subject, setSubject] = useState('');
@@ -26,10 +36,30 @@ const EmailBroadcast = () => {
     message: ''
   });
 
+  // Check if user is admin - redirect if not
+  useEffect(() => {
+    if (!authLoading) {
+      if (!user) {
+        // Not logged in - redirect to login
+        navigate('/login');
+        return;
+      }
+
+      // Check if user email is in admin list
+      if (!ADMIN_EMAILS.includes(user.email || '')) {
+        // Not an admin - redirect to dashboard
+        navigate('/dashboard');
+        return;
+      }
+    }
+  }, [user, authLoading, navigate]);
+
   // Fetch all users on mount
   useEffect(() => {
-    fetchUsers();
-  }, []);
+    if (user && ADMIN_EMAILS.includes(user.email || '')) {
+      fetchUsers();
+    }
+  }, [user]);
 
   const fetchUsers = async () => {
     try {
@@ -180,6 +210,47 @@ const EmailBroadcast = () => {
       setLoading(false);
     }
   };
+
+  // Show loading while checking authentication
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show unauthorized if not admin
+  if (!user || !ADMIN_EMAILS.includes(user.email || '')) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-white">
+        <Navbar />
+        <div className="flex items-center justify-center py-20">
+          <Card className="max-w-md">
+            <CardContent className="p-8 text-center">
+              <ShieldAlert className="w-16 h-16 text-red-500 mx-auto mb-4" />
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                Access Denied
+              </h2>
+              <p className="text-gray-600 mb-6">
+                This page is restricted to administrators only.
+              </p>
+              <Button
+                onClick={() => navigate('/dashboard')}
+                className="bg-gradient-to-r from-orange-500 to-red-500"
+              >
+                Go to Dashboard
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-white">
