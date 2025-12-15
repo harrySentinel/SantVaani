@@ -17,6 +17,7 @@ import BlogsPage from '@/pages/Blogs'
 import LeelaayanBooksPage from '@/pages/LeelaayanBooks'
 import OrganizationsPage from '@/pages/Organizations'
 import SantVaaniSpacePage from '@/pages/SantVaaniSpace'
+import EmailBroadcastPage from '@/pages/EmailBroadcast'
 
 // All content management pages are now complete
 
@@ -71,6 +72,9 @@ function App() {
 
               {/* SantVaani Space Management */}
               <Route path="santvaani-space" element={<SantVaaniSpacePage />} />
+
+              {/* Email Broadcast */}
+              <Route path="email-broadcast" element={<EmailBroadcastPage />} />
 
               {/* 404 fallback */}
               <Route path="*" element={<Navigate to="/dashboard" replace />} />

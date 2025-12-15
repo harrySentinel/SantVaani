@@ -14,7 +14,8 @@ import {
   FileText,
   BookMarked,
   Building2,
-  Share2
+  Share2,
+  Mail
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -112,6 +113,13 @@ const navigation = [
     href: '/organizations',
     icon: Building2,
     description: 'Review donation page submissions',
+    count: 0
+  },
+  {
+    name: 'Email Broadcast',
+    href: '/email-broadcast',
+    icon: Mail,
+    description: 'Send emails to users',
     count: 0
   }
 ]
