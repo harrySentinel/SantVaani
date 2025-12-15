@@ -4163,6 +4163,87 @@ app.post('/api/email/run-milestone-jobs', async (req, res) => {
   }
 });
 
+// Admin broadcast email endpoint
+app.post('/api/email/send-broadcast', async (req, res) => {
+  try {
+    const { recipients, subject, htmlContent, adminEmail } = req.body;
+
+    // Basic validation
+    if (!recipients || !Array.isArray(recipients) || recipients.length === 0) {
+      return res.status(400).json({ error: 'Recipients array is required' });
+    }
+
+    if (!subject || !htmlContent) {
+      return res.status(400).json({ error: 'Subject and HTML content are required' });
+    }
+
+    // TODO: Add proper admin authentication check here
+    // For now, we'll just log who's sending
+    console.log(`📧 Admin broadcast email requested by: ${adminEmail || 'unknown'}`);
+    console.log(`   Subject: ${subject}`);
+    console.log(`   Recipients: ${recipients.length} users`);
+
+    const { sendBroadcastEmail } = require('./email_service');
+
+    // Send broadcast email
+    const result = await sendBroadcastEmail(recipients, subject, htmlContent);
+
+    if (result.success) {
+      console.log(`✅ Broadcast email sent to ${recipients.length} recipients`);
+      res.json({
+        success: true,
+        message: `Broadcast email sent successfully to ${recipients.length} recipients`,
+        sentCount: recipients.length
+      });
+    } else {
+      console.error('❌ Failed to send broadcast email:', result.error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to send broadcast email',
+        details: result.error
+      });
+    }
+  } catch (error) {
+    console.error('Error in send-broadcast endpoint:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error while sending broadcast email'
+    });
+  }
+});
+
+// Get all users endpoint (for admin to select recipients)
+app.get('/api/admin/users', async (req, res) => {
+  try {
+    // TODO: Add proper admin authentication check here
+
+    // Get all users from Supabase
+    const { data: { users }, error } = await supabase.auth.admin.listUsers();
+
+    if (error) {
+      console.error('❌ Error fetching users:', error);
+      return res.status(500).json({ error: 'Failed to fetch users' });
+    }
+
+    // Return simplified user data
+    const userData = users.map(user => ({
+      id: user.id,
+      email: user.email,
+      name: user.user_metadata?.name || user.user_metadata?.full_name || 'User',
+      created_at: user.created_at
+    }));
+
+    res.json({
+      success: true,
+      users: userData,
+      count: userData.length
+    });
+  } catch (error) {
+    console.error('Error in admin/users endpoint:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 console.log('✅ Email automation endpoints registered successfully');
 
 // 404 handler (MUST be last)

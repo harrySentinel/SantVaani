@@ -41,6 +41,7 @@ const PrabhuKiLeelaayen_Book = lazy(() => import("./pages/prabhu-ki-leelaayen/bo
 const PrabhuKiLeelaayen_Read = lazy(() => import("./pages/prabhu-ki-leelaayen/read/[slug]"));
 const SantvaaniSpace = lazy(() => import("./pages/santvaani-space/index"));
 const SantvaaniSpacePost = lazy(() => import("./pages/santvaani-space/[postId]"));
+const AdminEmailBroadcast = lazy(() => import("./pages/admin/email-broadcast"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -110,6 +111,7 @@ const App = () => {
               <Route path="/prabhu-ki-leelaayen/read/:slug" element={<PrabhuKiLeelaayen_Read />} />
               <Route path="/santvaani-space" element={<SantvaaniSpace />} />
               <Route path="/santvaani-space/:postId" element={<SantvaaniSpacePost />} />
+              <Route path="/admin/email-broadcast" element={<AdminEmailBroadcast />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
