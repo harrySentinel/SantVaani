@@ -103,7 +103,7 @@ const SantvaaniSpace = () => {
         <div className="text-center">
           <p className="text-red-600 mb-4">{error}</p>
           <button
-            onClick={() => fetchPosts(1, selectedCategory)}
+            onClick={() => fetchPosts(1)}
             className="bg-orange-600 text-white px-6 py-2 rounded-lg hover:bg-orange-700"
           >
             {language === 'hi' ? 'पुनः प्रयास करें' : 'Try Again'}

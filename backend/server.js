@@ -19,10 +19,11 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Initialize Supabase client
+// Initialize Supabase client with service role key to bypass RLS
+// This allows the backend to perform operations on behalf of users
 const supabase = createClient(
   process.env.SUPABASE_URL,
-  process.env.SUPABASE_ANON_KEY
+  process.env.SUPABASE_SERVICE_ROLE_KEY
 ); 
 
 // In-memory cache to store bhajan data
