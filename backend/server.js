@@ -14,6 +14,10 @@ const {
   getTodaysPanchang,
   fetchRealPanchangData
 } = require('./panchang_service');
+const {
+  startEmailScheduler,
+  runMilestoneEmailJobs
+} = require('./email_scheduler');
 require('dotenv').config();
 
 const app = express();
@@ -4095,6 +4099,72 @@ app.delete('/api/santvaani-space/posts/:postId/comments/:commentId', async (req,
   }
 });
 
+// ============================================
+// EMAIL AUTOMATION ENDPOINTS
+// ============================================
+console.log('📧 Registering email automation endpoints...');
+
+const { sendWelcomeEmail, send7DayEmail, send30DayEmail } = require('./email_service');
+
+// Send welcome email (called from frontend after signup)
+app.post('/api/email/send-welcome', async (req, res) => {
+  try {
+    const { email, name } = req.body;
+
+    if (!email || !name) {
+      return res.status(400).json({ error: 'Email and name are required' });
+    }
+
+    console.log(`📧 Sending welcome email to: ${email}`);
+
+    // Send email (non-blocking - don't wait for result)
+    sendWelcomeEmail(email, name)
+      .then(result => {
+        if (result.success) {
+          console.log(`✅ Welcome email sent successfully to: ${email}`);
+        } else {
+          console.error(`❌ Failed to send welcome email to: ${email}`, result.error);
+        }
+      })
+      .catch(error => {
+        console.error(`❌ Error sending welcome email to: ${email}`, error);
+      });
+
+    // Return immediately (don't block signup)
+    res.json({ success: true, message: 'Welcome email queued' });
+  } catch (error) {
+    console.error('Error in send-welcome endpoint:', error);
+    // Don't fail the request even if email fails
+    res.json({ success: true, message: 'Signup successful' });
+  }
+});
+
+// Manual trigger for milestone emails (for testing/admin)
+app.post('/api/email/run-milestone-jobs', async (req, res) => {
+  try {
+    console.log('🔧 Manually triggering milestone email jobs...');
+
+    // Run the jobs asynchronously
+    runMilestoneEmailJobs()
+      .then(() => {
+        console.log('✅ Milestone email jobs completed');
+      })
+      .catch(error => {
+        console.error('❌ Error running milestone jobs:', error);
+      });
+
+    res.json({
+      success: true,
+      message: 'Milestone email jobs started. Check server logs for results.'
+    });
+  } catch (error) {
+    console.error('Error in run-milestone-jobs endpoint:', error);
+    res.status(500).json({ error: 'Failed to start milestone jobs' });
+  }
+});
+
+console.log('✅ Email automation endpoints registered successfully');
+
 // 404 handler (MUST be last)
 app.use((req, res) => {
   res.status(404).json({
@@ -4126,6 +4196,11 @@ app.listen(PORT, () => {
   // Initialize FCM notification scheduler
   console.log(`🔥 Initializing Firebase FCM notification scheduler...`);
   scheduleNotifications();
+
+  // Initialize Email Scheduler for milestone emails
+  console.log(`📧 Initializing Email Scheduler for milestone emails...`);
+  startEmailScheduler();
+
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
 });
 

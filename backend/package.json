@@ -19,6 +19,7 @@
   "author": "SantVaani Team",
   "license": "MIT",
   "dependencies": {
+    "@getbrevo/brevo": "^3.0.1",
     "@supabase/supabase-js": "^2.56.0",
     "axios": "^1.10.0",
     "cors": "^2.8.5",

@@ -1,6 +1,9 @@
 import { supabase } from './supabaseClient';
 import { User, Session } from '@supabase/supabase-js';
 
+// API URL for backend services
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+
 // Types for our auth system
 export interface AuthUser {
   id: string;
@@ -46,6 +49,26 @@ export const authService = {
 
     if (error) {
       throw new Error(error.message);
+    }
+
+    // Send welcome email (non-blocking - don't let email failure block signup)
+    try {
+      fetch(`${API_BASE_URL}/api/email/send-welcome`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email,
+          name
+        })
+      }).catch(err => {
+        // Silently log email errors - don't throw
+        console.error('Welcome email error:', err);
+      });
+    } catch (err) {
+      // Email service errors should not block signup
+      console.error('Failed to queue welcome email:', err);
     }
 
     return data;
