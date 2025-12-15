@@ -9,8 +9,8 @@ interface FeedbackFormProps {
 
 const FeedbackForm = ({ isOpen, onClose }: FeedbackFormProps) => {
   const { t } = useLanguage();
-  // Replace this URL with your actual Google Form URL
-  const GOOGLE_FORM_URL = 'https://forms.gle/your-form-id-here';
+  // Google Form URL for Santvaani Feedback
+  const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSeLsxmjx8AlDim_q1IAK1sBQms5hkDPQap9m9E4xCWPSBmn4Q/viewform?usp=dialog';
 
   const handleOpenGoogleForm = () => {
     window.open(GOOGLE_FORM_URL, '_blank');
