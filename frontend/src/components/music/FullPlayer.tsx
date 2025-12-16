@@ -61,7 +61,7 @@ const FullPlayer = () => {
   const getThumbnail = (url: string): string => {
     if (!url) return '/placeholder-bhajan.jpg';
     const videoId = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/)?.[1];
-    return videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : '/placeholder-bhajan.jpg';
+    return videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : '/placeholder-bhajan.jpg';
   };
 
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;

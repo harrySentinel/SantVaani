@@ -52,11 +52,11 @@ const MiniPlayer = () => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Get YouTube thumbnail
+  // Get YouTube thumbnail (using hqdefault which is always available)
   const getThumbnail = (url: string): string => {
     if (!url) return '/placeholder-bhajan.jpg';
     const videoId = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/)?.[1];
-    return videoId ? `https://img.youtube.com/vi/${videoId}/mqdefault.jpg` : '/placeholder-bhajan.jpg';
+    return videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : '/placeholder-bhajan.jpg';
   };
 
   if (!isPlayerVisible || !currentBhajan) return null;
