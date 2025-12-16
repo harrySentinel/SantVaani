@@ -331,7 +331,7 @@ export const MusicPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
     toggleRepeat,
     addToQueue,
     removeFromQueue,
-    setFullPlayerOpen,
+    setFullPlayerOpen: setIsFullPlayerOpen,
     clearPlayer,
   };
 
