@@ -1,5 +1,8 @@
-# Claude Code files
+# Claude Code files (hidden from git)
 .claude/
+**/.claude/
+CLAUDE_CONTEXT.md
+**/CLAUDE_*.md
 
 # Environment files
 .env
@@ -49,8 +52,6 @@ database/nuclear_cleanup.sql
 # Blog gamification implementation doc (context only)
 BLOG_GAMIFICATION_IMPLEMENTATION.md
 
-# Claude context and development notes (context only)
-CLAUDE_CONTEXT.mdnul
 
 # Notion documents (local only)
 NOTION_AI_EMAIL_INTEGRATION_GUIDE.md
