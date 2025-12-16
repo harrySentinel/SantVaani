@@ -11,8 +11,12 @@ import { lazy } from "react";
 import { getFCMToken, onFCMMessage } from "@/lib/firebase";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { MusicPlayerProvider } from "@/contexts/MusicPlayerContext";
 import AnalyticsProvider from "@/components/AnalyticsProvider";
 import { HelmetProvider } from "react-helmet-async";
+import YouTubePlayer from "@/components/music/YouTubePlayer";
+import MiniPlayer from "@/components/music/MiniPlayer";
+import FullPlayer from "@/components/music/FullPlayer";
 
 // Lazy load pages for better code splitting
 const Index = lazy(() => import("./pages/Index"));
@@ -75,49 +79,56 @@ const App = () => {
       <HelmetProvider>
         <LanguageProvider>
           <AuthProvider>
-            <QueryClientProvider client={queryClient}>
-              <TooltipProvider>
-                <Toaster />
-                <Sonner />
-                <BrowserRouter>
-                  <AnalyticsProvider>
-          <Suspense fallback={<LoadingPage text="Loading Santvaani..." />}>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/saints" element={<Saints />} />
-              <Route path="/living-saints" element={<LivingSaints />} />
-              <Route path="/divine" element={<Divine />} />
-              <Route path="/bhajans" element={<Bhajans />} />
-              <Route path="/quotes" element={<Quotes />} />
-              <Route path="/live-bhajans" element={<LiveBhajan />} />
-              <Route path="/daily-guide" element={<DailyGuide />} />
-              <Route path="/horoscope" element={<Horoscope />} />
-              <Route path="/events" element={<Events />} />
-              <Route path="/donation" element={<Donation />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/profile-settings" element={<ProfileSettings />} />
-              <Route path="/blog" element={<BlogLanguageSelector />} />
-              <Route path="/blog/hindi" element={<BlogIndex />} />
-              <Route path="/blog/english" element={<BlogIndex />} />
-              <Route path="/blog/post/:slug" element={<BlogPostDetail />} />
-              <Route path="/blog/category/:slug" element={<BlogCategoryPage />} />
-              <Route path="/prabhu-ki-leelaayen" element={<PrabhuKiLeelaayen />} />
-              <Route path="/prabhu-ki-leelaayen/book/:slug" element={<PrabhuKiLeelaayen_Book />} />
-              <Route path="/prabhu-ki-leelaayen/read/:slug" element={<PrabhuKiLeelaayen_Read />} />
-              <Route path="/santvaani-space" element={<SantvaaniSpace />} />
-              <Route path="/santvaani-space/:postId" element={<SantvaaniSpacePost />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Suspense>
-                  </AnalyticsProvider>
-                </BrowserRouter>
-              </TooltipProvider>
-            </QueryClientProvider>
+            <MusicPlayerProvider>
+              <QueryClientProvider client={queryClient}>
+                <TooltipProvider>
+                  <Toaster />
+                  <Sonner />
+                  <BrowserRouter>
+                    <AnalyticsProvider>
+                      <Suspense fallback={<LoadingPage text="Loading Santvaani..." />}>
+                        <Routes>
+                          <Route path="/" element={<Index />} />
+                          <Route path="/saints" element={<Saints />} />
+                          <Route path="/living-saints" element={<LivingSaints />} />
+                          <Route path="/divine" element={<Divine />} />
+                          <Route path="/bhajans" element={<Bhajans />} />
+                          <Route path="/quotes" element={<Quotes />} />
+                          <Route path="/live-bhajans" element={<LiveBhajan />} />
+                          <Route path="/daily-guide" element={<DailyGuide />} />
+                          <Route path="/horoscope" element={<Horoscope />} />
+                          <Route path="/events" element={<Events />} />
+                          <Route path="/donation" element={<Donation />} />
+                          <Route path="/about" element={<About />} />
+                          <Route path="/login" element={<Login />} />
+                          <Route path="/signup" element={<Signup />} />
+                          <Route path="/reset-password" element={<ResetPassword />} />
+                          <Route path="/dashboard" element={<Dashboard />} />
+                          <Route path="/profile-settings" element={<ProfileSettings />} />
+                          <Route path="/blog" element={<BlogLanguageSelector />} />
+                          <Route path="/blog/hindi" element={<BlogIndex />} />
+                          <Route path="/blog/english" element={<BlogIndex />} />
+                          <Route path="/blog/post/:slug" element={<BlogPostDetail />} />
+                          <Route path="/blog/category/:slug" element={<BlogCategoryPage />} />
+                          <Route path="/prabhu-ki-leelaayen" element={<PrabhuKiLeelaayen />} />
+                          <Route path="/prabhu-ki-leelaayen/book/:slug" element={<PrabhuKiLeelaayen_Book />} />
+                          <Route path="/prabhu-ki-leelaayen/read/:slug" element={<PrabhuKiLeelaayen_Read />} />
+                          <Route path="/santvaani-space" element={<SantvaaniSpace />} />
+                          <Route path="/santvaani-space/:postId" element={<SantvaaniSpacePost />} />
+                          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                          <Route path="*" element={<NotFound />} />
+                        </Routes>
+                      </Suspense>
+
+                      {/* Music Player Components */}
+                      <YouTubePlayer />
+                      <MiniPlayer />
+                      <FullPlayer />
+                    </AnalyticsProvider>
+                  </BrowserRouter>
+                </TooltipProvider>
+              </QueryClientProvider>
+            </MusicPlayerProvider>
           </AuthProvider>
         </LanguageProvider>
       </HelmetProvider>

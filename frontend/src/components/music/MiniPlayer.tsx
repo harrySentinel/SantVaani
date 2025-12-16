@@ -1,0 +1,250 @@
+import { useState, useEffect } from 'react';
+import { useMusicPlayer } from '@/contexts/MusicPlayerContext';
+import {
+  Play,
+  Pause,
+  SkipBack,
+  SkipForward,
+  Volume2,
+  VolumeX,
+  Shuffle,
+  Repeat,
+  Repeat1,
+  ChevronUp,
+  X,
+  ListMusic
+} from 'lucide-react';
+import { Slider } from '@/components/ui/slider';
+import { Button } from '@/components/ui/button';
+import { useLanguage } from '@/contexts/LanguageContext';
+
+const MiniPlayer = () => {
+  const {
+    currentBhajan,
+    isPlaying,
+    volume,
+    isMuted,
+    shuffle,
+    repeat,
+    currentTime,
+    duration,
+    isPlayerVisible,
+    togglePlayPause,
+    playNext,
+    playPrevious,
+    seekTo,
+    setVolume,
+    toggleMute,
+    toggleShuffle,
+    toggleRepeat,
+    setFullPlayerOpen,
+    clearPlayer,
+  } = useMusicPlayer();
+
+  const { language } = useLanguage();
+  const [showVolumeSlider, setShowVolumeSlider] = useState(false);
+
+  // Format time (seconds to mm:ss)
+  const formatTime = (seconds: number): string => {
+    if (!seconds || isNaN(seconds)) return '0:00';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  // Get YouTube thumbnail
+  const getThumbnail = (url: string): string => {
+    if (!url) return '/placeholder-bhajan.jpg';
+    const videoId = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/)?.[1];
+    return videoId ? `https://img.youtube.com/vi/${videoId}/mqdefault.jpg` : '/placeholder-bhajan.jpg';
+  };
+
+  if (!isPlayerVisible || !currentBhajan) return null;
+
+  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+
+  return (
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-r from-orange-600 via-red-600 to-orange-600 text-white shadow-2xl border-t border-orange-500/30">
+      {/* Progress Bar */}
+      <div className="w-full h-1 bg-black/20 cursor-pointer group" onClick={(e) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const percentage = x / rect.width;
+        seekTo(duration * percentage);
+      }}>
+        <div
+          className="h-full bg-white transition-all duration-100 relative"
+          style={{ width: `${progress}%` }}
+        >
+          <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+        </div>
+      </div>
+
+      <div className="px-4 py-3">
+        <div className="max-w-screen-2xl mx-auto flex items-center justify-between gap-4">
+          {/* Left: Song Info */}
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            <img
+              src={getThumbnail(currentBhajan.youtube_url || '')}
+              alt={currentBhajan.title}
+              className="w-14 h-14 rounded-lg object-cover shadow-lg cursor-pointer hover:scale-105 transition-transform"
+              onClick={() => setFullPlayerOpen(true)}
+            />
+            <div className="min-w-0 flex-1">
+              <h4
+                className="font-semibold text-sm truncate cursor-pointer hover:underline"
+                onClick={() => setFullPlayerOpen(true)}
+              >
+                {language === 'hi' && currentBhajan.title_hi
+                  ? currentBhajan.title_hi
+                  : currentBhajan.title}
+              </h4>
+              <p className="text-xs text-white/80 truncate">{currentBhajan.author}</p>
+            </div>
+          </div>
+
+          {/* Center: Player Controls */}
+          <div className="flex flex-col items-center gap-2 flex-shrink-0">
+            <div className="flex items-center gap-3">
+              {/* Shuffle */}
+              <Button
+                variant="ghost"
+                size="sm"
+                className={`h-8 w-8 p-0 hover:bg-white/20 transition-colors ${
+                  shuffle ? 'text-orange-200' : 'text-white/70'
+                }`}
+                onClick={toggleShuffle}
+              >
+                <Shuffle className="w-4 h-4" />
+              </Button>
+
+              {/* Previous */}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-9 w-9 p-0 hover:bg-white/20 text-white"
+                onClick={playPrevious}
+              >
+                <SkipBack className="w-5 h-5" fill="currentColor" />
+              </Button>
+
+              {/* Play/Pause */}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-11 w-11 p-0 bg-white hover:bg-white/90 text-orange-600 rounded-full shadow-lg hover:scale-105 transition-transform"
+                onClick={togglePlayPause}
+              >
+                {isPlaying ? (
+                  <Pause className="w-6 h-6" fill="currentColor" />
+                ) : (
+                  <Play className="w-6 h-6 ml-0.5" fill="currentColor" />
+                )}
+              </Button>
+
+              {/* Next */}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-9 w-9 p-0 hover:bg-white/20 text-white"
+                onClick={playNext}
+              >
+                <SkipForward className="w-5 h-5" fill="currentColor" />
+              </Button>
+
+              {/* Repeat */}
+              <Button
+                variant="ghost"
+                size="sm"
+                className={`h-8 w-8 p-0 hover:bg-white/20 transition-colors ${
+                  repeat !== 'none' ? 'text-orange-200' : 'text-white/70'
+                }`}
+                onClick={toggleRepeat}
+              >
+                {repeat === 'one' ? (
+                  <Repeat1 className="w-4 h-4" />
+                ) : (
+                  <Repeat className="w-4 h-4" />
+                )}
+              </Button>
+            </div>
+
+            {/* Time */}
+            <div className="text-xs text-white/80 font-medium">
+              {formatTime(currentTime)} / {formatTime(duration)}
+            </div>
+          </div>
+
+          {/* Right: Volume & Actions */}
+          <div className="flex items-center gap-3 flex-1 justify-end">
+            {/* Volume Control */}
+            <div
+              className="flex items-center gap-2 relative"
+              onMouseEnter={() => setShowVolumeSlider(true)}
+              onMouseLeave={() => setShowVolumeSlider(false)}
+            >
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0 hover:bg-white/20 text-white"
+                onClick={toggleMute}
+              >
+                {isMuted || volume === 0 ? (
+                  <VolumeX className="w-5 h-5" />
+                ) : (
+                  <Volume2 className="w-5 h-5" />
+                )}
+              </Button>
+
+              {showVolumeSlider && (
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-gray-900 rounded-lg p-3 shadow-xl">
+                  <Slider
+                    value={[isMuted ? 0 : volume]}
+                    onValueChange={(value) => setVolume(value[0])}
+                    max={100}
+                    step={1}
+                    className="w-24 [&_[role=slider]]:bg-white [&_[role=slider]]:border-2 [&_[role=slider]]:border-orange-500"
+                    orientation="vertical"
+                    style={{ height: '100px' }}
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Queue */}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0 hover:bg-white/20 text-white hidden md:flex"
+              onClick={() => setFullPlayerOpen(true)}
+            >
+              <ListMusic className="w-5 h-5" />
+            </Button>
+
+            {/* Expand */}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0 hover:bg-white/20 text-white"
+              onClick={() => setFullPlayerOpen(true)}
+            >
+              <ChevronUp className="w-5 h-5" />
+            </Button>
+
+            {/* Close */}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0 hover:bg-white/20 text-white/70 hover:text-white"
+              onClick={clearPlayer}
+            >
+              <X className="w-5 h-5" />
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default MiniPlayer;

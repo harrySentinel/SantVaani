@@ -3,6 +3,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useMusicPlayer } from '@/contexts/MusicPlayerContext';
 import BhajanModal from '@/components/BhajanModal';
 import BhajanShareButton from '@/components/BhajanShareButton';
 import FavoriteButton from '@/components/bhajan/FavoriteButton';
@@ -10,7 +11,8 @@ import BhajanStats from '@/components/bhajan/BhajanStats';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Music, Loader2, Search, Flame, TrendingUp, Sparkles } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Music, Loader2, Search, Flame, TrendingUp, Sparkles, Play, Pause } from 'lucide-react';
 import { Toaster } from '@/components/ui/toaster';
 import { supabase } from '@/lib/supabaseClient';
 import { usePagination } from '@/hooks/usePagination';
@@ -32,6 +34,7 @@ interface Bhajan {
 const Bhajans = () => {
   const { t, language } = useLanguage();
   const { user } = useAuth();
+  const { playBhajan, currentBhajan, isPlaying, togglePlayPause } = useMusicPlayer();
   const [selectedBhajan, setSelectedBhajan] = useState<Bhajan | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [bhajans, setBhajans] = useState<Bhajan[]>([]);
@@ -192,6 +195,35 @@ const Bhajans = () => {
           <div className="flex items-center justify-between pt-2">
             <p className="text-xs text-gray-500">- {bhajan.author}</p>
             <div className="flex items-center space-x-2">
+              {/* Play Button */}
+              {bhajan.youtube_url && (
+                <div onClick={(e) => e.stopPropagation()}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={`h-9 w-9 p-0 rounded-full transition-all ${
+                      currentBhajan?.id === bhajan.id && isPlaying
+                        ? 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white'
+                        : 'bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600 text-white'
+                    }`}
+                    onClick={() => {
+                      if (currentBhajan?.id === bhajan.id) {
+                        togglePlayPause();
+                      } else {
+                        playBhajan(bhajan, filteredBhajans);
+                        recordBhajanPlay(bhajan.id, user?.id);
+                      }
+                    }}
+                  >
+                    {currentBhajan?.id === bhajan.id && isPlaying ? (
+                      <Pause className="w-4 h-4" fill="currentColor" />
+                    ) : (
+                      <Play className="w-4 h-4 ml-0.5" fill="currentColor" />
+                    )}
+                  </Button>
+                </div>
+              )}
+
               <div onClick={(e) => e.stopPropagation()}>
                 <FavoriteButton
                   bhajanId={bhajan.id}
