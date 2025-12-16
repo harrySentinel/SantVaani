@@ -39,6 +39,9 @@ interface MusicPlayerContextType {
   removeFromQueue: (index: number) => void;
   setFullPlayerOpen: (open: boolean) => void;
   clearPlayer: () => void;
+  setPlayerRef: (player: any) => void;
+  setDuration: (duration: number) => void;
+  setCurrentTime: (time: number) => void;
 }
 
 const MusicPlayerContext = createContext<MusicPlayerContextType | undefined>(undefined);
@@ -306,6 +309,10 @@ export const MusicPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
     }
   }, []);
 
+  const setPlayerReference = useCallback((player: any) => {
+    playerRef.current = player;
+  }, []);
+
   const value = {
     currentBhajan,
     playlist,
@@ -333,6 +340,9 @@ export const MusicPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
     removeFromQueue,
     setFullPlayerOpen: setIsFullPlayerOpen,
     clearPlayer,
+    setPlayerRef: setPlayerReference,
+    setDuration,
+    setCurrentTime,
   };
 
   return (

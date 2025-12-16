@@ -9,7 +9,16 @@ declare global {
 }
 
 const YouTubePlayer = () => {
-  const { currentBhajan, isPlaying, volume, isMuted } = useMusicPlayer();
+  const {
+    currentBhajan,
+    isPlaying,
+    volume,
+    isMuted,
+    playNext,
+    setPlayerRef,
+    setDuration,
+    setCurrentTime: setContextCurrentTime,
+  } = useMusicPlayer();
   const playerRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -81,16 +90,47 @@ const YouTubePlayer = () => {
           },
           events: {
             onReady: (event: any) => {
+              console.log('YouTube player ready');
+              // Pass player reference to context
+              setPlayerRef(event.target);
+
+              // Set initial volume and mute state
               event.target.setVolume(volume);
               if (isMuted) {
                 event.target.mute();
               }
+
+              // Set duration
+              const videoDuration = event.target.getDuration();
+              if (videoDuration) {
+                setDuration(videoDuration);
+              }
+
+              // Auto-play if needed
               if (isPlaying) {
                 event.target.playVideo();
               }
             },
             onStateChange: (event: any) => {
-              // Handle state changes in context
+              // YouTube Player States:
+              // -1: unstarted
+              // 0: ended
+              // 1: playing
+              // 2: paused
+              // 3: buffering
+              // 5: video cued
+
+              if (event.data === 0) {
+                // Video ended - play next song
+                console.log('Video ended, playing next...');
+                playNext();
+              } else if (event.data === 1) {
+                // Playing - update duration if not set
+                const videoDuration = event.target.getDuration();
+                if (videoDuration) {
+                  setDuration(videoDuration);
+                }
+              }
             },
           },
         });
@@ -135,6 +175,20 @@ const YouTubePlayer = () => {
       playerRef.current.unMute?.();
     }
   }, [isMuted]);
+
+  // Update current time periodically while playing
+  useEffect(() => {
+    if (!playerRef.current || !isPlaying) return;
+
+    const interval = setInterval(() => {
+      if (playerRef.current && playerRef.current.getCurrentTime) {
+        const time = playerRef.current.getCurrentTime();
+        setContextCurrentTime(time);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [isPlaying, setContextCurrentTime]);
 
   // Hidden container for YouTube player
   return <div ref={containerRef} style={{ display: 'none' }} />;
