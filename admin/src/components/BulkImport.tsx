@@ -112,18 +112,37 @@ export default function BulkImport({
             }
             transformedItem = {
               name: item.name,
-              name_hi: item.name_hi || '',
-              birth_year: item.birth_year || null,
-              location: item.location || '',
-              image_url: item.image_url || '',
-              description: item.description || '',
-              description_hi: item.description_hi || '',
-              specialty: item.specialty || '',
-              specialty_hi: item.specialty_hi || '',
-              biography: item.biography || '',
-              biography_hi: item.biography_hi || '',
-              teachings: item.teachings || '',
-              contact_info: item.contact_info || ''
+              name_hi: item.name_hi || null,
+              organization: item.organization || null,
+              specialty: item.specialty || null,
+              specialty_hi: item.specialty_hi || null,
+              image: item.image || null,
+              description: item.description || null,
+              description_hi: item.description_hi || null,
+              website: item.website || null,
+              followers: item.followers || null,
+              teachings: Array.isArray(item.teachings) ? item.teachings :
+                        (item.teachings ? [item.teachings] : null),
+              birth_place: item.birth_place || null,
+              birth_place_hi: item.birth_place_hi || null,
+              current_location: item.current_location || null,
+              current_location_hi: item.current_location_hi || null,
+              biography: item.biography || null,
+              biography_hi: item.biography_hi || null,
+              spiritual_journey: item.spiritual_journey || null,
+              spiritual_journey_hi: item.spiritual_journey_hi || null,
+              key_teachings: Array.isArray(item.key_teachings) ? item.key_teachings :
+                           (item.key_teachings ? item.key_teachings.split(',').map((t: string) => t.trim()) : null),
+              key_teachings_hi: Array.isArray(item.key_teachings_hi) ? item.key_teachings_hi :
+                              (item.key_teachings_hi ? item.key_teachings_hi.split(',').map((t: string) => t.trim()) : null),
+              quotes: Array.isArray(item.quotes) ? item.quotes :
+                     (item.quotes ? [item.quotes] : null),
+              quotes_hi: Array.isArray(item.quotes_hi) ? item.quotes_hi :
+                        (item.quotes_hi ? [item.quotes_hi] : null),
+              ashram: item.ashram || null,
+              ashram_hi: item.ashram_hi || null,
+              lineage: item.lineage || null,
+              lineage_hi: item.lineage_hi || null
             }
             break
 
