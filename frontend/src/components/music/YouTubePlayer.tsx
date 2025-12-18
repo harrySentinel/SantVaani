@@ -22,6 +22,7 @@ const YouTubePlayer = () => {
     setIsBuffering,
     setError,
     isLoading,
+    setIsLoading,
   } = useMusicPlayer();
   const playerRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -142,6 +143,7 @@ const YouTubePlayer = () => {
               onReady: (event: any) => {
                 console.log('YouTube player ready');
                 setIsBuffering(false);
+                setIsLoading(false);
                 retryCountRef.current = 0;
 
                 // Pass player reference to context
@@ -184,8 +186,9 @@ const YouTubePlayer = () => {
                   setIsBuffering(false);
                   handlePlayNext();
                 } else if (event.data === 1) {
-                  // Playing - update duration if not set and clear buffering
+                  // Playing - update duration if not set and clear buffering/loading
                   setIsBuffering(false);
+                  setIsLoading(false);
                   setError(null);
                   const videoDuration = event.target.getDuration();
                   if (videoDuration) {
@@ -202,6 +205,7 @@ const YouTubePlayer = () => {
               onError: (event: any) => {
                 console.error('YouTube player error:', event.data);
                 setIsBuffering(false);
+                setIsLoading(false);
 
                 // YouTube error codes:
                 // 2: Invalid parameter

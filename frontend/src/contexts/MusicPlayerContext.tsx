@@ -50,6 +50,7 @@ interface MusicPlayerContextType {
   clearError: () => void;
   setIsBuffering: (buffering: boolean) => void;
   setError: (error: string | null) => void;
+  setIsLoading: (loading: boolean) => void;
 }
 
 const MusicPlayerContext = createContext<MusicPlayerContextType | undefined>(undefined);
@@ -408,6 +409,7 @@ export const MusicPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
     clearError,
     setIsBuffering,
     setError,
+    setIsLoading,
   };
 
   return (
