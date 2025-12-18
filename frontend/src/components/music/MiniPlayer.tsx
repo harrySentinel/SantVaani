@@ -66,17 +66,17 @@ const MiniPlayer = () => {
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-r from-orange-600 via-red-600 to-orange-600 text-white shadow-2xl border-t border-orange-500/30">
       {/* Progress Bar */}
-      <div className="w-full h-1 bg-black/20 cursor-pointer group" onClick={(e) => {
+      <div className="w-full h-1.5 bg-black/30 cursor-pointer group" onClick={(e) => {
         const rect = e.currentTarget.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const percentage = x / rect.width;
         seekTo(duration * percentage);
       }}>
         <div
-          className="h-full bg-white transition-all duration-100 relative"
+          className="h-full bg-white/90 transition-all duration-100 relative"
           style={{ width: `${progress}%` }}
         >
-          <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3.5 h-3.5 bg-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity scale-0 group-hover:scale-100" />
         </div>
       </div>
 
@@ -197,13 +197,13 @@ const MiniPlayer = () => {
               </Button>
 
               {showVolumeSlider && (
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-gray-900 rounded-lg p-3 shadow-xl">
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-gray-900/95 backdrop-blur-sm rounded-lg p-3 shadow-2xl border border-white/10">
                   <Slider
                     value={[isMuted ? 0 : volume]}
                     onValueChange={(value) => setVolume(value[0])}
                     max={100}
                     step={1}
-                    className="w-24 [&_[role=slider]]:bg-white [&_[role=slider]]:border-2 [&_[role=slider]]:border-orange-500"
+                    className="w-24 [&_[role=slider]]:bg-white [&_[role=slider]]:border-2 [&_[role=slider]]:border-orange-500 [&_[role=slider]]:shadow-lg [&>span:first-child]:bg-white/20 [&>span:first-child>span]:bg-white"
                     orientation="vertical"
                     style={{ height: '100px' }}
                   />

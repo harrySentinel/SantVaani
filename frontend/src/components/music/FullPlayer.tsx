@@ -136,7 +136,7 @@ const FullPlayer = () => {
                   onValueChange={(value) => seekTo(value[0])}
                   max={duration || 100}
                   step={1}
-                  className="[&_[role=slider]]:bg-white [&_[role=slider]]:border-2 [&_[role=slider]]:border-orange-500"
+                  className="[&_[role=slider]]:bg-white [&_[role=slider]]:border-2 [&_[role=slider]]:border-orange-500 [&_[role=slider]]:shadow-lg [&_[role=slider]]:w-4 [&_[role=slider]]:h-4 [&>span:first-child]:bg-white/30 [&>span:first-child]:h-2 [&>span:first-child>span]:bg-white"
                 />
                 <div className="flex justify-between text-sm text-white/80">
                   <span>{formatTime(currentTime)}</span>
@@ -226,7 +226,7 @@ const FullPlayer = () => {
                   onValueChange={(value) => setVolume(value[0])}
                   max={100}
                   step={1}
-                  className="flex-1 [&_[role=slider]]:bg-white [&_[role=slider]]:border-2 [&_[role=slider]]:border-orange-500"
+                  className="flex-1 [&_[role=slider]]:bg-white [&_[role=slider]]:border-2 [&_[role=slider]]:border-orange-500 [&_[role=slider]]:shadow-lg [&_[role=slider]]:w-4 [&_[role=slider]]:h-4 [&>span:first-child]:bg-white/30 [&>span:first-child]:h-2 [&>span:first-child>span]:bg-white"
                 />
               </div>
             </div>
