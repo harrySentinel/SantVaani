@@ -17,6 +17,7 @@ import { HelmetProvider } from "react-helmet-async";
 import YouTubePlayer from "@/components/music/YouTubePlayer";
 import MiniPlayer from "@/components/music/MiniPlayer";
 import FullPlayer from "@/components/music/FullPlayer";
+import KeyboardShortcuts from "@/components/music/KeyboardShortcuts";
 
 // Lazy load pages for better code splitting
 const Index = lazy(() => import("./pages/Index"));
@@ -124,6 +125,7 @@ const App = () => {
                       <YouTubePlayer />
                       <MiniPlayer />
                       <FullPlayer />
+                      <KeyboardShortcuts />
                     </AnalyticsProvider>
                   </BrowserRouter>
                 </TooltipProvider>

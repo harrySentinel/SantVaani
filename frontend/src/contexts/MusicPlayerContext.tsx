@@ -23,6 +23,10 @@ interface MusicPlayerContextType {
   duration: number;
   isPlayerVisible: boolean;
   isFullPlayerOpen: boolean;
+  isLoading: boolean;
+  isBuffering: boolean;
+  error: string | null;
+  playbackRate: number;
 
   playBhajan: (bhajan: Bhajan, newPlaylist?: Bhajan[]) => void;
   pauseBhajan: () => void;
@@ -42,62 +46,80 @@ interface MusicPlayerContextType {
   setPlayerRef: (player: any) => void;
   setDuration: (duration: number) => void;
   setCurrentTime: (time: number) => void;
+  setPlaybackRate: (rate: number) => void;
+  clearError: () => void;
+  setIsBuffering: (buffering: boolean) => void;
+  setError: (error: string | null) => void;
 }
 
 const MusicPlayerContext = createContext<MusicPlayerContextType | undefined>(undefined);
 
+// Load saved settings from localStorage
+const loadSavedSettings = () => {
+  try {
+    const savedVolume = localStorage.getItem('musicPlayer_volume');
+    const savedRepeat = localStorage.getItem('musicPlayer_repeat');
+    const savedPlaybackRate = localStorage.getItem('musicPlayer_playbackRate');
+
+    return {
+      volume: savedVolume ? parseInt(savedVolume, 10) : 80,
+      repeat: (savedRepeat as 'none' | 'one' | 'all') || 'all',
+      playbackRate: savedPlaybackRate ? parseFloat(savedPlaybackRate) : 1,
+    };
+  } catch (error) {
+    console.error('Failed to load saved settings:', error);
+    return { volume: 80, repeat: 'all' as const, playbackRate: 1 };
+  }
+};
+
 export const MusicPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const savedSettings = loadSavedSettings();
+
   const [currentBhajan, setCurrentBhajan] = useState<Bhajan | null>(null);
   const [playlist, setPlaylist] = useState<Bhajan[]>([]);
   const [originalPlaylist, setOriginalPlaylist] = useState<Bhajan[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolumeState] = useState(80);
+  const [volume, setVolumeState] = useState(savedSettings.volume);
   const [isMuted, setIsMuted] = useState(false);
   const [shuffle, setShuffle] = useState(false);
-  const [repeat, setRepeat] = useState<'none' | 'one' | 'all'>('all');
+  const [repeat, setRepeatState] = useState<'none' | 'one' | 'all'>(savedSettings.repeat);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isPlayerVisible, setIsPlayerVisible] = useState(false);
   const [isFullPlayerOpen, setIsFullPlayerOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isBuffering, setIsBuffering] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [playbackRate, setPlaybackRateState] = useState(savedSettings.playbackRate);
 
   const playerRef = useRef<any>(null);
+  const playNextRef = useRef<() => void>();
 
-  // YouTube player ready callback
-  const onPlayerReady = useCallback((event: any) => {
-    playerRef.current = event.target;
-    if (isPlaying) {
-      event.target.playVideo();
-    }
-    event.target.setVolume(volume);
-  }, [isPlaying, volume]);
-
-  // YouTube player state change callback
-  const onPlayerStateChange = useCallback((event: any) => {
-    // 0: ended, 1: playing, 2: paused
-    if (event.data === 0) {
-      // Video ended - play next
-      playNext();
-    } else if (event.data === 1) {
-      setIsPlaying(true);
-      setDuration(event.target.getDuration());
-    } else if (event.data === 2) {
-      setIsPlaying(false);
-    }
-  }, []);
-
-  // Update current time
+  // Save settings to localStorage whenever they change
   useEffect(() => {
-    if (!isPlaying || !playerRef.current) return;
+    try {
+      localStorage.setItem('musicPlayer_volume', volume.toString());
+    } catch (error) {
+      console.error('Failed to save volume:', error);
+    }
+  }, [volume]);
 
-    const interval = setInterval(() => {
-      if (playerRef.current && playerRef.current.getCurrentTime) {
-        setCurrentTime(playerRef.current.getCurrentTime());
-      }
-    }, 1000);
+  useEffect(() => {
+    try {
+      localStorage.setItem('musicPlayer_repeat', repeat);
+    } catch (error) {
+      console.error('Failed to save repeat mode:', error);
+    }
+  }, [repeat]);
 
-    return () => clearInterval(interval);
-  }, [isPlaying]);
+  useEffect(() => {
+    try {
+      localStorage.setItem('musicPlayer_playbackRate', playbackRate.toString());
+    } catch (error) {
+      console.error('Failed to save playback rate:', error);
+    }
+  }, [playbackRate]);
 
   // Shuffle playlist
   const shuffleArray = <T,>(array: T[]): T[] => {
@@ -110,29 +132,43 @@ export const MusicPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
   };
 
   const playBhajan = useCallback((bhajan: Bhajan, newPlaylist?: Bhajan[]) => {
-    setCurrentBhajan(bhajan);
-    setIsPlayerVisible(true);
-    setIsPlaying(true);
-    setCurrentTime(0);
-
-    if (newPlaylist && newPlaylist.length > 0) {
-      setOriginalPlaylist(newPlaylist);
-      const list = shuffle ? shuffleArray(newPlaylist) : newPlaylist;
-      setPlaylist(list);
-      const index = list.findIndex(b => b.id === bhajan.id);
-      setCurrentIndex(index >= 0 ? index : 0);
-    } else if (playlist.length === 0) {
-      setPlaylist([bhajan]);
-      setOriginalPlaylist([bhajan]);
-      setCurrentIndex(0);
-    } else {
-      const index = playlist.findIndex(b => b.id === bhajan.id);
-      if (index >= 0) {
-        setCurrentIndex(index);
-      } else {
-        setPlaylist([...playlist, bhajan]);
-        setCurrentIndex(playlist.length);
+    try {
+      // Validate bhajan has a YouTube URL
+      if (!bhajan.youtube_url) {
+        setError('This bhajan does not have a valid YouTube URL');
+        return;
       }
+
+      setError(null);
+      setIsLoading(true);
+      setCurrentBhajan(bhajan);
+      setIsPlayerVisible(true);
+      setIsPlaying(true);
+      setCurrentTime(0);
+
+      if (newPlaylist && newPlaylist.length > 0) {
+        setOriginalPlaylist(newPlaylist);
+        const list = shuffle ? shuffleArray(newPlaylist) : newPlaylist;
+        setPlaylist(list);
+        const index = list.findIndex(b => b.id === bhajan.id);
+        setCurrentIndex(index >= 0 ? index : 0);
+      } else if (playlist.length === 0) {
+        setPlaylist([bhajan]);
+        setOriginalPlaylist([bhajan]);
+        setCurrentIndex(0);
+      } else {
+        const index = playlist.findIndex(b => b.id === bhajan.id);
+        if (index >= 0) {
+          setCurrentIndex(index);
+        } else {
+          setPlaylist([...playlist, bhajan]);
+          setCurrentIndex(playlist.length);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to play bhajan:', err);
+      setError('Failed to play this bhajan. Please try again.');
+      setIsLoading(false);
     }
   }, [playlist, shuffle]);
 
@@ -271,8 +307,21 @@ export const MusicPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
     const modes: Array<'none' | 'one' | 'all'> = ['none', 'all', 'one'];
     const currentModeIndex = modes.indexOf(repeat);
     const nextMode = modes[(currentModeIndex + 1) % modes.length];
-    setRepeat(nextMode);
+    setRepeatState(nextMode);
   }, [repeat]);
+
+  const setPlaybackRate = useCallback((rate: number) => {
+    // Validate playback rate (0.25x to 2x)
+    const validRate = Math.max(0.25, Math.min(2, rate));
+    setPlaybackRateState(validRate);
+    if (playerRef.current && playerRef.current.setPlaybackRate) {
+      playerRef.current.setPlaybackRate(validRate);
+    }
+  }, []);
+
+  const clearError = useCallback(() => {
+    setError(null);
+  }, []);
 
   const addToQueue = useCallback((bhajan: Bhajan) => {
     setPlaylist(prev => [...prev, bhajan]);
@@ -304,6 +353,9 @@ export const MusicPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
     setIsFullPlayerOpen(false);
     setCurrentTime(0);
     setDuration(0);
+    setError(null);
+    setIsLoading(false);
+    setIsBuffering(false);
     if (playerRef.current && playerRef.current.stopVideo) {
       playerRef.current.stopVideo();
     }
@@ -312,6 +364,11 @@ export const MusicPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const setPlayerReference = useCallback((player: any) => {
     playerRef.current = player;
   }, []);
+
+  // Update playNextRef whenever playNext changes
+  useEffect(() => {
+    playNextRef.current = playNext;
+  }, [playNext]);
 
   const value = {
     currentBhajan,
@@ -325,6 +382,10 @@ export const MusicPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
     duration,
     isPlayerVisible,
     isFullPlayerOpen,
+    isLoading,
+    isBuffering,
+    error,
+    playbackRate,
     playBhajan,
     pauseBhajan,
     resumeBhajan,
@@ -343,6 +404,10 @@ export const MusicPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
     setPlayerRef: setPlayerReference,
     setDuration,
     setCurrentTime,
+    setPlaybackRate,
+    clearError,
+    setIsBuffering,
+    setError,
   };
 
   return (

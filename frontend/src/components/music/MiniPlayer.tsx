@@ -12,7 +12,9 @@ import {
   Repeat1,
   ChevronUp,
   X,
-  ListMusic
+  ListMusic,
+  Loader2,
+  AlertCircle,
 } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
@@ -29,6 +31,9 @@ const MiniPlayer = () => {
     currentTime,
     duration,
     isPlayerVisible,
+    isLoading,
+    isBuffering,
+    error,
     togglePlayPause,
     playNext,
     playPrevious,
@@ -39,6 +44,7 @@ const MiniPlayer = () => {
     toggleRepeat,
     setFullPlayerOpen,
     clearPlayer,
+    clearError,
   } = useMusicPlayer();
 
   const { language } = useLanguage();
@@ -64,7 +70,26 @@ const MiniPlayer = () => {
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-r from-orange-600 via-red-600 to-orange-600 text-white shadow-2xl border-t border-orange-500/30">
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-r from-orange-600 via-red-600 to-orange-600 text-white shadow-2xl border-t border-orange-500/30" role="region" aria-label="Music Player">
+      {/* Error Banner */}
+      {error && (
+        <div className="bg-red-700 px-4 py-2 flex items-center justify-between text-sm" role="alert">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-4 h-4" />
+            <span>{error}</span>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-6 w-6 p-0 hover:bg-red-800"
+            onClick={clearError}
+            aria-label="Dismiss error"
+          >
+            <X className="w-4 h-4" />
+          </Button>
+        </div>
+      )}
+
       {/* Progress Bar */}
       <div className="w-full h-1.5 bg-black/30 cursor-pointer group" onClick={(e) => {
         const rect = e.currentTarget.getBoundingClientRect();
@@ -114,6 +139,8 @@ const MiniPlayer = () => {
                   shuffle ? 'text-orange-200' : 'text-white/70'
                 }`}
                 onClick={toggleShuffle}
+                aria-label={shuffle ? 'Shuffle on' : 'Shuffle off'}
+                aria-pressed={shuffle}
               >
                 <Shuffle className="w-4 h-4" />
               </Button>
@@ -124,6 +151,7 @@ const MiniPlayer = () => {
                 size="sm"
                 className="h-9 w-9 p-0 hover:bg-white/20 text-white"
                 onClick={playPrevious}
+                aria-label="Previous track"
               >
                 <SkipBack className="w-5 h-5" fill="currentColor" />
               </Button>
@@ -134,8 +162,12 @@ const MiniPlayer = () => {
                 size="sm"
                 className="h-11 w-11 p-0 bg-white hover:bg-white/90 text-orange-600 rounded-full shadow-lg hover:scale-105 transition-transform"
                 onClick={togglePlayPause}
+                disabled={isLoading}
+                aria-label={isPlaying ? 'Pause' : 'Play'}
               >
-                {isPlaying ? (
+                {isBuffering || isLoading ? (
+                  <Loader2 className="w-6 h-6 animate-spin" />
+                ) : isPlaying ? (
                   <Pause className="w-6 h-6" fill="currentColor" />
                 ) : (
                   <Play className="w-6 h-6 ml-0.5" fill="currentColor" />
@@ -148,6 +180,7 @@ const MiniPlayer = () => {
                 size="sm"
                 className="h-9 w-9 p-0 hover:bg-white/20 text-white"
                 onClick={playNext}
+                aria-label="Next track"
               >
                 <SkipForward className="w-5 h-5" fill="currentColor" />
               </Button>
@@ -160,6 +193,8 @@ const MiniPlayer = () => {
                   repeat !== 'none' ? 'text-orange-200' : 'text-white/70'
                 }`}
                 onClick={toggleRepeat}
+                aria-label={`Repeat ${repeat}`}
+                aria-pressed={repeat !== 'none'}
               >
                 {repeat === 'one' ? (
                   <Repeat1 className="w-4 h-4" />
@@ -188,6 +223,8 @@ const MiniPlayer = () => {
                 size="sm"
                 className="h-8 w-8 p-0 hover:bg-white/20 text-white"
                 onClick={toggleMute}
+                aria-label={isMuted ? 'Unmute' : 'Mute'}
+                aria-pressed={isMuted}
               >
                 {isMuted || volume === 0 ? (
                   <VolumeX className="w-5 h-5" />
@@ -217,6 +254,7 @@ const MiniPlayer = () => {
               size="sm"
               className="h-8 w-8 p-0 hover:bg-white/20 text-white hidden md:flex"
               onClick={() => setFullPlayerOpen(true)}
+              aria-label="Show queue"
             >
               <ListMusic className="w-5 h-5" />
             </Button>
@@ -227,6 +265,7 @@ const MiniPlayer = () => {
               size="sm"
               className="h-8 w-8 p-0 hover:bg-white/20 text-white"
               onClick={() => setFullPlayerOpen(true)}
+              aria-label="Expand player"
             >
               <ChevronUp className="w-5 h-5" />
             </Button>
@@ -237,6 +276,7 @@ const MiniPlayer = () => {
               size="sm"
               className="h-8 w-8 p-0 hover:bg-white/20 text-white/70 hover:text-white"
               onClick={clearPlayer}
+              aria-label="Close player"
             >
               <X className="w-5 h-5" />
             </Button>

@@ -15,6 +15,9 @@ import {
   Music,
   List,
   Heart,
+  Loader2,
+  AlertCircle,
+  Gauge,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
@@ -34,6 +37,10 @@ const FullPlayer = () => {
     currentTime,
     duration,
     isFullPlayerOpen,
+    isLoading,
+    isBuffering,
+    error,
+    playbackRate,
     togglePlayPause,
     playNext,
     playPrevious,
@@ -44,6 +51,8 @@ const FullPlayer = () => {
     toggleRepeat,
     setFullPlayerOpen,
     playBhajan,
+    setPlaybackRate,
+    clearError,
   } = useMusicPlayer();
 
   const { language } = useLanguage();
@@ -67,7 +76,26 @@ const FullPlayer = () => {
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (
-    <div className="fixed inset-0 z-[100] bg-gradient-to-br from-orange-600 via-red-600 to-orange-700 text-white overflow-hidden">
+    <div className="fixed inset-0 z-[100] bg-gradient-to-br from-orange-600 via-red-600 to-orange-700 text-white overflow-hidden" role="dialog" aria-label="Full music player">
+      {/* Error Banner */}
+      {error && (
+        <div className="absolute top-0 left-0 right-0 bg-red-700 px-6 py-3 flex items-center justify-between z-20" role="alert">
+          <div className="flex items-center gap-3">
+            <AlertCircle className="w-5 h-5" />
+            <span className="font-medium">{error}</span>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 p-0 hover:bg-red-800"
+            onClick={clearError}
+            aria-label="Dismiss error"
+          >
+            <X className="w-5 h-5" />
+          </Button>
+        </div>
+      )}
+
       {/* Background blur effect */}
       <div
         className="absolute inset-0 opacity-20"
@@ -173,8 +201,12 @@ const FullPlayer = () => {
                     size="icon"
                     className="w-16 h-16 bg-white hover:bg-white/90 text-orange-600 rounded-full shadow-lg hover:scale-105 transition-transform"
                     onClick={togglePlayPause}
+                    disabled={isLoading}
+                    aria-label={isPlaying ? 'Pause' : 'Play'}
                   >
-                    {isPlaying ? (
+                    {isBuffering || isLoading ? (
+                      <Loader2 className="w-8 h-8 animate-spin" />
+                    ) : isPlaying ? (
                       <Pause className="w-8 h-8" fill="currentColor" />
                     ) : (
                       <Play className="w-8 h-8 ml-1" fill="currentColor" />
@@ -214,6 +246,7 @@ const FullPlayer = () => {
                   size="icon"
                   className="hover:bg-white/20 flex-shrink-0"
                   onClick={toggleMute}
+                  aria-label={isMuted ? 'Unmute' : 'Mute'}
                 >
                   {isMuted || volume === 0 ? (
                     <VolumeX className="w-5 h-5" />
@@ -227,7 +260,28 @@ const FullPlayer = () => {
                   max={100}
                   step={1}
                   className="flex-1 [&_[role=slider]]:bg-white [&_[role=slider]]:border-2 [&_[role=slider]]:border-orange-500 [&_[role=slider]]:shadow-lg [&_[role=slider]]:w-4 [&_[role=slider]]:h-4 [&>span:first-child]:bg-white/30 [&>span:first-child]:h-2 [&>span:first-child>span]:bg-white"
+                  aria-label="Volume"
                 />
+              </div>
+
+              {/* Playback Speed */}
+              <div className="flex items-center gap-3">
+                <Gauge className="w-5 h-5" />
+                <select
+                  value={playbackRate}
+                  onChange={(e) => setPlaybackRate(parseFloat(e.target.value))}
+                  className="bg-white/10 hover:bg-white/20 rounded px-3 py-1.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-white/50"
+                  aria-label="Playback speed"
+                >
+                  <option value="0.25">0.25x</option>
+                  <option value="0.5">0.5x</option>
+                  <option value="0.75">0.75x</option>
+                  <option value="1">Normal</option>
+                  <option value="1.25">1.25x</option>
+                  <option value="1.5">1.5x</option>
+                  <option value="1.75">1.75x</option>
+                  <option value="2">2x</option>
+                </select>
               </div>
             </div>
           </div>
