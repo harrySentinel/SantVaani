@@ -272,7 +272,7 @@ const YouTubePlayer = () => {
     return () => {
       // Don't destroy player on unmount, keep it playing
     };
-  }, [currentBhajan?.youtube_url, currentBhajan?.id, isPlaying, volume, isMuted, playbackRate, setPlayerRef, setDuration, setIsBuffering, setError, handlePlayNext]);
+  }, [currentBhajan?.youtube_url, currentBhajan?.id, setPlayerRef, setDuration, setIsBuffering, setError, handlePlayNext]);
 
   // Handle play/pause
   useEffect(() => {
