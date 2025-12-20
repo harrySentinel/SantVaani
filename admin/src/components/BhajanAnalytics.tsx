@@ -3,7 +3,7 @@ import { TrendingUp, Users, Heart, Play, Award, Flame } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import axios from 'axios'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_URL || 'http://localhost:5000'
 
 interface BhajanWithStats {
   bhajans: {

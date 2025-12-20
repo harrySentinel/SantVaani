@@ -3,7 +3,7 @@ import { Send, Users, Mail, Sparkles, CheckCircle, AlertCircle, Loader2 } from '
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 interface User {
   id: string;
