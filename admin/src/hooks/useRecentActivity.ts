@@ -92,7 +92,7 @@ export function useRecentActivity() {
           try {
             const { data, error } = await supabase
               .from(table.name)
-              .select(`id, ${table.nameField}, created_at, updated_at`)
+              .select('*')
               .order('created_at', { ascending: false })
               .limit(3)
 
