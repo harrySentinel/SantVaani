@@ -21,6 +21,7 @@ export default function BhajanAnalytics() {
   const [trendingBhajans, setTrendingBhajans] = useState<BhajanWithStats[]>([])
   const [popularBhajans, setPopularBhajans] = useState<BhajanWithStats[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     fetchAnalytics()
@@ -28,15 +29,24 @@ export default function BhajanAnalytics() {
 
   const fetchAnalytics = async () => {
     try {
+      setLoading(true)
+      setError(null)
+
+      console.log('Fetching analytics from:', API_BASE_URL)
+
       const [trendingRes, popularRes] = await Promise.all([
         axios.get(`${API_BASE_URL}/api/bhajans/trending?limit=10`),
         axios.get(`${API_BASE_URL}/api/bhajans/popular?limit=10`)
       ])
 
+      console.log('Trending response:', trendingRes.data)
+      console.log('Popular response:', popularRes.data)
+
       setTrendingBhajans(trendingRes.data.trending || [])
       setPopularBhajans(popularRes.data.popular || [])
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching analytics:', error)
+      setError(error?.message || 'Failed to load analytics data')
     } finally {
       setLoading(false)
     }
@@ -61,6 +71,31 @@ export default function BhajanAnalytics() {
             </Card>
           ))}
         </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <Card className="border-red-200 bg-red-50">
+          <CardContent className="pt-6">
+            <div className="text-center space-y-4">
+              <div className="text-red-500 text-5xl">⚠️</div>
+              <h3 className="text-lg font-semibold text-red-900">Failed to Load Analytics</h3>
+              <p className="text-sm text-red-700">{error}</p>
+              <p className="text-xs text-red-600">
+                API URL: {API_BASE_URL}
+              </p>
+              <button
+                onClick={fetchAnalytics}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              >
+                Retry
+              </button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     )
   }
