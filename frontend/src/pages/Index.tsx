@@ -15,6 +15,7 @@ import NoticeBoard from '@/components/NoticeBoard';
 import LandingBlogSection from '@/components/LandingBlogSection';
 import LandingStoriesSection from '@/components/LandingStoriesSection';
 import LandingBhajanSection from '@/components/LandingBhajanSection';
+import LandingHoroscopeSection from '@/components/LandingHoroscopeSection';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 // Lazy load ChatBot for better performance
@@ -34,8 +35,8 @@ const Index = () => {
     },
     {
       icon: Heart,
-      title: t('features.living.title'),
-      description: t('features.living.description'),
+      title: "Contemporary Saints",
+      description: "Discover living spiritual masters and their divine teachings",
       to: "/living-saints",
       color: "from-red-500 to-red-600"
     },
@@ -44,20 +45,6 @@ const Index = () => {
       title: t('features.divine.title'),
       description: t('features.divine.description'),
       to: "/divine",
-      color: "from-purple-500 to-purple-600"
-    },
-    {
-      icon: Book,
-      title: t('features.bhajans.title'),
-      description: t('features.bhajans.description'),
-      to: "/bhajans",
-      color: "from-green-500 to-green-600"
-    },
-    {
-      icon: Star,
-      title: t('features.horoscope.title'),
-      description: t('features.horoscope.description'),
-      to: "/horoscope",
       color: "from-purple-500 to-purple-600"
     }
   ];
@@ -96,7 +83,7 @@ const Index = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
-              {t('features.title')}
+              Explore Sacred Wisdom
             </h2>
 
              {/* Beta Badge - Option 3: Next to heading */}
@@ -105,11 +92,11 @@ const Index = () => {
               </span>
 
             <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
-              {t('features.subtitle')}
+              Connect with enlightened masters and divine manifestations
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {features.map((feature, index) => {
               const Icon = feature.icon;
               return (
@@ -188,6 +175,9 @@ const Index = () => {
 
       {/* Featured Bhajan Section - New Spotify-style */}
       <LandingBhajanSection />
+
+      {/* Featured Horoscope Section */}
+      <LandingHoroscopeSection />
 
       {/* Featured Divine Stories Section */}
       <LandingStoriesSection />
