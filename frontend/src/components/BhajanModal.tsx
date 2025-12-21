@@ -1,9 +1,16 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Music, Copy, Quote, Play, ExternalLink, Youtube } from 'lucide-react';
+import { X, Music, Copy, Quote, Play, ExternalLink, Youtube, Heart, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { CopyToClipboard } from '@/utils/copyUtils';
+import { getGradientClass, getCategoryIcon } from '@/utils/categoryGradients';
+import { useMusicPlayer } from '@/contexts/MusicPlayerContext';
+import { useAuth } from '@/contexts/AuthContext';
+import FavoriteButton from './bhajan/FavoriteButton';
+import BhajanShareButton from './BhajanShareButton';
+import { recordBhajanPlay } from '@/services/bhajanEngagementService';
 
 interface Bhajan {
   id: string;
@@ -25,6 +32,8 @@ interface BhajanModalProps {
 
 const BhajanModal: React.FC<BhajanModalProps> = ({ bhajan, isOpen, onClose }) => {
   const { toast } = useToast();
+  const { playBhajan, currentBhajan, isPlaying, togglePlayPause } = useMusicPlayer();
+  const { user } = useAuth();
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
@@ -34,7 +43,7 @@ const BhajanModal: React.FC<BhajanModalProps> = ({ bhajan, isOpen, onClose }) =>
 
   const handleCopyLyrics = async () => {
     if (!bhajan) return;
-    
+
     const formattedText = CopyToClipboard.formatBhajanForSharing({
       title: bhajan.title,
       title_hi: bhajan.title_hi,
@@ -44,9 +53,9 @@ const BhajanModal: React.FC<BhajanModalProps> = ({ bhajan, isOpen, onClose }) =>
       author: bhajan.author,
       category: bhajan.category
     });
-    
+
     const success = await CopyToClipboard.copyText(formattedText);
-    
+
     if (success) {
       toast({
         title: "🎵 Bhajan Copied!",
@@ -63,13 +72,28 @@ const BhajanModal: React.FC<BhajanModalProps> = ({ bhajan, isOpen, onClose }) =>
     }
   };
 
+  const handlePlayClick = () => {
+    if (!bhajan) return;
+
+    if (currentBhajan?.id === bhajan.id) {
+      togglePlayPause();
+    } else {
+      playBhajan(bhajan, [bhajan]);
+      recordBhajanPlay(bhajan.id, user?.id);
+      toast({
+        title: "🎵 Now Playing",
+        description: bhajan.title,
+        duration: 2000,
+      });
+    }
+  };
+
   const handleListenOnYouTube = () => {
     if (!bhajan?.youtube_url) {
-      // Generate a search URL if no specific URL is provided
       const searchQuery = `${bhajan?.title} bhajan devotional song`.replace(/\s+/g, '+');
       const searchUrl = `https://www.youtube.com/results?search_query=${searchQuery}`;
       window.open(searchUrl, '_blank');
-      
+
       toast({
         title: "🎵 Redirecting to YouTube",
         description: "Opening YouTube search for this bhajan",
@@ -77,7 +101,7 @@ const BhajanModal: React.FC<BhajanModalProps> = ({ bhajan, isOpen, onClose }) =>
       });
     } else {
       window.open(bhajan.youtube_url, '_blank');
-      
+
       toast({
         title: "🎵 Opening YouTube",
         description: "Listen to this beautiful bhajan",
@@ -88,6 +112,10 @@ const BhajanModal: React.FC<BhajanModalProps> = ({ bhajan, isOpen, onClose }) =>
 
   if (!bhajan) return null;
 
+  const isCurrentlyPlaying = currentBhajan?.id === bhajan.id && isPlaying;
+  const gradientClass = getGradientClass(bhajan.category);
+  const categoryIcon = getCategoryIcon(bhajan.category);
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -97,148 +125,207 @@ const BhajanModal: React.FC<BhajanModalProps> = ({ bhajan, isOpen, onClose }) =>
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md"
             onClick={handleBackdropClick}
           />
-          
+
           {/* Modal */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.8, y: 50 }}
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.8, y: 50 }}
-            transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed inset-4 md:inset-8 lg:inset-16 z-50 overflow-hidden rounded-3xl bg-gradient-to-br from-green-50 via-white to-orange-50 shadow-2xl border border-green-200/50"
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            transition={{ type: "spring", damping: 30, stiffness: 300 }}
+            className="fixed inset-4 md:inset-8 lg:inset-12 xl:inset-16 z-50 overflow-hidden rounded-3xl bg-white shadow-2xl"
           >
-            {/* Close Button */}
-            <Button
-              onClick={onClose}
-              variant="ghost"
-              size="icon"
-              className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm shadow-lg hover:bg-white/90 transition-all duration-300"
-            >
-              <X className="w-5 h-5 text-gray-700" />
-            </Button>
+            {/* Gradient Header with Blur */}
+            <div className={`relative ${gradientClass} p-8 md:p-12`}>
+              <div className="absolute inset-0 opacity-20">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-9xl">{categoryIcon}</span>
+                </div>
+              </div>
+
+              {/* Close Button */}
+              <Button
+                onClick={onClose}
+                variant="ghost"
+                size="icon"
+                className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-black/20 backdrop-blur-sm hover:bg-black/30 transition-all duration-300 text-white"
+              >
+                <X className="w-5 h-5" />
+              </Button>
+
+              {/* Header Content */}
+              <div className="relative z-10 text-white space-y-4">
+                <Badge className="bg-white/20 text-white border-white/30 backdrop-blur-sm">
+                  {bhajan.category}
+                </Badge>
+
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight drop-shadow-lg">
+                  {bhajan.title}
+                </h1>
+
+                <p className="text-2xl md:text-3xl font-medium opacity-90 drop-shadow">
+                  {bhajan.title_hi}
+                </p>
+
+                <p className="text-lg opacity-80">
+                  by {bhajan.author}
+                </p>
+
+                {/* Action Buttons */}
+                <div className="flex flex-wrap items-center gap-3 pt-4">
+                  {bhajan.youtube_url && (
+                    <Button
+                      onClick={handlePlayClick}
+                      size="lg"
+                      className={`rounded-full font-semibold px-8 shadow-lg transition-all ${
+                        isCurrentlyPlaying
+                          ? 'bg-green-500 hover:bg-green-600 text-white'
+                          : 'bg-white text-gray-900 hover:bg-gray-100'
+                      }`}
+                    >
+                      {isCurrentlyPlaying ? (
+                        <>
+                          <Music className="w-5 h-5 mr-2 animate-pulse" />
+                          Playing
+                        </>
+                      ) : (
+                        <>
+                          <Play className="w-5 h-5 mr-2" />
+                          Play Now
+                        </>
+                      )}
+                    </Button>
+                  )}
+
+                  <div onClick={(e) => e.stopPropagation()}>
+                    <FavoriteButton
+                      bhajanId={bhajan.id}
+                      bhajanTitle={bhajan.title}
+                      size="lg"
+                      variant="default"
+                    />
+                  </div>
+
+                  <Button
+                    onClick={handleCopyLyrics}
+                    variant="ghost"
+                    size="lg"
+                    className="rounded-full bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 border border-white/30"
+                  >
+                    <Copy className="w-5 h-5 mr-2" />
+                    Copy
+                  </Button>
+
+                  <div onClick={(e) => e.stopPropagation()}>
+                    <BhajanShareButton
+                      bhajan={bhajan}
+                      variant="ghost"
+                      size="lg"
+                      className="rounded-full bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 border border-white/30"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
 
             {/* Content Container */}
-            <div className="h-full overflow-y-auto">
-              <div className="min-h-full p-6 md:p-8 lg:p-12">
-                <div className="max-w-4xl mx-auto">
-                  {/* Header Section */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 50 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="text-center space-y-6 mb-8"
-                  >
-                    <div className="space-y-2">
-                      <div className="flex justify-center items-center space-x-2 mb-4">
-                        <Music className="w-8 h-8 text-green-500" />
-                        <span className="text-3xl">🎵</span>
-                      </div>
-                      <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-green-600 via-green-700 to-orange-600 bg-clip-text text-transparent leading-tight">
-                        {bhajan.title}
-                      </h1>
-                      <p className="text-xl md:text-2xl text-green-600 font-medium">
-                        {bhajan.title_hi}
-                      </p>
-                    </div>
-
-                    <div className="flex justify-center">
-                      <div className="flex items-center space-x-2 text-gray-600 bg-white/70 backdrop-blur-sm rounded-full px-4 py-2 shadow-sm">
-                        <Music className="w-5 h-5 text-green-500" />
-                        <span className="font-medium">{bhajan.category}</span>
-                      </div>
-                    </div>
-                  </motion.div>
+            <div className="h-[calc(100%-250px)] md:h-[calc(100%-280px)] overflow-y-auto bg-gray-50">
+              <div className="max-w-5xl mx-auto p-6 md:p-8 lg:p-12">
+                <div className="space-y-8">
 
                   {/* Lyrics Section */}
                   <motion.div
-                    initial={{ opacity: 0, y: 50 }}
+                    initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
+                    transition={{ delay: 0.1 }}
                     className="space-y-6"
                   >
-                    <div className="text-center">
-                      <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">
+                    <div className="flex items-center space-x-3">
+                      <div className={`w-1 h-8 rounded-full ${gradientClass}`}></div>
+                      <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
                         Sacred Lyrics
                       </h2>
-                      <div className="w-24 h-1 bg-gradient-to-r from-green-400 to-orange-600 mx-auto rounded-full" />
                     </div>
 
-                    {/* Hindi Lyrics */}
-                    <div className="bg-gradient-to-r from-green-50 to-orange-100/50 rounded-2xl p-6 md:p-8 shadow-lg border border-green-200/50">
-                      <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
-                        <span className="w-6 h-6 bg-gradient-to-r from-green-400 to-orange-600 rounded-full mr-3" />
-                        देवनागरी (Devanagari)
-                      </h3>
-                      <pre className="text-gray-700 leading-relaxed text-base md:text-lg whitespace-pre-wrap font-medium">
-                        {bhajan.lyrics_hi}
-                      </pre>
-                    </div>
-
-                    {/* Transliteration */}
-                    <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 md:p-8 shadow-lg border border-green-100">
-                      <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
-                        <span className="w-6 h-6 bg-gradient-to-r from-green-400 to-orange-600 rounded-full mr-3" />
-                        Transliteration
-                      </h3>
-                      <pre className="text-gray-700 leading-relaxed text-base md:text-lg whitespace-pre-wrap">
-                        {bhajan.lyrics}
-                      </pre>
-                    </div>
-
-                    {/* Meaning */}
-                    <div className="bg-gradient-to-r from-orange-50 to-green-50 rounded-2xl p-6 md:p-8 shadow-lg border border-orange-200/50">
-                      <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
-                        <Quote className="w-6 h-6 text-orange-500 mr-3" />
-                        Spiritual Meaning
-                      </h3>
-                      <p className="text-gray-700 leading-relaxed text-base md:text-lg italic">
-                        {bhajan.meaning}
-                      </p>
-                      <p className="text-sm text-gray-500 mt-4 font-medium">- {bhajan.author}</p>
-                    </div>
-
-                    {/* Listen Section */}
-                    <div className="bg-gradient-to-r from-red-50 via-white to-orange-50 rounded-2xl p-6 md:p-8 shadow-lg border border-red-200/50">
-                      <div className="text-center space-y-4">
-                        <div className="flex justify-center items-center space-x-2">
-                          <Youtube className="w-8 h-8 text-red-500 animate-pulse" />
-                          <Play className="w-6 h-6 text-red-500" />
-                          <span className="text-2xl">🎵</span>
+                    {/* Dual Language Display */}
+                    <div className="grid md:grid-cols-2 gap-6">
+                      {/* Hindi Lyrics */}
+                      <div className="bg-white rounded-2xl p-6 md:p-8 shadow-md border border-gray-200">
+                        <div className="flex items-center space-x-2 mb-4">
+                          <span className={`w-3 h-3 rounded-full ${gradientClass}`}></span>
+                          <h3 className="text-lg font-semibold text-gray-800">
+                            देवनागरी
+                          </h3>
                         </div>
-                        <h3 className="text-xl font-semibold text-gray-800">
-                          Experience the Divine Melody
-                        </h3>
-                        <p className="text-gray-600 max-w-md mx-auto">
-                          Listen to this sacred bhajan on YouTube and let the divine vibrations fill your heart with peace and devotion.
-                        </p>
-                        <div className="flex justify-center">
-                          <button
-                            onClick={handleListenOnYouTube}
-                            className="group flex items-center space-x-3 bg-white/80 backdrop-blur-sm rounded-full px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border border-red-200/50"
-                          >
-                            <div className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center group-hover:bg-red-600 transition-colors">
-                              <Play className="w-5 h-5 text-white ml-0.5" />
-                            </div>
-                            <span className="font-medium text-gray-700">Listen Now</span>
-                            <ExternalLink className="w-4 h-4 text-gray-500 group-hover:text-gray-700 transition-colors" />
-                          </button>
+                        <pre className="text-gray-700 leading-relaxed text-base whitespace-pre-wrap font-medium">
+                          {bhajan.lyrics_hi}
+                        </pre>
+                      </div>
+
+                      {/* Transliteration */}
+                      <div className="bg-white rounded-2xl p-6 md:p-8 shadow-md border border-gray-200">
+                        <div className="flex items-center space-x-2 mb-4">
+                          <span className={`w-3 h-3 rounded-full ${gradientClass}`}></span>
+                          <h3 className="text-lg font-semibold text-gray-800">
+                            Transliteration
+                          </h3>
                         </div>
-                        
-                        <div className="flex justify-center mt-4">
-                          <Button
-                            onClick={handleCopyLyrics}
-                            variant="ghost"
-                            className="flex items-center space-x-2 text-gray-600 hover:text-gray-700 hover:bg-white/50 px-6 py-2 rounded-full transition-all duration-300"
-                          >
-                            <Copy className="w-4 h-4" />
-                            <span>Copy Lyrics</span>
-                          </Button>
-                        </div>
+                        <pre className="text-gray-700 leading-relaxed text-base whitespace-pre-wrap">
+                          {bhajan.lyrics}
+                        </pre>
                       </div>
                     </div>
                   </motion.div>
+
+                  {/* Meaning Section */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="bg-gradient-to-br from-orange-50 to-green-50 rounded-2xl p-6 md:p-8 shadow-md border border-orange-200/50"
+                  >
+                    <div className="flex items-center space-x-3 mb-4">
+                      <Quote className="w-6 h-6 text-orange-500" />
+                      <h3 className="text-xl font-semibold text-gray-800">
+                        Spiritual Meaning
+                      </h3>
+                    </div>
+                    <p className="text-gray-700 leading-relaxed text-base md:text-lg italic">
+                      {bhajan.meaning}
+                    </p>
+                  </motion.div>
+
+                  {/* YouTube Section */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="bg-gradient-to-br from-red-50 to-orange-50 rounded-2xl p-6 md:p-8 shadow-md border border-red-200/50"
+                  >
+                    <div className="text-center space-y-4">
+                      <div className="flex justify-center items-center space-x-2">
+                        <Youtube className="w-8 h-8 text-red-500 animate-pulse" />
+                        <Play className="w-6 h-6 text-red-500" />
+                      </div>
+                      <h3 className="text-xl font-semibold text-gray-800">
+                        Experience on YouTube
+                      </h3>
+                      <p className="text-gray-600 max-w-md mx-auto">
+                        Listen to this sacred bhajan and let the divine vibrations fill your heart with peace and devotion.
+                      </p>
+                      <Button
+                        onClick={handleListenOnYouTube}
+                        className="group bg-red-500 hover:bg-red-600 text-white rounded-full px-6 py-3 shadow-lg transition-all hover:shadow-xl hover:scale-105"
+                      >
+                        <Youtube className="w-5 h-5 mr-2" />
+                        Open in YouTube
+                        <ExternalLink className="w-4 h-4 ml-2 opacity-70 group-hover:opacity-100 transition-opacity" />
+                      </Button>
+                    </div>
+                  </motion.div>
+
                 </div>
               </div>
             </div>

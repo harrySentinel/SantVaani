@@ -2,17 +2,13 @@ import React, { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useAuth } from '@/contexts/AuthContext';
 import { useMusicPlayer } from '@/contexts/MusicPlayerContext';
 import BhajanModal from '@/components/BhajanModal';
-import BhajanShareButton from '@/components/BhajanShareButton';
-import FavoriteButton from '@/components/bhajan/FavoriteButton';
-import BhajanStats from '@/components/bhajan/BhajanStats';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import CompactBhajanCard from '@/components/bhajan/CompactBhajanCard';
+import HorizontalBhajanSection from '@/components/bhajan/HorizontalBhajanSection';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Music, Loader2, Search, Flame, TrendingUp, Sparkles, Play, Pause } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Music, Loader2, Search, Flame, TrendingUp, Sparkles, LibraryBig } from 'lucide-react';
 import { Toaster } from '@/components/ui/toaster';
 import { supabase } from '@/lib/supabaseClient';
 import { usePagination } from '@/hooks/usePagination';
@@ -33,8 +29,6 @@ interface Bhajan {
 
 const Bhajans = () => {
   const { t, language } = useLanguage();
-  const { user } = useAuth();
-  const { playBhajan, currentBhajan, isPlaying, togglePlayPause } = useMusicPlayer();
   const [selectedBhajan, setSelectedBhajan] = useState<Bhajan | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [bhajans, setBhajans] = useState<Bhajan[]>([]);
@@ -44,7 +38,7 @@ const Bhajans = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [itemsPerPage, setItemsPerPage] = useState(8);
+  const [itemsPerPage] = useState(16); // 4 columns x 4 rows
 
   // Fetch bhajans from Supabase
   const fetchBhajans = async () => {
@@ -70,8 +64,8 @@ const Bhajans = () => {
   const fetchEngagementData = async () => {
     try {
       const [trendingData, popularData] = await Promise.all([
-        getTrendingBhajans(6),
-        getPopularBhajans(6)
+        getTrendingBhajans(10),
+        getPopularBhajans(10)
       ]);
 
       setTrendingBhajans(trendingData.trending || []);
@@ -145,121 +139,9 @@ const Bhajans = () => {
     setSelectedBhajan(null);
   };
 
-  // Render bhajan card
-  const renderBhajanCard = (bhajan: Bhajan, index?: number) => (
-    <Card
-      key={bhajan.id}
-      className="group hover:shadow-xl transition-all duration-300 border-0 shadow-lg bg-white/90 backdrop-blur-sm cursor-pointer"
-      onClick={() => handleBhajanClick(bhajan)}
-      style={index !== undefined ? { animationDelay: `${index * 50}ms` } : undefined}
-    >
-      <CardContent className="p-6 space-y-4">
-        <div className="flex items-start justify-between">
-          <div className="space-y-2 flex-1">
-            <h3 className="text-xl font-semibold text-gray-800 group-hover:text-green-600 transition-colors">
-              {bhajan.title}
-            </h3>
-            <p className="text-sm text-green-600 font-medium">
-              {bhajan.title_hi}
-            </p>
-            <div className="flex items-center space-x-2 flex-wrap">
-              <Badge variant="outline" className="border-green-200 text-green-600">
-                {bhajan.category}
-              </Badge>
-              <BhajanStats bhajanId={bhajan.id} variant="badge" />
-            </div>
-          </div>
-          <Music className="w-6 h-6 text-green-500 flex-shrink-0 ml-2" />
-        </div>
-
-        <div className="space-y-3">
-          <div className="bg-gradient-to-r from-green-50 to-orange-50 rounded-lg p-4 border border-green-100">
-            <p className="text-sm font-medium text-gray-700 mb-2">Preview:</p>
-            <div className="space-y-2">
-              <pre className="text-sm text-gray-600 whitespace-pre-wrap font-medium leading-relaxed line-clamp-3">
-                {bhajan.lyrics.split('\n').slice(0, 4).join('\n')}...
-              </pre>
-              <pre className="text-sm text-green-600 whitespace-pre-wrap font-medium leading-relaxed line-clamp-3">
-                {bhajan.lyrics_hi.split('\n').slice(0, 4).join('\n')}...
-              </pre>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-gray-700">Meaning:</p>
-            <p className="text-sm text-gray-600 leading-relaxed italic line-clamp-2">
-              {bhajan.meaning}
-            </p>
-          </div>
-
-          <div className="flex items-center justify-between pt-2">
-            <p className="text-xs text-gray-500">- {bhajan.author}</p>
-            <div className="flex items-center space-x-2">
-              {/* Play Button */}
-              {bhajan.youtube_url && (
-                <div onClick={(e) => e.stopPropagation()}>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className={`h-9 w-9 p-0 rounded-full transition-all ${
-                      currentBhajan?.id === bhajan.id && isPlaying
-                        ? 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white'
-                        : 'bg-gradient-to-r from-green-500 to-orange-500 hover:from-green-600 hover:to-orange-600 text-white'
-                    }`}
-                    onClick={() => {
-                      if (currentBhajan?.id === bhajan.id) {
-                        togglePlayPause();
-                      } else {
-                        playBhajan(bhajan, filteredBhajans);
-                        recordBhajanPlay(bhajan.id, user?.id);
-                      }
-                    }}
-                  >
-                    {currentBhajan?.id === bhajan.id && isPlaying ? (
-                      <Pause className="w-4 h-4" fill="currentColor" />
-                    ) : (
-                      <Play className="w-4 h-4 ml-0.5" fill="currentColor" />
-                    )}
-                  </Button>
-                </div>
-              )}
-
-              <div onClick={(e) => e.stopPropagation()}>
-                <FavoriteButton
-                  bhajanId={bhajan.id}
-                  bhajanTitle={bhajan.title}
-                  size="sm"
-                  variant="minimal"
-                />
-              </div>
-
-              <div onClick={(e) => e.stopPropagation()}>
-                <BhajanShareButton
-                  bhajan={{
-                    id: bhajan.id,
-                    title: bhajan.title,
-                    title_hi: bhajan.title_hi,
-                    category: bhajan.category,
-                    lyrics: bhajan.lyrics,
-                    lyrics_hi: bhajan.lyrics_hi,
-                    author: bhajan.author,
-                    meaning: bhajan.meaning
-                  }}
-                  variant="ghost"
-                  size="sm"
-                  className="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-orange-50">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
         <Navbar />
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center space-y-4">
@@ -274,7 +156,7 @@ const Bhajans = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-orange-50">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
         <Navbar />
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center space-y-4">
@@ -295,130 +177,134 @@ const Bhajans = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-orange-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <Navbar />
 
-      {/* Header */}
-      <section className="pt-20 pb-12 bg-gradient-to-r from-green-100 to-orange-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      {/* Header - Spotify Style */}
+      <section className="pt-20 pb-8 bg-gradient-to-b from-green-600 to-green-500">
+        <div className="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="space-y-4">
-            <div className="flex justify-center items-center space-x-2 mb-4">
-              <Music className="w-8 h-8 text-green-500 animate-pulse" />
-              <span className="text-3xl">🎵</span>
-              <Music className="w-8 h-8 text-orange-500 animate-pulse" />
+            <div className="flex items-center space-x-3 mb-2">
+              <Music className="w-10 h-10 text-white/90" />
+              <span className="text-4xl">🎵</span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-green-600 to-orange-600 bg-clip-text text-transparent pt-2">
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white">
               {t('bhajans.title')}
             </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl text-white/90 max-w-2xl leading-relaxed">
               {t('bhajans.subtitle')}
             </p>
-            <div className="flex justify-center">
-              <Badge variant="secondary" className="bg-green-100 text-green-700 px-4 py-2">
-                {searchQuery
-                  ? `${bhajanPagination.totalItems} of ${bhajans.length}`
-                  : `${bhajans.length}`
-                } {t('bhajans.songs.count')}
-                {bhajanPagination.totalPages > 1 && ` • Page ${bhajanPagination.currentPage} of ${bhajanPagination.totalPages}`}
-              </Badge>
-            </div>
+            <Badge variant="secondary" className="bg-white/20 text-white backdrop-blur-sm px-4 py-2 text-base border-white/30">
+              {bhajans.length} {t('bhajans.songs.count')}
+            </Badge>
           </div>
         </div>
       </section>
 
-      {/* Trending Section */}
+      {/* Trending Section - Horizontal Scroll */}
       {trendingBhajans.length > 0 && (
-        <section className="py-8 bg-gradient-to-r from-orange-50 to-yellow-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center space-x-2 mb-6">
-              <Flame className="w-6 h-6 text-orange-500 animate-pulse" />
-              <h2 className="text-2xl font-bold text-gray-800">Trending This Week</h2>
-              <Sparkles className="w-5 h-5 text-yellow-500" />
-            </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {trendingBhajans.slice(0, 6).map((item, index) => renderBhajanCard(item.bhajans, index))}
-            </div>
-          </div>
-        </section>
+        <HorizontalBhajanSection
+          title="Trending This Week"
+          icon={<Flame className="w-7 h-7 text-orange-500 animate-pulse" />}
+          bhajans={trendingBhajans}
+          onBhajanClick={handleBhajanClick}
+          bgClass="bg-gradient-to-r from-orange-50 via-yellow-50 to-amber-50"
+        />
       )}
 
-      {/* Popular Section */}
+      {/* Popular Section - Horizontal Scroll */}
       {popularBhajans.length > 0 && (
-        <section className="py-8 bg-gradient-to-r from-purple-50 to-pink-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center space-x-2 mb-6">
-              <TrendingUp className="w-6 h-6 text-purple-500" />
-              <h2 className="text-2xl font-bold text-gray-800">Most Popular</h2>
-            </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {popularBhajans.slice(0, 6).map((item, index) => renderBhajanCard(item.bhajans, index))}
-            </div>
-          </div>
-        </section>
+        <HorizontalBhajanSection
+          title="Most Popular"
+          icon={<TrendingUp className="w-7 h-7 text-purple-500" />}
+          bhajans={popularBhajans}
+          onBhajanClick={handleBhajanClick}
+          bgClass="bg-gradient-to-r from-purple-50 via-pink-50 to-rose-50"
+        />
       )}
 
-      {/* Main Content */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Main Content - All Bhajans Grid */}
+      <section className="py-12 bg-gradient-to-br from-gray-50 to-white">
+        <div className="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="space-y-8">
-            <div className="text-center space-y-4">
-              <h2 className="text-3xl font-bold text-gray-800">All Bhajans</h2>
-              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                Explore our complete collection of devotional songs
-              </p>
+            {/* Section Header */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <LibraryBig className="w-7 h-7 text-gray-700" />
+                <h2 className="text-3xl md:text-4xl font-bold text-gray-800">
+                  All Bhajans
+                </h2>
+              </div>
             </div>
 
             {/* Search */}
-            <div className="max-w-2xl mx-auto">
+            <div className="max-w-xl">
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <Search className="h-5 w-5 text-gray-400" />
                 </div>
                 <Input
                   type="text"
-                  placeholder={language === 'EN' ? 'खोजें: हनुमान चालीसा, राम भजन, कृष्ण... (' + t('bhajans.search.placeholder') + ')' : t('bhajans.search.placeholder')}
+                  placeholder={language === 'EN' ? 'Search bhajans... (हनुमान चालीसा, राम भजन, कृष्ण)' : 'Search bhajans...'}
                   value={searchQuery}
                   onChange={handleSearch}
-                  className="block w-full pl-10 pr-3 py-3 border-2 border-green-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900 placeholder-gray-500 bg-white/90 backdrop-blur-sm"
+                  className="block w-full pl-12 pr-4 py-6 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900 placeholder-gray-400 bg-white shadow-sm text-base"
                 />
                 {searchQuery && (
                   <button
                     onClick={() => setSearchQuery('')}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    className="absolute inset-y-0 right-0 pr-4 flex items-center"
                   >
-                    <span className="text-gray-400 hover:text-gray-600 text-sm">Clear</span>
+                    <span className="text-gray-400 hover:text-gray-600 text-sm font-medium">Clear</span>
                   </button>
                 )}
               </div>
               {searchQuery && (
-                <p className="mt-2 text-sm text-gray-600 text-center">
+                <p className="mt-2 text-sm text-gray-600">
                   {bhajanPagination.totalItems === 0
                     ? `No results for "${searchQuery}"`
-                    : `Found ${bhajanPagination.totalItems} bhajan${bhajanPagination.totalItems !== 1 ? 's' : ''} matching "${searchQuery}"`
+                    : `${bhajanPagination.totalItems} result${bhajanPagination.totalItems !== 1 ? 's' : ''} found`
                   }
                 </p>
               )}
             </div>
 
+            {/* Results */}
             {bhajanPagination.totalItems === 0 && searchQuery ? (
-              <div className="text-center py-12">
-                <div className="text-gray-400 text-6xl mb-4">🔍</div>
+              <div className="text-center py-20">
+                <div className="text-gray-300 text-7xl mb-6">🔍</div>
                 <h3 className="text-2xl font-semibold text-gray-700 mb-2">No Results Found</h3>
-                <p className="text-gray-500">No bhajans match your search "{searchQuery}". Try different keywords.</p>
+                <p className="text-gray-500">Try different keywords or browse all bhajans</p>
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="mt-6 px-6 py-3 bg-green-600 text-white rounded-full hover:bg-green-700 transition-colors"
+                >
+                  Show All Bhajans
+                </button>
               </div>
             ) : bhajans.length === 0 ? (
-              <div className="text-center py-12">
-                <Music className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+              <div className="text-center py-20">
+                <Music className="w-20 h-20 text-gray-300 mx-auto mb-6" />
                 <p className="text-gray-500 text-lg">No bhajans available yet</p>
-                <p className="text-gray-400 text-sm">Check back soon for sacred melodies</p>
+                <p className="text-gray-400 text-sm mt-2">Check back soon for sacred melodies</p>
               </div>
             ) : (
               <div id="bhajans-grid" className="space-y-8">
-                <div className="grid md:grid-cols-2 gap-6">
-                  {bhajanPagination.currentItems.map((bhajan) => renderBhajanCard(bhajan))}
+                {/* 4-Column Grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 md:gap-6">
+                  {bhajanPagination.currentItems.map((bhajan, index) => (
+                    <CompactBhajanCard
+                      key={bhajan.id}
+                      bhajan={bhajan}
+                      onClick={() => handleBhajanClick(bhajan)}
+                      playlist={filteredBhajans}
+                      index={index}
+                    />
+                  ))}
                 </div>
 
-                {bhajanPagination.totalItems > 0 && (
+                {/* Pagination */}
+                {bhajanPagination.totalPages > 1 && (
                   <BhajanPagination
                     currentPage={bhajanPagination.currentPage}
                     totalPages={bhajanPagination.totalPages}
