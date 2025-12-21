@@ -14,6 +14,7 @@ import FeedbackForm from '@/components/FeedbackForm';
 import NoticeBoard from '@/components/NoticeBoard';
 import LandingBlogSection from '@/components/LandingBlogSection';
 import LandingStoriesSection from '@/components/LandingStoriesSection';
+import LandingBhajanSection from '@/components/LandingBhajanSection';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 // Lazy load ChatBot for better performance
@@ -184,6 +185,9 @@ const Index = () => {
     </Link>
   </div>
 </section>
+
+      {/* Featured Bhajan Section - New Spotify-style */}
+      <LandingBhajanSection />
 
       {/* Featured Divine Stories Section */}
       <LandingStoriesSection />
