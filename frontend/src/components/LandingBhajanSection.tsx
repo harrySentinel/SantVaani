@@ -80,7 +80,7 @@ const LandingBhajanSection = () => {
 
   if (loading) {
     return (
-      <section className="py-16 bg-gradient-to-br from-green-50 via-emerald-50 to-green-50">
+      <section className="py-16 bg-gradient-to-br from-orange-50 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-center py-20">
             <Loader2 className="w-8 h-8 animate-spin text-green-600" />
@@ -96,11 +96,11 @@ const LandingBhajanSection = () => {
 
   return (
     <>
-      <section className="py-20 bg-gradient-to-br from-green-50 via-emerald-50 to-green-50 relative overflow-hidden">
+      <section className="py-20 bg-gradient-to-br from-orange-50 via-white to-orange-50 relative overflow-hidden">
         {/* Decorative background elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-10 right-10 w-72 h-72 bg-green-200/20 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-10 left-10 w-96 h-96 bg-emerald-200/20 rounded-full blur-3xl"></div>
+          <div className="absolute top-10 right-10 w-72 h-72 bg-orange-200/20 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-10 left-10 w-96 h-96 bg-orange-200/20 rounded-full blur-3xl"></div>
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -144,7 +144,7 @@ const LandingBhajanSection = () => {
 
           {/* Call to Action */}
           <div className="text-center space-y-6">
-            <div className="bg-gradient-to-r from-green-100 to-emerald-100 rounded-2xl p-8 max-w-3xl mx-auto border border-green-200 shadow-lg">
+            <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-2xl p-8 max-w-3xl mx-auto border border-orange-200 shadow-lg">
               <div className="flex items-center justify-center space-x-2 mb-4">
                 <Play className="w-6 h-6 text-green-600" />
                 <Music className="w-6 h-6 text-emerald-600" />
@@ -175,7 +175,7 @@ const LandingBhajanSection = () => {
 
             {/* Feature Highlights */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto mt-8">
-              <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-green-100 shadow-sm">
+              <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-orange-100 shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-center space-x-2 mb-2">
                   <Music className="w-5 h-5 text-green-600" />
                   <span className="text-sm font-semibold text-gray-700">Full Lyrics</span>
@@ -183,15 +183,15 @@ const LandingBhajanSection = () => {
                 <p className="text-xs text-gray-600">English & Hindi with meanings</p>
               </div>
 
-              <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-emerald-100 shadow-sm">
+              <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-orange-100 shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-center space-x-2 mb-2">
-                  <Play className="w-5 h-5 text-emerald-600" />
+                  <Play className="w-5 h-5 text-green-600" />
                   <span className="text-sm font-semibold text-gray-700">YouTube Player</span>
                 </div>
                 <p className="text-xs text-gray-600">Built-in music player</p>
               </div>
 
-              <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-green-100 shadow-sm">
+              <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-orange-100 shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-center space-x-2 mb-2">
                   <Flame className="w-5 h-5 text-orange-500" />
                   <span className="text-sm font-semibold text-gray-700">Trending</span>
