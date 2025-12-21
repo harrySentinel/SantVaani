@@ -70,7 +70,7 @@ const MiniPlayer = () => {
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-r from-orange-600 via-red-600 to-orange-600 text-white shadow-2xl border-t border-orange-500/30" role="region" aria-label="Music Player">
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-r from-green-600 via-emerald-600 to-green-600 text-white shadow-2xl border-t border-green-500/30" role="region" aria-label="Music Player">
       {/* Error Banner */}
       {error && (
         <div className="bg-red-700 px-4 py-2 flex items-center justify-between text-sm" role="alert">
@@ -136,7 +136,7 @@ const MiniPlayer = () => {
                 variant="ghost"
                 size="sm"
                 className={`h-8 w-8 p-0 hover:bg-white/20 transition-colors ${
-                  shuffle ? 'text-orange-200' : 'text-white/70'
+                  shuffle ? 'text-green-200' : 'text-white/70'
                 }`}
                 onClick={toggleShuffle}
                 aria-label={shuffle ? 'Shuffle on' : 'Shuffle off'}
@@ -190,7 +190,7 @@ const MiniPlayer = () => {
                 variant="ghost"
                 size="sm"
                 className={`h-8 w-8 p-0 hover:bg-white/20 transition-colors ${
-                  repeat !== 'none' ? 'text-orange-200' : 'text-white/70'
+                  repeat !== 'none' ? 'text-green-200' : 'text-white/70'
                 }`}
                 onClick={toggleRepeat}
                 aria-label={`Repeat ${repeat}`}
