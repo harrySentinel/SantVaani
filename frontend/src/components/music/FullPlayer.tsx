@@ -287,9 +287,9 @@ const FullPlayer = () => {
           </div>
 
           {/* Right: Lyrics & Queue */}
-          <div className="flex-1 flex flex-col min-h-0">
-            <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="flex-1 flex flex-col">
-              <TabsList className="bg-white/10 border-white/20">
+          <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+            <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="flex-1 flex flex-col min-h-0">
+              <TabsList className="bg-white/10 border-white/20 flex-shrink-0">
                 <TabsTrigger value="lyrics" className="data-[state=active]:bg-white/20">
                   <Music className="w-4 h-4 mr-2" />
                   Lyrics
@@ -300,9 +300,9 @@ const FullPlayer = () => {
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="lyrics" className="flex-1 mt-4 overflow-hidden">
-                <ScrollArea className="h-full pr-4">
-                  <div className="space-y-4">
+              <TabsContent value="lyrics" className="flex-1 mt-4 min-h-0 data-[state=active]:flex data-[state=active]:flex-col">
+                <ScrollArea className="flex-1 pr-4">
+                  <div className="space-y-4 pb-4">
                     {language === 'hi' && currentBhajan.lyrics_hi ? (
                       <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6">
                         <h3 className="font-semibold mb-4 text-lg">गीत</h3>
@@ -327,9 +327,9 @@ const FullPlayer = () => {
                 </ScrollArea>
               </TabsContent>
 
-              <TabsContent value="queue" className="flex-1 mt-4 overflow-hidden">
-                <ScrollArea className="h-full pr-4">
-                  <div className="space-y-2">
+              <TabsContent value="queue" className="flex-1 mt-4 min-h-0 data-[state=active]:flex data-[state=active]:flex-col">
+                <ScrollArea className="flex-1 pr-4">
+                  <div className="space-y-2 pb-4">
                     {playlist.map((bhajan, index) => (
                       <div
                         key={`${bhajan.id}-${index}`}
