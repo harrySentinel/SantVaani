@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import CompactBhajanCard from '@/components/bhajan/CompactBhajanCard';
 import BhajanModal from '@/components/BhajanModal';
 import { supabase } from '@/lib/supabaseClient';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface Bhajan {
   id: string;
@@ -19,6 +20,7 @@ interface Bhajan {
 }
 
 const LandingBhajanSection = () => {
+  const { language } = useLanguage();
   const [bhajans, setBhajans] = useState<Bhajan[]>([]);
   const [selectedBhajan, setSelectedBhajan] = useState<Bhajan | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -105,17 +107,19 @@ const LandingBhajanSection = () => {
             </div>
 
             <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mb-4">
-              Sacred Bhajans
+              {language === 'HI' ? 'पवित्र भजन' : 'Sacred Bhajans'}
             </h2>
 
             <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-              Immerse yourself in divine melodies. Experience our beautifully revamped bhajan collection with Spotify-style interface.
+              {language === 'HI'
+                ? 'दिव्य संगीत में डूब जाइए। हमारे खूबसूरती से सजाए गए भजन संग्रह का अनुभव करें।'
+                : 'Immerse yourself in divine melodies. Experience our beautifully revamped bhajan collection.'}
             </p>
 
             <div className="flex items-center justify-center gap-2 mt-4">
               <Flame className="w-5 h-5 text-orange-500 animate-pulse" />
               <span className="text-sm font-medium text-gray-600">
-                Trending this week
+                {language === 'HI' ? 'इस सप्ताह ट्रेंडिंग' : 'Trending this week'}
               </span>
             </div>
           </div>
@@ -142,11 +146,12 @@ const LandingBhajanSection = () => {
                 <Music className="w-6 h-6 text-emerald-600" />
               </div>
               <h3 className="text-2xl font-bold text-gray-800 mb-3">
-                Explore Complete Collection
+                {language === 'HI' ? 'पूरा संग्रह देखें' : 'Explore Complete Collection'}
               </h3>
               <p className="text-gray-600 mb-6 leading-relaxed">
-                Discover hundreds of devotional songs with lyrics, meanings, and YouTube playback.
-                Create your own playlists and track your learning journey.
+                {language === 'HI'
+                  ? 'गीत, अर्थ और YouTube प्लेबैक के साथ सैकड़ों भक्ति गीत खोजें।'
+                  : 'Discover hundreds of devotional songs with lyrics, meanings, and YouTube playback.'}
               </p>
 
               <Link to="/bhajans">
@@ -155,13 +160,13 @@ const LandingBhajanSection = () => {
                   className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-8 py-6 rounded-full text-lg font-semibold shadow-xl hover:shadow-2xl transition-all transform hover:scale-105 group"
                 >
                   <Music className="w-5 h-5 mr-2 group-hover:animate-pulse" />
-                  View All Bhajans
+                  {language === 'HI' ? 'सभी भजन देखें' : 'View All Bhajans'}
                   <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
 
               <p className="text-sm text-gray-500 mt-4">
-                <strong className="text-green-600">{bhajans.length}+</strong> bhajans and growing
+                <strong className="text-green-600">{bhajans.length}+</strong> {language === 'HI' ? 'भजन और बढ़ रहे हैं' : 'bhajans and growing'}
               </p>
             </div>
 
@@ -170,25 +175,25 @@ const LandingBhajanSection = () => {
               <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-orange-100 shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-center space-x-2 mb-2">
                   <Music className="w-5 h-5 text-green-600" />
-                  <span className="text-sm font-semibold text-gray-700">Full Lyrics</span>
+                  <span className="text-sm font-semibold text-gray-700">{language === 'HI' ? 'पूर्ण गीत' : 'Full Lyrics'}</span>
                 </div>
-                <p className="text-xs text-gray-600">English & Hindi with meanings</p>
+                <p className="text-xs text-gray-600">{language === 'HI' ? 'अर्थ के साथ हिंदी और अंग्रेजी' : 'English & Hindi with meanings'}</p>
               </div>
 
               <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-orange-100 shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-center space-x-2 mb-2">
                   <Play className="w-5 h-5 text-green-600" />
-                  <span className="text-sm font-semibold text-gray-700">YouTube Player</span>
+                  <span className="text-sm font-semibold text-gray-700">{language === 'HI' ? 'YouTube प्लेयर' : 'YouTube Player'}</span>
                 </div>
-                <p className="text-xs text-gray-600">Built-in music player</p>
+                <p className="text-xs text-gray-600">{language === 'HI' ? 'बिल्ट-इन म्यूज़िक प्लेयर' : 'Built-in music player'}</p>
               </div>
 
               <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-orange-100 shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-center space-x-2 mb-2">
                   <Flame className="w-5 h-5 text-orange-500" />
-                  <span className="text-sm font-semibold text-gray-700">Trending</span>
+                  <span className="text-sm font-semibold text-gray-700">{language === 'HI' ? 'ट्रेंडिंग' : 'Trending'}</span>
                 </div>
-                <p className="text-xs text-gray-600">Discover popular bhajans</p>
+                <p className="text-xs text-gray-600">{language === 'HI' ? 'लोकप्रिय भजन खोजें' : 'Discover popular bhajans'}</p>
               </div>
             </div>
           </div>

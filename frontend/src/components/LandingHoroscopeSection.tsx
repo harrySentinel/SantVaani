@@ -1,9 +1,12 @@
 import { Link } from 'react-router-dom';
 import { Star, Sparkles, ArrowRight, Calendar, Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const LandingHoroscopeSection = () => {
-  const today = new Date().toLocaleDateString('en-US', {
+  const { language } = useLanguage();
+
+  const today = new Date().toLocaleDateString(language === 'HI' ? 'hi-IN' : 'en-US', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
@@ -22,11 +25,13 @@ const LandingHoroscopeSection = () => {
         {/* Section Header */}
         <div className="text-center mb-12">
           <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
-            Daily Horoscope
+            {language === 'HI' ? 'दैनिक राशिफल' : 'Daily Horoscope'}
           </h2>
 
           <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            Discover what the stars have in store for you today. Get personalized insights based on Vedic astrology.
+            {language === 'HI'
+              ? 'जानें कि आज तारे आपके लिए क्या लेकर आए हैं। वैदिक ज्योतिष पर आधारित व्यक्तिगत जानकारी प्राप्त करें।'
+              : 'Discover what the stars have in store for you today. Get personalized insights based on Vedic astrology.'}
           </p>
 
           <div className="flex items-center justify-center gap-2 mt-4">
@@ -46,11 +51,12 @@ const LandingHoroscopeSection = () => {
               <Star className="w-6 h-6 text-purple-600" />
             </div>
             <h3 className="text-2xl font-bold text-gray-800 mb-3">
-              Get Your Daily Guidance
+              {language === 'HI' ? 'अपना दैनिक मार्गदर्शन प्राप्त करें' : 'Get Your Daily Guidance'}
             </h3>
             <p className="text-gray-600 mb-6 leading-relaxed">
-              Receive personalized predictions based on ancient Vedic astrology.
-              Discover insights about love, career, health, and more.
+              {language === 'HI'
+                ? 'प्राचीन वैदिक ज्योतिष पर आधारित व्यक्तिगत भविष्यवाणियां प्राप्त करें। प्रेम, करियर, स्वास्थ्य और अधिक के बारे में जानकारी प्राप्त करें।'
+                : 'Receive personalized predictions based on ancient Vedic astrology. Discover insights about love, career, health, and more.'}
             </p>
 
             <Link to="/horoscope">
@@ -59,13 +65,13 @@ const LandingHoroscopeSection = () => {
                 className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-6 rounded-full text-lg font-semibold shadow-xl hover:shadow-2xl transition-all transform hover:scale-105 group"
               >
                 <Star className="w-5 h-5 mr-2 group-hover:animate-pulse" />
-                View Today's Horoscope
+                {language === 'HI' ? 'आज का राशिफल देखें' : "View Today's Horoscope"}
                 <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
 
             <p className="text-sm text-gray-500 mt-4">
-              Updated daily with accurate Vedic predictions
+              {language === 'HI' ? 'सटीक वैदिक भविष्यवाणियों के साथ दैनिक अपडेट' : 'Updated daily with accurate Vedic predictions'}
             </p>
           </div>
 
@@ -74,25 +80,25 @@ const LandingHoroscopeSection = () => {
             <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-purple-100 shadow-sm hover:shadow-md transition-shadow">
               <div className="flex items-center justify-center space-x-2 mb-2">
                 <Calendar className="w-5 h-5 text-purple-600" />
-                <span className="text-sm font-semibold text-gray-700">Daily Updates</span>
+                <span className="text-sm font-semibold text-gray-700">{language === 'HI' ? 'दैनिक अपडेट' : 'Daily Updates'}</span>
               </div>
-              <p className="text-xs text-gray-600">Fresh predictions every day</p>
+              <p className="text-xs text-gray-600">{language === 'HI' ? 'हर दिन नई भविष्यवाणियां' : 'Fresh predictions every day'}</p>
             </div>
 
             <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-pink-100 shadow-sm hover:shadow-md transition-shadow">
               <div className="flex items-center justify-center space-x-2 mb-2">
                 <Star className="w-5 h-5 text-purple-600" />
-                <span className="text-sm font-semibold text-gray-700">Vedic Astrology</span>
+                <span className="text-sm font-semibold text-gray-700">{language === 'HI' ? 'वैदिक ज्योतिष' : 'Vedic Astrology'}</span>
               </div>
-              <p className="text-xs text-gray-600">Ancient wisdom & accuracy</p>
+              <p className="text-xs text-gray-600">{language === 'HI' ? 'प्राचीन ज्ञान और सटीकता' : 'Ancient wisdom & accuracy'}</p>
             </div>
 
             <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-purple-100 shadow-sm hover:shadow-md transition-shadow">
               <div className="flex items-center justify-center space-x-2 mb-2">
                 <Sparkles className="w-5 h-5 text-pink-500" />
-                <span className="text-sm font-semibold text-gray-700">All Aspects</span>
+                <span className="text-sm font-semibold text-gray-700">{language === 'HI' ? 'सभी पहलू' : 'All Aspects'}</span>
               </div>
-              <p className="text-xs text-gray-600">Love, career, health & more</p>
+              <p className="text-xs text-gray-600">{language === 'HI' ? 'प्रेम, करियर, स्वास्थ्य और अधिक' : 'Love, career, health & more'}</p>
             </div>
           </div>
         </div>
