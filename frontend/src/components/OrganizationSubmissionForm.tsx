@@ -1,8 +1,7 @@
 import React from 'react';
 import { Building, ExternalLink, CheckCircle, FileText } from 'lucide-react';
 
-// TODO: Replace with your actual Google Form URL
-const GOOGLE_FORM_URL = 'https://forms.google.com/YOUR_FORM_ID_HERE';
+const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSeVloZVTjbX6cAGSg6ky3hsoN9m3JIl4iup5V26Ch7hO3VKMA/viewform?usp=publish-editor';
 
 const OrganizationSubmissionForm = () => {
   const handleOpenForm = () => {
