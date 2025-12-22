@@ -278,14 +278,14 @@ export default function OrganizationsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex-1">
           <h1 className="text-3xl font-bold text-gray-900">Organizations</h1>
-          <p className="text-gray-600 mt-1">Manage organizations and add new ones from Google Form submissions</p>
+          <p className="text-gray-600 mt-1 text-sm sm:text-base">Manage organizations and add new ones from Google Form submissions</p>
         </div>
         <Button
           onClick={() => setAddingOrg(true)}
-          className="bg-orange-500 hover:bg-orange-600"
+          className="bg-orange-500 hover:bg-orange-600 text-white shadow-md hover:shadow-lg transition-all whitespace-nowrap flex-shrink-0"
         >
           <Plus className="w-4 h-4 mr-2" />
           Add Organization
