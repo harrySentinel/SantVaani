@@ -37,7 +37,6 @@ const LandingBlogSection = () => {
           .from('blog_posts')
           .select('id, title, excerpt, slug, published_at, reading_time, category, spiritual_quotes')
           .eq('language', contentLanguage)
-          .eq('status', 'published')
           .order('published_at', { ascending: false })
           .limit(3)
 
