@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Search, CheckCircle, XCircle, Eye, Edit, Trash2, Building2, Phone, Mail, MapPin } from 'lucide-react'
+import { Search, CheckCircle, XCircle, Eye, Edit, Trash2, Building2, Phone, Mail, MapPin, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/hooks/use-toast'
 import { supabase } from '@/lib/supabase'
@@ -47,6 +47,26 @@ export default function OrganizationsPage() {
   const [viewingOrg, setViewingOrg] = useState<Organization | null>(null)
   const [editingOrg, setEditingOrg] = useState<Organization | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
+  const [addingOrg, setAddingOrg] = useState(false)
+  const [newOrgData, setNewOrgData] = useState({
+    organization_name: '',
+    organization_name_hi: '',
+    organization_type: 'vridh_ashram',
+    contact_person: '',
+    phone: '',
+    email: '',
+    city: '',
+    state: '',
+    address: '',
+    pincode: '',
+    description: '',
+    description_hi: '',
+    established_year: '',
+    capacity: '',
+    upi_id: '',
+    needs: [] as string[]
+  })
+  const [submittingNew, setSubmittingNew] = useState(false)
 
   const { toast } = useToast()
 
@@ -170,6 +190,79 @@ export default function OrganizationsPage() {
     }
   }
 
+  // Add new organization (manually by admin)
+  const addNewOrganization = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setSubmittingNew(true)
+
+    try {
+      const dataToInsert: any = {
+        organization_name: newOrgData.organization_name,
+        organization_type: newOrgData.organization_type,
+        contact_person: newOrgData.contact_person,
+        phone: newOrgData.phone,
+        email: newOrgData.email,
+        city: newOrgData.city,
+        state: newOrgData.state,
+        status: 'approved', // Directly approved since admin is adding it
+        reviewed_at: new Date().toISOString()
+      }
+
+      // Add optional fields if provided
+      if (newOrgData.organization_name_hi) dataToInsert.organization_name_hi = newOrgData.organization_name_hi
+      if (newOrgData.address) dataToInsert.address = newOrgData.address
+      if (newOrgData.pincode) dataToInsert.pincode = newOrgData.pincode
+      if (newOrgData.description) dataToInsert.description = newOrgData.description
+      if (newOrgData.description_hi) dataToInsert.description_hi = newOrgData.description_hi
+      if (newOrgData.upi_id) dataToInsert.upi_id = newOrgData.upi_id
+      if (newOrgData.established_year) dataToInsert.established_year = parseInt(newOrgData.established_year)
+      if (newOrgData.capacity) dataToInsert.capacity = parseInt(newOrgData.capacity)
+      if (newOrgData.needs.length > 0) dataToInsert.needs = newOrgData.needs
+
+      const { error } = await supabase
+        .from('organization_submissions')
+        .insert([dataToInsert])
+
+      if (error) throw error
+
+      toast({
+        title: "Success",
+        description: `${newOrgData.organization_name} has been added and is now live!`
+      })
+
+      // Reset form
+      setNewOrgData({
+        organization_name: '',
+        organization_name_hi: '',
+        organization_type: 'vridh_ashram',
+        contact_person: '',
+        phone: '',
+        email: '',
+        city: '',
+        state: '',
+        address: '',
+        pincode: '',
+        description: '',
+        description_hi: '',
+        established_year: '',
+        capacity: '',
+        upi_id: '',
+        needs: []
+      })
+      setAddingOrg(false)
+      fetchOrganizations()
+    } catch (error) {
+      console.error('Error adding organization:', error)
+      toast({
+        title: "Error",
+        description: "Failed to add organization. Please try again.",
+        variant: "destructive"
+      })
+    } finally {
+      setSubmittingNew(false)
+    }
+  }
+
   // Filter organizations by search
   const filteredOrganizations = organizations.filter(org =>
     org.organization_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -187,9 +280,16 @@ export default function OrganizationsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Organization Submissions</h1>
-          <p className="text-gray-600 mt-1">Review and manage organization submissions</p>
+          <h1 className="text-3xl font-bold text-gray-900">Organizations</h1>
+          <p className="text-gray-600 mt-1">Manage organizations and add new ones from Google Form submissions</p>
         </div>
+        <Button
+          onClick={() => setAddingOrg(true)}
+          className="bg-orange-500 hover:bg-orange-600"
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          Add Organization
+        </Button>
       </div>
 
       {/* Stats */}
@@ -554,6 +654,259 @@ export default function OrganizationsPage() {
               >
                 Cancel
               </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Organization Modal */}
+      {addingOrg && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+          <div className="bg-white rounded-lg max-w-4xl w-full my-8">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="text-2xl font-bold">Add New Organization</h2>
+                  <p className="text-sm text-gray-600 mt-1">Manually add organization from verified Google Form submissions</p>
+                </div>
+                <button
+                  onClick={() => setAddingOrg(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <form onSubmit={addNewOrganization} className="space-y-6 max-h-[70vh] overflow-y-auto pr-2">
+                {/* Basic Information */}
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-lg border-b pb-2">Basic Information</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Organization Name (English) <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={newOrgData.organization_name}
+                        onChange={(e) => setNewOrgData({...newOrgData, organization_name: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Organization Name (Hindi)
+                      </label>
+                      <input
+                        type="text"
+                        value={newOrgData.organization_name_hi}
+                        onChange={(e) => setNewOrgData({...newOrgData, organization_name_hi: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Organization Type <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        required
+                        value={newOrgData.organization_type}
+                        onChange={(e) => setNewOrgData({...newOrgData, organization_type: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      >
+                        <option value="vridh_ashram">Vridh Ashram</option>
+                        <option value="orphanage">Orphanage</option>
+                        <option value="dharamshala">Dharamshala</option>
+                        <option value="temple">Temple</option>
+                        <option value="gaushala">Gaushala</option>
+                        <option value="other">Other</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Established Year
+                      </label>
+                      <input
+                        type="number"
+                        value={newOrgData.established_year}
+                        onChange={(e) => setNewOrgData({...newOrgData, established_year: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                        placeholder="2000"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Capacity (No. of residents)
+                      </label>
+                      <input
+                        type="number"
+                        value={newOrgData.capacity}
+                        onChange={(e) => setNewOrgData({...newOrgData, capacity: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                        placeholder="50"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        UPI ID
+                      </label>
+                      <input
+                        type="text"
+                        value={newOrgData.upi_id}
+                        onChange={(e) => setNewOrgData({...newOrgData, upi_id: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                        placeholder="org@upi"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Contact Information */}
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-lg border-b pb-2">Contact Information</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Contact Person <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={newOrgData.contact_person}
+                        onChange={(e) => setNewOrgData({...newOrgData, contact_person: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Phone <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="tel"
+                        required
+                        value={newOrgData.phone}
+                        onChange={(e) => setNewOrgData({...newOrgData, phone: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Email <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="email"
+                        required
+                        value={newOrgData.email}
+                        onChange={(e) => setNewOrgData({...newOrgData, email: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Location */}
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-lg border-b pb-2">Location</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Address
+                      </label>
+                      <input
+                        type="text"
+                        value={newOrgData.address}
+                        onChange={(e) => setNewOrgData({...newOrgData, address: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        City <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={newOrgData.city}
+                        onChange={(e) => setNewOrgData({...newOrgData, city: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        State <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={newOrgData.state}
+                        onChange={(e) => setNewOrgData({...newOrgData, state: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Pincode
+                      </label>
+                      <input
+                        type="text"
+                        value={newOrgData.pincode}
+                        onChange={(e) => setNewOrgData({...newOrgData, pincode: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Description */}
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-lg border-b pb-2">Description</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Description (English)
+                      </label>
+                      <textarea
+                        value={newOrgData.description}
+                        onChange={(e) => setNewOrgData({...newOrgData, description: e.target.value})}
+                        rows={4}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Description (Hindi)
+                      </label>
+                      <textarea
+                        value={newOrgData.description_hi}
+                        onChange={(e) => setNewOrgData({...newOrgData, description_hi: e.target.value})}
+                        rows={4}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-3 pt-4 border-t sticky bottom-0 bg-white">
+                  <Button
+                    type="submit"
+                    disabled={submittingNew}
+                    className="flex-1 bg-orange-500 hover:bg-orange-600"
+                  >
+                    {submittingNew ? 'Adding...' : 'Add Organization'}
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={() => setAddingOrg(false)}
+                    variant="outline"
+                    className="flex-1"
+                    disabled={submittingNew}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </form>
             </div>
           </div>
         </div>
