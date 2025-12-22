@@ -33,14 +33,30 @@ const LandingBlogSection = () => {
         const contentLanguage = language === 'HI' ? 'hi' : 'en'
 
         // Fetch directly from Supabase for faster loading
-        const { data, error } = await supabase
+        // Try with language filter first
+        let { data, error } = await supabase
           .from('blog_posts')
           .select('id, title, excerpt, slug, published_at, reading_time, category, spiritual_quotes')
           .eq('language', contentLanguage)
           .order('published_at', { ascending: false })
           .limit(3)
 
-        if (error) throw error
+        // If no posts found for current language, fetch any posts
+        if (!error && (!data || data.length === 0)) {
+          const fallback = await supabase
+            .from('blog_posts')
+            .select('id, title, excerpt, slug, published_at, reading_time, category, spiritual_quotes')
+            .order('published_at', { ascending: false })
+            .limit(3)
+
+          data = fallback.data
+          error = fallback.error
+        }
+
+        if (error) {
+          console.error('Supabase error:', error)
+          throw error
+        }
 
         // Format the data to match BlogPost interface
         const formattedPosts = (data || []).map((post: any) => ({
@@ -93,8 +109,24 @@ const LandingBlogSection = () => {
     )
   }
 
+  // Show section even if no posts, just with a message
   if (featuredPosts.length === 0) {
-    return null
+    return (
+      <section className="py-20 bg-gradient-to-br from-white via-orange-25 to-white relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              {language === 'HI' ? 'आध्यात्मिक ब्लॉग' : 'Spiritual Blog'}
+            </h2>
+            <p className="text-lg text-gray-600">
+              {language === 'HI'
+                ? 'जल्द ही नए लेख आ रहे हैं...'
+                : 'New articles coming soon...'}
+            </p>
+          </div>
+        </div>
+      </section>
+    )
   }
 
   return (
