@@ -4,7 +4,6 @@ import { Music, ArrowRight, Play, Flame, Sparkles, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button';
 import CompactBhajanCard from '@/components/bhajan/CompactBhajanCard';
 import BhajanModal from '@/components/BhajanModal';
-import { getTrendingBhajans } from '@/services/bhajanEngagementService';
 import { supabase } from '@/lib/supabaseClient';
 
 interface Bhajan {
@@ -33,36 +32,29 @@ const LandingBhajanSection = () => {
     try {
       setLoading(true);
 
-      // Try to get trending bhajans first
-      const trendingData = await getTrendingBhajans(6);
+      // Fetch recent bhajans directly from Supabase (faster than trending API)
+      const { data, error } = await supabase
+        .from('bhajans')
+        .select('id, title, title_hi, category, youtube_url, author')
+        .not('youtube_url', 'is', null)
+        .order('created_at', { ascending: false })
+        .limit(6);
 
-      if (trendingData.trending && trendingData.trending.length > 0) {
-        // Use trending bhajans
-        setBhajans(trendingData.trending.map((item: any) => item.bhajans));
-      } else {
-        // Fallback: Get random recent bhajans
-        const { data, error } = await supabase
-          .from('bhajans')
-          .select('*')
-          .not('youtube_url', 'is', null)
-          .order('created_at', { ascending: false })
-          .limit(6);
+      if (error) throw error;
 
-        if (error) throw error;
-        setBhajans(data || []);
-      }
+      // Add minimal required fields for display
+      const formattedData = (data || []).map(bhajan => ({
+        ...bhajan,
+        lyrics: '',
+        lyrics_hi: '',
+        meaning: ''
+      }));
+
+      setBhajans(formattedData);
     } catch (error) {
       console.error('Error fetching bhajans:', error);
-      // Try to get any bhajans as last resort
-      try {
-        const { data } = await supabase
-          .from('bhajans')
-          .select('*')
-          .limit(6);
-        setBhajans(data || []);
-      } catch (err) {
-        console.error('Fallback fetch failed:', err);
-      }
+      // Silent fail - just show empty section
+      setBhajans([]);
     } finally {
       setLoading(false);
     }
