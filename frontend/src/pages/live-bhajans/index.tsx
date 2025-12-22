@@ -1,9 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Play, Users, Eye, Clock, RefreshCw, Wifi, WifiOff, AlertCircle } from 'lucide-react';
+import { Play, Users, Eye, Clock, RefreshCw, Wifi, WifiOff, AlertCircle, ArrowLeft, Home, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 
 const LiveBhajan = () => {
+  const navigate = useNavigate();
   const [bhajans, setBhajans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -182,7 +186,8 @@ const LiveBhajan = () => {
   if (loading && bhajans.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50">
-        <div className="flex items-center justify-center min-h-[100vh]">
+        <Navbar />
+        <div className="flex items-center justify-center min-h-[calc(100vh-80px)]">
           <div className="text-center space-y-6">
             <div className="w-20 h-20 bg-gradient-to-r from-orange-400 to-red-500 rounded-full mx-auto flex items-center justify-center animate-pulse">
               <Play className="w-10 h-10 text-white" fill="white" />
@@ -198,12 +203,15 @@ const LiveBhajan = () => {
             </div>
           </div>
         </div>
+        <Footer />
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50">
+      <Navbar />
+
       {/* Hero Section */}
       <section className="relative py-20 bg-gradient-to-r from-orange-400 via-red-400 to-pink-500 overflow-hidden">
         {/* Animated background elements */}
@@ -212,7 +220,40 @@ const LiveBhajan = () => {
           <div className="absolute bottom-20 right-20 w-24 h-24 bg-white rounded-full animate-pulse delay-1000"></div>
           <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-white rounded-full animate-pulse delay-500"></div>
         </div>
-        
+
+        {/* Navigation Buttons */}
+        <div className="absolute top-4 left-4 right-4 z-10 flex justify-between">
+          <Button
+            onClick={() => navigate(-1)}
+            className="bg-white/20 hover:bg-white/30 text-white border-white/30 backdrop-blur-sm"
+            variant="outline"
+            size="sm"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back
+          </Button>
+
+          <div className="flex space-x-2">
+            <Button
+              onClick={() => navigate('/')}
+              className="bg-white/20 hover:bg-white/30 text-white border-white/30 backdrop-blur-sm"
+              variant="outline"
+              size="sm"
+            >
+              <Home className="w-4 h-4 mr-2" />
+              Home
+            </Button>
+            <Button
+              onClick={() => navigate('/')}
+              className="bg-white/20 hover:bg-white/30 text-white border-white/30 backdrop-blur-sm"
+              variant="outline"
+              size="icon"
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="flex justify-center items-center space-x-4 mb-8">
             <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-3xl flex items-center justify-center shadow-2xl">
@@ -505,6 +546,8 @@ const LiveBhajan = () => {
           </div>
         </div>
       </section>
+
+      <Footer />
     </div>
   );
 };
