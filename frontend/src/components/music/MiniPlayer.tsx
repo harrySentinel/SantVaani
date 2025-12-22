@@ -70,7 +70,7 @@ const MiniPlayer = () => {
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-r from-green-600 via-emerald-600 to-green-600 text-white shadow-2xl border-t border-green-500/30" role="region" aria-label="Music Player">
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-r from-orange-600 via-orange-500 to-orange-600 text-white shadow-2xl border-t border-orange-500/30" role="region" aria-label="Music Player">
       {/* Error Banner */}
       {error && (
         <div className="bg-red-700 px-4 py-2 flex items-center justify-between text-sm" role="alert">
@@ -136,7 +136,7 @@ const MiniPlayer = () => {
                 variant="ghost"
                 size="sm"
                 className={`h-8 w-8 p-0 hover:bg-white/20 transition-colors ${
-                  shuffle ? 'text-green-200' : 'text-white/70'
+                  shuffle ? 'text-orange-200' : 'text-white/70'
                 }`}
                 onClick={toggleShuffle}
                 aria-label={shuffle ? 'Shuffle on' : 'Shuffle off'}
@@ -190,7 +190,7 @@ const MiniPlayer = () => {
                 variant="ghost"
                 size="sm"
                 className={`h-8 w-8 p-0 hover:bg-white/20 transition-colors ${
-                  repeat !== 'none' ? 'text-green-200' : 'text-white/70'
+                  repeat !== 'none' ? 'text-orange-200' : 'text-white/70'
                 }`}
                 onClick={toggleRepeat}
                 aria-label={`Repeat ${repeat}`}
@@ -234,16 +234,17 @@ const MiniPlayer = () => {
               </Button>
 
               {showVolumeSlider && (
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-gray-900/95 backdrop-blur-sm rounded-lg p-3 shadow-2xl border border-white/10">
-                  <Slider
-                    value={[isMuted ? 0 : volume]}
-                    onValueChange={(value) => setVolume(value[0])}
-                    max={100}
-                    step={1}
-                    className="w-24 [&_[role=slider]]:bg-white [&_[role=slider]]:border-2 [&_[role=slider]]:border-orange-500 [&_[role=slider]]:shadow-lg [&>span:first-child]:bg-white/20 [&>span:first-child>span]:bg-white"
-                    orientation="vertical"
-                    style={{ height: '100px' }}
-                  />
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-gray-900/95 backdrop-blur-sm rounded-lg px-3 py-4 shadow-2xl border border-white/10 w-auto">
+                  <div className="h-24 flex items-center">
+                    <Slider
+                      value={[isMuted ? 0 : volume]}
+                      onValueChange={(value) => setVolume(value[0])}
+                      max={100}
+                      step={1}
+                      className="h-full [&_[role=slider]]:bg-white [&_[role=slider]]:border-2 [&_[role=slider]]:border-orange-500 [&_[role=slider]]:shadow-lg [&_[role=slider]]:w-4 [&_[role=slider]]:h-4 [&>span:first-child]:bg-white/20 [&>span:first-child]:w-1.5 [&>span:first-child>span]:bg-white"
+                      orientation="vertical"
+                    />
+                  </div>
                 </div>
               )}
             </div>

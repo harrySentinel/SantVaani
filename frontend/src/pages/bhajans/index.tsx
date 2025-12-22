@@ -145,7 +145,7 @@ const Bhajans = () => {
         <Navbar />
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center space-y-4">
-            <Loader2 className="w-12 h-12 animate-spin text-green-600 mx-auto" />
+            <Loader2 className="w-12 h-12 animate-spin text-orange-600 mx-auto" />
             <p className="text-lg text-gray-600">{t('bhajans.loading')}</p>
           </div>
         </div>
@@ -165,7 +165,7 @@ const Bhajans = () => {
             <p className="text-gray-600">{error}</p>
             <button
               onClick={() => window.location.reload()}
-              className="px-6 py-3 bg-green-600 text-white rounded-full hover:bg-green-700 transition-colors"
+              className="px-6 py-3 bg-orange-600 text-white rounded-full hover:bg-orange-700 transition-colors"
             >
               Try Again
             </button>
@@ -181,7 +181,7 @@ const Bhajans = () => {
       <Navbar />
 
       {/* Header - Spotify Style */}
-      <section className="pt-20 pb-8 bg-gradient-to-b from-green-600 to-green-500">
+      <section className="pt-20 pb-8 bg-gradient-to-b from-orange-500 to-orange-600">
         <div className="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="space-y-4">
             <div className="flex items-center space-x-3 mb-2">
@@ -248,7 +248,7 @@ const Bhajans = () => {
                   placeholder={language === 'EN' ? 'Search bhajans... (हनुमान चालीसा, राम भजन, कृष्ण)' : 'Search bhajans...'}
                   value={searchQuery}
                   onChange={handleSearch}
-                  className="block w-full pl-12 pr-4 py-6 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 text-gray-900 placeholder-gray-400 bg-white shadow-sm text-base"
+                  className="block w-full pl-12 pr-4 py-6 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 placeholder-gray-400 bg-white shadow-sm text-base"
                 />
                 {searchQuery && (
                   <button
@@ -277,7 +277,7 @@ const Bhajans = () => {
                 <p className="text-gray-500">Try different keywords or browse all bhajans</p>
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="mt-6 px-6 py-3 bg-green-600 text-white rounded-full hover:bg-green-700 transition-colors"
+                  className="mt-6 px-6 py-3 bg-orange-600 text-white rounded-full hover:bg-orange-700 transition-colors"
                 >
                   Show All Bhajans
                 </button>
@@ -318,7 +318,7 @@ const Bhajans = () => {
                     onPageChange={handleBhajanPageChange}
                     showStats={true}
                     showFirstLast={true}
-                    theme="green"
+                    theme="orange"
                   />
                 )}
               </div>
@@ -328,7 +328,7 @@ const Bhajans = () => {
       </section>
 
       {/* Daily Inspiration */}
-      <section className="py-16 bg-gradient-to-r from-green-100 to-orange-100">
+      <section className="py-16 bg-gradient-to-r from-orange-50 to-orange-100">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8">
           <div className="space-y-4">
             <h2 className="text-3xl font-bold text-gray-800">
@@ -340,20 +340,20 @@ const Bhajans = () => {
             </p>
           </div>
 
-          <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-8 border border-green-200">
+          <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-8 border border-orange-200">
             <blockquote className="text-xl md:text-2xl text-gray-700 italic font-medium leading-relaxed">
               "संगीत ही सबसे बड़ा धर्म है"
             </blockquote>
-            <p className="text-lg text-green-600 mt-2">
+            <p className="text-lg text-orange-600 mt-2">
               "Music is the greatest religion"
             </p>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="/saints" className="inline-flex items-center justify-center px-6 py-3 bg-green-600 text-white rounded-full hover:bg-green-700 transition-colors">
+            <a href="/saints" className="inline-flex items-center justify-center px-6 py-3 bg-orange-600 text-white rounded-full hover:bg-orange-700 transition-colors">
               Saints' Teachings
             </a>
-            <a href="/quotes" className="inline-flex items-center justify-center px-6 py-3 border-2 border-green-600 text-green-600 rounded-full hover:bg-green-50 transition-colors">
+            <a href="/quotes" className="inline-flex items-center justify-center px-6 py-3 border-2 border-orange-600 text-orange-600 rounded-full hover:bg-orange-50 transition-colors">
               Divine Quotes
             </a>
           </div>

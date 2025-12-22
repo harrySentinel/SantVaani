@@ -76,7 +76,7 @@ const FullPlayer = () => {
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (
-    <div className="fixed inset-0 z-[100] bg-gradient-to-br from-green-600 via-emerald-600 to-green-700 text-white overflow-hidden" role="dialog" aria-label="Full music player">
+    <div className="fixed inset-0 z-[100] bg-gradient-to-br from-orange-600 via-orange-500 to-orange-700 text-white overflow-hidden" role="dialog" aria-label="Full music player">
       {/* Error Banner */}
       {error && (
         <div className="absolute top-0 left-0 right-0 bg-red-700 px-6 py-3 flex items-center justify-between z-20" role="alert">
@@ -164,7 +164,7 @@ const FullPlayer = () => {
                   onValueChange={(value) => seekTo(value[0])}
                   max={duration || 100}
                   step={1}
-                  className="[&_[role=slider]]:bg-white [&_[role=slider]]:border-2 [&_[role=slider]]:border-green-500 [&_[role=slider]]:shadow-lg [&_[role=slider]]:w-4 [&_[role=slider]]:h-4 [&>span:first-child]:bg-white/30 [&>span:first-child]:h-2 [&>span:first-child>span]:bg-white"
+                  className="[&_[role=slider]]:bg-white [&_[role=slider]]:border-2 [&_[role=slider]]:border-orange-500 [&_[role=slider]]:shadow-lg [&_[role=slider]]:w-4 [&_[role=slider]]:h-4 [&>span:first-child]:bg-white/30 [&>span:first-child]:h-2 [&>span:first-child>span]:bg-white"
                 />
                 <div className="flex justify-between text-sm text-white/80">
                   <span>{formatTime(currentTime)}</span>
@@ -178,7 +178,7 @@ const FullPlayer = () => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={`hover:bg-white/20 ${shuffle ? 'text-green-200' : 'text-white/70'}`}
+                  className={`hover:bg-white/20 ${shuffle ? 'text-orange-200' : 'text-white/70'}`}
                   onClick={toggleShuffle}
                 >
                   <Shuffle className="w-5 h-5" />
@@ -199,7 +199,7 @@ const FullPlayer = () => {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="w-16 h-16 bg-white hover:bg-white/90 text-green-600 rounded-full shadow-lg hover:scale-105 transition-transform"
+                    className="w-16 h-16 bg-white hover:bg-white/90 text-orange-600 rounded-full shadow-lg hover:scale-105 transition-transform"
                     onClick={togglePlayPause}
                     disabled={isLoading}
                     aria-label={isPlaying ? 'Pause' : 'Play'}
@@ -228,7 +228,7 @@ const FullPlayer = () => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={`hover:bg-white/20 ${repeat !== 'none' ? 'text-green-200' : 'text-white/70'}`}
+                  className={`hover:bg-white/20 ${repeat !== 'none' ? 'text-orange-200' : 'text-white/70'}`}
                   onClick={toggleRepeat}
                 >
                   {repeat === 'one' ? (
@@ -259,7 +259,7 @@ const FullPlayer = () => {
                   onValueChange={(value) => setVolume(value[0])}
                   max={100}
                   step={1}
-                  className="flex-1 [&_[role=slider]]:bg-white [&_[role=slider]]:border-2 [&_[role=slider]]:border-green-500 [&_[role=slider]]:shadow-lg [&_[role=slider]]:w-4 [&_[role=slider]]:h-4 [&>span:first-child]:bg-white/30 [&>span:first-child]:h-2 [&>span:first-child>span]:bg-white"
+                  className="flex-1 [&_[role=slider]]:bg-white [&_[role=slider]]:border-2 [&_[role=slider]]:border-orange-500 [&_[role=slider]]:shadow-lg [&_[role=slider]]:w-4 [&_[role=slider]]:h-4 [&>span:first-child]:bg-white/30 [&>span:first-child]:h-2 [&>span:first-child>span]:bg-white"
                   aria-label="Volume"
                 />
               </div>
