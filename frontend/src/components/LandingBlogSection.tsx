@@ -32,11 +32,25 @@ const LandingBlogSection = () => {
         setIsLoading(true)
         const contentLanguage = language === 'HI' ? 'hi' : 'en'
 
-        // Fetch directly from Supabase for faster loading
+        // Fetch directly from Supabase for faster loading with proper join
         // Try with language filter first
         let { data, error } = await supabase
           .from('blog_posts')
-          .select('id, title, excerpt, slug, published_at, reading_time, category, spiritual_quotes')
+          .select(`
+            id,
+            title,
+            excerpt,
+            slug,
+            published_at,
+            reading_time,
+            spiritual_quotes,
+            blog_categories (
+              id,
+              name,
+              icon,
+              color
+            )
+          `)
           .eq('language', contentLanguage)
           .order('published_at', { ascending: false })
           .limit(3)
@@ -45,7 +59,21 @@ const LandingBlogSection = () => {
         if (!error && (!data || data.length === 0)) {
           const fallback = await supabase
             .from('blog_posts')
-            .select('id, title, excerpt, slug, published_at, reading_time, category, spiritual_quotes')
+            .select(`
+              id,
+              title,
+              excerpt,
+              slug,
+              published_at,
+              reading_time,
+              spiritual_quotes,
+              blog_categories (
+                id,
+                name,
+                icon,
+                color
+              )
+            `)
             .order('published_at', { ascending: false })
             .limit(3)
 
@@ -66,7 +94,7 @@ const LandingBlogSection = () => {
           slug: post.slug,
           publishedAt: post.published_at,
           readingTime: post.reading_time || 5,
-          category: typeof post.category === 'string' ? JSON.parse(post.category) : post.category,
+          category: post.blog_categories || { name: 'Spiritual', icon: '🙏', color: '#ff6b35' },
           spiritualQuotes: post.spiritual_quotes || []
         }))
 
