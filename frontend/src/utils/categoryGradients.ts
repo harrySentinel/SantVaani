@@ -155,6 +155,14 @@ export const categoryGradients: Record<string, GradientConfig> = {
     icon: '🎶'
   },
 
+  // Satsang - Indigo/Purple (Spiritual Discourse, Truth)
+  'Satsang': {
+    from: 'from-indigo-400',
+    to: 'to-purple-600',
+    text: 'text-indigo-100',
+    icon: '🙏'
+  },
+
   // Default fallback
   'default': {
     from: 'from-gray-400',

@@ -37,12 +37,6 @@ const LandingHoroscopeSection = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Section Header */}
         <div className="text-center mb-12">
-          <div className="flex items-center justify-center space-x-3 mb-4">
-            <Star className="w-8 h-8 text-purple-600 animate-pulse" />
-            <Sparkles className="w-6 h-6 text-purple-500" />
-            <span className="text-4xl">✨</span>
-          </div>
-
           <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
             Daily Horoscope
           </h2>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Play, Users, Eye, Clock, RefreshCw, Wifi, WifiOff, AlertCircle, ArrowLeft, Home, X } from 'lucide-react';
+import { Play, Users, Eye, Clock, RefreshCw, Wifi, WifiOff, AlertCircle, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -185,11 +185,11 @@ const LiveBhajan = () => {
   // Loading state
   if (loading && bhajans.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
         <Navbar />
         <div className="flex items-center justify-center min-h-[calc(100vh-80px)]">
           <div className="text-center space-y-6">
-            <div className="w-20 h-20 bg-gradient-to-r from-orange-400 to-red-500 rounded-full mx-auto flex items-center justify-center animate-pulse">
+            <div className="w-20 h-20 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full mx-auto flex items-center justify-center animate-pulse">
               <Play className="w-10 h-10 text-white" fill="white" />
             </div>
             <div className="space-y-2">
@@ -197,9 +197,9 @@ const LiveBhajan = () => {
               <p className="text-gray-600">Connecting to spiritual channels worldwide</p>
             </div>
             <div className="flex justify-center space-x-1">
-              <div className="w-2 h-2 bg-orange-500 rounded-full animate-bounce"></div>
-              <div className="w-2 h-2 bg-red-500 rounded-full animate-bounce delay-100"></div>
-              <div className="w-2 h-2 bg-pink-500 rounded-full animate-bounce delay-200"></div>
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-bounce"></div>
+              <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce delay-100"></div>
+              <div className="w-2 h-2 bg-teal-500 rounded-full animate-bounce delay-200"></div>
             </div>
           </div>
         </div>
@@ -209,11 +209,11 @@ const LiveBhajan = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
       <Navbar />
 
       {/* Hero Section */}
-      <section className="relative py-20 bg-gradient-to-r from-orange-400 via-red-400 to-pink-500 overflow-hidden">
+      <section className="relative py-20 bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 overflow-hidden">
         {/* Animated background elements */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-20 left-20 w-32 h-32 bg-white rounded-full animate-pulse"></div>
@@ -221,8 +221,8 @@ const LiveBhajan = () => {
           <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-white rounded-full animate-pulse delay-500"></div>
         </div>
 
-        {/* Navigation Buttons */}
-        <div className="absolute top-4 left-4 right-4 z-10 flex justify-between">
+        {/* Navigation Button */}
+        <div className="absolute top-4 left-4 z-10">
           <Button
             onClick={() => navigate(-1)}
             className="bg-white/20 hover:bg-white/30 text-white border-white/30 backdrop-blur-sm"
@@ -232,26 +232,6 @@ const LiveBhajan = () => {
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
           </Button>
-
-          <div className="flex space-x-2">
-            <Button
-              onClick={() => navigate('/')}
-              className="bg-white/20 hover:bg-white/30 text-white border-white/30 backdrop-blur-sm"
-              variant="outline"
-              size="sm"
-            >
-              <Home className="w-4 h-4 mr-2" />
-              Home
-            </Button>
-            <Button
-              onClick={() => navigate('/')}
-              className="bg-white/20 hover:bg-white/30 text-white border-white/30 backdrop-blur-sm"
-              variant="outline"
-              size="icon"
-            >
-              <X className="w-4 h-4" />
-            </Button>
-          </div>
         </div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -260,8 +240,8 @@ const LiveBhajan = () => {
               <Play className="w-10 h-10 text-white" fill="white" />
             </div>
             {liveBhajans.length > 0 && (
-              <div className="flex items-center space-x-2 bg-red-500 px-4 py-2 rounded-full shadow-lg">
-                <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
+              <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm border border-white/40 px-4 py-2 rounded-full shadow-lg">
+                <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
                 <span className="text-white font-bold text-lg">LIVE</span>
               </div>
             )}
@@ -337,19 +317,19 @@ const LiveBhajan = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
             <div className="space-y-2">
-              <div className="text-2xl font-bold text-red-500">{liveBhajans.length}</div>
+              <div className="text-2xl font-bold text-green-600">{liveBhajans.length}</div>
               <div className="text-sm text-gray-600">Live Streams</div>
             </div>
             <div className="space-y-2">
-              <div className="text-2xl font-bold text-orange-500">{recentBhajans.length}</div>
+              <div className="text-2xl font-bold text-emerald-600">{recentBhajans.length}</div>
               <div className="text-sm text-gray-600">Recent Videos</div>
             </div>
             <div className="space-y-2">
-              <div className="text-2xl font-bold text-pink-500">{bhajans.length}</div>
+              <div className="text-2xl font-bold text-teal-600">{bhajans.length}</div>
               <div className="text-sm text-gray-600">Total Content</div>
             </div>
             <div className="space-y-2">
-              <div className="text-2xl font-bold text-purple-500">
+              <div className="text-2xl font-bold text-green-600">
                 {nextUpdate ? Math.ceil((nextUpdate.getTime() - new Date().getTime()) / (1000 * 60)) : '~'}
               </div>
               <div className="text-sm text-gray-600">Mins to Update</div>
@@ -401,7 +381,7 @@ const LiveBhajan = () => {
                         {/* Play Button Overlay */}
                         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                           <div className="w-16 h-16 bg-white/95 rounded-full flex items-center justify-center shadow-2xl transform scale-95 group-hover:scale-100 transition-transform duration-300">
-                            <Play className="w-8 h-8 text-red-500 ml-1" fill="currentColor" />
+                            <Play className="w-8 h-8 text-green-600 ml-1" fill="currentColor" />
                           </div>
                         </div>
                       </div>
@@ -409,12 +389,12 @@ const LiveBhajan = () => {
                       {/* Content - Better padding and spacing */}
                       <div className="flex-1 p-6 lg:p-6 xl:p-8 flex flex-col justify-between">
                         <div className="space-y-3">
-                          <h3 className="text-xl lg:text-2xl font-bold text-gray-800 group-hover:text-red-600 transition-colors leading-tight line-clamp-2">
+                          <h3 className="text-xl lg:text-2xl font-bold text-gray-800 group-hover:text-green-600 transition-colors leading-tight line-clamp-2">
                             {bhajan.title}
                           </h3>
-                          
+
                           <div className="flex flex-wrap items-center gap-4 text-gray-600">
-                            <span className="text-red-600 font-semibold">
+                            <span className="text-green-600 font-semibold">
                               {bhajan.channel}
                             </span>
                             <div className="flex items-center space-x-1">
@@ -427,13 +407,13 @@ const LiveBhajan = () => {
                         <div className="flex flex-col sm:flex-row gap-3 mt-6">
                           <Button
                             onClick={() => openYouTube(bhajan.videoId, bhajan.title)}
-                            className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-6 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                            className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-6 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                           >
                             <Play className="w-5 h-5 mr-2" />
                             Watch Live
                           </Button>
                           <div className="flex items-center space-x-2 text-sm text-gray-500 px-4 py-2">
-                            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                            <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
                             <span>Live now with {bhajan.views} viewers</span>
                           </div>
                         </div>
@@ -449,7 +429,7 @@ const LiveBhajan = () => {
 
       {/* Recent Bhajans Section - Enhanced grid layout */}
       {recentBhajans.length > 0 && (
-        <section className="py-16 bg-gradient-to-br from-gray-50 to-orange-50">
+        <section className="py-16 bg-gradient-to-br from-gray-50 to-green-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
@@ -484,18 +464,18 @@ const LiveBhajan = () => {
                       {/* Play Button */}
                       <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                         <div className="w-12 h-12 bg-white/95 rounded-full flex items-center justify-center shadow-xl">
-                          <Play className="w-6 h-6 text-orange-600 ml-1" fill="currentColor" />
+                          <Play className="w-6 h-6 text-green-600 ml-1" fill="currentColor" />
                         </div>
                       </div>
                     </div>
 
                     <div className="p-6 space-y-4">
-                      <h3 className="text-lg font-bold text-gray-800 group-hover:text-orange-600 transition-colors leading-tight line-clamp-2">
+                      <h3 className="text-lg font-bold text-gray-800 group-hover:text-green-600 transition-colors leading-tight line-clamp-2">
                         {bhajan.title}
                       </h3>
-                      
+
                       <div className="flex items-center justify-between text-sm text-gray-600">
-                        <span className="text-orange-600 font-semibold truncate mr-2">
+                        <span className="text-green-600 font-semibold truncate mr-2">
                           {bhajan.channel}
                         </span>
                         <div className="flex items-center space-x-1 flex-shrink-0">
@@ -507,7 +487,7 @@ const LiveBhajan = () => {
                       <Button
                         onClick={() => openYouTube(bhajan.videoId, bhajan.title)}
                         variant="outline"
-                        className="w-full border-orange-300 text-orange-600 hover:bg-orange-50 hover:border-orange-400 transition-colors duration-300"
+                        className="w-full border-green-300 text-green-600 hover:bg-green-50 hover:border-green-400 transition-colors duration-300"
                       >
                         <Play className="w-4 h-4 mr-2" />
                         Watch Now
@@ -522,9 +502,9 @@ const LiveBhajan = () => {
       )}
 
       {/* Auto-Update Notice */}
-      <section className="py-12 bg-gradient-to-r from-orange-100 to-red-100">
+      <section className="py-12 bg-gradient-to-r from-green-50 to-emerald-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-green-100">
             <div className="flex justify-center items-center space-x-2 mb-4">
               <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
               <span className="text-gray-800 font-bold text-lg">Real-time Updates</span>
