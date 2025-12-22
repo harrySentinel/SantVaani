@@ -1,22 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Star, Sparkles, ArrowRight, Calendar, Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-
-const zodiacSigns = [
-  { name: 'Aries', icon: '♈', dates: 'Mar 21 - Apr 19', color: 'from-red-500 to-orange-500' },
-  { name: 'Taurus', icon: '♉', dates: 'Apr 20 - May 20', color: 'from-green-500 to-emerald-500' },
-  { name: 'Gemini', icon: '♊', dates: 'May 21 - Jun 20', color: 'from-yellow-500 to-amber-500' },
-  { name: 'Cancer', icon: '♋', dates: 'Jun 21 - Jul 22', color: 'from-blue-500 to-cyan-500' },
-  { name: 'Leo', icon: '♌', dates: 'Jul 23 - Aug 22', color: 'from-orange-500 to-red-500' },
-  { name: 'Virgo', icon: '♍', dates: 'Aug 23 - Sep 22', color: 'from-green-600 to-teal-500' },
-  { name: 'Libra', icon: '♎', dates: 'Sep 23 - Oct 22', color: 'from-pink-500 to-purple-500' },
-  { name: 'Scorpio', icon: '♏', dates: 'Oct 23 - Nov 21', color: 'from-purple-600 to-indigo-600' },
-  { name: 'Sagittarius', icon: '♐', dates: 'Nov 22 - Dec 21', color: 'from-purple-500 to-pink-500' },
-  { name: 'Capricorn', icon: '♑', dates: 'Dec 22 - Jan 19', color: 'from-gray-600 to-slate-600' },
-  { name: 'Aquarius', icon: '♒', dates: 'Jan 20 - Feb 18', color: 'from-blue-600 to-purple-600' },
-  { name: 'Pisces', icon: '♓', dates: 'Feb 19 - Mar 20', color: 'from-teal-500 to-blue-500' },
-];
 
 const LandingHoroscopeSection = () => {
   const today = new Date().toLocaleDateString('en-US', {
@@ -51,30 +35,6 @@ const LandingHoroscopeSection = () => {
               {today}
             </span>
           </div>
-        </div>
-
-        {/* Zodiac Signs Grid */}
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-3 md:gap-4 mb-12">
-          {zodiacSigns.map((sign, index) => (
-            <Link key={sign.name} to="/horoscope" className="group">
-              <Card className="hover:shadow-xl transition-all duration-300 transform hover:scale-105 border-0 shadow-md bg-white/90 backdrop-blur-sm h-full">
-                <CardContent className="p-3 md:p-4 text-center space-y-2">
-                  <div className={`w-12 h-12 mx-auto rounded-full bg-gradient-to-br ${sign.color} flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
-                    <span className="text-2xl text-white">{sign.icon}</span>
-                  </div>
-
-                  <div className="space-y-1">
-                    <h3 className="text-xs md:text-sm font-semibold text-gray-800 group-hover:text-purple-600 transition-colors">
-                      {sign.name}
-                    </h3>
-                    <p className="text-xs text-gray-500 hidden sm:block">
-                      {sign.dates}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
         </div>
 
         {/* Call to Action */}

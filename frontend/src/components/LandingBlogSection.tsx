@@ -3,9 +3,23 @@ import { Link } from 'react-router-dom'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { BookOpen, Clock, Calendar, ArrowRight, Sparkles } from 'lucide-react'
-import { blogService } from '@/services/blogService'
-import { BlogPost } from '@/types/blog'
+import { supabase } from '@/lib/supabaseClient'
 import { useLanguage } from '@/contexts/LanguageContext'
+
+interface BlogPost {
+  id: string
+  title: string
+  excerpt: string
+  slug: string
+  publishedAt: string
+  readingTime: number
+  category: {
+    name: string
+    icon: string
+    color: string
+  }
+  spiritualQuotes?: string[]
+}
 
 const LandingBlogSection = () => {
   const [featuredPosts, setFeaturedPosts] = useState<BlogPost[]>([])
@@ -16,24 +30,42 @@ const LandingBlogSection = () => {
     const fetchFeaturedPosts = async () => {
       try {
         setIsLoading(true)
-        // Fetch posts matching the UI language
         const contentLanguage = language === 'HI' ? 'hi' : 'en'
-        const response = await blogService.getPosts({
-          limit: 3,
-          language: contentLanguage
-        })
-        if (response.success && response.posts) {
-          setFeaturedPosts(response.posts.slice(0, 3))
-        }
+
+        // Fetch directly from Supabase for faster loading
+        const { data, error } = await supabase
+          .from('blog_posts')
+          .select('id, title, excerpt, slug, published_at, reading_time, category, spiritual_quotes')
+          .eq('language', contentLanguage)
+          .eq('status', 'published')
+          .order('published_at', { ascending: false })
+          .limit(3)
+
+        if (error) throw error
+
+        // Format the data to match BlogPost interface
+        const formattedPosts = (data || []).map((post: any) => ({
+          id: post.id,
+          title: post.title,
+          excerpt: post.excerpt,
+          slug: post.slug,
+          publishedAt: post.published_at,
+          readingTime: post.reading_time || 5,
+          category: typeof post.category === 'string' ? JSON.parse(post.category) : post.category,
+          spiritualQuotes: post.spiritual_quotes || []
+        }))
+
+        setFeaturedPosts(formattedPosts)
       } catch (error) {
         console.error('Error fetching featured posts:', error)
+        setFeaturedPosts([])
       } finally {
         setIsLoading(false)
       }
     }
 
     fetchFeaturedPosts()
-  }, [language]) // Re-fetch when language changes
+  }, [language])
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
