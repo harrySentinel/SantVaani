@@ -25,6 +25,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { Toaster } from '@/components/ui/toaster';
 import { Link } from 'react-router-dom';
+import NaamJapCounter from '@/components/naam-jap/NaamJapCounter';
 
 interface NaamJapEntry {
   id: string;
@@ -443,6 +444,15 @@ const NaamJapTracker = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
+                {/* Interactive Click Counter */}
+                <div className="mb-8 border-b border-gray-200 pb-8">
+                  <NaamJapCounter
+                    initialCount={parseInt(count) || 0}
+                    onCountChange={(newCount) => setCount(newCount.toString())}
+                    language={language}
+                  />
+                </div>
+
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
