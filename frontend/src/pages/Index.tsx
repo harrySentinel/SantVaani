@@ -36,8 +36,8 @@ const Index = () => {
     },
     {
       icon: Heart,
-      title: "Contemporary Saints",
-      description: "Discover living spiritual masters and their divine teachings",
+      title: t('livingsaints.title'),
+      description: t('livingsaints.subtitle'),
       to: "/living-saints",
       color: "from-red-500 to-red-600"
     },
