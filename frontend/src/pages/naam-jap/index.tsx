@@ -49,8 +49,8 @@ const NaamJapTracker = () => {
   const { user, loading: authLoading } = useAuth();
   const { toast } = useToast();
 
-  // Form state
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  // Form state - ALWAYS today's date only
+  const todayDate = new Date().toISOString().split('T')[0];
   const [count, setCount] = useState('');
   const [notes, setNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -75,8 +75,8 @@ const NaamJapTracker = () => {
   }, [user]);
 
   useEffect(() => {
-    // Check if there's an entry for selected date
-    const entry = entries.find(e => e.date === selectedDate);
+    // Check if there's an entry for TODAY only
+    const entry = entries.find(e => e.date === todayDate);
     if (entry) {
       setTodayEntry(entry);
       setCount(entry.count.toString());
@@ -86,7 +86,7 @@ const NaamJapTracker = () => {
       setCount('');
       setNotes('');
     }
-  }, [selectedDate, entries]);
+  }, [entries, todayDate]);
 
   const fetchEntries = async () => {
     if (!user) return;
@@ -216,7 +216,7 @@ const NaamJapTracker = () => {
     try {
       const entryData = {
         user_id: user.id,
-        date: selectedDate,
+        date: todayDate, // Only allow entries for today
         count: parseInt(count),
         notes: notes.trim() || null
       };
@@ -446,15 +446,23 @@ const NaamJapTracker = () => {
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {language === 'HI' ? 'तारीख' : 'Date'}
+                      {language === 'HI' ? 'तारीख (केवल आज)' : 'Date (Today Only)'}
                     </label>
-                    <Input
-                      type="date"
-                      value={selectedDate}
-                      onChange={(e) => setSelectedDate(e.target.value)}
-                      max={new Date().toISOString().split('T')[0]}
-                      className="w-full"
-                    />
+                    <div className="w-full p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                      <p className="text-gray-800 font-medium">
+                        {new Date().toLocaleDateString(language === 'HI' ? 'hi-IN' : 'en-US', {
+                          weekday: 'long',
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}
+                      </p>
+                      <p className="text-xs text-gray-600 mt-1">
+                        {language === 'HI'
+                          ? '⚠️ पिछली तारीखों के लिए एंट्री नहीं जोड़ी जा सकती'
+                          : '⚠️ Cannot add entries for past dates'}
+                      </p>
+                    </div>
                   </div>
 
                   <div>
