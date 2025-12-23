@@ -9,6 +9,8 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     persistSession: true, // Persist auth session in localStorage
     autoRefreshToken: true, // Auto refresh the token before it expires
     detectSessionInUrl: true, // Detect OAuth sessions in URL
-    storageKey: 'santvaani-auth', // Custom storage key for better organization
+    storage: window.localStorage, // Explicitly use localStorage
+    storageKey: 'sb-auth-token', // Use standard Supabase storage key
+    flowType: 'pkce', // Use PKCE flow for better security
   }
 })
