@@ -24,6 +24,7 @@ import { Toaster } from '@/components/ui/toaster';
 
 interface NaamJapEntry {
   id: string;
+  user_id: string;
   date: string;
   count: number;
   notes?: string;
@@ -39,9 +40,26 @@ interface Stats {
   totalDays: number;
 }
 
+// Helper function to get or create anonymous user ID
+const getAnonymousUserId = (): string => {
+  const STORAGE_KEY = 'naam_jap_user_id';
+
+  // Check if ID exists in localStorage
+  let userId = localStorage.getItem(STORAGE_KEY);
+
+  if (!userId) {
+    // Generate new anonymous ID
+    userId = `anon_${crypto.randomUUID()}`;
+    localStorage.setItem(STORAGE_KEY, userId);
+  }
+
+  return userId;
+};
+
 const NaamJapTracker = () => {
   const { language } = useLanguage();
   const { toast } = useToast();
+  const [userId] = useState(getAnonymousUserId());
 
   // Form state
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -64,7 +82,7 @@ const NaamJapTracker = () => {
 
   useEffect(() => {
     fetchEntries();
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
     // Check if there's an entry for selected date
@@ -84,19 +102,22 @@ const NaamJapTracker = () => {
     try {
       setLoading(true);
 
-      // For now, using localStorage for demo
-      // TODO: Replace with Supabase when auth is ready
-      const storedEntries = localStorage.getItem('naamJapEntries');
-      if (storedEntries) {
-        const parsedEntries = JSON.parse(storedEntries);
-        setEntries(parsedEntries);
-        calculateStats(parsedEntries);
-      }
-    } catch (error) {
+      // Fetch entries from Supabase
+      const { data, error } = await supabase
+        .from('naam_jap_entries')
+        .select('*')
+        .eq('user_id', userId)
+        .order('date', { ascending: false });
+
+      if (error) throw error;
+
+      setEntries(data || []);
+      calculateStats(data || []);
+    } catch (error: any) {
       console.error('Error fetching entries:', error);
       toast({
         title: language === 'HI' ? 'त्रुटि' : 'Error',
-        description: language === 'HI' ? 'एंट्रीज़ लोड करने में विफल' : 'Failed to load entries',
+        description: error.message || (language === 'HI' ? 'एंट्रीज़ लोड करने में विफल' : 'Failed to load entries'),
         variant: 'destructive'
       });
     } finally {
@@ -199,43 +220,47 @@ const NaamJapTracker = () => {
     setSubmitting(true);
 
     try {
-      const newEntry: NaamJapEntry = {
-        id: todayEntry?.id || crypto.randomUUID(),
+      const entryData = {
+        user_id: userId,
         date: selectedDate,
         count: parseInt(count),
-        notes: notes.trim(),
-        created_at: todayEntry?.created_at || new Date().toISOString()
+        notes: notes.trim() || null
       };
 
-      // Update localStorage (TODO: Replace with Supabase)
-      const storedEntries = localStorage.getItem('naamJapEntries');
-      let updatedEntries: NaamJapEntry[] = storedEntries ? JSON.parse(storedEntries) : [];
+      if (todayEntry) {
+        // Update existing entry
+        const { error } = await supabase
+          .from('naam_jap_entries')
+          .update(entryData)
+          .eq('id', todayEntry.id);
 
-      // Remove existing entry for this date if updating
-      updatedEntries = updatedEntries.filter(e => e.date !== selectedDate);
-      updatedEntries.push(newEntry);
+        if (error) throw error;
 
-      localStorage.setItem('naamJapEntries', JSON.stringify(updatedEntries));
+        toast({
+          title: language === 'HI' ? 'सफलतापूर्वक अपडेट किया गया!' : 'Updated Successfully!',
+          description: language === 'HI' ? 'आपकी प्रविष्टि अपडेट की गई' : 'Your entry has been updated',
+        });
+      } else {
+        // Insert new entry
+        const { error } = await supabase
+          .from('naam_jap_entries')
+          .insert([entryData]);
 
-      setEntries(updatedEntries);
-      calculateStats(updatedEntries);
+        if (error) throw error;
 
-      toast({
-        title: language === 'HI' ? 'सफलतापूर्वक सहेजा गया!' : 'Saved Successfully!',
-        description: todayEntry
-          ? (language === 'HI' ? 'आपकी प्रविष्टि अपडेट की गई' : 'Your entry has been updated')
-          : (language === 'HI' ? 'आपकी प्रविष्टि दर्ज की गई' : 'Your entry has been recorded'),
-      });
-
-      // Reset form if it was for today
-      if (selectedDate === new Date().toISOString().split('T')[0]) {
-        // Keep the values to show what was saved
+        toast({
+          title: language === 'HI' ? 'सफलतापूर्वक सहेजा गया!' : 'Saved Successfully!',
+          description: language === 'HI' ? 'आपकी प्रविष्टि दर्ज की गई' : 'Your entry has been recorded',
+        });
       }
-    } catch (error) {
+
+      // Refresh entries
+      await fetchEntries();
+    } catch (error: any) {
       console.error('Error saving entry:', error);
       toast({
         title: language === 'HI' ? 'त्रुटि' : 'Error',
-        description: language === 'HI' ? 'प्रविष्टि सहेजने में विफल' : 'Failed to save entry',
+        description: error.message || (language === 'HI' ? 'प्रविष्टि सहेजने में विफल' : 'Failed to save entry'),
         variant: 'destructive'
       });
     } finally {
@@ -248,7 +273,10 @@ const NaamJapTracker = () => {
       <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50">
         <Navbar />
         <div className="flex items-center justify-center min-h-screen">
-          <Loader2 className="w-12 h-12 animate-spin text-orange-600" />
+          <div className="text-center">
+            <Loader2 className="w-12 h-12 animate-spin text-orange-600 mx-auto mb-4" />
+            <p className="text-gray-600">{language === 'HI' ? 'लोड हो रहा है...' : 'Loading...'}</p>
+          </div>
         </div>
         <Footer />
       </div>
@@ -376,42 +404,44 @@ const NaamJapTracker = () => {
                 {entries.length === 0 ? (
                   <div className="text-center py-12">
                     <span className="text-6xl mb-4 block">📿</span>
-                    <p className="text-gray-600">
+                    <p className="text-gray-600 mb-2">
                       {language === 'HI'
                         ? 'अभी तक कोई प्रविष्टि नहीं। अपनी यात्रा शुरू करें!'
                         : 'No entries yet. Start your journey!'}
                     </p>
+                    <p className="text-sm text-gray-500">
+                      {language === 'HI'
+                        ? 'आपका डेटा सुरक्षित रूप से डेटाबेस में संग्रहीत है'
+                        : 'Your data is securely stored in the database'}
+                    </p>
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    {entries
-                      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-                      .slice(0, 10)
-                      .map((entry) => (
-                        <div
-                          key={entry.id}
-                          className="flex items-center justify-between p-4 bg-gradient-to-r from-orange-50 to-amber-50 rounded-lg border border-orange-200"
-                        >
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2">
-                              <Calendar className="w-4 h-4 text-orange-600" />
-                              <span className="font-medium text-gray-900">
-                                {new Date(entry.date).toLocaleDateString(language === 'HI' ? 'hi-IN' : 'en-US', {
-                                  weekday: 'short',
-                                  month: 'short',
-                                  day: 'numeric'
-                                })}
-                              </span>
-                            </div>
-                            {entry.notes && (
-                              <p className="text-sm text-gray-600 mt-1 truncate">{entry.notes}</p>
-                            )}
+                    {entries.slice(0, 10).map((entry) => (
+                      <div
+                        key={entry.id}
+                        className="flex items-center justify-between p-4 bg-gradient-to-r from-orange-50 to-amber-50 rounded-lg border border-orange-200"
+                      >
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <Calendar className="w-4 h-4 text-orange-600" />
+                            <span className="font-medium text-gray-900">
+                              {new Date(entry.date).toLocaleDateString(language === 'HI' ? 'hi-IN' : 'en-US', {
+                                weekday: 'short',
+                                month: 'short',
+                                day: 'numeric'
+                              })}
+                            </span>
                           </div>
-                          <div className="text-right">
-                            <span className="text-2xl font-bold text-orange-600">{entry.count.toLocaleString()}</span>
-                          </div>
+                          {entry.notes && (
+                            <p className="text-sm text-gray-600 mt-1 truncate">{entry.notes}</p>
+                          )}
                         </div>
-                      ))}
+                        <div className="text-right">
+                          <span className="text-2xl font-bold text-orange-600">{entry.count.toLocaleString()}</span>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 )}
               </CardContent>

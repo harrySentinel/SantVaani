@@ -7,7 +7,7 @@
 -- Create naam_jap_entries table
 CREATE TABLE IF NOT EXISTS naam_jap_entries (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE, -- Link to authenticated user (optional)
+  user_id TEXT NOT NULL, -- Anonymous ID or authenticated user ID
   date DATE NOT NULL, -- The date of the entry
   count INTEGER NOT NULL CHECK (count >= 0), -- Number of naam japs done (must be non-negative)
   notes TEXT, -- Optional notes about the practice (feelings, insights)
@@ -43,58 +43,38 @@ CREATE TRIGGER naam_jap_updated_at_trigger
 -- Enable Row Level Security (RLS)
 ALTER TABLE naam_jap_entries ENABLE ROW LEVEL SECURITY;
 
--- RLS Policies
+-- RLS Policies for anonymous and authenticated users
 
--- 1. Users can view only their own entries
-CREATE POLICY "Users can view their own naam jap entries"
+-- Allow anyone to read all entries (you can restrict this later if needed)
+CREATE POLICY "Allow public read access"
   ON naam_jap_entries
   FOR SELECT
-  USING (auth.uid() = user_id);
+  USING (true);
 
--- 2. Users can insert their own entries
-CREATE POLICY "Users can insert their own naam jap entries"
+-- Allow anyone to insert entries
+CREATE POLICY "Allow public insert"
   ON naam_jap_entries
   FOR INSERT
-  WITH CHECK (auth.uid() = user_id);
+  WITH CHECK (true);
 
--- 3. Users can update only their own entries
-CREATE POLICY "Users can update their own naam jap entries"
+-- Allow anyone to update entries
+CREATE POLICY "Allow public update"
   ON naam_jap_entries
   FOR UPDATE
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
+  USING (true)
+  WITH CHECK (true);
 
--- 4. Users can delete only their own entries
-CREATE POLICY "Users can delete their own naam jap entries"
+-- Allow anyone to delete entries
+CREATE POLICY "Allow public delete"
   ON naam_jap_entries
   FOR DELETE
-  USING (auth.uid() = user_id);
+  USING (true);
 
--- Optional: For testing/development - allow public access without auth
--- IMPORTANT: Remove these policies in production if you require authentication!
--- CREATE POLICY "Allow public read access for testing"
---   ON naam_jap_entries
---   FOR SELECT
---   USING (true);
-
--- CREATE POLICY "Allow public insert for testing"
---   ON naam_jap_entries
---   FOR INSERT
---   WITH CHECK (true);
-
--- CREATE POLICY "Allow public update for testing"
---   ON naam_jap_entries
---   FOR UPDATE
---   USING (true)
---   WITH CHECK (true);
-
--- CREATE POLICY "Allow public delete for testing"
---   ON naam_jap_entries
---   FOR DELETE
---   USING (true);
+-- Note: In production, you may want to restrict these policies to only allow
+-- users to access their own entries by checking the user_id matches
 
 -- Helper function: Get user's total count
-CREATE OR REPLACE FUNCTION get_user_total_count(p_user_id UUID)
+CREATE OR REPLACE FUNCTION get_user_total_count(p_user_id TEXT)
 RETURNS INTEGER AS $$
 BEGIN
   RETURN COALESCE(
@@ -105,7 +85,7 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Helper function: Get user's current streak
-CREATE OR REPLACE FUNCTION get_user_current_streak(p_user_id UUID)
+CREATE OR REPLACE FUNCTION get_user_current_streak(p_user_id TEXT)
 RETURNS INTEGER AS $$
 DECLARE
   v_streak INTEGER := 0;
@@ -134,7 +114,7 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Helper function: Get user's longest streak
-CREATE OR REPLACE FUNCTION get_user_longest_streak(p_user_id UUID)
+CREATE OR REPLACE FUNCTION get_user_longest_streak(p_user_id TEXT)
 RETURNS INTEGER AS $$
 DECLARE
   v_max_streak INTEGER := 0;
