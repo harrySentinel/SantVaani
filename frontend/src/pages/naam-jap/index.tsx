@@ -50,8 +50,17 @@ const NaamJapTracker = () => {
   const { user, loading: authLoading } = useAuth();
   const { toast } = useToast();
 
+  // Get today's date in local timezone (not UTC)
+  const getTodayDate = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   // Form state - ALWAYS today's date only
-  const todayDate = new Date().toISOString().split('T')[0];
+  const todayDate = getTodayDate();
   const [count, setCount] = useState('');
   const [notes, setNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
