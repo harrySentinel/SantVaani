@@ -523,71 +523,6 @@ const NaamJapTracker = () => {
               </CardContent>
             </Card>
 
-            {/* Instructions / How It Works */}
-            <Card className="shadow-lg bg-gradient-to-br from-orange-50 to-amber-50 border-orange-200">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-orange-800">
-                  <AlertCircle className="w-5 h-5" />
-                  {language === 'HI' ? 'यह कैसे काम करता है' : 'How It Works'}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {/* Rule 1: Today Only */}
-                  <div className="bg-white p-4 rounded-lg border border-orange-200">
-                    <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                      <Calendar className="w-4 h-4 text-orange-600" />
-                      {language === 'HI' ? 'केवल आज' : 'Today Only'}
-                    </h4>
-                    <p className="text-sm text-gray-600">
-                      {language === 'HI'
-                        ? 'आप केवल आज की प्रविष्टि जोड़ या अपडेट कर सकते हैं। दिन बीत जाने के बाद, यह हमेशा के लिए लॉक हो जाती है।'
-                        : 'You can only add or update your entry for today. Once the day passes, it\'s locked forever.'}
-                    </p>
-                  </div>
-
-                  {/* Rule 2: One Entry Per Day */}
-                  <div className="bg-white p-4 rounded-lg border border-orange-200">
-                    <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 text-orange-600" />
-                      {language === 'HI' ? 'दिन में एक बार' : 'One Entry Per Day'}
-                    </h4>
-                    <p className="text-sm text-gray-600">
-                      {language === 'HI'
-                        ? 'आज की गिनती जोड़ें, और दिन के दौरान कभी भी इसे अपडेट करें। कल, आप नए सिरे से शुरू करेंगे।'
-                        : 'Add your count for today, and update it anytime during the day. Tomorrow, you start fresh.'}
-                    </p>
-                  </div>
-
-                  {/* Rule 3: Authentic Streaks */}
-                  <div className="bg-white p-4 rounded-lg border border-orange-200">
-                    <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                      <Flame className="w-4 h-4 text-orange-600" />
-                      {language === 'HI' ? 'प्रामाणिक स्ट्रीक' : 'Authentic Streaks'}
-                    </h4>
-                    <p className="text-sm text-gray-600">
-                      {language === 'HI'
-                        ? 'पिछली तारीख की एंट्री नहीं। यदि आप एक दिन चूक जाते हैं, तो आपकी स्ट्रीक टूट जाती है। यह वास्तविक दैनिक अभ्यास सुनिश्चित करता है।'
-                        : 'No backdating allowed. If you miss a day, your streak breaks. This ensures genuine daily practice.'}
-                    </p>
-                  </div>
-
-                  {/* Rule 4: Daily Discipline */}
-                  <div className="bg-white p-4 rounded-lg border border-orange-200">
-                    <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                      <Target className="w-4 h-4 text-orange-600" />
-                      {language === 'HI' ? 'दैनिक अनुशासन' : 'Daily Discipline'}
-                    </h4>
-                    <p className="text-sm text-gray-600">
-                      {language === 'HI'
-                        ? 'दैनिक प्रतिबद्धता के माध्यम से निरंतरता बनाएं। आपकी आध्यात्मिक यात्रा समर्पण की मांग करती है।'
-                        : 'Build consistency through daily commitment. Your spiritual journey deserves dedication.'}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
             {/* Recent Entries */}
             <Card className="shadow-lg">
               <CardHeader>
@@ -769,6 +704,73 @@ const NaamJapTracker = () => {
             </Card>
           </div>
         </div>
+      </div>
+
+      {/* Instructions / How It Works - Moved to bottom */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+        <Card className="shadow-lg bg-gradient-to-br from-orange-50 to-amber-50 border-orange-200">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-orange-800">
+              <AlertCircle className="w-5 h-5" />
+              {language === 'HI' ? 'यह कैसे काम करता है' : 'How It Works'}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {/* Rule 1: Today Only */}
+              <div className="bg-white p-4 rounded-lg border border-orange-200">
+                <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-orange-600" />
+                  {language === 'HI' ? 'केवल आज' : 'Today Only'}
+                </h4>
+                <p className="text-sm text-gray-600">
+                  {language === 'HI'
+                    ? 'आप केवल आज की प्रविष्टि जोड़ या अपडेट कर सकते हैं। दिन बीत जाने के बाद, यह हमेशा के लिए लॉक हो जाती है।'
+                    : 'You can only add or update your entry for today. Once the day passes, it\'s locked forever.'}
+                </p>
+              </div>
+
+              {/* Rule 2: One Entry Per Day */}
+              <div className="bg-white p-4 rounded-lg border border-orange-200">
+                <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-orange-600" />
+                  {language === 'HI' ? 'दिन में एक बार' : 'One Entry Per Day'}
+                </h4>
+                <p className="text-sm text-gray-600">
+                  {language === 'HI'
+                    ? 'आज की गिनती जोड़ें, और दिन के दौरान कभी भी इसे अपडेट करें। कल, आप नए सिरे से शुरू करेंगे।'
+                    : 'Add your count for today, and update it anytime during the day. Tomorrow, you start fresh.'}
+                </p>
+              </div>
+
+              {/* Rule 3: Authentic Streaks */}
+              <div className="bg-white p-4 rounded-lg border border-orange-200">
+                <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                  <Flame className="w-4 h-4 text-orange-600" />
+                  {language === 'HI' ? 'प्रामाणिक स्ट्रीक' : 'Authentic Streaks'}
+                </h4>
+                <p className="text-sm text-gray-600">
+                  {language === 'HI'
+                    ? 'पिछली तारीख की एंट्री नहीं। यदि आप एक दिन चूक जाते हैं, तो आपकी स्ट्रीक टूट जाती है। यह वास्तविक दैनिक अभ्यास सुनिश्चित करता है।'
+                    : 'No backdating allowed. If you miss a day, your streak breaks. This ensures genuine daily practice.'}
+                </p>
+              </div>
+
+              {/* Rule 4: Daily Discipline */}
+              <div className="bg-white p-4 rounded-lg border border-orange-200">
+                <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                  <Target className="w-4 h-4 text-orange-600" />
+                  {language === 'HI' ? 'दैनिक अनुशासन' : 'Daily Discipline'}
+                </h4>
+                <p className="text-sm text-gray-600">
+                  {language === 'HI'
+                    ? 'दैनिक प्रतिबद्धता के माध्यम से निरंतरता बनाएं। आपकी आध्यात्मिक यात्रा समर्पण की मांग करती है।'
+                    : 'Build consistency through daily commitment. Your spiritual journey deserves dedication.'}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       <Toaster />
