@@ -16,6 +16,7 @@ import LandingBlogSection from '@/components/LandingBlogSection';
 import LandingStoriesSection from '@/components/LandingStoriesSection';
 import LandingBhajanSection from '@/components/LandingBhajanSection';
 import LandingHoroscopeSection from '@/components/LandingHoroscopeSection';
+import LandingNaamJapSection from '@/components/LandingNaamJapSection';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 // Lazy load ChatBot for better performance
@@ -178,6 +179,9 @@ const Index = () => {
 
       {/* Featured Horoscope Section */}
       <LandingHoroscopeSection />
+
+      {/* Naam Jap Tracker Section */}
+      <LandingNaamJapSection />
 
       {/* Featured Divine Stories Section */}
       <LandingStoriesSection />
