@@ -11,9 +11,8 @@ const LandingNaamJapSection = () => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center">
           {/* Compact Header */}
-          <div className="flex items-center justify-center gap-3 mb-3">
-            <span className="text-3xl font-bold text-orange-600">OM</span>
-            <span className="text-2xl">📿</span>
+          <div className="flex items-center justify-center mb-3">
+            <span className="text-4xl">📿</span>
           </div>
 
           <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent mb-3">
