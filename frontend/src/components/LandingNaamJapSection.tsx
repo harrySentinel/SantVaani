@@ -12,7 +12,7 @@ const LandingNaamJapSection = () => {
         <div className="text-center">
           {/* Compact Header */}
           <div className="flex items-center justify-center mb-3">
-            <span className="text-4xl">📿</span>
+            <span className="text-5xl font-bold text-orange-600">ॐ</span>
           </div>
 
           <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent mb-3">
