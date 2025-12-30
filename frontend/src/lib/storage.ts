@@ -105,17 +105,85 @@ class PersistentStorage {
 const persistentStorage = new PersistentStorage();
 
 // Supabase-compatible storage adapter
+// Use synchronous localStorage for Supabase (required for tab sharing)
+// IndexedDB is used as background backup only
 export const supabaseStorage = {
-  getItem: async (key: string) => {
-    return await persistentStorage.getItem(key);
+  getItem: (key: string) => {
+    try {
+      return localStorage.getItem(key);
+    } catch (error) {
+      console.error('localStorage.getItem failed:', error);
+      return null;
+    }
   },
-  setItem: async (key: string, value: string) => {
-    await persistentStorage.setItem(key, value);
+  setItem: (key: string, value: string) => {
+    try {
+      localStorage.setItem(key, value);
+      // Backup to IndexedDB in background (don't await)
+      persistentStorage.setItem(key, value).catch(err =>
+        console.warn('IndexedDB backup failed:', err)
+      );
+    } catch (error) {
+      console.error('localStorage.setItem failed:', error);
+    }
   },
-  removeItem: async (key: string) => {
-    await persistentStorage.removeItem(key);
+  removeItem: (key: string) => {
+    try {
+      localStorage.removeItem(key);
+      // Remove from IndexedDB in background (don't await)
+      persistentStorage.removeItem(key).catch(err =>
+        console.warn('IndexedDB remove failed:', err)
+      );
+    } catch (error) {
+      console.error('localStorage.removeItem failed:', error);
+    }
   },
 };
+
+// Restore sessions from IndexedDB to localStorage if localStorage is empty
+export async function restoreSessionFromIndexedDB(): Promise<void> {
+  try {
+    // Initialize IndexedDB
+    await persistentStorage.init();
+
+    if (!persistentStorage.db) {
+      console.log('IndexedDB not available for restore');
+      return;
+    }
+
+    // Get all keys from IndexedDB
+    const tx = persistentStorage.db.transaction(STORE_NAME, 'readonly');
+    const store = tx.objectStore(STORE_NAME);
+    const allKeys = await store.getAllKeys();
+
+    let restoredCount = 0;
+
+    // Check each key and restore to localStorage if missing
+    for (const key of allKeys) {
+      const localValue = localStorage.getItem(key as string);
+
+      // Only restore if not in localStorage
+      if (!localValue) {
+        const indexedDBValue = await persistentStorage.db.get(STORE_NAME, key);
+        if (indexedDBValue) {
+          try {
+            localStorage.setItem(key as string, indexedDBValue);
+            restoredCount++;
+            console.log('✅ Restored session from IndexedDB:', key);
+          } catch (e) {
+            console.warn('Failed to restore to localStorage:', key, e);
+          }
+        }
+      }
+    }
+
+    if (restoredCount > 0) {
+      console.log(`🔄 Restored ${restoredCount} session(s) from IndexedDB`);
+    }
+  } catch (error) {
+    console.error('Error restoring from IndexedDB:', error);
+  }
+}
 
 // Request persistent storage permission from browser
 export async function requestPersistentStorage(): Promise<boolean> {

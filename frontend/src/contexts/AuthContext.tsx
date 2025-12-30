@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { authService } from '@/lib/auth';
-import { requestPersistentStorage, getStorageEstimate } from '@/lib/storage';
+import { requestPersistentStorage, getStorageEstimate, restoreSessionFromIndexedDB } from '@/lib/storage';
 
 interface AuthContextType {
   user: User | null;
@@ -27,36 +27,32 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Request persistent storage permission for better session persistence
-    const initStorage = async () => {
+    // Initialize storage and restore session
+    const initializeAuth = async () => {
       try {
+        // Step 1: Request persistent storage permission
         const isPersisted = await requestPersistentStorage();
         console.log('🔐 Storage persistence status:', isPersisted);
 
-        // Log storage estimate for debugging
+        // Step 2: Restore from IndexedDB if localStorage was cleared
+        await restoreSessionFromIndexedDB();
+
+        // Step 3: Log storage estimate for debugging
         await getStorageEstimate();
-      } catch (error) {
-        console.error('Storage initialization error:', error);
-      }
-    };
 
-    initStorage();
-
-    // Get initial session
-    const getInitialSession = async () => {
-      try {
+        // Step 4: Get initial session (now from localStorage or restored from IndexedDB)
         const session = await authService.getCurrentSession();
         console.log('📱 Session restored:', session ? `User: ${session.user?.email}` : 'No session found');
         setSession(session);
         setUser(session?.user ?? null);
       } catch (error) {
-        console.error('Error getting session:', error);
+        console.error('Auth initialization error:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    getInitialSession();
+    initializeAuth();
 
     // Listen for auth changes
     const { data: { subscription } } = authService.onAuthStateChange(
