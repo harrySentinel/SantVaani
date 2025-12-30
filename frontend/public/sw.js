@@ -18,7 +18,7 @@ firebase.initializeApp({
 // Initialize Firebase messaging in service worker
 const messaging = firebase.messaging();
 
-const CACHE_NAME = 'santvaani-v1';
+const CACHE_NAME = 'santvaani-v2-persistent-auth';
 const urlsToCache = [
   '/',
   '/daily-guide',
@@ -31,23 +31,72 @@ const urlsToCache = [
 
 // Install event - cache resources
 self.addEventListener('install', (event) => {
+  console.log('🔧 Service Worker installing...');
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
         return cache.addAll(urlsToCache);
       })
   );
+  // Force the waiting service worker to become the active service worker
+  self.skipWaiting();
+});
+
+// Activate event - clean up old caches
+self.addEventListener('activate', (event) => {
+  console.log('✅ Service Worker activated');
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          if (cacheName !== CACHE_NAME) {
+            console.log('🗑️ Deleting old cache:', cacheName);
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+  // Take control of all pages immediately
+  return self.clients.claim();
 });
 
 // Fetch event - serve cached content when offline
 self.addEventListener('fetch', (event) => {
+  // Don't cache API requests or auth-related requests
+  const url = new URL(event.request.url);
+  const isApiRequest = url.pathname.includes('/api/') ||
+                       url.hostname.includes('supabase.co') ||
+                       url.hostname.includes('googleapis.com');
+
+  if (isApiRequest) {
+    // For API requests, always go to network
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
+  // For static assets, use cache-first strategy
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
         // Return cached version or fetch from network
-        return response || fetch(event.request);
-      }
-    )
+        return response || fetch(event.request).then((fetchResponse) => {
+          // Don't cache non-successful responses
+          if (!fetchResponse || fetchResponse.status !== 200) {
+            return fetchResponse;
+          }
+
+          // Cache the new response for next time
+          return caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, fetchResponse.clone());
+            return fetchResponse;
+          });
+        });
+      })
+      .catch(() => {
+        // If both cache and network fail, could return a fallback page
+        console.log('Fetch failed for:', event.request.url);
+      })
   );
 });
 

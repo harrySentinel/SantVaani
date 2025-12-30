@@ -54,6 +54,7 @@
     "firebase": "^12.1.0",
     "framer-motion": "^12.17.3",
     "html2canvas": "^1.4.1",
+    "idb": "^8.0.3",
     "input-otp": "^1.2.4",
     "jspdf": "^3.0.3",
     "lucide-react": "^0.462.0",

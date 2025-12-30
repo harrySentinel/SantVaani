@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { authService } from '@/lib/auth';
+import { requestPersistentStorage, getStorageEstimate } from '@/lib/storage';
 
 interface AuthContextType {
   user: User | null;
@@ -26,10 +27,26 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Request persistent storage permission for better session persistence
+    const initStorage = async () => {
+      try {
+        const isPersisted = await requestPersistentStorage();
+        console.log('🔐 Storage persistence status:', isPersisted);
+
+        // Log storage estimate for debugging
+        await getStorageEstimate();
+      } catch (error) {
+        console.error('Storage initialization error:', error);
+      }
+    };
+
+    initStorage();
+
     // Get initial session
     const getInitialSession = async () => {
       try {
         const session = await authService.getCurrentSession();
+        console.log('📱 Session restored:', session ? `User: ${session.user?.email}` : 'No session found');
         setSession(session);
         setUser(session?.user ?? null);
       } catch (error) {
@@ -44,7 +61,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     // Listen for auth changes
     const { data: { subscription } } = authService.onAuthStateChange(
       (event, session) => {
-        console.log('Auth state changed:', event, session?.user?.email);
+        console.log('🔄 Auth state changed:', event, session?.user?.email);
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
