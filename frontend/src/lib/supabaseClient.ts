@@ -11,7 +11,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     autoRefreshToken: true,
     detectSessionInUrl: true,
     storage: supabaseStorage,
-    flowType: 'pkce', // Use PKCE flow for better security
+    // Removed PKCE flow - it was interfering with cross-tab session sharing
     // Using default storage key - don't override
   }
 })
