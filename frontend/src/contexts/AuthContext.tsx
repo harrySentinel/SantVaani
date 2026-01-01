@@ -27,6 +27,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let subscription: any;
+
     // Initialize storage and restore session
     const initializeAuth = async () => {
       try {
@@ -47,24 +49,31 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setUser(session?.user ?? null);
       } catch (error) {
         console.error('Auth initialization error:', error);
+        setSession(null);
+        setUser(null);
       } finally {
+        // CRITICAL: Only set loading to false AFTER session is restored
         setLoading(false);
       }
+
+      // IMPORTANT: Set up auth listener AFTER initial session is loaded
+      const { data } = authService.onAuthStateChange(
+        (event, session) => {
+          console.log('🔄 Auth state changed:', event, session?.user?.email);
+          setSession(session);
+          setUser(session?.user ?? null);
+        }
+      );
+      subscription = data.subscription;
     };
 
     initializeAuth();
 
-    // Listen for auth changes
-    const { data: { subscription } } = authService.onAuthStateChange(
-      (event, session) => {
-        console.log('🔄 Auth state changed:', event, session?.user?.email);
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
+    return () => {
+      if (subscription) {
+        subscription.unsubscribe();
       }
-    );
-
-    return () => subscription.unsubscribe();
+    };
   }, []);
 
   const signUp = async (userData: { email: string; password: string; name: string; username: string; phone?: string }) => {
