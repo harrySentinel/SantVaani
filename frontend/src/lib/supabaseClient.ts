@@ -10,7 +10,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
-    detectSessionInUrl: true,
+    detectSessionInUrl: false, // Disabled - was causing session clearing in new tabs
     storage: supabaseStorage,
     // Note: NOT using PKCE flow to ensure proper cross-tab session sharing
   }
