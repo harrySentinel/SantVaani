@@ -27,53 +27,34 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let subscription: any;
-
-    // Initialize storage and restore session
+    // SIMPLIFIED - Just get the session and listen for changes
     const initializeAuth = async () => {
       try {
-        // Step 1: Request persistent storage permission
-        const isPersisted = await requestPersistentStorage();
-        console.log('🔐 Storage persistence status:', isPersisted);
-
-        // Step 2: Restore from IndexedDB if localStorage was cleared
-        await restoreSessionFromIndexedDB();
-
-        // Step 3: Log storage estimate for debugging
-        await getStorageEstimate();
-
-        // Step 4: Get initial session (now from localStorage or restored from IndexedDB)
         const session = await authService.getCurrentSession();
-        console.log('📱 Session restored:', session ? `User: ${session.user?.email}` : 'No session found');
+        console.log('📱 Session check:', session ? `Logged in as ${session.user?.email}` : 'No session');
         setSession(session);
         setUser(session?.user ?? null);
       } catch (error) {
-        console.error('Auth initialization error:', error);
+        console.error('Auth error:', error);
         setSession(null);
         setUser(null);
       } finally {
-        // CRITICAL: Only set loading to false AFTER session is restored
         setLoading(false);
       }
-
-      // IMPORTANT: Set up auth listener AFTER initial session is loaded
-      const { data } = authService.onAuthStateChange(
-        (event, session) => {
-          console.log('🔄 Auth state changed:', event, session?.user?.email);
-          setSession(session);
-          setUser(session?.user ?? null);
-        }
-      );
-      subscription = data.subscription;
     };
 
     initializeAuth();
 
-    return () => {
-      if (subscription) {
-        subscription.unsubscribe();
+    // Listen for auth changes
+    const { data: { subscription } } = authService.onAuthStateChange(
+      (event, session) => {
+        console.log('🔄 Auth changed:', event);
+        setSession(session);
+        setUser(session?.user ?? null);
       }
-    };
+    );
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const signUp = async (userData: { email: string; password: string; name: string; username: string; phone?: string }) => {

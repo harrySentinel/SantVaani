@@ -1,17 +1,13 @@
-// Supabase client configuration for Santvaani
+// Supabase client - using absolute minimal config
 import { createClient } from '@supabase/supabase-js'
-import { supabaseStorage } from './storage'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL!
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY!
 
-// Initialize Supabase client with persistent storage
+// MINIMAL CONFIG - No custom storage, no special settings
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
-    detectSessionInUrl: false, // Disabled - was causing session clearing in new tabs
-    storage: supabaseStorage,
-    // Note: NOT using PKCE flow to ensure proper cross-tab session sharing
   }
 })
