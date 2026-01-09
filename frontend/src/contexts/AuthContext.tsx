@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { authService } from '@/lib/auth';
-import { backupSession, getBackupSession, clearBackupSession } from '@/lib/sessionBackup';
+import { saveSession, restoreSession, startSessionBackup } from '@/lib/sessionPersistence';
 import { supabase } from '@/lib/supabaseClient';
 
 interface AuthContextType {
@@ -30,36 +30,35 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        // Try to get session from Supabase
+        // STEP 1: Try Supabase first
         let session = await authService.getCurrentSession();
 
-        // If no session, try manual backup
+        // STEP 2: If no Supabase session, restore from our storage
         if (!session) {
-          console.log('🔍 No Supabase session, checking backup...');
-          const backup = getBackupSession();
+          console.log('🔍 No Supabase session, checking backups...');
+          const backup = restoreSession();
           if (backup) {
-            // Manually restore session to Supabase
+            // Restore to Supabase
             const { data, error } = await supabase.auth.setSession({
               access_token: backup.access_token,
               refresh_token: backup.refresh_token
             });
             if (data.session) {
               session = data.session;
-              console.log('✅ Session restored from backup!');
+              console.log('🎉 SESSION RESTORED FROM BACKUP!');
             } else {
-              console.error('❌ Failed to restore:', error);
-              clearBackupSession();
+              console.error('❌ Restore failed:', error);
             }
           }
         }
 
-        console.log('📱 Session:', session ? `Logged in as ${session.user?.email}` : 'No session');
+        console.log('📱 Final session:', session ? `✅ ${session.user?.email}` : '❌ Not logged in');
         setSession(session);
         setUser(session?.user ?? null);
 
-        // Backup current session
+        // STEP 3: Save current session
         if (session) {
-          backupSession(session);
+          saveSession(session);
         }
       } catch (error) {
         console.error('Auth error:', error);
@@ -72,23 +71,29 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     initializeAuth();
 
-    // Listen for auth changes and backup sessions
+    // Listen for auth changes
     const { data: { subscription } } = authService.onAuthStateChange(
       (event, session) => {
-        console.log('🔄 Auth changed:', event);
+        console.log('🔄 Auth event:', event);
         setSession(session);
         setUser(session?.user ?? null);
 
-        // Backup on any auth change
-        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-          backupSession(session);
+        // Save session on every change
+        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
+          saveSession(session);
         } else if (event === 'SIGNED_OUT') {
-          clearBackupSession();
+          saveSession(null);
         }
       }
     );
 
-    return () => subscription.unsubscribe();
+    // Start periodic backup (every 10 seconds)
+    const stopBackup = startSessionBackup(authService.getCurrentSession);
+
+    return () => {
+      subscription.unsubscribe();
+      stopBackup();
+    };
   }, []);
 
   const signUp = async (userData: { email: string; password: string; name: string; username: string; phone?: string }) => {
