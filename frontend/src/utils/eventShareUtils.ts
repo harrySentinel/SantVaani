@@ -16,7 +16,7 @@ export interface EventShareData {
 function getEventTypeEmoji(type: string): string {
   switch (type) {
     case 'bhagwad-katha': return '📿';
-    case 'bhandara': return '🍽️';
+    case 'bhandara': return '🙏';
     case 'kirtan': return '🎵';
     case 'satsang': return '🕉️';
     default: return '🙏';
