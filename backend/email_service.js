@@ -168,7 +168,7 @@ function getEmailHeaders(userName) {
     'X-Priority': '3',
     'X-Mailer': 'Santvaani',
     'Precedence': 'bulk',
-    'List-Unsubscribe': '<mailto:support@santvaani.com?subject=unsubscribe>',
+    'List-Unsubscribe': '<mailto:santvaani.digitalashram@gmail.com?subject=unsubscribe>',
     'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
   };
 }
@@ -184,7 +184,7 @@ async function sendWelcomeEmail(userEmail, userName) {
     };
     sendSmtpEmail.replyTo = {
       name: 'Santvaani Support',
-      email: 'support@santvaani.com'
+      email: 'santvaani.digitalashram@gmail.com'
     };
     sendSmtpEmail.to = [{ email: userEmail, name: userName }];
     sendSmtpEmail.subject = EMAIL_TEMPLATES.welcome.subject.replace('{{name}}', userName);
@@ -212,7 +212,7 @@ async function send7DayEmail(userEmail, userName) {
     };
     sendSmtpEmail.replyTo = {
       name: 'Santvaani Support',
-      email: 'support@santvaani.com'
+      email: 'santvaani.digitalashram@gmail.com'
     };
     sendSmtpEmail.to = [{ email: userEmail, name: userName }];
     sendSmtpEmail.subject = EMAIL_TEMPLATES.sevenDays.subject.replace('{{name}}', userName);
@@ -240,7 +240,7 @@ async function send30DayEmail(userEmail, userName) {
     };
     sendSmtpEmail.replyTo = {
       name: 'Santvaani Support',
-      email: 'support@santvaani.com'
+      email: 'santvaani.digitalashram@gmail.com'
     };
     sendSmtpEmail.to = [{ email: userEmail, name: userName }];
     sendSmtpEmail.subject = EMAIL_TEMPLATES.thirtyDays.subject.replace('{{name}}', userName);
@@ -272,7 +272,7 @@ async function sendBroadcastEmail(recipients, subject, htmlContent) {
       };
       sendSmtpEmail.replyTo = {
         name: 'Santvaani Support',
-        email: 'support@santvaani.com'
+        email: 'santvaani.digitalashram@gmail.com'
       };
       sendSmtpEmail.to = [{
         email: recipient.email,
