@@ -738,10 +738,7 @@ const Events = () => {
                         </button>
                         <EventShareButton
                           event={event}
-                          variant="outline"
-                          size="sm"
-                          className="!h-auto px-3 py-3 rounded-xl border border-gray-300 text-gray-600 hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 shadow-sm hover:shadow-md"
-                          showLabel
+                          className="flex items-center justify-center px-3 py-3 rounded-xl border border-gray-300 text-gray-600 hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 shadow-sm hover:shadow-md"
                         />
                       </div>
                     </div>
