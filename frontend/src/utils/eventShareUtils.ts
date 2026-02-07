@@ -15,10 +15,10 @@ export interface EventShareData {
 
 function getEventTypeEmoji(type: string): string {
   switch (type) {
-    case 'bhagwad-katha': return '📿';
+    case 'bhagwad-katha': return '🙏';
     case 'bhandara': return '🙏';
-    case 'kirtan': return '🎵';
-    case 'satsang': return '🕉️';
+    case 'kirtan': return '🙏';
+    case 'satsang': return '🙏';
     default: return '🙏';
   }
 }
@@ -63,21 +63,21 @@ export function generateEventWhatsAppMessage(event: EventShareData): string {
   // Invitation preview (first 150 chars)
   const invitation = event.invitation_message || event.invitationMessage || '';
   const invitationPreview = invitation
-    ? `\n\n💌 ${invitation.substring(0, 150)}${invitation.length > 150 ? '...' : ''}`
+    ? `\n\n${invitation.substring(0, 150)}${invitation.length > 150 ? '...' : ''}`
     : '';
 
   const message = `${emoji} *${event.title}*
 _${typeLabel}_
 
-📅 ${formattedDate}
-🕐 ${event.time}
-📍 ${event.location}, ${event.city}${invitationPreview}
+${formattedDate}
+${event.time}
+${event.location}, ${event.city}${invitationPreview}
 
-👤 Organized by: ${event.organizer}
+Organized by: ${event.organizer}
 
-🔗 पूरी जानकारी देखें: ${eventUrl}
+पूरी जानकारी देखें: ${eventUrl}
 
-_Santvaani पर आध्यात्मिक कार्यक्रम खोजें_ ✨
+_Santvaani पर आध्यात्मिक कार्यक्रम खोजें_ 🙏
 #SantvaaniEvent ${typeHashtag} #Santvaani`;
 
   return encodeURIComponent(message);
