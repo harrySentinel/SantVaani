@@ -13,6 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { eventsService } from '@/lib/events';
 import { getFCMToken } from '@/lib/firebase';
 import { useLanguage } from '@/contexts/LanguageContext';
+import EventShareButton from '@/components/EventShareButton';
 
 const Events = () => {
   const { t, language } = useLanguage();
@@ -692,10 +693,10 @@ const Events = () => {
                     </div>
 
                     <div className="pt-4 border-t border-gray-100">
-                      <div className="flex space-x-3">
+                      <div className="flex space-x-2">
                         <button
                           onClick={() => handleNotificationToggle(event.id)}
-                          className={`flex-1 relative overflow-hidden py-3 px-4 rounded-xl transition-all duration-700 ease-in-out text-sm font-medium shadow-md hover:shadow-lg transform ${
+                          className={`flex-1 relative overflow-hidden py-3 px-3 rounded-xl transition-all duration-700 ease-in-out text-sm font-medium shadow-md hover:shadow-lg transform ${
                             subscribedEvents.has(event.id)
                               ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white'
                               : user
@@ -731,10 +732,17 @@ const Events = () => {
                         </button>
                         <button
                           onClick={() => handleShowDetails(event)}
-                          className="px-4 py-3 border border-gray-300 text-gray-600 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 text-sm font-medium shadow-sm hover:shadow-md"
+                          className="px-3 py-3 border border-gray-300 text-gray-600 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 text-sm font-medium shadow-sm hover:shadow-md"
                         >
                           {t('events.details.button')}
                         </button>
+                        <EventShareButton
+                          event={event}
+                          variant="outline"
+                          size="sm"
+                          className="!h-auto px-3 py-3 rounded-xl border border-gray-300 text-gray-600 hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 shadow-sm hover:shadow-md"
+                          showLabel
+                        />
                       </div>
                     </div>
                   </div>
@@ -879,11 +887,11 @@ const Events = () => {
                 </div>
               )}
 
-              {/* Action Button */}
-              <div className="pt-4 border-t border-gray-200">
+              {/* Action Buttons */}
+              <div className="pt-4 border-t border-gray-200 flex space-x-3">
                 <button
                   onClick={() => handleNotificationToggle(selectedEvent.id)}
-                  className={`w-full relative overflow-hidden py-3 px-4 rounded-xl transition-all duration-700 ease-in-out text-sm font-medium shadow-md hover:shadow-lg transform ${
+                  className={`flex-1 relative overflow-hidden py-3 px-4 rounded-xl transition-all duration-700 ease-in-out text-sm font-medium shadow-md hover:shadow-lg transform ${
                     subscribedEvents.has(selectedEvent.id)
                       ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white'
                       : user
@@ -917,6 +925,12 @@ const Events = () => {
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"></div>
                   )}
                 </button>
+                <EventShareButton
+                  event={selectedEvent}
+                  variant="outline"
+                  size="default"
+                  className="px-4 py-3 rounded-xl border-gray-300 text-gray-600 hover:bg-gray-50 hover:border-gray-400 shadow-sm hover:shadow-md"
+                />
               </div>
             </div>
           </div>
