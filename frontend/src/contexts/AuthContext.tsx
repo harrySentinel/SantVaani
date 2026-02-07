@@ -1,7 +1,6 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { authService } from '@/lib/auth';
-import { saveSession, restoreSession, startSessionBackup } from '@/lib/sessionPersistence';
 import { supabase } from '@/lib/supabaseClient';
 
 interface AuthContextType {
@@ -28,71 +27,20 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const initializeAuth = async () => {
-      try {
-        // STEP 1: Try Supabase first
-        let session = await authService.getCurrentSession();
-
-        // STEP 2: If no Supabase session, restore from our storage
-        if (!session) {
-          console.log('🔍 No Supabase session, checking backups...');
-          const backup = restoreSession();
-          if (backup) {
-            // Restore to Supabase
-            const { data, error } = await supabase.auth.setSession({
-              access_token: backup.access_token,
-              refresh_token: backup.refresh_token
-            });
-            if (data.session) {
-              session = data.session;
-              console.log('🎉 SESSION RESTORED FROM BACKUP!');
-            } else {
-              console.error('❌ Restore failed:', error);
-            }
-          }
-        }
-
-        console.log('📱 Final session:', session ? `✅ ${session.user?.email}` : '❌ Not logged in');
-        setSession(session);
-        setUser(session?.user ?? null);
-
-        // STEP 3: Save current session
-        if (session) {
-          saveSession(session);
-        }
-      } catch (error) {
-        console.error('Auth error:', error);
-        setSession(null);
-        setUser(null);
-      } finally {
+    // Use onAuthStateChange as the SINGLE source of truth.
+    // Supabase fires INITIAL_SESSION on subscribe which covers the initial load.
+    // No manual getSession() call needed — this avoids the race condition.
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, currentSession) => {
+        console.log('Auth event:', event, currentSession ? currentSession.user?.email : 'no session');
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
         setLoading(false);
-      }
-    };
-
-    initializeAuth();
-
-    // Listen for auth changes
-    const { data: { subscription } } = authService.onAuthStateChange(
-      (event, session) => {
-        console.log('🔄 Auth event:', event);
-        setSession(session);
-        setUser(session?.user ?? null);
-
-        // Save session on every change
-        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
-          saveSession(session);
-        } else if (event === 'SIGNED_OUT') {
-          saveSession(null);
-        }
       }
     );
 
-    // Start periodic backup (every 10 seconds)
-    const stopBackup = startSessionBackup(authService.getCurrentSession);
-
     return () => {
       subscription.unsubscribe();
-      stopBackup();
     };
   }, []);
 
