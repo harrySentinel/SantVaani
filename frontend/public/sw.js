@@ -18,14 +18,8 @@ firebase.initializeApp({
 // Initialize Firebase messaging in service worker
 const messaging = firebase.messaging();
 
-const CACHE_NAME = 'santvaani-v2-persistent-auth';
+const CACHE_NAME = 'santvaani-v3';
 const urlsToCache = [
-  '/',
-  '/daily-guide',
-  '/saints',
-  '/living-saints',
-  '/divine',
-  '/bhajans',
   '/favicon.ico'
 ];
 
@@ -61,42 +55,39 @@ self.addEventListener('activate', (event) => {
   return self.clients.claim();
 });
 
-// Fetch event - serve cached content when offline
+// Fetch event - network-first for pages, cache-first only for static assets
 self.addEventListener('fetch', (event) => {
-  // Don't cache API requests or auth-related requests
   const url = new URL(event.request.url);
+
+  // Skip non-GET requests
+  if (event.request.method !== 'GET') return;
+
+  // Never intercept API, auth, or external requests
   const isApiRequest = url.pathname.includes('/api/') ||
                        url.hostname.includes('supabase.co') ||
                        url.hostname.includes('googleapis.com');
+  if (isApiRequest) return;
 
-  if (isApiRequest) {
-    // For API requests, always go to network
-    event.respondWith(fetch(event.request));
+  // Navigation requests (HTML pages) — ALWAYS network-first
+  // This ensures new tabs always get the latest code
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request).catch(() => caches.match(event.request))
+    );
     return;
   }
 
-  // For static assets, use cache-first strategy
+  // Static assets (JS, CSS, images) — network-first with cache fallback
   event.respondWith(
-    caches.match(event.request)
+    fetch(event.request)
       .then((response) => {
-        // Return cached version or fetch from network
-        return response || fetch(event.request).then((fetchResponse) => {
-          // Don't cache non-successful responses
-          if (!fetchResponse || fetchResponse.status !== 200) {
-            return fetchResponse;
-          }
-
-          // Cache the new response for next time
-          return caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, fetchResponse.clone());
-            return fetchResponse;
-          });
-        });
+        if (response && response.status === 200) {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+        }
+        return response;
       })
-      .catch(() => {
-        // If both cache and network fail, could return a fallback page
-        console.log('Fetch failed for:', event.request.url);
-      })
+      .catch(() => caches.match(event.request))
   );
 });
 
