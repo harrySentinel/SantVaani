@@ -248,24 +248,24 @@ const About = () => {
       </div>
 
       {/* Grandmother Tribute */}
-      <section className="py-20 px-4">
+      <section className="py-20 px-4 bg-gradient-to-b from-amber-50/40 to-white">
         <div className="max-w-2xl mx-auto text-center space-y-8">
-
-          {/* Flame / diya symbol */}
-          <div className="flex justify-center">
-            <span className="text-4xl animate-pulse">🪔</span>
-          </div>
 
           {/* Photo placeholder — replace src with real photo when ready */}
           <div className="flex justify-center">
-            <div className="relative">
+            <div className="relative inline-block">
+              {/* Glow ring */}
+              <div className="absolute inset-0 rounded-full animate-ping opacity-10 bg-amber-300" />
+              {/* Circle */}
               <div className="w-32 h-32 rounded-full bg-amber-50 border-4 border-amber-200 flex items-center justify-center overflow-hidden shadow-lg"
                 style={{ boxShadow: '0 0 30px rgba(251, 191, 36, 0.3)' }}>
-                {/* Replace the div below with <img src="/grandma.jpg" ... /> once photo is ready */}
+                {/* Replace with <img src="/grandma.jpg" className="w-full h-full object-cover" alt="Vimla Srivastava" /> once photo is ready */}
                 <span className="text-5xl">🙏</span>
               </div>
-              {/* Soft glow ring */}
-              <div className="absolute inset-0 rounded-full animate-ping opacity-10 bg-amber-300" />
+              {/* Diya sitting at the bottom of the circle */}
+              <div className="absolute -bottom-4 left-1/2 -translate-x-1/2">
+                <span className="text-2xl animate-pulse">🪔</span>
+              </div>
             </div>
           </div>
 
