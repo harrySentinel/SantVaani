@@ -247,6 +247,83 @@ const About = () => {
         <div className="h-px bg-gray-100" />
       </div>
 
+      {/* Grandmother Tribute */}
+      <section className="py-20 px-4">
+        <div className="max-w-2xl mx-auto text-center space-y-8">
+
+          {/* Flame / diya symbol */}
+          <div className="flex justify-center">
+            <span className="text-4xl animate-pulse">🪔</span>
+          </div>
+
+          {/* Photo placeholder — replace src with real photo when ready */}
+          <div className="flex justify-center">
+            <div className="relative">
+              <div className="w-32 h-32 rounded-full bg-amber-50 border-4 border-amber-200 flex items-center justify-center overflow-hidden shadow-lg"
+                style={{ boxShadow: '0 0 30px rgba(251, 191, 36, 0.3)' }}>
+                {/* Replace the div below with <img src="/grandma.jpg" ... /> once photo is ready */}
+                <span className="text-5xl">🙏</span>
+              </div>
+              {/* Soft glow ring */}
+              <div className="absolute inset-0 rounded-full animate-ping opacity-10 bg-amber-300" />
+            </div>
+          </div>
+
+          {/* Name */}
+          <div className="space-y-1">
+            <p className="text-sm text-amber-600 font-semibold uppercase tracking-widest">In Loving Memory</p>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Vimla Srivastava</h2>
+            <p className="text-gray-400 text-sm">With all due respect and love</p>
+          </div>
+
+          {/* Radhasoami */}
+          <div className="py-4">
+            <p className="text-2xl md:text-3xl font-medium text-amber-700 italic tracking-wide">
+              " Radhasoami "
+            </p>
+            <p className="text-gray-400 text-sm mt-2">Her words. Her faith. Her way of life.</p>
+          </div>
+
+          {/* Tribute text */}
+          <div className="space-y-4 text-gray-600 text-lg leading-relaxed text-left">
+            <p>
+              She was the iron lady of our home — a woman whose strength was quiet, whose love was boundless,
+              and whose faith in God never wavered for a single moment.
+            </p>
+            <p>
+              From her, I learned that you never give up. Not when it is hard, not when it hurts,
+              not when the world feels heavy. She never did — and that lesson lives in every page of SantVaani.
+            </p>
+            <p>
+              She always believed in God. And in a way, SantVaani is the fruit of that belief —
+              a small offering to the divine she spent her whole life devoted to.
+            </p>
+            <p>
+              Her last word was the name of Bhagwan. There is no more beautiful way to leave this world.
+            </p>
+          </div>
+
+          {/* Divider */}
+          <div className="w-12 h-0.5 bg-amber-300 mx-auto" />
+
+          {/* Thank you */}
+          <div className="space-y-2">
+            <p className="text-gray-500 text-base italic">
+              Thank you for reading this.
+            </p>
+            <p className="text-amber-600 font-medium text-lg">
+              You are a kind heart. 🙏
+            </p>
+          </div>
+
+        </div>
+      </section>
+
+      {/* Divider */}
+      <div className="max-w-3xl mx-auto px-4">
+        <div className="h-px bg-gray-100" />
+      </div>
+
       {/* CTA */}
       <section className="py-20 px-4 bg-gradient-to-b from-white to-orange-50/50">
         <div className="max-w-2xl mx-auto text-center space-y-6">
