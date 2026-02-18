@@ -266,7 +266,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ className = '' }) => {
                       ? 'bg-orange-500 text-white rounded-br-sm'
                       : 'bg-white border border-gray-100 text-gray-800 rounded-bl-sm shadow-sm'
                   }`}>
-                    <p className={`text-sm leading-relaxed whitespace-pre-line ${msg.type === 'user' ? 'text-white' : 'text-gray-700'}`}>
+                    <p className={`text-base sm:text-sm leading-relaxed whitespace-pre-line ${msg.type === 'user' ? 'text-white' : 'text-gray-700'}`}>
                       {msg.content}
                       {msg.isAnimating && (
                         <span className="inline-block w-0.5 h-4 ml-0.5 bg-orange-400 animate-pulse align-middle" />
@@ -317,7 +317,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ className = '' }) => {
                   onFocus={handleInputFocus}
                   placeholder={PLACEHOLDERS[language as keyof typeof PLACEHOLDERS] || PLACEHOLDERS.en}
                   disabled={isLoading || backendStatus === 'disconnected'}
-                  className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-700
+                  className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-base sm:text-sm text-gray-700
                     placeholder-gray-400 bg-gray-50 focus:bg-white
                     focus:outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-300
                     disabled:opacity-50 disabled:cursor-not-allowed transition-all"
