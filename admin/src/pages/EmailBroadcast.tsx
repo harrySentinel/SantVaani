@@ -64,10 +64,10 @@ const EmailBroadcast = () => {
     setSelectedUsers([]);
   };
 
-  const getSelectedEmails = () => {
+  const getSelectedRecipients = () => {
     return users
       .filter(u => selectedUsers.includes(u.id))
-      .map(u => u.email);
+      .map(u => ({ email: u.email, name: u.name }));
   };
 
   const generateEmailHTML = () => {
@@ -135,7 +135,7 @@ const EmailBroadcast = () => {
       setLoading(true);
       setStatus({ type: null, message: '' });
 
-      const recipients = getSelectedEmails();
+      const recipients = getSelectedRecipients();
       const htmlContent = generateEmailHTML();
 
       const response = await fetch(`${API_BASE_URL}/api/email/send-broadcast`, {
