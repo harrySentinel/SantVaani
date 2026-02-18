@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { MessageCircle, X, Send, Sparkles, Loader2 } from 'lucide-react';
+import { X, Send, Loader2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface Message {
@@ -35,105 +35,70 @@ const ChatBot: React.FC<ChatBotProps> = ({ className = '' }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Backend configuration
   const getBackendUrl = () => {
-    if (import.meta.env.MODE === 'development') {
-      return 'http://localhost:5000';
-    }
+    if (import.meta.env.MODE === 'development') return 'http://localhost:5000';
     return import.meta.env.VITE_BACKEND_URL || 'https://santvaani-backend.onrender.com';
   };
 
   const BACKEND_URL = getBackendUrl();
 
-  // Initialize messages based on language (only when chatbot first opens)
   useEffect(() => {
     if (isOpen && messages.length === 0) {
-      const initialMsg: Message = {
+      setMessages([{
         id: '1',
         type: 'bot',
         content: INITIAL_MESSAGES[language as keyof typeof INITIAL_MESSAGES] || INITIAL_MESSAGES.en,
         timestamp: new Date()
-      };
-      setMessages([initialMsg]);
+      }]);
     }
   }, [isOpen]);
 
-  // Update greeting message when language changes (only if it's the initial greeting)
   useEffect(() => {
     if (isOpen && messages.length > 0 && messages[0].type === 'bot') {
-      // Check if the first message is still a greeting (hasn't been cleared)
-      const firstMessage = messages[0];
-      const isGreetingMessage =
-        firstMessage.content.includes('Namaste') ||
-        firstMessage.content.includes('नमस्ते') ||
-        firstMessage.content.includes('Santvaani') ||
-        firstMessage.content.includes('संतवाणी');
-
-      if (isGreetingMessage) {
-        const updatedMessages = [...messages];
-        updatedMessages[0] = {
-          ...updatedMessages[0],
-          content: INITIAL_MESSAGES[language as keyof typeof INITIAL_MESSAGES] || INITIAL_MESSAGES.en
-        };
-        setMessages(updatedMessages);
+      const first = messages[0];
+      const isGreeting = first.content.includes('Namaste') || first.content.includes('नमस्ते');
+      if (isGreeting) {
+        setMessages(prev => {
+          const updated = [...prev];
+          updated[0] = { ...updated[0], content: INITIAL_MESSAGES[language as keyof typeof INITIAL_MESSAGES] || INITIAL_MESSAGES.en };
+          return updated;
+        });
       }
     }
   }, [language, isOpen]);
 
-  // Smooth scrolling to bottom
   const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, []);
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, scrollToBottom]);
+  useEffect(() => { scrollToBottom(); }, [messages, scrollToBottom]);
 
-  // Check backend health
   useEffect(() => {
-    const checkBackendHealth = async () => {
+    const check = async () => {
       try {
         setBackendStatus('checking');
-        const response = await fetch(`${BACKEND_URL}/api/health`, {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
-          signal: AbortSignal.timeout(10000)
-        });
-
-        if (response.ok) {
-          setBackendStatus('connected');
-        } else {
-          setBackendStatus('disconnected');
-        }
-      } catch (error) {
-        console.error('Backend health check error:', error);
+        const res = await fetch(`${BACKEND_URL}/api/health`, { signal: AbortSignal.timeout(10000) });
+        setBackendStatus(res.ok ? 'connected' : 'disconnected');
+      } catch {
         setBackendStatus('disconnected');
       }
     };
-
-    checkBackendHealth();
+    check();
   }, [BACKEND_URL]);
 
-  // Prevent body scroll when modal is open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'unset';
     }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
+    return () => { document.body.style.overflow = 'unset'; };
   }, [isOpen]);
 
-  // Get backend response
   const getBackendResponse = async (userMessage: string): Promise<string> => {
     try {
       setIsLoading(true);
-
-      if (backendStatus === 'disconnected') {
-        return 'Backend service is unavailable. Please try again later. 🔌';
-      }
+      if (backendStatus === 'disconnected') return 'Service is unavailable right now. Please try again later. 🙏';
 
       const response = await fetch(`${BACKEND_URL}/api/chat`, {
         method: 'POST',
@@ -143,304 +108,235 @@ const ChatBot: React.FC<ChatBotProps> = ({ className = '' }) => {
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        if (response.status === 429) {
-          return errorData.message || 'Too many requests. Please try again in a moment. ⏰';
-        }
-        throw new Error(`Backend request failed: ${response.status}`);
+        const err = await response.json().catch(() => ({}));
+        if (response.status === 429) return err.message || 'Too many requests. Please wait a moment. ⏰';
+        throw new Error(`Request failed: ${response.status}`);
       }
 
       const data = await response.json();
-
-      if (data.success && data.response) {
-        return data.response;
-      } else {
-        throw new Error('Invalid response format from backend');
-      }
-
+      if (data.success && data.response) return data.response;
+      throw new Error('Invalid response format');
     } catch (error) {
-      console.error('Error getting backend response:', error);
-
       if (error instanceof Error) {
-        if (error.name === 'AbortError' || error.message.includes('timeout')) {
-          return 'Response timed out. Please try again. ⏱️';
-        } else if (error.message.includes('fetch') || error.message.includes('network')) {
-          return 'Internet connection issue. Please check your connection. 🌐';
-        }
+        if (error.name === 'AbortError' || error.message.includes('timeout')) return 'Response timed out. Please try again. ⏱️';
+        if (error.message.includes('fetch') || error.message.includes('network')) return 'Check your internet connection and try again. 🌐';
       }
-
-      return `I'm happy you asked. Please try again in a moment. 🙏\n\nUntil then, contemplate this Gita verse:\n"कर्मण्येवाधिकारस्ते मा फलेषु कदाचन" (2.47)\n\n"You have the right to perform actions, but not to the fruits of action."`;
+      return `Please try again in a moment. 🙏\n\n"कर्मण्येवाधिकारस्ते मा फलेषु कदाचन" (Gita 2.47)\n\n"You have the right to act, but never to the fruits of action."`;
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Typing animation for bot messages
   const animateMessage = useCallback((content: string, messageId: string) => {
-    let currentIndex = 0;
+    let index = 0;
     const words = content.split(' ');
-
     const interval = setInterval(() => {
-      if (currentIndex < words.length) {
-        const displayContent = words.slice(0, currentIndex + 1).join(' ');
-        setMessages(prev => prev.map(msg =>
-          msg.id === messageId
-            ? { ...msg, content: displayContent, isAnimating: true }
-            : msg
-        ));
-        currentIndex++;
+      if (index < words.length) {
+        const display = words.slice(0, index + 1).join(' ');
+        setMessages(prev => prev.map(m => m.id === messageId ? { ...m, content: display, isAnimating: true } : m));
+        index++;
       } else {
         clearInterval(interval);
-        setMessages(prev => prev.map(msg =>
-          msg.id === messageId
-            ? { ...msg, isAnimating: false }
-            : msg
-        ));
+        setMessages(prev => prev.map(m => m.id === messageId ? { ...m, isAnimating: false } : m));
       }
-    }, 30); // Speed of typing animation (30ms per word for smoother effect)
-
+    }, 30);
     return () => clearInterval(interval);
   }, []);
 
-  // Handle sending messages
   const handleSendMessage = async (): Promise<void> => {
     if (!inputMessage.trim() || isLoading) return;
-
-    const userMessageText = inputMessage.trim();
-
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      type: 'user',
-      content: userMessageText,
-      timestamp: new Date()
-    };
-
-    setMessages(prev => [...prev, userMessage]);
+    const text = inputMessage.trim();
+    const userMsg: Message = { id: Date.now().toString(), type: 'user', content: text, timestamp: new Date() };
+    setMessages(prev => [...prev, userMsg]);
     setInputMessage('');
     setIsTyping(true);
 
     try {
-      const aiResponseContent = await getBackendResponse(userMessageText);
-
-      const botResponseId = (Date.now() + 1).toString();
-      const botResponse: Message = {
-        id: botResponseId,
-        type: 'bot',
-        content: '',
-        timestamp: new Date(),
-        isAnimating: true
-      };
-
-      setMessages(prev => [...prev, botResponse]);
+      const aiContent = await getBackendResponse(text);
+      const botId = (Date.now() + 1).toString();
+      setMessages(prev => [...prev, { id: botId, type: 'bot', content: '', timestamp: new Date(), isAnimating: true }]);
       setIsTyping(false);
-
-      // Start typing animation
-      animateMessage(aiResponseContent, botResponseId);
-
-    } catch (error) {
-      console.error('Error in chat:', error);
-      const errorResponse: Message = {
-        id: (Date.now() + 1).toString(),
-        type: 'bot',
-        content: `Sorry, there's a technical issue. 🛠️\n\nThe Gita says: "Yogasthah kuru karmani" - perform action with equanimity.\n\nPlease try again. 🙏`,
+      animateMessage(aiContent, botId);
+    } catch {
+      setMessages(prev => [...prev, {
+        id: (Date.now() + 1).toString(), type: 'bot',
+        content: `Sorry, a technical issue occurred. 🛠️\n\nPlease try again. 🙏`,
         timestamp: new Date()
-      };
-      setMessages(prev => [...prev, errorResponse]);
+      }]);
       setIsTyping(false);
     }
   };
 
-  // Format timestamp
-  const formatTime = (date: Date): string => {
-    return date.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true
-    });
+  const formatTime = (date: Date) => date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(); }
   };
 
-  // Handle Enter key
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>): void => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
-  };
-
-  // Handle input focus - removed scroll behavior to fix keyboard overlap
   const handleInputFocus = () => {
-    // Scroll to bottom of messages instead of input field
-    setTimeout(() => {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
+    setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
   };
 
-  // Get status indicator
-  const getStatusColor = () => {
-    switch (backendStatus) {
-      case 'connected': return 'bg-green-500';
-      case 'disconnected': return 'bg-red-500';
-      case 'checking': return 'bg-yellow-500';
-      default: return 'bg-gray-500';
-    }
-  };
+  const isConnected = backendStatus === 'connected';
 
   return (
     <>
-      {/* Floating Chat Button */}
-      <button
-        onClick={() => setIsOpen(true)}
-        className={`fixed bottom-6 right-6 z-50 w-16 h-16 bg-gradient-to-r from-orange-500 via-red-500 to-pink-500
-          rounded-full shadow-2xl flex items-center justify-center text-white
-          hover:from-orange-600 hover:via-red-600 hover:to-pink-600
-          active:scale-95 hover:scale-110 transition-all duration-300
-          border-2 border-white/20 ${isOpen ? 'hidden' : 'block'} ${className}`}
-        aria-label="Open chat"
-      >
-        <div className="relative">
-          <MessageCircle className="w-7 h-7" />
-          <div className={`absolute -top-1 -right-1 w-4 h-4 ${getStatusColor()} rounded-full flex items-center justify-center ${backendStatus === 'connected' ? 'animate-pulse' : ''}`}>
-            <Sparkles className="w-2 h-2 text-white" />
-          </div>
-        </div>
-      </button>
+      {/* Floating Button */}
+      {!isOpen && (
+        <button
+          onClick={() => setIsOpen(true)}
+          className={`fixed bottom-6 right-6 z-50 w-14 h-14 bg-orange-500 hover:bg-orange-600
+            rounded-full shadow-xl flex items-center justify-center
+            transition-all duration-300 active:scale-95 hover:scale-105
+            border-2 border-orange-300/40 ${className}`}
+          aria-label="Open Gita Guide"
+        >
+          <span className="text-white text-2xl font-bold leading-none" style={{ fontFamily: 'serif' }}>ॐ</span>
+          {/* Status dot */}
+          <span className={`absolute top-0.5 right-0.5 w-3 h-3 rounded-full border-2 border-white
+            ${isConnected ? 'bg-green-400' : backendStatus === 'checking' ? 'bg-yellow-400' : 'bg-red-400'}
+            ${isConnected ? 'animate-pulse' : ''}`}
+          />
+        </button>
+      )}
 
-      {/* Full Screen Modal */}
+      {/* Chat Panel */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200 overflow-hidden">
-          <div className="h-full flex items-end sm:items-center justify-center p-0 sm:p-4">
-            <div className="w-full max-w-6xl h-full sm:h-auto sm:max-h-[90vh] bg-white sm:rounded-2xl shadow-2xl flex flex-col animate-in slide-in-from-bottom sm:zoom-in-95 duration-300">
+        <>
+          {/* Mobile backdrop */}
+          <div className="fixed inset-0 bg-black/40 z-40 sm:hidden" onClick={() => setIsOpen(false)} />
 
-              {/* Header */}
-              <div className="bg-gradient-to-r from-orange-500 via-orange-600 to-red-500 rounded-t-2xl p-6 flex items-center justify-between shadow-lg relative overflow-hidden">
-                {/* Animated background pattern */}
-                <div className="absolute inset-0 opacity-10">
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
+          {/* Panel */}
+          <div className={`
+            fixed z-50 bg-white flex flex-col overflow-hidden
+            /* Mobile: full screen */
+            inset-0
+            /* Desktop: compact panel bottom-right */
+            sm:inset-auto sm:bottom-6 sm:right-6
+            sm:w-[400px] sm:h-[600px]
+            sm:rounded-2xl sm:shadow-2xl
+            transition-all duration-300
+          `}
+            style={{ boxShadow: '0 8px 40px rgba(0,0,0,0.18)' }}
+          >
+
+            {/* Header */}
+            <div className="bg-orange-500 px-5 py-4 flex items-center justify-between flex-shrink-0">
+              <div className="flex items-center gap-3">
+                {/* Avatar */}
+                <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center border border-white/30">
+                  <span className="text-white text-lg font-bold" style={{ fontFamily: 'serif' }}>ॐ</span>
                 </div>
-                <div className="flex items-center space-x-4 relative z-10">
-                  <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm border-2 border-white/40 shadow-lg">
-                    <Sparkles className="w-6 h-6 text-white animate-pulse" />
+                <div>
+                  <h2 className="text-white font-semibold text-base leading-tight">Gita Guide</h2>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <span className={`w-1.5 h-1.5 rounded-full ${isConnected ? 'bg-green-300 animate-pulse' : 'bg-gray-300'}`} />
+                    <span className="text-white/75 text-xs">
+                      {isConnected ? 'Online' : backendStatus === 'checking' ? 'Connecting...' : 'Offline'}
+                    </span>
                   </div>
-                  <div>
-                    <h2 className="text-white font-bold text-2xl flex items-center drop-shadow-md">
-                      Santvaani Guide
-                    </h2>
-                    <p className="text-white/95 text-sm flex items-center mt-1">
-                      <span className={`w-2 h-2 ${getStatusColor()} rounded-full mr-2 shadow-lg ${backendStatus === 'connected' ? 'animate-pulse' : ''}`}></span>
-                      Powered by Gita Wisdom
+                </div>
+              </div>
+              <button
+                onClick={() => setIsOpen(false)}
+                className="text-white/80 hover:text-white p-1.5 rounded-full hover:bg-white/15 transition-colors"
+                aria-label="Close"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Messages */}
+            <div
+              className="flex-1 overflow-y-auto px-4 py-5 space-y-4 bg-orange-50/20"
+              style={{ scrollbarWidth: 'thin', scrollbarColor: '#fed7aa transparent' }}
+            >
+              {messages.map((msg) => (
+                <div key={msg.id} className={`flex gap-2.5 ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}>
+
+                  {/* Bot avatar */}
+                  {msg.type === 'bot' && (
+                    <div className="w-8 h-8 rounded-full bg-orange-100 border border-orange-200 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-orange-600 text-sm font-bold" style={{ fontFamily: 'serif' }}>ॐ</span>
+                    </div>
+                  )}
+
+                  <div className={`max-w-[78%] rounded-2xl px-4 py-3 ${
+                    msg.type === 'user'
+                      ? 'bg-orange-500 text-white rounded-br-sm'
+                      : 'bg-white border border-gray-100 text-gray-800 rounded-bl-sm shadow-sm'
+                  }`}>
+                    <p className={`text-sm leading-relaxed whitespace-pre-line ${msg.type === 'user' ? 'text-white' : 'text-gray-700'}`}>
+                      {msg.content}
+                      {msg.isAnimating && (
+                        <span className="inline-block w-0.5 h-4 ml-0.5 bg-orange-400 animate-pulse align-middle" />
+                      )}
+                    </p>
+                    <p className={`text-xs mt-1.5 ${msg.type === 'user' ? 'text-orange-100' : 'text-gray-300'}`}>
+                      {formatTime(msg.timestamp)}
                     </p>
                   </div>
+
+                  {/* User avatar */}
+                  {msg.type === 'user' && (
+                    <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-white text-xs font-semibold">You</span>
+                    </div>
+                  )}
                 </div>
+              ))}
+
+              {/* Typing indicator */}
+              {isTyping && (
+                <div className="flex gap-2.5 justify-start">
+                  <div className="w-8 h-8 rounded-full bg-orange-100 border border-orange-200 flex items-center justify-center flex-shrink-0">
+                    <span className="text-orange-600 text-sm font-bold" style={{ fontFamily: 'serif' }}>ॐ</span>
+                  </div>
+                  <div className="bg-white border border-gray-100 rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm">
+                    <div className="flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 bg-orange-400 rounded-full animate-bounce" />
+                      <span className="w-1.5 h-1.5 bg-orange-400 rounded-full animate-bounce" style={{ animationDelay: '0.15s' }} />
+                      <span className="w-1.5 h-1.5 bg-orange-400 rounded-full animate-bounce" style={{ animationDelay: '0.3s' }} />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div ref={messagesEndRef} />
+            </div>
+
+            {/* Input */}
+            <div className="px-4 py-3 border-t border-gray-100 bg-white flex-shrink-0">
+              <div className="flex items-center gap-2">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={inputMessage}
+                  onChange={(e) => setInputMessage(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  onFocus={handleInputFocus}
+                  placeholder={PLACEHOLDERS[language as keyof typeof PLACEHOLDERS] || PLACEHOLDERS.en}
+                  disabled={isLoading || backendStatus === 'disconnected'}
+                  className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-700
+                    placeholder-gray-400 bg-gray-50 focus:bg-white
+                    focus:outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-300
+                    disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                />
                 <button
-                  onClick={() => setIsOpen(false)}
-                  className="text-white/90 hover:text-white transition-all duration-200 p-2 rounded-full hover:bg-white/20 active:scale-95 relative z-10"
-                  aria-label="Close chat"
+                  onClick={handleSendMessage}
+                  disabled={!inputMessage.trim() || isLoading || backendStatus === 'disconnected'}
+                  className="w-10 h-10 bg-orange-500 hover:bg-orange-600 rounded-xl flex items-center justify-center
+                    text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0"
+                  aria-label="Send"
                 >
-                  <X className="w-6 h-6" />
+                  {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                 </button>
               </div>
-
-              {/* Messages Area */}
-              <div
-                className="flex-1 overflow-y-auto p-6 space-y-6 bg-gradient-to-b from-orange-50/30 via-white to-orange-50/30"
-                style={{ scrollbarWidth: 'thin', scrollbarColor: '#fed7aa #fff7ed' }}
-              >
-                {messages.map((message) => (
-                  <div
-                    key={message.id}
-                    className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-4 duration-300`}
-                  >
-                    <div className={`max-w-[85%] sm:max-w-[80%] rounded-2xl p-4 ${
-                      message.type === 'user'
-                        ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg'
-                        : 'bg-white border border-orange-200 text-gray-800 shadow-md'
-                    }`}>
-                      {message.type === 'bot' && (
-                        <div className="flex items-center space-x-2 mb-2">
-                          <div className="w-6 h-6 bg-gradient-to-r from-orange-400 to-red-400 rounded-full flex items-center justify-center">
-                            <Sparkles className="w-3 h-3 text-white" />
-                          </div>
-                          <span className="font-semibold text-orange-600">Santvaani</span>
-                        </div>
-                      )}
-                      <p className={`text-base leading-relaxed whitespace-pre-line ${
-                        message.type === 'user' ? 'text-white' : 'text-gray-700'
-                      }`}>
-                        {message.content}
-                        {message.isAnimating && (
-                          <span className="inline-block w-1 h-4 ml-1 bg-orange-500 animate-pulse"></span>
-                        )}
-                      </p>
-                      <p className={`text-xs mt-2 ${
-                        message.type === 'user' ? 'text-white/70' : 'text-gray-400'
-                      }`}>
-                        {formatTime(message.timestamp)}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-
-                {/* Typing Indicator */}
-                {isTyping && (
-                  <div className="flex justify-start animate-in fade-in duration-200">
-                    <div className="bg-white border border-orange-200 rounded-2xl p-4 shadow-md">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-6 h-6 bg-gradient-to-r from-orange-400 to-red-400 rounded-full flex items-center justify-center">
-                          <Sparkles className="w-3 h-3 text-white" />
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <span className="text-sm text-gray-600">Santvaani is thinking</span>
-                          <div className="flex space-x-1">
-                            <div className="w-2 h-2 bg-orange-400 rounded-full animate-bounce"></div>
-                            <div className="w-2 h-2 bg-orange-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                            <div className="w-2 h-2 bg-orange-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                <div ref={messagesEndRef} />
-              </div>
-
-              {/* Input Area - Fixed to bottom on mobile */}
-              <div className="p-4 sm:p-6 border-t border-orange-100 bg-gradient-to-r from-orange-50/50 to-white rounded-b-2xl">
-                <div className="flex items-center space-x-3">
-                  <input
-                    ref={inputRef}
-                    type="text"
-                    value={inputMessage}
-                    onChange={(e) => setInputMessage(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    onFocus={handleInputFocus}
-                    placeholder={PLACEHOLDERS[language as keyof typeof PLACEHOLDERS] || PLACEHOLDERS.en}
-                    disabled={isLoading || backendStatus === 'disconnected'}
-                    className="flex-1 p-3 sm:p-4 rounded-xl border-2 border-orange-200
-                      focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent
-                      bg-white text-gray-700 placeholder-gray-400 text-base
-                      disabled:opacity-50 disabled:cursor-not-allowed
-                      transition-all duration-200 shadow-sm hover:shadow-md focus:shadow-md"
-                  />
-                  <button
-                    onClick={handleSendMessage}
-                    disabled={!inputMessage.trim() || isLoading || backendStatus === 'disconnected'}
-                    className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl
-                      flex items-center justify-center text-white hover:from-orange-600 hover:to-red-600
-                      transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-lg
-                      disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex-shrink-0"
-                    aria-label="Send message"
-                  >
-                    {isLoading ? (
-                      <Loader2 className="w-5 h-5 sm:w-6 sm:h-6 animate-spin" />
-                    ) : (
-                      <Send className="w-5 h-5 sm:w-6 sm:h-6" />
-                    )}
-                  </button>
-                </div>
-              </div>
+              <p className="text-center text-xs text-gray-300 mt-2">Powered by Bhagavad Gita wisdom</p>
             </div>
+
           </div>
-        </div>
+        </>
       )}
     </>
   );
