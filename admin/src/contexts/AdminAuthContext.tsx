@@ -8,6 +8,7 @@ interface AdminAuthContextType {
   loading: boolean;
   isAdmin: boolean;
   signIn: (email: string, password: string) => Promise<any>;
+  signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
   checkAdminAccess: () => boolean;
 }
@@ -45,8 +46,20 @@ export const AdminAuthProvider = ({ children }: AdminAuthProviderProps) => {
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         console.log('Admin auth state changed:', event, session?.user?.email);
+
+        // On OAuth sign-in, verify admin access immediately and kick out if not admin
+        if (event === 'SIGNED_IN' && session?.user && !isAdminUser(session.user)) {
+          await supabase.auth.signOut();
+          setSession(null);
+          setUser(null);
+          setLoading(false);
+          // Show access denied — we use a custom event so AdminLogin can display it
+          window.dispatchEvent(new CustomEvent('admin-access-denied'));
+          return;
+        }
+
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
@@ -75,6 +88,19 @@ export const AdminAuthProvider = ({ children }: AdminAuthProviderProps) => {
     return data;
   };
 
+  const signInWithGoogle = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/dashboard`
+      }
+    });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+  };
+
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
@@ -86,18 +112,8 @@ export const AdminAuthProvider = ({ children }: AdminAuthProviderProps) => {
   const isAdminUser = (user: User | null): boolean => {
     if (!user) return false;
 
-    // Admin check 1: Email contains 'admin'
-    if (user.email?.includes('admin')) return true;
-
-    // Admin check 2: User metadata role
-    if (user.user_metadata?.role === 'admin') return true;
-
-    // Admin check 3: Specific admin emails (you can add more)
     const adminEmails = [
-      'admin@santvaani.com',
-      'aditya@santvaani.com',
       'adityasri1801@gmail.com',
-      // Add more admin emails here
     ];
 
     if (user.email && adminEmails.includes(user.email)) return true;
@@ -117,6 +133,7 @@ export const AdminAuthProvider = ({ children }: AdminAuthProviderProps) => {
     loading,
     isAdmin,
     signIn,
+    signInWithGoogle,
     signOut,
     checkAdminAccess
   };
