@@ -162,14 +162,20 @@ const EMAIL_TEMPLATES = {
   }
 };
 
-// Common email headers for inbox delivery
+// Headers for transactional emails (welcome, milestone)
 function getEmailHeaders(userName) {
   return {
-    'X-Priority': '3',
+    'X-Priority': '1',
     'X-Mailer': 'Santvaani',
-    'Precedence': 'bulk',
-    'List-Unsubscribe': '<mailto:santvaani.digitalashram@gmail.com?subject=unsubscribe>',
-    'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
+    'Precedence': 'personal'
+  };
+}
+
+// Headers for broadcast emails — no bulk signals
+function getBroadcastEmailHeaders() {
+  return {
+    'X-Priority': '1',
+    'X-Mailer': 'Santvaani'
   };
 }
 
@@ -267,11 +273,11 @@ async function sendBroadcastEmail(recipients, subject, htmlContent) {
       const name = recipient.name || 'Dear User';
 
       sendSmtpEmail.sender = {
-        name: 'Santvaani',
+        name: 'Aditya from SantVaani',
         email: 'noreply@santvaani.com'
       };
       sendSmtpEmail.replyTo = {
-        name: 'Santvaani Support',
+        name: 'Aditya from SantVaani',
         email: 'santvaani.digitalashram@gmail.com'
       };
       sendSmtpEmail.to = [{
@@ -281,7 +287,7 @@ async function sendBroadcastEmail(recipients, subject, htmlContent) {
       sendSmtpEmail.subject = subject.replace('{{name}}', name);
       sendSmtpEmail.htmlContent = htmlContent.replace(/{{name}}/g, name);
       sendSmtpEmail.textContent = htmlToPlainText(htmlContent, name);
-      sendSmtpEmail.headers = getEmailHeaders(name);
+      sendSmtpEmail.headers = getBroadcastEmailHeaders();
 
       const result = await apiInstance.sendTransacEmail(sendSmtpEmail);
       results.push({

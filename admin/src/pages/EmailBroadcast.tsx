@@ -71,48 +71,25 @@ const EmailBroadcast = () => {
   };
 
   const generateEmailHTML = () => {
-    return `
-<!DOCTYPE html>
-<html>
+    return `<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
-    .header { background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); padding: 40px 20px; text-align: center; }
-    .om-symbol { font-size: 72px; color: white; margin-bottom: 20px; text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    .header-title { color: white; font-size: 28px; font-weight: bold; margin: 0; }
-    .content { padding: 40px 30px; color: #374151; line-height: 1.8; }
-    .message { white-space: pre-wrap; }
-    .footer { background-color: #f9fafb; padding: 30px; text-align: center; color: #6b7280; }
-    .signature { color: #f97316; font-weight: 600; margin-top: 20px; }
-  </style>
 </head>
-<body>
-  <div class="container">
-    <div class="header">
-      <div class="om-symbol">ॐ</div>
-      <h1 class="header-title">Santvaani Digital Ashram</h1>
-    </div>
-    <div class="content">
-      <div class="message">${message.replace(/\n/g, '<br>')}</div>
-      <div class="signature">
-        🙏 Santvaani Team
-      </div>
-    </div>
-    <div class="footer">
-      <p style="margin: 0; font-size: 14px;">
-        You're receiving this email because you're part of the Santvaani community.
-      </p>
-      <p style="margin: 10px 0 0 0; font-size: 12px;">
-        © 2025 Santvaani Digital Ashram. All rights reserved.
-      </p>
-    </div>
-  </div>
+<body style="font-family: Arial, sans-serif; font-size: 16px; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; line-height: 1.7;">
+
+  <p>Namaste {{name}},</p>
+
+  ${message.split('\n').filter(line => line.trim()).map(line => `<p>${line}</p>`).join('\n  ')}
+
+  <p style="margin-top: 24px;">🙏 Aditya<br>SantVaani Digital Ashram<br><a href="https://santvaani.com" style="color: #ea580c;">santvaani.com</a></p>
+
+  <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+  <p style="font-size: 12px; color: #999;">You are receiving this because you are part of the SantVaani community.</p>
+
 </body>
-</html>
-    `.trim();
+</html>`.trim();
   };
 
   const handleSendBroadcast = async () => {
