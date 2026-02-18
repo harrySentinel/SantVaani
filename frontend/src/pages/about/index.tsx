@@ -1,64 +1,62 @@
-
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
 import StructuredData, { BreadcrumbSchema } from '@/components/StructuredData';
-import { Card, CardContent } from '@/components/ui/card';
-import { Heart, Globe, Users, BookOpen, Lightbulb, Target } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+
+const team = [
+  {
+    name: "Aditya Srivastava",
+    title: "Founder & Developer",
+    role: "A devotee and software engineer who built SantVaani to bring the wisdom of saints closer to every heart.",
+    image: "/profie.jpg"
+  },
+  {
+    name: "Neeraj Yadav",
+    title: "Co-Founder & Developer",
+    role: "A spiritual developer and tech visionary dedicated to building divine technology that serves humanity.",
+    image: "/founder2.jpg"
+  },
+  {
+    name: "Arpita Patwa",
+    title: "Admin",
+    role: "The heart behind our operations, ensuring the community is nurtured with care and devotion.",
+    image: ""
+  }
+];
+
+const values = [
+  {
+    symbol: "॥",
+    title: "Love & Devotion",
+    titleHi: "प्रेम और भक्ति",
+    description: "We believe love is the highest path to divine realization — the foundation of every word on this platform."
+  },
+  {
+    symbol: "॥",
+    title: "Universal Wisdom",
+    titleHi: "सार्वभौमिक ज्ञान",
+    description: "The teachings of our saints have no borders. They speak to every soul, in every language, across every age."
+  },
+  {
+    symbol: "॥",
+    title: "Preservation",
+    titleHi: "संरक्षण",
+    description: "Sacred wisdom is a flame. We exist to ensure it is never extinguished — passed gently to every generation."
+  },
+  {
+    symbol: "॥",
+    title: "Community",
+    titleHi: "समुदाय",
+    description: "A seeker walking alone walks slowly. Together, our community walks toward the light with strength."
+  }
+];
 
 const About = () => {
   const { language } = useLanguage();
-  const values = [
-    {
-      icon: Heart,
-      title: "Love & Devotion",
-      titleHi: "प्रेम और भक्ति",
-      description: "We believe that love is the highest path to divine realization and the foundation of all spiritual practice."
-    },
-    {
-      icon: Globe,
-      title: "Universal Wisdom",
-      titleHi: "सार्वभौमिक ज्ञान",
-      description: "Sharing the timeless teachings that transcend boundaries and speak to the universal human experience."
-    },
-    {
-      icon: Users,
-      title: "Community",
-      titleHi: "समुदाय",
-      description: "Building a global community of spiritual seekers united in their quest for truth and enlightenment."
-    },
-    {
-      icon: BookOpen,
-      title: "Preservation",
-      titleHi: "संरक्षण",
-      description: "Preserving and protecting the sacred wisdom of our saints for future generations."
-    }
-  ];
-
-  const team = [
-    {
-      name: "Aditya Srivastava",
-      title: "Founder & Developer",
-      role: "Devotee & Software Engineer building spiritual technology to serve humanity",
-      image: "/profie.jpg"
-    },
-    {
-      name: "Neeraj Yadav",
-      title: "Co-Founder & Developer",
-      role: "Spiritual developer and tech visionary dedicated to building divine technology solutions",
-      image: "/founder2.jpg"
-    },
-    {
-      name: "Arpita Patwa",
-      title: "Admin",
-      role: "Dedicated administrator ensuring smooth operations and community engagement",
-      image: ""
-    }
-  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-orange-50">
+    <div className="min-h-screen bg-white">
       <SEO
         title="About Santvaani - Our Mission & Vision"
         description="Learn about Santvaani's mission to preserve and share the profound wisdom of India's greatest spiritual masters. Meet our team and discover our vision for a global spiritual community."
@@ -73,228 +71,215 @@ const About = () => {
         ]}
       />
       <Navbar />
-      
-      {/* Header */}
-      <section className="pt-20 pb-12 bg-gradient-to-r from-blue-100 to-orange-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="space-y-6">
-            <div className="flex justify-center items-center space-x-2 mb-4">
-              <span className="text-3xl">🕉️</span>
-              <Heart className="w-8 h-8 text-blue-500 animate-pulse" />
-              <span className="text-3xl">📿</span>
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-orange-600 bg-clip-text text-transparent">
-              {language === 'HI' ? 'संतवाणी के बारे में' : 'About Santvaani'}
-            </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+
+      {/* Hero */}
+      <section className="pt-24 pb-16 px-4 bg-gradient-to-b from-orange-50/60 to-white">
+        <div className="max-w-3xl mx-auto text-center space-y-6">
+          <p className="text-5xl">ॐ</p>
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
+            {language === 'HI' ? 'संतवाणी के बारे में' : 'About SantVaani'}
+          </h1>
+          <p className="text-lg md:text-xl text-gray-500 leading-relaxed max-w-2xl mx-auto">
+            {language === 'HI'
+              ? 'एक डिजिटल आश्रम — जहाँ भारत के महान संतों की वाणी आज भी जीवित है।'
+              : 'A digital ashram — where the voice of India\'s greatest saints still lives.'
+            }
+          </p>
+          <div className="w-16 h-0.5 bg-orange-400 mx-auto mt-4" />
+        </div>
+      </section>
+
+      {/* Story */}
+      <section className="py-16 px-4">
+        <div className="max-w-3xl mx-auto space-y-8">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+            {language === 'HI' ? 'यह कहानी कैसे शुरू हुई' : 'How this story began'}
+          </h2>
+          <div className="space-y-5 text-gray-600 text-lg leading-relaxed">
+            <p>
               {language === 'HI'
-                ? 'भारत के महान आध्यात्मिक गुरुओं के गहन ज्ञान को संरक्षित करने और दुनिया भर के साधकों के साथ साझा करने के लिए समर्पित एक डिजिटल अभयारण्य।'
-                : 'A digital sanctuary dedicated to preserving and sharing the profound wisdom of India\'s greatest spiritual masters with seekers around the world.'
+                ? 'SantVaani का जन्म एक साधारण इच्छा से हुआ — कि भारत के महान संतों का ज्ञान, जो हमारे घरों और मंदिरों में बोला जाता था, आज की पीढ़ी तक पहुँचे। वो ज्ञान जो दादी-नानी की कहानियों में था, जो भजनों में था — वो कहीं खो न जाए।'
+                : 'SantVaani began with one simple wish — that the wisdom spoken in our homes, temples, and by our grandmothers would not be lost to time. The kind of wisdom found in bhajans, in stories told at dusk, in the quiet teachings of saints who asked nothing in return.'
+              }
+            </p>
+            <p>
+              {language === 'HI'
+                ? 'आज की दुनिया तेज़ है। लेकिन हमारे संतों का संदेश शांत है — और वही शांति हर इंसान ढूंढता है। SantVaani उस शांति को, उस ज्ञान को, डिजिटल दुनिया में ले आया है।'
+                : 'The world moves fast. But the message of our saints is still — and that stillness is what every soul seeks. SantVaani brings that stillness, that wisdom, into the digital world.'
+              }
+            </p>
+            <p>
+              {language === 'HI'
+                ? 'यह केवल एक वेबसाइट नहीं है। यह एक आश्रम है — जहाँ आप किसी भी समय, कहीं से भी, आ सकते हैं।'
+                : 'This is not just a website. It is an ashram — one you can walk into at any hour, from anywhere in the world.'
+              }
+            </p>
+          </div>
+
+          {/* Sanskrit quote */}
+          <div className="border-l-4 border-orange-400 pl-6 py-2 mt-8">
+            <p className="text-xl md:text-2xl text-gray-800 font-medium italic">
+              "वसुधैव कुटुम्बकम्"
+            </p>
+            <p className="text-orange-600 mt-2 text-base">
+              The world is one family — our guiding principle
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Divider */}
+      <div className="max-w-3xl mx-auto px-4">
+        <div className="h-px bg-gray-100" />
+      </div>
+
+      {/* Mission & Vision */}
+      <section className="py-16 px-4">
+        <div className="max-w-3xl mx-auto space-y-12">
+          <div className="space-y-4">
+            <span className="text-orange-500 font-semibold text-sm uppercase tracking-widest">Our Mission</span>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+              {language === 'HI' ? 'हमारा लक्ष्य' : 'What we are here to do'}
+            </h2>
+            <p className="text-gray-600 text-lg leading-relaxed">
+              {language === 'HI'
+                ? 'भारत की आध्यात्मिक विरासत को संरक्षित करना और इसे आधुनिक साधकों तक पहुँचाना — यही हमारा उद्देश्य है। हम मानते हैं कि संतों का ज्ञान किसी एक युग का नहीं, यह सनातन है।'
+                : 'To preserve India\'s spiritual heritage and make it accessible to every modern seeker. The wisdom of our saints does not belong to one era — it is eternal, and it belongs to everyone.'
+              }
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            <span className="text-orange-500 font-semibold text-sm uppercase tracking-widest">Our Vision</span>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+              {language === 'HI' ? 'हमारी दृष्टि' : 'Where we are going'}
+            </h2>
+            <p className="text-gray-600 text-lg leading-relaxed">
+              {language === 'HI'
+                ? 'एक ऐसा वैश्विक समुदाय बनाना जहाँ आध्यात्मिक ज्ञान स्वतंत्र रूप से बहे — जहाँ भाषा, संस्कृति या देश की कोई सीमा न हो।'
+                : 'A global community where spiritual wisdom flows freely — where no boundary of language, culture, or geography can stop a seeker from finding the light.'
               }
             </p>
           </div>
         </div>
       </section>
 
-      {/* Mission Section */}
-      <section className="py-16">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6">
-              <div className="space-y-4">
-                <div className="flex items-center space-x-2">
-                  <Target className="w-6 h-6 text-blue-600" />
-                  <h2 className="text-3xl font-bold text-gray-800">
-                    {language === 'HI' ? 'हमारा लक्ष्य' : 'Our Mission'}
-                  </h2>
-                </div>
-                <p className="text-lg text-gray-600 leading-relaxed">
-                  {language === 'HI'
-                    ? 'संतवाणी का जन्म भारत की आध्यात्मिक विरासत के प्रति गहरी श्रद्धा और इन कालातीत शिक्षाओं को आधुनिक साधकों के लिए सुलभ बनाने की इच्छा से हुआ। हम मानते हैं कि आज की तेज़-तर्रार दुनिया में, हमारे संतों का ज्ञान मार्गदर्शन, शांति और दिशा प्रदान कर सकता है।'
-                    : 'Santvaani was born from a deep reverence for the spiritual heritage of India and a desire to make these timeless teachings accessible to modern seekers. We believe that in today\'s fast-paced world, the wisdom of our saints can provide guidance, peace, and direction.'
-                  }
-                </p>
-              </div>
+      {/* Divider */}
+      <div className="max-w-3xl mx-auto px-4">
+        <div className="h-px bg-gray-100" />
+      </div>
 
-              <div className="space-y-4">
-                <div className="flex items-center space-x-2">
-                  <Lightbulb className="w-6 h-6 text-orange-600" />
-                  <h3 className="text-xl font-semibold text-gray-800">
-                    {language === 'HI' ? 'हमारी दृष्टि' : 'Our Vision'}
-                  </h3>
-                </div>
-                <p className="text-gray-600 leading-relaxed">
-                  {language === 'HI'
-                    ? 'एक वैश्विक समुदाय बनाना जहां आध्यात्मिक ज्ञान स्वतंत्र रूप से बहे, जहां साधक प्रामाणिक शिक्षाएं पा सकें, और जहां हमारे संतों का दिव्य प्रेम संस्कृति, भाषा और भूगोल की सभी सीमाओं को पार करते हुए हृदयों को परिवर्तित करता रहे।'
-                    : 'To create a global community where spiritual wisdom flows freely, where seekers can find authentic teachings, and where the divine love of our saints continues to transform hearts across all boundaries of culture, language, and geography.'
-                  }
-                </p>
-              </div>
-
-              <div className="bg-gradient-to-r from-blue-50 to-orange-50 rounded-xl p-6 border border-blue-200">
-                <blockquote className="text-lg text-gray-700 italic font-medium leading-relaxed">
-                  "वसुधैव कुटुम्बकम्"
-                </blockquote>
-                <p className="text-blue-600 mt-2">
-                  "The world is one family" - Our guiding principle
-                </p>
-              </div>
-            </div>
-
-            <div className="relative">
-              <img 
-                src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=600&h=400&fit=crop"
-                alt="Spiritual meditation"
-                className="rounded-2xl shadow-xl"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent rounded-2xl"></div>
-              <div className="absolute bottom-6 left-6 text-white">
-                <p className="text-lg font-medium">Connecting hearts to divine wisdom</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Values Section */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">
+      {/* Values */}
+      <section className="py-16 px-4">
+        <div className="max-w-3xl mx-auto space-y-10">
+          <div className="space-y-2">
+            <span className="text-orange-500 font-semibold text-sm uppercase tracking-widest">What we stand for</span>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
               {language === 'HI' ? 'हमारे मूल मूल्य' : 'Our Core Values'}
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              {language === 'HI'
-                ? 'वे सिद्धांत जो हमारे काम का मार्गदर्शन करते हैं और आध्यात्मिक ज्ञान की प्रामाणिक अभिव्यक्ति सुनिश्चित करते हैं'
-                : 'The principles that guide our work and ensure authentic representation of spiritual wisdom'
-              }
-            </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {values.map((value, index) => {
-              const Icon = value.icon;
-              return (
-                <Card key={index} className="group hover:shadow-xl transition-all duration-300 transform hover:scale-105 border-0 shadow-lg bg-white">
-                  <CardContent className="p-6 text-center space-y-4">
-                    <div className="w-16 h-16 mx-auto bg-gradient-to-br from-blue-500 to-orange-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                      <Icon className="w-8 h-8 text-white" />
-                    </div>
-
-                    <h3 className="text-xl font-semibold text-gray-800">
-                      {language === 'HI' ? value.titleHi : value.title}
-                    </h3>
-
-                    <p className="text-gray-600 leading-relaxed text-sm">
-                      {value.description}
-                    </p>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* Team Section */}
-      <section className="py-16 bg-gradient-to-r from-blue-50 to-orange-50">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">
-              {language === 'HI' ? 'टीम से मिलें' : 'Meet the Team'}
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              {language === 'HI'
-                ? 'संतवाणी एक समर्पित टीम द्वारा बनाई गई है जो आध्यात्मिक ज्ञान के प्रामाणिक संरक्षण और साझाकरण को सुनिश्चित करने के लिए श्रद्धा के साथ काम कर रही है।'
-                : 'Santvaani is built by a dedicated team working with reverence to ensure the authentic preservation and sharing of spiritual wisdom.'
-              }
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {team.map((member, index) => (
-              <Card key={index} className="group hover:shadow-xl transition-all duration-300 border-0 shadow-lg bg-white/90 backdrop-blur-sm">
-                <CardContent className="p-8 text-center space-y-4">
-                  {member.image ? (
-                    <img
-                      src={member.image}
-                      alt={member.name}
-                      className="w-24 h-24 rounded-full mx-auto object-cover group-hover:scale-110 transition-transform duration-300 border-4 border-gradient-to-br from-blue-200 to-orange-200"
-                    />
-                  ) : (
-                    <div className="w-24 h-24 rounded-full mx-auto bg-gradient-to-br from-blue-400 to-orange-400 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 border-4 border-blue-200">
-                      <span className="text-white text-3xl font-bold">
-                        {member.name.split(' ').map(n => n[0]).join('')}
-                      </span>
-                    </div>
-                  )}
-
-                  <div className="space-y-2">
-                    <h3 className="text-xl font-semibold text-gray-800">
-                      {member.name}
-                    </h3>
-                    <p className="text-blue-600 font-medium">
-                      {member.title}
-                    </p>
-                  </div>
-
-                  <p className="text-gray-600 leading-relaxed">
-                    {member.role}
-                  </p>
-                </CardContent>
-              </Card>
+          <div className="grid sm:grid-cols-2 gap-8">
+            {values.map((value, index) => (
+              <div key={index} className="space-y-2">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {language === 'HI' ? value.titleHi : value.title}
+                </h3>
+                <p className="text-gray-500 leading-relaxed">
+                  {value.description}
+                </p>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Journey Section */}
-      <section className="py-16 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8">
-          <div className="space-y-4">
-            <h2 className="text-3xl font-bold text-gray-800">
-              {language === 'HI' ? 'हमारी आध्यात्मिक यात्रा में शामिल हों' : 'Join Our Spiritual Journey'}
+      {/* Divider */}
+      <div className="max-w-3xl mx-auto px-4">
+        <div className="h-px bg-gray-100" />
+      </div>
+
+      {/* Team */}
+      <section className="py-16 px-4">
+        <div className="max-w-3xl mx-auto space-y-10">
+          <div className="space-y-2">
+            <span className="text-orange-500 font-semibold text-sm uppercase tracking-widest">The people</span>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+              {language === 'HI' ? 'टीम से मिलें' : 'Meet the team'}
             </h2>
-            <p className="text-lg text-gray-600 leading-relaxed">
+            <p className="text-gray-500 text-lg">
               {language === 'HI'
-                ? 'चाहे आप अपने आध्यात्मिक पथ की शुरुआत कर रहे हों या अपने अभ्यास को गहरा कर रहे हों, संतवाणी आपका स्वागत करता है अन्वेषण, सीखने और बढ़ने के लिए। साथ मिलकर, हम आने वाली पीढ़ियों के लिए दिव्य ज्ञान की ज्योति को उज्ज्वल रख सकते हैं।'
-                : 'Whether you are beginning your spiritual path or deepening your practice, Santvaani welcomes you to explore, learn, and grow. Together, we can keep the flame of divine wisdom burning bright for generations to come.'
+                ? 'SantVaani एक छोटी, समर्पित टीम द्वारा श्रद्धा के साथ बनाई गई है।'
+                : 'SantVaani is built by a small, devoted team — with reverence, not resources.'
               }
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6 mt-8">
-            <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl p-6 border border-blue-200">
-              <h3 className="font-semibold text-gray-800 mb-2 flex items-center justify-center space-x-2">
-                <BookOpen className="w-5 h-5 text-blue-600" />
-                <span>Learn</span>
-              </h3>
-              <p className="text-sm text-gray-600">Discover authentic teachings from great saints</p>
-            </div>
-            <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-xl p-6 border border-orange-200">
-              <h3 className="font-semibold text-gray-800 mb-2 flex items-center justify-center space-x-2">
-                <Users className="w-5 h-5 text-orange-600" />
-                <span>Connect</span>
-              </h3>
-              <p className="text-sm text-gray-600">Join a community of like-minded seekers</p>
-            </div>
+          <div className="space-y-8">
+            {team.map((member, index) => (
+              <div key={index} className="flex items-start gap-5">
+                {member.image ? (
+                  <img
+                    src={member.image}
+                    alt={member.name}
+                    className="w-16 h-16 rounded-full object-cover flex-shrink-0 border-2 border-orange-100"
+                  />
+                ) : (
+                  <div className="w-16 h-16 rounded-full flex-shrink-0 bg-orange-50 border-2 border-orange-100 flex items-center justify-center">
+                    <span className="text-orange-600 text-xl font-bold">
+                      {member.name.split(' ').map(n => n[0]).join('')}
+                    </span>
+                  </div>
+                )}
+                <div className="space-y-1">
+                  <h3 className="text-lg font-semibold text-gray-900">{member.name}</h3>
+                  <p className="text-orange-500 text-sm font-medium">{member.title}</p>
+                  <p className="text-gray-500 leading-relaxed">{member.role}</p>
+                </div>
+              </div>
+            ))}
           </div>
+        </div>
+      </section>
 
-          <div className="bg-gradient-to-r from-blue-100 to-orange-100 rounded-2xl p-8 border border-blue-200">
-            <blockquote className="text-xl md:text-2xl text-gray-700 italic font-medium leading-relaxed">
+      {/* Divider */}
+      <div className="max-w-3xl mx-auto px-4">
+        <div className="h-px bg-gray-100" />
+      </div>
+
+      {/* CTA */}
+      <section className="py-20 px-4 bg-gradient-to-b from-white to-orange-50/50">
+        <div className="max-w-2xl mx-auto text-center space-y-6">
+          <p className="text-4xl">🙏</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+            {language === 'HI' ? 'यात्रा में शामिल हों' : 'Walk with us'}
+          </h2>
+          <p className="text-gray-500 text-lg leading-relaxed">
+            {language === 'HI'
+              ? 'चाहे आप पहली बार आध्यात्मिक मार्ग पर कदम रख रहे हों, या वर्षों से इस पथ पर हों — SantVaani आपका स्वागत करता है।'
+              : 'Whether you are taking your first steps on a spiritual path or walking it for years — SantVaani welcomes you, exactly as you are.'
+            }
+          </p>
+          <div className="border-l-4 border-orange-400 pl-6 py-1 text-left max-w-lg mx-auto">
+            <p className="text-lg text-gray-700 italic font-medium">
               "सत्संग से ही सत्य की प्राप्ति होती है"
-            </blockquote>
-            <p className="text-blue-600 mt-2 text-lg">
-              "Truth is attained only through the company of the wise"
+            </p>
+            <p className="text-orange-500 mt-1 text-sm">
+              Truth is found in the company of the wise
             </p>
           </div>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="/saints" className="inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors">
-              Start Your Journey
+          <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
+            <a
+              href="/saints"
+              className="inline-flex items-center justify-center px-7 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-full text-base font-medium transition-colors"
+            >
+              Explore the Saints
             </a>
-            <a href="/bhajans" className="inline-flex items-center justify-center px-6 py-3 border-2 border-blue-600 text-blue-600 rounded-full hover:bg-blue-50 transition-colors">
-              Explore Bhajans
+            <a
+              href="/bhajans"
+              className="inline-flex items-center justify-center px-7 py-3 border border-orange-300 text-orange-600 hover:bg-orange-50 rounded-full text-base font-medium transition-colors"
+            >
+              Listen to Bhajans
             </a>
           </div>
         </div>
