@@ -472,7 +472,6 @@ const Events = () => {
       <section className="pt-20 pb-12 bg-orange-50/60">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="space-y-4">
-            <p className="text-5xl">🕉️</p>
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900">
               {t('events.title')}
             </h1>

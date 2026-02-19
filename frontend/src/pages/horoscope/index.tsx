@@ -180,23 +180,28 @@ const HoroscopePage = () => {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="pt-20 pb-12 bg-orange-50/60">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <section className="pt-20 pb-14 bg-white border-b border-orange-100">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="space-y-4">
-            <p className="text-5xl mb-2">✨</p>
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900">
+            <span
+              className="text-5xl text-orange-300 block leading-none mb-3"
+              style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
+            >
+              ॐ
+            </span>
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight">
               {t('horoscope.title')}
             </h1>
-            <p className="text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-base text-gray-400 max-w-xl mx-auto leading-relaxed">
               {t('horoscope.subtitle')}
             </p>
             {language === 'EN' && (
-              <p className="text-base text-orange-600">
+              <p className="text-sm text-orange-500">
                 आपके लिए ज्योतिषीय भविष्यवाणी और मार्गदर्शन
               </p>
             )}
-            <div className="flex justify-center">
-              <span className="bg-orange-100 text-orange-700 px-4 py-1.5 rounded-full text-sm font-medium">
+            <div className="flex justify-center pt-1">
+              <span className="border border-orange-200 text-orange-600 px-4 py-1 rounded-full text-xs font-medium tracking-wide">
                 {t('horoscope.badge')}
               </span>
             </div>
@@ -210,61 +215,59 @@ const HoroscopePage = () => {
 
           {/* Zodiac Sign Selector */}
           <div className="mb-8">
-            <Card className="border-orange-100 shadow-sm bg-white">
-              <CardHeader className="text-center pb-2">
-                <CardTitle className="text-xl text-gray-800">
-                  {t('horoscope.select.title')}
-                </CardTitle>
-                <p className="text-gray-500 text-sm">{t('horoscope.select.subtitle')}</p>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <Select value={selectedSign} onValueChange={handleSignSelect}>
-                    <SelectTrigger className="w-full max-w-md mx-auto border-orange-200 focus:ring-orange-400 text-base h-12">
-                      <SelectValue placeholder={t('horoscope.select.placeholder')} />
-                    </SelectTrigger>
-                    <SelectContent className="max-h-80 overflow-y-auto">
-                      {zodiacSigns.map((sign) => (
-                        <SelectItem
-                          key={sign.id}
-                          value={sign.id}
-                          className="py-3 px-3 cursor-pointer hover:bg-orange-50 focus:bg-orange-50"
-                        >
-                          <div className="flex items-center space-x-3">
-                            <span className="text-xl">{sign.symbol}</span>
-                            <div className="flex flex-col">
-                              <div className="text-sm font-medium text-gray-800">
-                                {language === 'EN' ? (
-                                  <>{sign.name} <span className="text-orange-600">({sign.nameHi})</span></>
-                                ) : (
-                                  <>{sign.nameHi} <span className="text-orange-600">({sign.name})</span></>
-                                )}
-                              </div>
-                              <div className="text-xs text-gray-500">{sign.dates}</div>
-                            </div>
+            <div className="bg-white border border-orange-100 rounded-2xl p-6 shadow-sm">
+              <div className="text-center mb-5">
+                <h2 className="text-lg font-semibold text-gray-800">{t('horoscope.select.title')}</h2>
+                <p className="text-gray-400 text-sm mt-0.5">{t('horoscope.select.subtitle')}</p>
+              </div>
+              <div className="space-y-5">
+                <Select value={selectedSign} onValueChange={handleSignSelect}>
+                  <SelectTrigger className="w-full max-w-sm mx-auto border-orange-200 focus:ring-orange-300 text-base h-12 rounded-xl">
+                    <SelectValue placeholder={t('horoscope.select.placeholder')} />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-80 overflow-y-auto">
+                    {zodiacSigns.map((sign) => (
+                      <SelectItem
+                        key={sign.id}
+                        value={sign.id}
+                        className="py-2.5 px-3 cursor-pointer hover:bg-orange-50 focus:bg-orange-50"
+                      >
+                        <div className="flex items-center space-x-3">
+                          <span className="text-lg">{sign.symbol}</span>
+                          <div className="flex flex-col">
+                            <span className="text-sm font-medium text-gray-800">
+                              {language === 'EN' ? (
+                                <>{sign.name} <span className="text-orange-500 font-normal">· {sign.nameHi}</span></>
+                              ) : (
+                                <>{sign.nameHi} <span className="text-orange-500 font-normal">· {sign.name}</span></>
+                              )}
+                            </span>
+                            <span className="text-xs text-gray-400">{sign.dates}</span>
                           </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
 
-                  {selectedZodiac && (
-                    <div className="flex items-center justify-center space-x-4 mt-6">
-                      <div className="text-5xl">{selectedZodiac.symbol}</div>
-                      <div className="text-center">
-                        <h3 className="text-2xl font-bold text-gray-800">
-                          {language === 'EN' ? selectedZodiac.name : selectedZodiac.nameHi}
-                        </h3>
-                        <p className="text-orange-600 font-medium text-lg">
-                          {language === 'EN' ? selectedZodiac.nameHi : selectedZodiac.name}
-                        </p>
-                        <p className="text-sm text-gray-500">{selectedZodiac.dates}</p>
-                      </div>
+                {selectedZodiac && (
+                  <div className="flex items-center justify-center gap-5 py-4 border-t border-orange-50">
+                    <div className="w-16 h-16 rounded-full bg-orange-50 border border-orange-100 flex items-center justify-center text-3xl flex-shrink-0">
+                      {selectedZodiac.symbol}
                     </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-900 leading-tight">
+                        {language === 'EN' ? selectedZodiac.name : selectedZodiac.nameHi}
+                      </h3>
+                      <p className="text-orange-500 text-sm font-medium">
+                        {language === 'EN' ? selectedZodiac.nameHi : selectedZodiac.name}
+                      </p>
+                      <p className="text-xs text-gray-400 mt-0.5">{selectedZodiac.dates}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
 
           {selectedSign && (
@@ -335,17 +338,22 @@ const HoroscopePage = () => {
 
           {/* Empty State */}
           {!selectedSign && (
-            <div className="text-center py-20">
-              <div className="text-7xl mb-6">🌟</div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-3">{t('horoscope.welcome.title')}</h2>
-              <p className="text-gray-500 max-w-xl mx-auto leading-relaxed">
+            <div className="text-center py-16">
+              <div className="flex justify-center gap-3 mb-6 text-2xl text-gray-300">
+                <span>♈</span><span>♉</span><span>♊</span><span>♋</span><span>♌</span><span>♍</span>
+              </div>
+              <h2 className="text-xl font-semibold text-gray-700 mb-2">{t('horoscope.welcome.title')}</h2>
+              <p className="text-gray-400 text-sm max-w-sm mx-auto leading-relaxed">
                 {t('horoscope.welcome.description')}
               </p>
               {language === 'EN' && (
-                <p className="text-orange-500 mt-3 text-sm">
+                <p className="text-orange-400 mt-2 text-xs">
                   अपनी राशि चुनकर व्यक्तिगत भविष्यवाणी प्राप्त करें
                 </p>
               )}
+              <div className="flex justify-center gap-3 mt-6 text-2xl text-gray-300">
+                <span>♎</span><span>♏</span><span>♐</span><span>♑</span><span>♒</span><span>♓</span>
+              </div>
             </div>
           )}
         </div>
