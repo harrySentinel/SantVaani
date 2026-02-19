@@ -7,7 +7,7 @@ import StructuredData from '@/components/StructuredData';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Users, Heart, Sparkles, Book, ArrowDown, Video, MessageSquare, Star } from 'lucide-react';
+import { Users, Heart, Star, Book, ArrowDown, Video, MessageSquare } from 'lucide-react';
 import VisitorCounter from '@/components/VisitorCounter';
 import SpiritualFactBox from '@/components/SpiritualFactBox';
 import FeedbackForm from '@/components/FeedbackForm';
@@ -33,7 +33,7 @@ const Index = () => {
       title: t('features.saints.title'),
       description: t('features.saints.description'),
       to: "/saints",
-      color: "from-blue-500 to-blue-600"
+      color: "from-orange-500 to-orange-600"
     },
     {
       icon: Heart,
@@ -43,11 +43,11 @@ const Index = () => {
       color: "from-red-500 to-red-600"
     },
     {
-      icon: Sparkles,
+      icon: Star,
       title: t('features.divine.title'),
       description: t('features.divine.description'),
       to: "/divine",
-      color: "from-purple-500 to-purple-600"
+      color: "from-amber-500 to-orange-500"
     }
   ];
 
@@ -65,9 +65,8 @@ const Index = () => {
 
 
        {/* Beta Banner - Option 1: Top of page */}
-      <div className="bg-gradient-to-r from-orange-400 to-red-500 text-white text-center py-2 px-4 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-orange-400/20 to-red-500/20 animate-pulse"></div>
-        <p className="text-sm font-medium relative z-10">
+      <div className="bg-gradient-to-r from-orange-400 to-red-500 text-white text-center py-2 px-4">
+        <p className="text-sm font-medium">
           {t('beta.banner')}
         </p>
       </div>
@@ -103,9 +102,9 @@ const Index = () => {
               const Icon = feature.icon;
               return (
                 <Link key={index} to={feature.to}>
-                  <Card className="group hover:shadow-xl transition-all duration-300 transform hover:scale-105 border-0 shadow-lg bg-white/80 backdrop-blur-sm">
+                  <Card className="group hover:shadow-xl transition-shadow duration-300 border-0 shadow-md bg-white">
                     <CardContent className="p-6 text-center space-y-4">
-                      <div className={`w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
+                      <div className={`w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center`}>
                         <Icon className="w-8 h-8 text-white" />
                       </div>
                       
@@ -143,9 +142,9 @@ const Index = () => {
     </div>
     
     <Link to="/live-bhajans">
-      <Card className="group hover:shadow-2xl transition-all duration-300 transform hover:scale-105 border-0 shadow-xl bg-gradient-to-br from-white to-orange-50 backdrop-blur-sm max-w-md mx-auto">
+      <Card className="group hover:shadow-xl transition-shadow duration-300 border-0 shadow-lg bg-gradient-to-br from-white to-orange-50 max-w-md mx-auto">
         <CardContent className="p-8 text-center space-y-6">
-          <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg relative">
+          <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center shadow-lg relative">
             <Video className="w-10 h-10 text-white ml-1" fill="white" />
             {/* Live indicator dot */}
             <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full animate-pulse border-2 border-white"></div>

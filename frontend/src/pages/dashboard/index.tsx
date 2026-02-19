@@ -8,7 +8,6 @@ import {
   Calendar,
   MapPin,
   Clock,
-  Plus,
   CheckCircle,
   AlertCircle,
   XCircle,
@@ -18,7 +17,6 @@ import {
   Eye,
   Loader2,
   Gift,
-  Download,
   Bookmark,
   BookOpen,
   List,
@@ -43,10 +41,9 @@ const Dashboard = () => {
   const { user, loading, signOut } = useAuth();
 
   useEffect(() => {
-    // Check if user is logged in
     if (!loading && !user) {
       toast({
-        title: "⚠️ Authentication Required",
+        title: "Authentication Required",
         description: "Please login to access dashboard",
         duration: 3000,
       });
@@ -54,14 +51,10 @@ const Dashboard = () => {
       return;
     }
 
-    // Load user's events from database
     if (user) {
       loadUserEvents();
       loadUserProfile();
       loadSavedBlogs();
-
-      // Always show welcome letter initially (robust fallback)
-      // This ensures it shows even if backend APIs are down
       setShowWelcomeLetter(true);
     }
   }, [user, loading, navigate]);
@@ -78,7 +71,7 @@ const Dashboard = () => {
     } catch (error) {
       console.error('Error loading user events:', error);
       toast({
-        title: "⚠️ Error Loading Events",
+        title: "Error Loading Events",
         description: "Failed to load your events. Please refresh the page.",
         duration: 4000,
       });
@@ -106,15 +99,13 @@ const Dashboard = () => {
       if (data.success) {
         setUserProfile(data.profile);
 
-        // Show welcome letter for new users or those who haven't downloaded it
         if (!data.profile.welcome_letter_downloaded) {
           setShowWelcomeLetter(true);
         }
 
-        // Show special welcome message for first-time users
         if (data.isFirstLogin) {
           toast({
-            title: "🙏 Welcome to Santvaani!",
+            title: "Welcome to Santvaani! 🙏",
             description: "Your divine journey begins today. Check out your special welcome gift below!",
             duration: 6000,
           });
@@ -122,7 +113,6 @@ const Dashboard = () => {
       }
     } catch (error) {
       console.error('Error loading user profile:', error);
-      // Fallback: Show welcome letter for testing
       const fallbackProfile = {
         welcome_letter_downloaded: false,
         first_login_at: user.created_at,
@@ -131,9 +121,8 @@ const Dashboard = () => {
       setUserProfile(fallbackProfile);
       setShowWelcomeLetter(true);
 
-      // Show welcome toast
       toast({
-        title: "🙏 Welcome to Santvaani!",
+        title: "Welcome to Santvaani! 🙏",
         description: "Check out your special divine welcome letter below!",
         duration: 6000,
       });
@@ -149,7 +138,6 @@ const Dashboard = () => {
       const result = await getUserBookmarks(user.id);
 
       if (result.success) {
-        // Extract blog posts from bookmarks
         const blogs = result.bookmarks
           .map((bookmark: any) => bookmark.blog_posts)
           .filter((blog: any) => blog !== null);
@@ -162,7 +150,7 @@ const Dashboard = () => {
     } catch (error) {
       console.error('Error loading saved blogs:', error);
       toast({
-        title: "⚠️ Error Loading Bookmarks",
+        title: "Error Loading Bookmarks",
         description: "Failed to load your saved blogs. Please refresh the page.",
         duration: 4000,
       });
@@ -179,7 +167,7 @@ const Dashboard = () => {
     try {
       await signOut();
       toast({
-        title: "👋 Logged Out",
+        title: "Logged Out",
         description: "Successfully logged out. Come back soon!",
         duration: 3000,
       });
@@ -187,7 +175,7 @@ const Dashboard = () => {
     } catch (error) {
       console.error('Logout error:', error);
       toast({
-        title: "⚠️ Logout Error",
+        title: "Logout Error",
         description: "Failed to logout. Please try again.",
         duration: 3000,
       });
@@ -196,10 +184,10 @@ const Dashboard = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'pending': return 'from-yellow-500 to-orange-500';
+      case 'pending': return 'from-yellow-400 to-amber-500';
       case 'approved': return 'from-green-500 to-emerald-600';
       case 'rejected': return 'from-red-500 to-red-600';
-      default: return 'from-gray-500 to-gray-600';
+      default: return 'from-gray-400 to-gray-500';
     }
   };
 
@@ -223,17 +211,17 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-orange-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-600" />
-          <p className="text-gray-600">Loading...</p>
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-3 text-orange-500" />
+          <p className="text-gray-500 text-sm">Loading...</p>
         </div>
       </div>
     );
   }
 
   if (!user) {
-    return null; // Will redirect to login in useEffect
+    return null;
   }
 
   const stats = {
@@ -244,47 +232,44 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-orange-50">
+    <div className="min-h-screen bg-white">
       <Navbar />
 
       {/* Dashboard Header */}
-      <section className="pt-20 pb-12 bg-gradient-to-r from-blue-100 to-orange-100">
+      <section className="pt-20 pb-10 bg-orange-50/60">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
-            <div className="space-y-2">
-              <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-orange-500 rounded-full flex items-center justify-center">
-                  <User className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-3xl md:text-4xl font-bold text-gray-800">
-                    Welcome, {user.user_metadata?.name || user.email?.split('@')[0]}!
-                  </h1>
-                  <p className="text-gray-600">{user.email}</p>
-                </div>
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center flex-shrink-0">
+                <User className="w-6 h-6 text-white" />
               </div>
-              <p className="text-lg text-gray-600">
-                Manage your spiritual events and track their approval status
-              </p>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+                  Welcome back, {user.user_metadata?.name || user.email?.split('@')[0]}
+                </h1>
+                <p className="text-gray-500 text-sm">{user.email}</p>
+                <p className="text-gray-500 text-sm mt-0.5">Manage your spiritual events and bookmarks</p>
+              </div>
             </div>
 
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2 flex-wrap gap-y-2">
               <Link to="/profile-settings">
-                <Button variant="outline" className="flex items-center space-x-2">
+                <Button variant="outline" size="sm" className="flex items-center space-x-1.5 border-gray-200 text-gray-600 hover:bg-gray-50">
                   <Settings className="w-4 h-4" />
                   <span>Edit Profile</span>
                 </Button>
               </Link>
               <Link to="/events">
-                <Button variant="outline" className="flex items-center space-x-2">
+                <Button variant="outline" size="sm" className="flex items-center space-x-1.5 border-gray-200 text-gray-600 hover:bg-gray-50">
                   <Eye className="w-4 h-4" />
-                  <span>View All Events</span>
+                  <span>All Events</span>
                 </Button>
               </Link>
               <Button
                 onClick={handleLogout}
                 variant="outline"
-                className="flex items-center space-x-2 text-red-600 border-red-300 hover:bg-red-50"
+                size="sm"
+                className="flex items-center space-x-1.5 text-red-500 border-red-200 hover:bg-red-50"
               >
                 <LogOut className="w-4 h-4" />
                 <span>Logout</span>
@@ -295,38 +280,38 @@ const Dashboard = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="py-8 -mt-6">
+      <section className="py-6 -mt-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Card className="bg-white shadow-lg border-0">
+            <Card className="bg-white shadow-sm border border-gray-100">
               <CardContent className="p-4 text-center">
-                <BarChart3 className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-                <p className="text-2xl font-bold text-gray-800">{stats.total}</p>
-                <p className="text-sm text-gray-600">Total Events</p>
+                <BarChart3 className="w-7 h-7 text-orange-500 mx-auto mb-2" />
+                <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+                <p className="text-sm text-gray-500">Total Events</p>
               </CardContent>
             </Card>
 
-            <Card className="bg-white shadow-lg border-0">
+            <Card className="bg-white shadow-sm border border-gray-100">
               <CardContent className="p-4 text-center">
-                <AlertCircle className="w-8 h-8 text-yellow-600 mx-auto mb-2" />
-                <p className="text-2xl font-bold text-gray-800">{stats.pending}</p>
-                <p className="text-sm text-gray-600">Pending</p>
+                <AlertCircle className="w-7 h-7 text-amber-500 mx-auto mb-2" />
+                <p className="text-2xl font-bold text-gray-900">{stats.pending}</p>
+                <p className="text-sm text-gray-500">Pending</p>
               </CardContent>
             </Card>
 
-            <Card className="bg-white shadow-lg border-0">
+            <Card className="bg-white shadow-sm border border-gray-100">
               <CardContent className="p-4 text-center">
-                <CheckCircle className="w-8 h-8 text-green-600 mx-auto mb-2" />
-                <p className="text-2xl font-bold text-gray-800">{stats.approved}</p>
-                <p className="text-sm text-gray-600">Approved</p>
+                <CheckCircle className="w-7 h-7 text-green-500 mx-auto mb-2" />
+                <p className="text-2xl font-bold text-gray-900">{stats.approved}</p>
+                <p className="text-sm text-gray-500">Approved</p>
               </CardContent>
             </Card>
 
-            <Card className="bg-white shadow-lg border-0">
+            <Card className="bg-white shadow-sm border border-gray-100">
               <CardContent className="p-4 text-center">
-                <XCircle className="w-8 h-8 text-red-600 mx-auto mb-2" />
-                <p className="text-2xl font-bold text-gray-800">{stats.rejected}</p>
-                <p className="text-sm text-gray-600">Needs Revision</p>
+                <XCircle className="w-7 h-7 text-red-400 mx-auto mb-2" />
+                <p className="text-2xl font-bold text-gray-900">{stats.rejected}</p>
+                <p className="text-sm text-gray-500">Needs Revision</p>
               </CardContent>
             </Card>
           </div>
@@ -336,63 +321,61 @@ const Dashboard = () => {
       {/* Quick Actions Section */}
       <section className="py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-orange-600 bg-clip-text text-transparent">
-              Quick Actions
-            </h2>
-            <p className="text-gray-600 mt-1">Navigate to your favorite sections</p>
+          <div className="mb-5">
+            <h2 className="text-xl font-bold text-gray-900">Quick Actions</h2>
+            <p className="text-gray-500 text-sm mt-0.5">Navigate to your favourite sections</p>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Card
-              className="bg-white shadow-lg border-0 hover:shadow-xl transition-all cursor-pointer group"
+              className="bg-white shadow-sm border border-gray-100 hover:shadow-md transition-shadow cursor-pointer"
               onClick={() => navigate('/blog')}
             >
-              <CardContent className="p-6 text-center">
-                <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
-                  <BookOpen className="w-7 h-7 text-white" />
+              <CardContent className="p-5 text-center">
+                <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                  <BookOpen className="w-6 h-6 text-orange-600" />
                 </div>
-                <p className="font-semibold text-gray-800">Browse Blogs</p>
-                <p className="text-xs text-gray-500 mt-1">Read latest posts</p>
+                <p className="font-semibold text-gray-800 text-sm">Browse Blogs</p>
+                <p className="text-xs text-gray-400 mt-0.5">Read latest posts</p>
               </CardContent>
             </Card>
 
             <Card
-              className="bg-white shadow-lg border-0 hover:shadow-xl transition-all cursor-pointer group"
+              className="bg-white shadow-sm border border-gray-100 hover:shadow-md transition-shadow cursor-pointer"
               onClick={() => scrollToSection(savedBlogsRef)}
             >
-              <CardContent className="p-6 text-center">
-                <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
-                  <Bookmark className="w-7 h-7 text-white" />
+              <CardContent className="p-5 text-center">
+                <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                  <Bookmark className="w-6 h-6 text-amber-600" />
                 </div>
-                <p className="font-semibold text-gray-800">My Bookmarks</p>
-                <p className="text-xs text-gray-500 mt-1">View saved blogs</p>
+                <p className="font-semibold text-gray-800 text-sm">My Bookmarks</p>
+                <p className="text-xs text-gray-400 mt-0.5">View saved blogs</p>
               </CardContent>
             </Card>
 
             <Card
-              className="bg-white shadow-lg border-0 hover:shadow-xl transition-all cursor-pointer group"
+              className="bg-white shadow-sm border border-gray-100 hover:shadow-md transition-shadow cursor-pointer"
               onClick={() => navigate('/events')}
             >
-              <CardContent className="p-6 text-center">
-                <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
-                  <Calendar className="w-7 h-7 text-white" />
+              <CardContent className="p-5 text-center">
+                <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                  <Calendar className="w-6 h-6 text-orange-600" />
                 </div>
-                <p className="font-semibold text-gray-800">Create Event</p>
-                <p className="text-xs text-gray-500 mt-1">Organize gathering</p>
+                <p className="font-semibold text-gray-800 text-sm">Create Event</p>
+                <p className="text-xs text-gray-400 mt-0.5">Organise gathering</p>
               </CardContent>
             </Card>
 
             <Card
-              className="bg-white shadow-lg border-0 hover:shadow-xl transition-all cursor-pointer group"
+              className="bg-white shadow-sm border border-gray-100 hover:shadow-md transition-shadow cursor-pointer"
               onClick={() => scrollToSection(eventsRef)}
             >
-              <CardContent className="p-6 text-center">
-                <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
-                  <List className="w-7 h-7 text-white" />
+              <CardContent className="p-5 text-center">
+                <div className="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center mx-auto mb-3">
+                  <List className="w-6 h-6 text-red-400" />
                 </div>
-                <p className="font-semibold text-gray-800">My Events</p>
-                <p className="text-xs text-gray-500 mt-1">View your events</p>
+                <p className="font-semibold text-gray-800 text-sm">My Events</p>
+                <p className="text-xs text-gray-400 mt-0.5">View your events</p>
               </CardContent>
             </Card>
           </div>
@@ -403,15 +386,15 @@ const Dashboard = () => {
       {showWelcomeLetter && user && (
         <section className="py-8">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="bg-gradient-to-r from-orange-600 to-red-600 rounded-2xl p-6 text-white text-center mb-6">
+            <div className="bg-orange-500 rounded-2xl p-6 text-white mb-6">
               <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
-                <div className="space-y-2">
-                  <div className="flex items-center justify-center md:justify-start space-x-3">
-                    <Gift className="w-8 h-8" />
-                    <h2 className="text-2xl font-bold">Welcome Gift for You!</h2>
+                <div className="space-y-1">
+                  <div className="flex items-center space-x-2">
+                    <Gift className="w-6 h-6" />
+                    <h2 className="text-xl font-bold">Welcome Gift for You!</h2>
                   </div>
-                  <p className="text-orange-100">
-                    Download your personalized divine welcome letter as a beautiful PDF
+                  <p className="text-orange-100 text-sm">
+                    Download your personalised divine welcome letter as a beautiful PDF
                   </p>
                 </div>
                 <Button
@@ -419,9 +402,9 @@ const Dashboard = () => {
                     const letterElement = document.querySelector('[data-welcome-letter]');
                     letterElement?.scrollIntoView({ behavior: 'smooth' });
                   }}
-                  className="bg-white text-orange-600 hover:bg-orange-50 transition-colors flex items-center space-x-2"
+                  className="bg-white text-orange-600 hover:bg-orange-50 transition-colors flex items-center space-x-2 text-sm"
                 >
-                  <Eye className="w-5 h-5" />
+                  <Eye className="w-4 h-4" />
                   <span>View Letter</span>
                 </Button>
               </div>
@@ -434,10 +417,9 @@ const Dashboard = () => {
                 joinDate={user.created_at || new Date().toISOString()}
                 userId={user.id}
                 onDownloadComplete={() => {
-                  // Hide the welcome letter section after download
                   setShowWelcomeLetter(false);
                   toast({
-                    title: "🎉 Welcome Gift Saved!",
+                    title: "Welcome Gift Saved!",
                     description: "Your divine welcome letter is now in your downloads. You can always access it from your profile.",
                     duration: 5000,
                   });
@@ -449,82 +431,78 @@ const Dashboard = () => {
       )}
 
       {/* Saved Blogs Section */}
-      <section className="py-12" ref={savedBlogsRef}>
+      <section className="py-10" ref={savedBlogsRef}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-8">
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
-              Saved Blogs
-            </h2>
-            <p className="text-gray-600">Your bookmarked spiritual readings</p>
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-1">Saved Blogs</h2>
+            <p className="text-gray-500 text-sm">Your bookmarked spiritual readings</p>
           </div>
 
           {isLoadingBlogs ? (
-            // Loading skeleton
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
               {Array.from({ length: 3 }).map((_, index) => (
-                <Card key={index} className="shadow-lg border-0 bg-white rounded-2xl overflow-hidden animate-pulse">
-                  <div className="h-48 bg-gray-200"></div>
-                  <div className="p-6 space-y-4">
-                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                    <div className="h-3 bg-gray-200 rounded w-full"></div>
-                    <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+                <Card key={index} className="border border-gray-100 bg-white rounded-xl overflow-hidden animate-pulse">
+                  <div className="h-40 bg-gray-100"></div>
+                  <div className="p-5 space-y-3">
+                    <div className="h-4 bg-gray-100 rounded w-3/4"></div>
+                    <div className="h-3 bg-gray-100 rounded w-full"></div>
+                    <div className="h-3 bg-gray-100 rounded w-2/3"></div>
                   </div>
                 </Card>
               ))}
             </div>
           ) : savedBlogs.length === 0 ? (
-            <Card className="text-center py-12 shadow-lg border-0">
+            <Card className="text-center py-12 border border-gray-100 shadow-sm">
               <CardContent>
-                <Bookmark className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-gray-600 mb-2">No Saved Blogs Yet</h3>
-                <p className="text-gray-500 mb-6">Start bookmarking blogs to save them for later</p>
+                <Bookmark className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+                <h3 className="text-base font-semibold text-gray-600 mb-1">No Saved Blogs Yet</h3>
+                <p className="text-gray-400 text-sm mb-5">Start bookmarking blogs to save them for later</p>
                 <Link to="/blog">
-                  <Button className="bg-gradient-to-r from-purple-600 to-pink-600">
+                  <Button className="bg-orange-500 hover:bg-orange-600 text-white text-sm">
                     Browse Blogs
                   </Button>
                 </Link>
               </CardContent>
             </Card>
           ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
               {savedBlogs.map((blog: any) => (
-                <Card key={blog.id} className="shadow-lg border-0 bg-white rounded-2xl overflow-hidden hover:shadow-2xl transition-shadow">
+                <Card key={blog.id} className="border border-gray-100 shadow-sm bg-white rounded-xl overflow-hidden hover:shadow-md transition-shadow">
                   <CardContent className="p-0">
-                    {/* Featured Image - Default gradient if no image */}
-                    <div className="h-48 overflow-hidden bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                    <div className="h-40 overflow-hidden bg-orange-50 flex items-center justify-center">
                       {blog.featured_image ? (
                         <img
                           src={blog.featured_image}
                           alt={blog.title}
-                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                          className="w-full h-full object-cover"
                         />
                       ) : (
-                        <BookOpen className="w-16 h-16 text-white opacity-50" />
+                        <BookOpen className="w-12 h-12 text-orange-200" />
                       )}
                     </div>
 
-                    {/* Blog Details */}
-                    <div className="p-6 space-y-4">
+                    <div className="p-5 space-y-3">
                       <div>
-                        <h3 className="text-lg font-semibold text-gray-800 mb-2 line-clamp-2">
+                        <h3 className="text-base font-semibold text-gray-800 mb-1 line-clamp-2">
                           {blog.title}
                         </h3>
-                        <p className="text-gray-600 text-sm line-clamp-3">
+                        <p className="text-gray-500 text-sm line-clamp-3">
                           {blog.excerpt}
                         </p>
                       </div>
 
-                      <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                      <div className="flex items-center justify-between pt-3 border-t border-gray-100">
                         <Link to={`/blog/${blog.slug}`}>
                           <Button
                             variant="outline"
-                            className="flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white border-0 hover:opacity-90"
+                            size="sm"
+                            className="flex items-center space-x-1.5 border-orange-200 text-orange-600 hover:bg-orange-50 text-xs"
                           >
-                            <BookOpen className="w-4 h-4" />
+                            <BookOpen className="w-3.5 h-3.5" />
                             <span>Read More</span>
                           </Button>
                         </Link>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-gray-400">
                           {new Date(blog.created_at).toLocaleDateString()}
                         </p>
                       </div>
@@ -538,103 +516,98 @@ const Dashboard = () => {
       </section>
 
       {/* User Events */}
-      <section className="py-12" ref={eventsRef}>
+      <section className="py-10 bg-orange-50/30" ref={eventsRef}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-8">
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-orange-600 bg-clip-text text-transparent mb-2">
-              Your Events
-            </h2>
-            <p className="text-gray-600">Track the status of your submitted events</p>
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-1">Your Events</h2>
+            <p className="text-gray-500 text-sm">Track the status of your submitted events</p>
           </div>
 
           {isLoadingEvents ? (
-            // Loading skeleton
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
               {Array.from({ length: 3 }).map((_, index) => (
-                <Card key={index} className="shadow-lg border-0 bg-white rounded-2xl overflow-hidden animate-pulse">
-                  <div className="h-20 bg-gray-200"></div>
-                  <div className="p-6 space-y-4">
-                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                    <div className="h-3 bg-gray-200 rounded w-full"></div>
-                    <div className="h-3 bg-gray-200 rounded w-2/3"></div>
-                    <div className="h-8 bg-gray-200 rounded w-1/2"></div>
+                <Card key={index} className="border border-gray-100 bg-white rounded-xl overflow-hidden animate-pulse">
+                  <div className="h-16 bg-gray-100"></div>
+                  <div className="p-5 space-y-3">
+                    <div className="h-4 bg-gray-100 rounded w-3/4"></div>
+                    <div className="h-3 bg-gray-100 rounded w-full"></div>
+                    <div className="h-3 bg-gray-100 rounded w-2/3"></div>
                   </div>
                 </Card>
               ))}
             </div>
           ) : userEvents.length === 0 ? (
-            <Card className="text-center py-12 shadow-lg border-0">
+            <Card className="text-center py-12 border border-gray-100 shadow-sm bg-white">
               <CardContent>
-                <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-gray-600 mb-2">No Events Yet</h3>
-                <p className="text-gray-500 mb-6">You haven't submitted any events for approval</p>
+                <Calendar className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+                <h3 className="text-base font-semibold text-gray-600 mb-1">No Events Yet</h3>
+                <p className="text-gray-400 text-sm mb-5">You haven't submitted any events for approval</p>
                 <Link to="/events">
-                  <Button className="bg-gradient-to-r from-blue-600 to-orange-600">
+                  <Button className="bg-orange-500 hover:bg-orange-600 text-white text-sm">
                     Create Your First Event
                   </Button>
                 </Link>
               </CardContent>
             </Card>
           ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
               {userEvents.map((event) => {
                 const StatusIcon = getStatusIcon(event.status);
                 return (
-                  <Card key={event.id} className="shadow-lg border-0 bg-white rounded-2xl overflow-hidden">
+                  <Card key={event.id} className="border border-gray-100 shadow-sm bg-white rounded-xl overflow-hidden">
                     <CardContent className="p-0">
                       {/* Status Header */}
                       <div className={`bg-gradient-to-r ${getStatusColor(event.status)} p-4 text-white`}>
-                        <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-2">
-                            <StatusIcon className="w-5 h-5" />
+                            <StatusIcon className="w-4 h-4" />
                             <span className="font-semibold text-sm">
                               {getStatusText(event.status)}
                             </span>
                           </div>
-                          <span className="text-xs bg-white/20 px-2 py-1 rounded">
+                          <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">
                             {event.type}
                           </span>
                         </div>
                       </div>
 
                       {/* Event Details */}
-                      <div className="p-6 space-y-4">
+                      <div className="p-5 space-y-3">
                         <div>
-                          <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                          <h3 className="text-base font-semibold text-gray-800 mb-1">
                             {event.title}
                           </h3>
-                          <p className="text-gray-600 text-sm line-clamp-2">
+                          <p className="text-gray-500 text-sm line-clamp-2">
                             {event.description}
                           </p>
                         </div>
 
-                        <div className="space-y-2 text-sm text-gray-600">
+                        <div className="space-y-1.5 text-sm text-gray-500">
                           <div className="flex items-center space-x-2">
-                            <Calendar className="w-4 h-4" />
+                            <Calendar className="w-3.5 h-3.5 text-orange-400" />
                             <span>{event.date}</span>
                           </div>
                           <div className="flex items-center space-x-2">
-                            <Clock className="w-4 h-4" />
+                            <Clock className="w-3.5 h-3.5 text-orange-400" />
                             <span>{event.time}</span>
                           </div>
                           <div className="flex items-center space-x-2">
-                            <MapPin className="w-4 h-4" />
+                            <MapPin className="w-3.5 h-3.5 text-orange-400" />
                             <span>{event.location}, {event.city}</span>
                           </div>
                         </div>
 
                         {/* Admin Feedback */}
                         {event.adminFeedback && (
-                          <div className="bg-gray-50 p-3 rounded-lg">
-                            <p className="text-xs font-medium text-gray-700 mb-1">Admin Feedback:</p>
-                            <p className="text-sm text-gray-600">{event.adminFeedback}</p>
+                          <div className="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                            <p className="text-xs font-medium text-gray-600 mb-1">Admin Feedback:</p>
+                            <p className="text-sm text-gray-500">{event.adminFeedback}</p>
                           </div>
                         )}
 
-                        {/* Submitted Date */}
-                        <div className="pt-2 border-t border-gray-200">
-                          <p className="text-xs text-gray-500">
-                            Submitted on {new Date(event.created_at).toLocaleDateString()}
+                        <div className="pt-2 border-t border-gray-100">
+                          <p className="text-xs text-gray-400">
+                            Submitted {new Date(event.created_at).toLocaleDateString()}
                           </p>
                         </div>
                       </div>
