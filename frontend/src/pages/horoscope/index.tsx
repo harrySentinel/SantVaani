@@ -14,7 +14,6 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import {
-  Star,
   Palette,
   Hash,
   Calendar,
@@ -213,8 +212,7 @@ const HoroscopePage = () => {
           <div className="mb-8">
             <Card className="border-orange-100 shadow-sm bg-white">
               <CardHeader className="text-center pb-2">
-                <CardTitle className="text-xl text-gray-800 flex items-center justify-center gap-2">
-                  <Star className="w-5 h-5 text-orange-500" />
+                <CardTitle className="text-xl text-gray-800">
                   {t('horoscope.select.title')}
                 </CardTitle>
                 <p className="text-gray-500 text-sm">{t('horoscope.select.subtitle')}</p>
@@ -295,10 +293,10 @@ const HoroscopePage = () => {
                   <TabsContent key={period} value={period} className="mt-6">
                     {loading[period as keyof typeof loading] ? (
                       <Card className="border-orange-100 shadow-sm bg-white">
-                        <CardContent className="p-8">
-                          <div className="text-center space-y-4">
-                            <div className="animate-spin w-10 h-10 border-4 border-orange-100 border-t-orange-500 rounded-full mx-auto"></div>
-                            <p className="text-gray-500">{t('horoscope.loading')}</p>
+                        <CardContent className="p-10">
+                          <div className="text-center space-y-3">
+                            <span className="text-4xl text-orange-400 animate-pulse block" style={{ fontFamily: 'serif' }}>ॐ</span>
+                            <p className="text-gray-400 text-sm">{t('horoscope.loading')}</p>
                           </div>
                         </CardContent>
                       </Card>
@@ -317,10 +315,10 @@ const HoroscopePage = () => {
                       />
                     ) : (
                       <Card className="border-orange-100 shadow-sm bg-white">
-                        <CardContent className="p-8">
-                          <div className="text-center space-y-4">
-                            <Star className="w-12 h-12 text-orange-200 mx-auto" />
-                            <p className="text-gray-400 text-base">
+                        <CardContent className="p-10">
+                          <div className="text-center space-y-3">
+                            <span className="text-4xl block">✨</span>
+                            <p className="text-gray-400 text-sm">
                               {period === 'daily' ? t('horoscope.empty.daily') :
                                period === 'weekly' ? t('horoscope.empty.weekly') :
                                t('horoscope.empty.monthly')}
@@ -408,8 +406,7 @@ const HoroscopeDisplay = ({
       {/* Prediction */}
       <Card className="border-orange-100 shadow-sm bg-white">
         <CardHeader className="pb-2">
-          <CardTitle className="flex items-center text-gray-800 text-base">
-            <Star className="w-4 h-4 text-orange-500 mr-2" />
+          <CardTitle className="text-gray-800 text-base">
             {t('horoscope.prediction.title')}
           </CardTitle>
         </CardHeader>
@@ -440,7 +437,7 @@ const HoroscopeDisplay = ({
                   </>
                 ) : (
                   <>
-                    <Star className="w-3 h-3 mr-2" />
+                    <span className="mr-1.5 text-xs">✨</span>
                     {t('horoscope.summary.button')}
                   </>
                 )}
@@ -450,10 +447,7 @@ const HoroscopeDisplay = ({
             {/* AI Summary Display */}
             {showSummary && summary && (
               <div className="mt-3 bg-orange-50 rounded-lg p-4 border-l-4 border-orange-400">
-                <div className="flex items-center mb-2">
-                  <Star className="w-4 h-4 text-orange-500 mr-2" />
-                  <h4 className="font-semibold text-orange-800 text-sm">{t('horoscope.summary.title')}</h4>
-                </div>
+                <h4 className="font-semibold text-orange-800 text-sm mb-2">{t('horoscope.summary.title')}</h4>
                 <p className="text-orange-700 leading-relaxed text-sm font-medium">{summary}</p>
               </div>
             )}

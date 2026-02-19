@@ -15,7 +15,6 @@ import {
   User,
   LogOut,
   Eye,
-  Loader2,
   Gift,
   Bookmark,
   BookOpen,
@@ -212,9 +211,9 @@ const Dashboard = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-3 text-orange-500" />
-          <p className="text-gray-500 text-sm">Loading...</p>
+        <div className="text-center space-y-3">
+          <span className="text-5xl text-orange-400 animate-pulse block" style={{ fontFamily: 'serif' }}>ॐ</span>
+          <p className="text-gray-400 text-sm">Loading your dashboard...</p>
         </div>
       </div>
     );
