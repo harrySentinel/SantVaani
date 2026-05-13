@@ -561,9 +561,9 @@ async function fetchRealHoroscope(zodiacSign, period = 'daily') {
     if (!horoscopeResponse.ok) throw new Error(`External API error: ${horoscopeResponse.status}`);
 
     const horoscopeData = await horoscopeResponse.json();
-    if (!horoscopeData.success || !horoscopeData.data) throw new Error('Invalid external API response');
+    if (!horoscopeData.data) throw new Error('Invalid external API response');
 
-    prediction = horoscopeData.data.horoscope_data;
+    prediction = horoscopeData.data.horoscope_data || horoscopeData.data.horoscope;
     dateInfo = horoscopeData.data.date || today;
     standoutDays = horoscopeData.data.standout_days || null;
     challengingDays = horoscopeData.data.challenging_days || null;
