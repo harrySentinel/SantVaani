@@ -10,12 +10,8 @@ import {
   SelectTrigger, 
   SelectValue 
 } from '@/components/ui/select';
-import { 
-  Star, 
-  Heart, 
-  Briefcase, 
-  Activity, 
-  DollarSign,
+import {
+  Star,
   Palette,
   Hash,
   Sparkles
@@ -35,10 +31,6 @@ interface Horoscope {
   period: string;
   prediction: string;
   prediction_hi: string;
-  love_score: number;
-  career_score: number;
-  health_score: number;
-  money_score: number;
   lucky_color: string;
   lucky_number: number;
 }
@@ -53,7 +45,7 @@ const HoroscopeSection = () => {
   useEffect(() => {
     const fetchZodiacSigns = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/horoscope/zodiac/list');
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'}/api/horoscope/zodiac/list`);
         const data = await response.json();
         if (data.success) {
           setZodiacSigns(data.zodiacSigns);
@@ -72,7 +64,7 @@ const HoroscopeSection = () => {
     
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/horoscope/${signId}`);
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'}/api/horoscope/${signId}`);
       const data = await response.json();
       if (data.success) {
         setHoroscope(data.horoscope);
@@ -87,21 +79,6 @@ const HoroscopeSection = () => {
   const handleSignSelect = (signId: string) => {
     setSelectedSign(signId);
     fetchHoroscope(signId);
-  };
-
-  const renderStars = (score: number) => {
-    return Array.from({ length: 5 }, (_, i) => (
-      <Star 
-        key={i} 
-        className={`w-4 h-4 ${i < score ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
-      />
-    ));
-  };
-
-  const getScoreColor = (score: number) => {
-    if (score >= 4) return 'text-green-600';
-    if (score >= 3) return 'text-yellow-600';
-    return 'text-red-600';
   };
 
   const selectedZodiac = zodiacSigns.find(sign => sign.id === selectedSign);
@@ -183,53 +160,6 @@ const HoroscopeSection = () => {
                 {horoscope.prediction_hi && (
                   <p className="text-gray-600 italic leading-relaxed">{horoscope.prediction_hi}</p>
                 )}
-              </div>
-
-              {/* Scores Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-white/90 rounded-lg p-4 text-center border border-red-200">
-                  <Heart className="w-6 h-6 text-red-500 mx-auto mb-2" />
-                  <p className="text-sm text-gray-600 mb-1">Love</p>
-                  <div className="flex justify-center space-x-1 mb-1">
-                    {renderStars(horoscope.love_score)}
-                  </div>
-                  <p className={`text-xs font-medium ${getScoreColor(horoscope.love_score)}`}>
-                    {horoscope.love_score}/5
-                  </p>
-                </div>
-
-                <div className="bg-white/90 rounded-lg p-4 text-center border border-blue-200">
-                  <Briefcase className="w-6 h-6 text-blue-500 mx-auto mb-2" />
-                  <p className="text-sm text-gray-600 mb-1">Career</p>
-                  <div className="flex justify-center space-x-1 mb-1">
-                    {renderStars(horoscope.career_score)}
-                  </div>
-                  <p className={`text-xs font-medium ${getScoreColor(horoscope.career_score)}`}>
-                    {horoscope.career_score}/5
-                  </p>
-                </div>
-
-                <div className="bg-white/90 rounded-lg p-4 text-center border border-green-200">
-                  <Activity className="w-6 h-6 text-green-500 mx-auto mb-2" />
-                  <p className="text-sm text-gray-600 mb-1">Health</p>
-                  <div className="flex justify-center space-x-1 mb-1">
-                    {renderStars(horoscope.health_score)}
-                  </div>
-                  <p className={`text-xs font-medium ${getScoreColor(horoscope.health_score)}`}>
-                    {horoscope.health_score}/5
-                  </p>
-                </div>
-
-                <div className="bg-white/90 rounded-lg p-4 text-center border border-yellow-200">
-                  <DollarSign className="w-6 h-6 text-yellow-500 mx-auto mb-2" />
-                  <p className="text-sm text-gray-600 mb-1">Money</p>
-                  <div className="flex justify-center space-x-1 mb-1">
-                    {renderStars(horoscope.money_score)}
-                  </div>
-                  <p className={`text-xs font-medium ${getScoreColor(horoscope.money_score)}`}>
-                    {horoscope.money_score}/5
-                  </p>
-                </div>
               </div>
 
               {/* Lucky Elements */}

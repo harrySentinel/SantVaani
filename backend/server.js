@@ -460,144 +460,235 @@ setInterval(async () => {
 // HOROSCOPE API ROUTES
 // ===================================
 
+// In-memory daily cache: key = "sign_period_date"
+const horoscopeCache = new Map();
+
+// Deterministic hash so lucky elements are consistent for same sign+date
+function deterministicHash(str) {
+  let hash = 5381;
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) + hash) + str.charCodeAt(i);
+    hash = hash & 0x7fffffff;
+  }
+  return hash;
+}
+
+// Generate horoscope via Groq when external API is unavailable
+async function generateHoroscopeViaGroq(zodiacSign, period, GROQ_API_KEY) {
+  const periodLabel = period === 'daily' ? 'today' : period === 'weekly' ? 'this week' : 'this month';
+  const prompt = `You are a Vedic astrology expert. Generate a meaningful, specific horoscope for ${zodiacSign} for ${periodLabel}.
+
+RESPONSE FORMAT (JSON only):
+{
+  "prediction": "A detailed, specific 3-4 sentence horoscope prediction in English. Make it personal, uplifting, and spiritually grounded.",
+  "prediction_hi": "Same prediction translated naturally into Hindi (3-4 sentences)",
+  "spiritual_advice": "A 2-sentence spiritual guidance rooted in Vedic wisdom for this ${zodiacSign} native ${periodLabel}."
+}
+
+Be specific to the sign's traits. Do not be generic. Return only valid JSON.`;
+
+  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${GROQ_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'llama-3.1-8b-instant',
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.8,
+      max_tokens: 600,
+    })
+  });
+
+  if (!response.ok) throw new Error('Groq API failed');
+
+  const data = await response.json();
+  const text = data.choices?.[0]?.message?.content;
+  if (!text) throw new Error('Empty Groq response');
+
+  const jsonMatch = text.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) throw new Error('No JSON in Groq response');
+
+  return JSON.parse(jsonMatch[0]);
+}
+
 // Real Horoscope API Helper Function
 async function fetchRealHoroscope(zodiacSign, period = 'daily') {
   const GROQ_API_KEY = process.env.GROQ_API_KEY;
+  const today = new Date().toISOString().split('T')[0];
+  const cacheKey = `${zodiacSign}_${period}_${today}`;
+
+  // Return cached result if available (same data all day)
+  if (horoscopeCache.has(cacheKey)) {
+    console.log(`🔮 Serving horoscope from cache: ${cacheKey}`);
+    return horoscopeCache.get(cacheKey);
+  }
+
+  const luckyColors = ['Golden', 'Orange', 'Red', 'Blue', 'Green', 'Purple', 'Yellow', 'Silver'];
+  const luckyColor = luckyColors[deterministicHash(zodiacSign + today) % luckyColors.length];
+  const luckyNumber = (deterministicHash(today + zodiacSign) % 12) + 1;
+
+  let prediction = '';
+  let hindiPrediction = '';
+  let spiritualAdvice = '';
+  let dateInfo = today;
+  let periodTheme = 'Daily spiritual guidance';
+  let standoutDays = null;
+  let challengingDays = null;
+  let source = 'External API';
 
   try {
-    // Map our period format to API format
-    const periodMap = {
-      'daily': 'daily',
-      'weekly': 'weekly',
-      'monthly': 'monthly'
-    };
-
-    const apiPeriod = periodMap[period] || 'daily';
     let apiUrl;
-
-    // Build API URL based on period
     if (period === 'daily') {
       apiUrl = `https://horoscope-app-api.vercel.app/api/v1/get-horoscope/daily?sign=${zodiacSign}&day=TODAY`;
     } else if (period === 'weekly') {
       apiUrl = `https://horoscope-app-api.vercel.app/api/v1/get-horoscope/weekly?sign=${zodiacSign}`;
+      periodTheme = 'Weekly spiritual journey';
     } else {
       apiUrl = `https://horoscope-app-api.vercel.app/api/v1/get-horoscope/monthly?sign=${zodiacSign}`;
+      periodTheme = 'Monthly spiritual transformation';
     }
 
-    console.log(`🔮 Fetching real horoscope from: ${apiUrl}`);
+    console.log(`🔮 Fetching horoscope from external API: ${apiUrl}`);
 
-    // Fetch real horoscope data
-    const horoscopeResponse = await fetch(apiUrl);
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
 
-    if (!horoscopeResponse.ok) {
-      throw new Error(`Horoscope API error: ${horoscopeResponse.status}`);
-    }
+    const horoscopeResponse = await fetch(apiUrl, { signal: controller.signal });
+    clearTimeout(timeout);
+
+    if (!horoscopeResponse.ok) throw new Error(`External API error: ${horoscopeResponse.status}`);
 
     const horoscopeData = await horoscopeResponse.json();
+    if (!horoscopeData.success || !horoscopeData.data) throw new Error('Invalid external API response');
 
-    if (!horoscopeData.success || !horoscopeData.data) {
-      throw new Error('Invalid response from horoscope API');
-    }
+    prediction = horoscopeData.data.horoscope_data;
+    dateInfo = horoscopeData.data.date || today;
+    standoutDays = horoscopeData.data.standout_days || null;
+    challengingDays = horoscopeData.data.challenging_days || null;
 
-    const realPrediction = horoscopeData.data.horoscope_data;
-    let periodTheme = 'Daily spiritual guidance';
-    let dateInfo = horoscopeData.data.date || new Date().toLocaleDateString();
+    if (period === 'weekly' && horoscopeData.data.week) dateInfo = horoscopeData.data.week;
+    if (period === 'monthly' && horoscopeData.data.month) dateInfo = horoscopeData.data.month;
 
-    // Handle period-specific data
-    if (period === 'weekly' && horoscopeData.data.week) {
-      periodTheme = 'Weekly spiritual journey';
-      dateInfo = horoscopeData.data.week;
-    } else if (period === 'monthly') {
-      periodTheme = 'Monthly spiritual transformation';
-      if (horoscopeData.data.month) {
-        dateInfo = horoscopeData.data.month;
-      }
-    }
-
-    // Generate Hindi translation using AI if available
-    let hindiPrediction = '';
-    let spiritualAdvice = '';
-
+    // Translate + spiritual advice via Groq
     if (GROQ_API_KEY) {
       try {
-        const translationPrompt = `Translate this horoscope prediction to Hindi and add spiritual guidance:
+        const translationPrompt = `Translate this horoscope to Hindi and add spiritual guidance:
 
-Original: "${realPrediction}"
+Original: "${prediction}"
 
 RESPONSE FORMAT (JSON only):
 {
-  "prediction_hi": "Hindi translation here",
-  "spiritual_advice": "Add spiritual guidance based on the prediction in English (2-3 sentences)"
-}
+  "prediction_hi": "Natural Hindi translation",
+  "spiritual_advice": "2-3 sentences of Vedic spiritual guidance in English based on the prediction"
+}`;
 
-Make the Hindi natural and the spiritual advice meaningful and uplifting.`;
-
-        const translationResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        const tr = await fetch('https://api.groq.com/openai/v1/chat/completions', {
           method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${GROQ_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Authorization': `Bearer ${GROQ_API_KEY}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({
             model: 'llama-3.1-8b-instant',
-            messages: [{
-              role: 'user',
-              content: translationPrompt
-            }],
+            messages: [{ role: 'user', content: translationPrompt }],
             temperature: 0.7,
             max_tokens: 512,
           })
         });
 
-        if (translationResponse.ok) {
-          const translationData = await translationResponse.json();
-          const translationText = translationData.choices?.[0]?.message?.content;
-
-          if (translationText) {
-            const jsonMatch = translationText.match(/\{[\s\S]*\}/);
+        if (tr.ok) {
+          const trData = await tr.json();
+          const trText = trData.choices?.[0]?.message?.content;
+          if (trText) {
+            const jsonMatch = trText.match(/\{[\s\S]*\}/);
             if (jsonMatch) {
-              const translation = JSON.parse(jsonMatch[0]);
-              hindiPrediction = translation.prediction_hi || '';
-              spiritualAdvice = translation.spiritual_advice || '';
+              const parsed = JSON.parse(jsonMatch[0]);
+              hindiPrediction = parsed.prediction_hi || '';
+              spiritualAdvice = parsed.spiritual_advice || '';
             }
           }
         }
-      } catch (error) {
-        console.log('Hindi translation failed, using fallback');
+      } catch (e) {
+        console.log('Groq translation failed, continuing without it');
       }
     }
 
-    // Generate realistic scores based on prediction content
-    const generateScore = () => Math.floor(Math.random() * 3) + 3; // 3-5 range
-
-    // Generate lucky elements
-    const luckyColors = ['Golden', 'Orange', 'Red', 'Blue', 'Green', 'Purple', 'Yellow', 'Silver'];
-    const luckyColor = luckyColors[Math.floor(Math.random() * luckyColors.length)];
-    const luckyNumber = Math.floor(Math.random() * 12) + 1;
-
-    return {
-      zodiac_sign: zodiacSign.toLowerCase(),
-      date: new Date().toISOString().split('T')[0],
-      period: period,
-      prediction: realPrediction,
-      prediction_hi: hindiPrediction || `${zodiacSign} राशि के लिए आज का दिन शुभ है। सकारात्मक ऊर्जा और आध्यात्मिक विकास के अवसर मिलेंगे।`,
-      love_score: generateScore(),
-      career_score: generateScore(),
-      health_score: generateScore(),
-      money_score: generateScore(),
-      lucky_color: luckyColor,
-      lucky_number: luckyNumber,
-      period_theme: periodTheme,
-      spiritual_advice: spiritualAdvice || 'Focus on inner peace and positive thinking today. Trust your intuition and embrace opportunities for growth.',
-      date_range: dateInfo,
-      standout_days: horoscopeData.data.standout_days || null,
-      challenging_days: horoscopeData.data.challenging_days || null
-    };
-
   } catch (error) {
-    console.error('Error fetching real horoscope:', error);
-    throw error;
+    console.warn(`⚠️ External horoscope API failed (${error.message}), falling back to Groq`);
+    source = 'Groq AI';
+
+    if (GROQ_API_KEY) {
+      try {
+        const groqResult = await generateHoroscopeViaGroq(zodiacSign, period, GROQ_API_KEY);
+        prediction = groqResult.prediction || '';
+        hindiPrediction = groqResult.prediction_hi || '';
+        spiritualAdvice = groqResult.spiritual_advice || '';
+      } catch (groqError) {
+        console.error('Groq fallback also failed:', groqError.message);
+        // Last resort: sign-specific meaningful text (not generic for all signs)
+        const signMessages = {
+          aries: 'The stars align to bring you courage and new beginnings. Channel your natural leadership energy today.',
+          taurus: 'Stability and abundance flow toward you. Trust your patient and steadfast nature to see you through.',
+          gemini: 'Your sharp intellect opens new doors today. Communicate your ideas clearly and connections will deepen.',
+          cancer: 'Your intuition is heightened. Trust your inner voice and nurture the relationships that matter most.',
+          leo: 'Your natural radiance shines brighter today. Step into the spotlight with confidence and warmth.',
+          virgo: 'Attention to detail serves you well today. Your careful nature helps you find order in complexity.',
+          libra: 'Harmony and balance are within your reach. Seek diplomatic solutions and beauty in your surroundings.',
+          scorpio: 'Deep transformation is at work within you. Trust the process of change and emerge stronger.',
+          sagittarius: 'Adventure and wisdom call to you today. Expand your horizons and embrace new philosophies.',
+          capricorn: 'Your discipline and determination lead to achievement. Stay grounded and trust your ambitions.',
+          aquarius: 'Innovation and humanitarian ideals guide your path. Your unique perspective brings positive change.',
+          pisces: 'Your compassion and creativity flow freely. Artistic and spiritual pursuits bring deep fulfillment.'
+        };
+        const signKey = zodiacSign.toLowerCase();
+        prediction = signMessages[signKey] || `The cosmic energies align favorably for ${zodiacSign} today. Focus on spiritual growth and inner peace.`;
+        source = 'Fallback';
+      }
+    } else {
+      const signKey = zodiacSign.toLowerCase();
+      const signMessages = {
+        aries: 'The stars align to bring you courage and new beginnings. Channel your natural leadership energy today.',
+        taurus: 'Stability and abundance flow toward you. Trust your patient and steadfast nature.',
+        gemini: 'Your sharp intellect opens new doors today. Communicate clearly and connections will deepen.',
+        cancer: 'Your intuition is heightened. Trust your inner voice and nurture important relationships.',
+        leo: 'Your natural radiance shines brighter today. Step forward with confidence and warmth.',
+        virgo: 'Attention to detail serves you well today. Your careful nature brings order to complexity.',
+        libra: 'Harmony and balance are within your reach. Seek diplomatic solutions today.',
+        scorpio: 'Deep transformation is at work within you. Trust the process and emerge stronger.',
+        sagittarius: 'Adventure and wisdom call to you. Expand your horizons and embrace new ideas.',
+        capricorn: 'Your discipline leads to achievement today. Stay grounded and trust your ambitions.',
+        aquarius: 'Innovation guides your path today. Your unique perspective brings positive change.',
+        pisces: 'Your compassion and creativity flow freely. Spiritual pursuits bring deep fulfillment.'
+      };
+      prediction = signMessages[signKey] || `The cosmic energies align favorably for ${zodiacSign} today. Focus on spiritual growth and inner peace.`;
+      source = 'Fallback';
+    }
   }
+
+  const result = {
+    zodiac_sign: zodiacSign.toLowerCase(),
+    date: today,
+    period,
+    prediction,
+    prediction_hi: hindiPrediction || `${zodiacSign} राशि के लिए ${period === 'daily' ? 'आज' : period === 'weekly' ? 'इस सप्ताह' : 'इस महीने'} आध्यात्मिक ऊर्जा और विकास के अवसर हैं। सकारात्मक सोच और ध्यान पर ध्यान दें।`,
+    lucky_color: luckyColor,
+    lucky_number: luckyNumber,
+    period_theme: periodTheme,
+    spiritual_advice: spiritualAdvice || 'Connect with your inner self through prayer and meditation. The divine guides those who seek with a pure heart.',
+    date_range: dateInfo,
+    standout_days: standoutDays,
+    challenging_days: challengingDays,
+    source
+  };
+
+  // Cache the result for the rest of the day
+  horoscopeCache.set(cacheKey, result);
+
+  // Clean up old cache entries (keep only today's)
+  for (const key of horoscopeCache.keys()) {
+    if (!key.endsWith(today)) horoscopeCache.delete(key);
+  }
+
+  return result;
 }
 
 // Get all zodiac signs list (MUST be before dynamic routes)
@@ -623,66 +714,23 @@ app.get('/api/horoscope/zodiac/list', (req, res) => {
   });
 });
 
-// Get horoscope for a zodiac sign with period support (AI-Generated)
+// Get horoscope for a zodiac sign with period support
 app.get('/api/horoscope/:zodiacSign/:period?', async (req, res) => {
   try {
     const { zodiacSign, period = 'daily' } = req.params;
-
-    // Validate period
     const validPeriods = ['daily', 'weekly', 'monthly'];
     const requestedPeriod = validPeriods.includes(period) ? period : 'daily';
 
-    // Fetch real horoscope data
     const horoscope = await fetchRealHoroscope(zodiacSign, requestedPeriod);
 
     res.json({
       success: true,
-      horoscope: {
-        ...horoscope,
-        zodiac_sign: zodiacSign.toLowerCase(),
-        period: requestedPeriod,
-        date: new Date().toISOString().split('T')[0]
-      },
-      source: 'Real Astrology API'
+      horoscope,
+      source: horoscope.source || 'API'
     });
   } catch (error) {
-    console.error('Horoscope API error:', error);
-
-    // Fallback to basic prediction if AI fails
-    const { period = 'daily' } = req.params;
-    const fallbackMessages = {
-      daily: `Today brings spiritual energy and growth opportunities for ${req.params.zodiacSign}. Focus on inner peace and positive actions.`,
-      weekly: `This week offers spiritual growth and new opportunities for ${req.params.zodiacSign}. Focus on meditation and positive relationships.`,
-      monthly: `This month brings significant spiritual transformation for ${req.params.zodiacSign}. Embrace change and trust your inner wisdom.`
-    };
-
-    const fallbackMessagesHi = {
-      daily: `आज ${req.params.zodiacSign} के लिए आध्यात्मिक ऊर्जा और विकास के अवसर हैं। आंतरिक शांति और सकारात्मक कार्यों पर ध्यान दें।`,
-      weekly: `इस सप्ताह ${req.params.zodiacSign} के लिए आध्यात्मिक विकास और नए अवसर हैं। ध्यान और सकारात्मक रिश्तों पर ध्यान दें।`,
-      monthly: `इस महीने ${req.params.zodiacSign} के लिए महत्वपूर्ण आध्यात्मिक परिवर्तन है। बदलाव को अपनाएं और अपनी आंतरिक बुद्धि पर भरोसा रखें।`
-    };
-
-    const fallbackHoroscope = {
-      zodiac_sign: req.params.zodiacSign.toLowerCase(),
-      date: new Date().toISOString().split('T')[0],
-      period: period,
-      prediction: fallbackMessages[period] || fallbackMessages.daily,
-      prediction_hi: fallbackMessagesHi[period] || fallbackMessagesHi.daily,
-      love_score: Math.floor(Math.random() * 2) + 3, // 3-4 range
-      career_score: Math.floor(Math.random() * 2) + 3,
-      health_score: Math.floor(Math.random() * 2) + 3,
-      money_score: Math.floor(Math.random() * 2) + 3,
-      lucky_color: ['Golden', 'Orange', 'Red', 'Blue', 'Green'][Math.floor(Math.random() * 5)],
-      lucky_number: Math.floor(Math.random() * 12) + 1,
-      period_theme: period === 'daily' ? 'Daily Focus' : period === 'weekly' ? 'Weekly Growth' : 'Monthly Transformation',
-      spiritual_advice: `Focus on spiritual practices and inner growth during this ${period}.`
-    };
-
-    res.json({
-      success: true,
-      horoscope: fallbackHoroscope,
-      source: 'Fallback'
-    });
+    console.error('Horoscope route error:', error);
+    res.status(500).json({ success: false, error: 'Unable to fetch horoscope. Please try again.' });
   }
 });
 

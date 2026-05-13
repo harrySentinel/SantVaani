@@ -41,6 +41,9 @@ interface Horoscope {
   lucky_number: number;
   period_theme?: string;
   spiritual_advice?: string;
+  source?: string;
+  standout_days?: string | null;
+  challenging_days?: string | null;
 }
 
 const HoroscopePage = () => {
