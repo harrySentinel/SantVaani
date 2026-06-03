@@ -1,11 +1,11 @@
-# 🕉️ SantVaani – A Bhakti Platform for the Modern Age
+# -> SantVaani – A Bhakti Platform for the Modern Age
 
 Welcome to **SantVaani** – a spiritual storytelling platform built to share the timeless wisdom of Indian saints and devotional teachings with the world.  
 From soul-touching bhajans to divine quotes and saintly life stories — SantVaani bridges technology and bhakti in a peaceful, modern design.
 
 ---
 
-## ✨ What is SantVaani?
+## -> What is SantVaani?
 
 SantVaani is a full-stack web app designed to spread spiritual knowledge and inspire devotion through:
 
@@ -22,7 +22,7 @@ SantVaani is a full-stack web app designed to spread spiritual knowledge and ins
 
 ---
 
-## 🔧 Tech Stack
+## -> Tech Stack
 
 Built with a modern, scalable, and spiritual tech stack:
 
@@ -35,7 +35,7 @@ Built with a modern, scalable, and spiritual tech stack:
 
 ---
 
-## 📌 Features (Implemented & Upcoming)
+## -> Features (Implemented & Upcoming)
 
 - ✅ Divine homepage with calm, spiritual animations  
 - ✅ Saint Stories in Hindi & English  
@@ -51,7 +51,7 @@ Built with a modern, scalable, and spiritual tech stack:
 
 ---
 
-## 💝 Support Seva – Donate with Heart
+## -> Support Seva – Donate with Heart
 
 SantVaani is not just a platform for devotion but also for **compassionate action** for spiritual seekers.  
 We’ve built a dedicated **Donation Page** where users can explore, support, and directly contribute to:
@@ -63,7 +63,7 @@ Help us spread joy and dignity to those who need it most 🕊️
 
 ---
 
-## 🎥 Watch Live Bhajans Anytime, Anywhere
+## -> Watch Live Bhajans Anytime, Anywhere
 
 Now, experience **live-streamed bhajans and satsangs** from top devotional YouTube channels — right within SantVaani.
 
@@ -72,18 +72,18 @@ Now, experience **live-streamed bhajans and satsangs** from top devotional YouTu
 - Peaceful design with full-screen support
 - Channel list curated from trusted sources like T-Series Bhakti Sagar, Rajshri Soul, Bhajan Saar, and more
 
-> 🌐 **Live Bhakti meets Digital Simplicity.**
+> -> **Live Bhakti meets Digital Simplicity.**
 
 ---
 
-## 🎯 Vision
+## -> Vision
 
 To revive and preserve the spiritual richness of Bharat through a digital-first approach.  
 SantVaani aims to be a **peaceful space on the internet** where anyone—young or old—can discover devotion, reflect, and feel inspired.
 
 ---
 
-## 🛠️ Setup Instructions
+## -> Setup Instructions
 
 ### Prerequisites
 - Node.js 18+ 
@@ -146,7 +146,7 @@ npm run preview     # Preview production build
 
 ---
 
-## 🧪 Testing
+## -> Testing
 
 We maintain comprehensive test coverage with:
 - **Unit Tests**: Component testing with Vitest + Testing Library (Jest)
@@ -162,7 +162,7 @@ npm run test:ui     # Visual test runner
 
 ---
 
-## 🚀 Deployment
+## -> Deployment
 
 ### Frontend (Vercel)
 1. Connect your GitHub repository to Vercel
@@ -194,7 +194,7 @@ PORT=5000
 
 ---
 
-## 📊 Project Stats
+## -> Project Stats
 
 - **Frontend**: React + TypeScript + Vite
 - **Backend**: Node.js + Express
@@ -205,7 +205,7 @@ PORT=5000
 
 ---
 
-## 👥 Contributing
+## -> Contributing
 
 We welcome contributions! Please:
 1. Fork the repository
@@ -216,13 +216,13 @@ We welcome contributions! Please:
 
 ---
 
-## 📝 License
+## -> License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 🙏 Acknowledgments
+## -> Acknowledgments
 
 - Inspired by the timeless wisdom of Indian saints
 - Built with love for the spiritual community
