@@ -9,13 +9,13 @@ From soul-touching bhajans to divine quotes and saintly life stories — SantVaa
 
 SantVaani is a full-stack web app designed to spread spiritual knowledge and inspire devotion through:
 
-- 🧘‍♂️ **Life stories** of saints like Meera Bai, Kabir, Tulsidas, and more  
-- 🎶 **Bhajans** in Hindi & Hinglish (with lyrics and shareable modals)  
-- 💬 **Quotes** with authorship (e.g., Kabir, Tulsidas) and calm UI animations  
-- 📺 **YouTube Live Bhajans** and curated spiritual video playlists — now watch your favorite satsangs and bhajans live, directly from the platform  
-- 🛕 **Old Age Homes & Orphanages** listing with donation support  
-- 💝 A dedicated **Donation Page** to directly support listed Ashrams and Orphanages  
-- 🌅 Aesthetic and modern UI with a peaceful **saffron/orange theme**
+- **Life stories** of saints like Meera Bai, Kabir, Tulsidas, and more  
+- **Bhajans** in Hindi & Hinglish (with lyrics and shareable modals)  
+- **Quotes** with authorship (e.g., Kabir, Tulsidas) and calm UI animations  
+- **YouTube Live Bhajans** and curated spiritual video playlists — now watch your favorite satsangs and bhajans live, directly from the platform  
+- **Old Age Homes & Orphanages** listing with donation support  
+- A dedicated **Donation Page** to directly support listed Ashrams and Orphanages  
+- Aesthetic and modern UI with a peaceful **saffron/orange theme**
 - Added form in donation and as feedback form
 - added working email
 - added google form for feedback
@@ -37,17 +37,17 @@ Built with a modern, scalable, and spiritual tech stack:
 
 ## -> Features (Implemented & Upcoming)
 
-- ✅ Divine homepage with calm, spiritual animations  
-- ✅ Saint Stories in Hindi & English  
-- ✅ Bhajans & Quotes section with modals, copy/share/audio  
-- ✅ Watch **Live Bhajans** & curated **YouTube Videos** from top devotional channels  
-- ✅ Category-wise listing of **Old Age Homes** and **Orphanages**  
-- ✅ **Donation Page** to support verified Ashrams and Orphanages  
-- ✅ **Visitor Counter** beautifully animated via Supabase  
-- 🔄 Contact flow for institutions to submit their listing (via santvaani@gmail.com)  
-- 🔜 Bhagavad Gita Chatbot (GEMINI AI)  
-- 🔜 Bookmark & Save your favorite bhajans/quotes  
-- 🔜 Admin dashboard for content uploads and feedback management  
+- Divine homepage with calm, spiritual animations  
+- Saint Stories in Hindi & English  
+- Bhajans & Quotes section with modals, copy/share/audio  
+- Watch **Live Bhajans** & curated **YouTube Videos** from top devotional channels  
+- Category-wise listing of **Old Age Homes** and **Orphanages**  
+- **Donation Page** to support verified Ashrams and Orphanages  
+- **Visitor Counter** beautifully animated via Supabase  
+- Contact flow for institutions to submit their listing (via santvaani@gmail.com)  
+- Bhagavad Gita Chatbot (GEMINI AI)  
+- Bookmark & Save your favorite bhajans/quotes  
+- Admin dashboard for content uploads and feedback management  
 
 ---
 
