@@ -12,12 +12,6 @@ const team = [
     image: "/profie.jpg"
   },
   {
-    name: "Neeraj Yadav",
-    title: "Co-Founder & Developer",
-    role: "A spiritual developer and tech visionary dedicated to building divine technology that serves humanity.",
-    image: "/founder2.jpg"
-  },
-  {
     name: "Arpita Patwa",
     title: "Admin",
     role: "The heart behind our operations, ensuring the community is nurtured with care and devotion.",
