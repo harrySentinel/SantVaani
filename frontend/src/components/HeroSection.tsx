@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowDown, Sparkles, Heart, Music, BookOpen, RefreshCw } from 'lucide-react';
+import { ArrowDown, Heart, Music, BookOpen, RefreshCw } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/lib/supabaseClient';
 
@@ -94,11 +94,9 @@ export default function HeroSection() {
       <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
         <div className="text-center space-y-10">
 
-          {/* OM + sparkles */}
-          <div className="flex justify-center items-center space-x-3">
-            <Sparkles className="w-7 h-7 text-orange-400 animate-pulse" />
-            <span className="text-6xl leading-none select-none">ॐ</span>
-            <Sparkles className="w-7 h-7 text-orange-400 animate-pulse" />
+          {/* OM */}
+          <div className="flex justify-center">
+            <span className="text-6xl leading-none select-none text-orange-400">ॐ</span>
           </div>
 
           {/* Heading */}
@@ -212,7 +210,7 @@ export default function HeroSection() {
             <Link to="/saints">
               <Button
                 size="lg"
-                className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-8 py-3 rounded-full shadow-md transition-colors duration-200"
               >
                 <Heart className="w-5 h-5 mr-2" />
                 {t('hero.button.saints')}
@@ -223,7 +221,7 @@ export default function HeroSection() {
               <Button
                 variant="outline"
                 size="lg"
-                className="border-2 border-orange-500 text-orange-600 hover:bg-orange-50 px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                className="border-2 border-orange-500 text-orange-600 hover:bg-orange-50 px-8 py-3 rounded-full transition-colors duration-200"
               >
                 <Music className="w-5 h-5 mr-2" />
                 {language === 'EN' ? 'Listen Bhajans' : 'भजन सुनें'}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Sparkles, Clock, Lightbulb, Star } from 'lucide-react';
+import { Lightbulb } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -12,173 +12,100 @@ interface SpiritualFact {
   source?: string;
 }
 
+const FALLBACK_FACTS: SpiritualFact[] = [
+  {
+    id: '1',
+    text: "In the Ramayana, Hanuman's heart contains an image of Rama and Sita, discovered when his chest was opened by the gods to verify his devotion.",
+    text_hi: "रामायण में, हनुमान के हृदय में राम और सीता की छवि है, जो उनकी भक्ति को सत्यापित करने के लिए देवताओं द्वारा उनकी छाती खोले जाने पर खोजी गई।",
+    category: "Ramayana",
+    icon: ""
+  },
+  {
+    id: '2',
+    text: "Lord Ganesha wrote the entire Mahabharata as Sage Vyasa dictated it, breaking his tusk to use as a pen when the original one broke.",
+    text_hi: "भगवान गणेश ने संपूर्ण महाभारत को महर्षि व्यास के कहे अनुसार लिखा, जब उनकी मूल कलम टूट गई तो अपना दांत तोड़कर कलम के रूप में इस्तेमाल किया।",
+    category: "Hindu Deities",
+    icon: ""
+  },
+];
+
 const SpiritualFactBox = () => {
   const { t, language } = useLanguage();
-  const [currentFactIndex, setCurrentFactIndex] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [visible, setVisible] = useState(true);
   const [facts, setFacts] = useState<SpiritualFact[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch facts from database
-  const fetchFacts = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('spiritual_facts')
-        .select('*')
-        .eq('is_active', true)
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error fetching facts:', error);
-        // Fallback to mock data if database fails
-        setFacts([
-          {
-            id: '1',
-            text: "In the Ramayana, Hanuman's heart contains an image of Rama and Sita, discovered when his chest was opened by the gods to verify his devotion.",
-            text_hi: "रामायण में, हनुमान के हृदय में राम और सीता की छवि है, जो उनकी भक्ति को सत्यापित करने के लिए देवताओं द्वारा उनकी छाती खोले जाने पर खोजी गई।",
-            category: "Ramayana",
-            icon: ""
-          },
-          {
-            id: '2',
-            text: "The Mahabharata mentions that Krishna lifted Govardhan hill for 7 days straight, protecting the villagers from Indra's torrential rains.",
-            text_hi: "महाभारत में उल्लेख है कि कृष्ण ने लगातार 7 दिनों तक गोवर्धन पर्वत को उठाया, ग्रामीणों को इंद्र की मूसलधार बारिश से बचाया।",
-            category: "Mahabharata",
-            icon: ""
-          },
-          {
-            id: '3',
-            text: "Lord Ganesha wrote the entire Mahabharata as Sage Vyasa dictated it, breaking his tusk to use as a pen when his original one broke.",
-            text_hi: "भगवान गणेश ने संपूर्ण महाभारत को महर्षि व्यास के कहे अनुसार लिखा, जब उनकी मूल कलम टूट गई तो अपना दांत तोड़कर कलम के रूप में इस्तेमाल किया।",
-            category: "Hindu Deities",
-            icon: ""
-          }
-        ]);
-      } else {
-        setFacts(data || []);
-      }
-    } catch (err) {
-      console.error('Failed to fetch facts:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Load facts on component mount
   useEffect(() => {
+    const fetchFacts = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('spiritual_facts')
+          .select('*')
+          .eq('is_active', true)
+          .order('created_at', { ascending: false });
+        if (error || !data?.length) throw new Error();
+        setFacts(data);
+      } catch {
+        setFacts(FALLBACK_FACTS);
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchFacts();
   }, []);
 
-  // Simple fact rotation with fixed interval
   useEffect(() => {
-    if (facts.length === 0) return;
-    
+    if (facts.length < 2) return;
     const interval = setInterval(() => {
-      setIsAnimating(true);
-      
+      setVisible(false);
       setTimeout(() => {
-        setCurrentFactIndex((prev) => (prev + 1) % facts.length);
-        setIsAnimating(false);
-      }, 500);
-    }, 7000); // Change every 7 seconds
-
+        setCurrentIndex(prev => (prev + 1) % facts.length);
+        setVisible(true);
+      }, 400);
+    }, 7000);
     return () => clearInterval(interval);
   }, [facts.length]);
 
-  // Show loading state if no facts loaded yet
-  if (loading || facts.length === 0) {
-    return (
-      <div className="w-full px-4 md:px-8 lg:px-16">
-        <div className="relative overflow-hidden">
-          <div className="bg-gradient-to-br from-orange-50 via-white to-orange-100 rounded-3xl p-8 md:p-12 border-2 border-orange-200 shadow-2xl">
-            <div className="text-center">
-              <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-full p-4 shadow-xl animate-pulse mx-auto w-fit mb-4">
-                <Lightbulb className="w-8 h-8 text-white" />
-              </div>
-              <p className="text-orange-600 font-medium">{t('didyouknow.loading')}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  if (loading || facts.length === 0) return null;
 
-  const currentFact = facts[currentFactIndex];
+  const fact = facts[currentIndex];
 
   return (
-    <div className="w-full px-4 md:px-8 lg:px-16">
-      <div className="relative overflow-hidden">
-        
-        {/* Background Pattern - matches your theme */}
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute top-10 left-10 w-32 h-32 bg-orange-400 rounded-full blur-2xl animate-pulse"></div>
-          <div className="absolute bottom-10 right-10 w-40 h-40 bg-orange-300 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        </div>
-
-        <div className={`relative bg-gradient-to-br from-orange-100 via-orange-50 to-orange-100 rounded-3xl p-8 md:p-12 lg:p-16 border border-orange-300 shadow-xl backdrop-blur-sm hover:shadow-2xl transition-all duration-700 ${isAnimating ? 'scale-95 opacity-80' : 'scale-100 opacity-100'}`}>
-          
-          {/* Glowing border effect */}
-          <div className="absolute inset-0 bg-gradient-to-r from-orange-500 via-orange-600 to-orange-500 rounded-3xl opacity-25 blur-sm"></div>
-          <div className="relative bg-gradient-to-br from-white/80 via-orange-50 to-white/80 rounded-2xl p-8 md:p-10 lg:p-12 backdrop-blur-lg border border-orange-200">
-            
-            {/* Header with enhanced design */}
-            <div className="text-center mb-8">
-              <div className="flex items-center justify-center mb-4">
-                <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-full p-4 shadow-xl animate-bounce">
-                  <Lightbulb className="w-8 h-8 text-white" />
-                </div>
-              </div>
-              
-              <h3 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-orange-600 to-orange-700 bg-clip-text text-transparent mb-2">
-                {t('didyouknow.title')}
-              </h3>
-              <div className="flex items-center justify-center space-x-2 mb-4">
-                <span className="text-orange-600 font-semibold text-lg">{currentFact.category}</span>
-              </div>
-              
-              {/* Decorative line */}
-              <div className="w-24 h-1 bg-gradient-to-r from-orange-400 to-orange-600 rounded-full mx-auto"></div>
-            </div>
-
-            {/* Fact Content with enhanced styling */}
-            <div className="mb-8">
-              <div className={`transition-all duration-500 ${isAnimating ? 'opacity-0 translate-y-6' : 'opacity-100 translate-y-0'}`}>
-                <div className="bg-white/90 backdrop-blur-md rounded-xl p-6 md:p-8 shadow-lg border border-orange-200 max-w-5xl mx-auto ring-1 ring-orange-300/60">
-                  <p className="text-gray-900 text-lg md:text-xl leading-relaxed font-semibold text-center max-w-4xl mx-auto tracking-wide">
-                    {language === 'EN' ? currentFact.text : (currentFact.text_hi || currentFact.text)}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Simple bottom section */}
-            <div className="flex items-center justify-center pt-6 border-t border-white/30">
-              <div className="flex space-x-3">
-                {facts.slice(0, Math.min(5, facts.length)).map((_, index) => (
-                  <div
-                    key={index}
-                    className={`rounded-full transition-all duration-700 ease-out ${
-                      index === currentFactIndex % facts.length
-                        ? 'bg-gradient-to-r from-orange-400 to-orange-500 w-10 h-3 shadow-md' 
-                        : 'bg-orange-200/60 w-3 h-3 hover:bg-orange-300/60'
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Enhanced decorative elements */}
-            <div className="absolute top-6 right-6 opacity-20">
-              <Sparkles className="w-16 h-16 text-orange-500 animate-pulse" />
-            </div>
-            <div className="absolute bottom-6 left-6 opacity-20">
-              <Sparkles className="w-12 h-12 text-orange-400 animate-pulse delay-500" />
-            </div>
-            <div className="absolute top-1/2 left-6 opacity-10">
-              <Sparkles className="w-8 h-8 text-orange-600 animate-pulse delay-1000" />
-            </div>
+    <div className="max-w-3xl mx-auto px-4 sm:px-6">
+      <div className="bg-orange-50 border border-orange-200 rounded-2xl p-8 md:p-10">
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-9 h-9 rounded-full bg-orange-100 border border-orange-200 flex items-center justify-center flex-shrink-0">
+            <Lightbulb className="w-4 h-4 text-orange-600" />
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-orange-600 uppercase tracking-widest">{t('didyouknow.title')}</p>
+            <p className="text-xs text-orange-400">{fact.category}</p>
           </div>
         </div>
+
+        <div
+          className="transition-opacity duration-400"
+          style={{ opacity: visible ? 1 : 0 }}
+        >
+          <p className="text-gray-800 text-lg leading-relaxed font-medium">
+            {language === 'EN' ? fact.text : (fact.text_hi || fact.text)}
+          </p>
+        </div>
+
+        {facts.length > 1 && (
+          <div className="flex gap-1.5 mt-6">
+            {facts.slice(0, Math.min(facts.length, 6)).map((_, i) => (
+              <button
+                key={i}
+                onClick={() => { setVisible(false); setTimeout(() => { setCurrentIndex(i); setVisible(true); }, 400); }}
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  i === currentIndex ? 'w-6 bg-orange-500' : 'w-1.5 bg-orange-200 hover:bg-orange-300'
+                }`}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { BookMarked, BookOpen, Eye, ArrowRight, Sparkles, Crown } from 'lucide-react'
+import { BookMarked, BookOpen, Eye, ArrowRight, Crown } from 'lucide-react'
 import { supabase } from '@/lib/supabaseClient'
 import { useLanguage } from '@/contexts/LanguageContext'
 
@@ -102,7 +102,7 @@ const LandingStoriesSection = () => {
         <div className="grid md:grid-cols-3 gap-8 mb-12">
           {featuredBooks.map((book, index) => (
             <Link key={book.id} to={`/prabhu-ki-leelaayen/book/${book.slug}`} className="group">
-              <Card className="h-full hover:shadow-2xl transition-all duration-500 transform hover:scale-105 border-0 shadow-xl bg-white overflow-hidden relative">
+              <Card className="h-full hover:shadow-xl transition-shadow duration-300 border-0 shadow-md bg-white overflow-hidden relative">
                 {/* Premium Badge for First Book */}
                 {index === 0 && (
                   <div className="absolute top-4 right-4 z-10">
@@ -181,18 +181,13 @@ const LandingStoriesSection = () => {
           <Link to="/prabhu-ki-leelaayen">
             <Button
               size="lg"
-              className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white px-8 py-6 rounded-full shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 text-lg"
+              className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-7 py-3 rounded-full gap-2"
             >
-              <BookMarked className="w-5 h-5 mr-2" />
+              <BookMarked className="w-4 h-4" />
               {language === 'HI' ? 'सभी कहानियां देखें' : 'Explore All Stories'}
-              <Sparkles className="w-5 h-5 ml-2" />
+              <ArrowRight className="w-4 h-4" />
             </Button>
           </Link>
-          <p className="text-sm text-gray-500 mt-4">
-            {language === 'HI'
-              ? 'अपनी आध्यात्मिक यात्रा शुरू करें - निःशुल्क!'
-              : 'Start your spiritual journey - Completely Free!'}
-          </p>
         </div>
       </div>
     </section>

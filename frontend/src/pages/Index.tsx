@@ -7,7 +7,7 @@ import StructuredData from '@/components/StructuredData';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Users, Heart, Star, Book, ArrowDown, Video, MessageSquare } from 'lucide-react';
+import { Users, Heart, Star, ArrowRight, Video, MessageSquare } from 'lucide-react';
 import VisitorCounter from '@/components/VisitorCounter';
 import SpiritualFactBox from '@/components/SpiritualFactBox';
 import FeedbackForm from '@/components/FeedbackForm';
@@ -81,39 +81,33 @@ const Index = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-gradient-to-br from-white to-orange-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
-              Explore Sacred Wisdom
+      <section className="py-16 bg-white border-t border-gray-100">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-10">
+            <p className="text-xs font-semibold text-orange-500 uppercase tracking-widest mb-2">Explore</p>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+              Sacred Wisdom
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
-              Connect with enlightened masters and divine manifestations
-            </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {features.map((feature, index) => {
               const Icon = feature.icon;
               return (
                 <Link key={index} to={feature.to}>
-                  <Card className="group hover:shadow-xl transition-shadow duration-300 border-0 shadow-md bg-white">
-                    <CardContent className="p-6 text-center space-y-4">
-                      <div className={`w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center`}>
-                        <Icon className="w-8 h-8 text-white" />
+                  <Card className="group hover:shadow-lg transition-shadow duration-200 border border-gray-100 shadow-sm bg-white">
+                    <CardContent className="p-6 space-y-4">
+                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center`}>
+                        <Icon className="w-6 h-6 text-white" />
                       </div>
-                      
-                      <div className="space-y-2">
-                        <h3 className="text-xl font-semibold text-gray-800 group-hover:text-orange-600 transition-colors">
+                      <div className="space-y-1.5">
+                        <h3 className="text-lg font-semibold text-gray-800 group-hover:text-orange-600 transition-colors flex items-center justify-between">
                           {feature.title}
+                          <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-orange-400 transition-colors" />
                         </h3>
-                        <p className="text-sm text-gray-600 leading-relaxed">
+                        <p className="text-sm text-gray-500 leading-relaxed">
                           {feature.description}
                         </p>
-                      </div>
-
-                      <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <ArrowDown className="w-5 h-5 text-orange-500 mx-auto transform rotate-[-90deg]" />
                       </div>
                     </CardContent>
                   </Card>
@@ -124,50 +118,31 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Featured Live Bhajan Section */}
-<section className="py-16 bg-gradient-to-br from-orange-50 to-red-50">
-  <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div className="text-center mb-12">
-      <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
-        {t('live.title')}
-      </h2>
-      <p className="text-lg text-gray-600">
-        {t('live.subtitle')}
-      </p>
-    </div>
-    
-    <Link to="/live-bhajans">
-      <Card className="group hover:shadow-xl transition-shadow duration-300 border-0 shadow-lg bg-gradient-to-br from-white to-orange-50 max-w-md mx-auto">
-        <CardContent className="p-8 text-center space-y-6">
-          <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center shadow-lg relative">
-            <Video className="w-10 h-10 text-white ml-1" fill="white" />
-            {/* Live indicator dot */}
-            <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full animate-pulse border-2 border-white"></div>
-          </div>
-          
-          <div className="space-y-3">
-            <h3 className="text-2xl font-bold text-gray-800 group-hover:text-orange-600 transition-colors">
-              {t('live.button')}
-            </h3>
-            <p className="text-gray-600 leading-relaxed">
-              {t('live.description')}
-            </p>
-            <div className="flex items-center justify-center space-x-2">
-              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-              <p className="text-sm text-red-600 font-medium">
-                {t('live.status')}
-              </p>
+      {/* Live Bhajans */}
+      <section className="py-16 bg-orange-50 border-t border-orange-100">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center shadow-md relative flex-shrink-0">
+              <Video className="w-7 h-7 text-white ml-0.5" fill="white" />
+              <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-red-500 rounded-full border-2 border-white animate-pulse" />
             </div>
+            <div className="flex-1 text-center md:text-left space-y-2">
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-900">{t('live.title')}</h2>
+              <p className="text-gray-500">{t('live.description')}</p>
+              <div className="flex items-center gap-2 justify-center md:justify-start">
+                <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                <span className="text-sm text-red-600 font-medium">{t('live.status')}</span>
+              </div>
+            </div>
+            <Link to="/live-bhajans" className="flex-shrink-0">
+              <button className="flex items-center gap-2 bg-white border border-orange-200 text-orange-600 hover:bg-orange-50 px-6 py-3 rounded-full text-sm font-semibold transition-colors">
+                {t('live.button')}
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </Link>
           </div>
-
-          <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <ArrowDown className="w-6 h-6 text-orange-500 mx-auto transform rotate-[-90deg]" />
-          </div>
-        </CardContent>
-      </Card>
-    </Link>
-  </div>
-</section>
+        </div>
+      </section>
 
       {/* Featured Bhajan Section - New Spotify-style */}
       <LandingBhajanSection />
