@@ -56,6 +56,9 @@ BLOG_GAMIFICATION_IMPLEMENTATION.md
 # Notion documents (local only)
 NOTION_AI_EMAIL_INTEGRATION_GUIDE.md
 
+# Local planning and improvement notes
+upcoming_changes.md
+
 # Ignore all markdown files except README.md files
 *.md
 !README.md

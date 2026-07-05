@@ -31,8 +31,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     // Supabase fires INITIAL_SESSION on subscribe which covers the initial load.
     // No manual getSession() call needed — this avoids the race condition.
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, currentSession) => {
-        console.log('Auth event:', event, currentSession ? currentSession.user?.email : 'no session');
+      (_event, currentSession) => {
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
         setLoading(false);

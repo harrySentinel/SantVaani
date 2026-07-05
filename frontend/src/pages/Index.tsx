@@ -86,12 +86,6 @@ const Index = () => {
             <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
               Explore Sacred Wisdom
             </h2>
-
-             {/* Beta Badge - Option 3: Next to heading */}
-              <span className="bg-gradient-to-r from-orange-500 to-red-600 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-md">
-                {t('beta.badge')}
-              </span>
-
             <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
               Connect with enlightened masters and divine manifestations
             </p>
@@ -210,13 +204,6 @@ const Index = () => {
               <p className="text-lg text-gray-600 leading-relaxed">
                 {t('mission.description')}
               </p>
-
-               {/* Beta Notice - Option 4: In mission section */}
-              <div className="bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-lg p-4 mt-6">
-                <p className="text-sm text-gray-700">
-                  {t('mission.beta.notice')}
-                </p>
-              </div>
 
             </div>
 

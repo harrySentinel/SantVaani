@@ -49,27 +49,19 @@ const SantvaaniSpace = lazy(() => import("./pages/santvaani-space/index"));
 const SantvaaniSpacePost = lazy(() => import("./pages/santvaani-space/[postId]"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: { staleTime: 5 * 60 * 1000, retry: 1 },
+  },
+});
 
 const App = () => {
   useEffect(() => {
     // Initialize Firebase FCM on app load
     const initializeFCM = async () => {
-      console.log('🔥 Initializing Firebase FCM...');
-      
-      // Firebase automatically registers firebase-messaging-sw.js
-      // No need to manually register service worker
-      
-      // Request FCM token
-      const token = await getFCMToken();
-      if (token) {
-        console.log('✅ FCM initialized successfully');
-      }
-      
-      // Listen for foreground messages
-      onFCMMessage((payload) => {
-        console.log('📱 Received foreground message:', payload);
-        // You can show toast notifications here
+      await getFCMToken();
+      onFCMMessage((_payload) => {
+        // foreground push messages — show toast here if needed
       });
     };
 
