@@ -48,7 +48,7 @@ const LandingBhajanSection = () => {
 
   if (loading) {
     return (
-      <section className="py-16 bg-white border-t border-gray-100">
+      <section className="py-16 relative">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <BhajanGridSkeleton count={6} />
         </div>
@@ -60,7 +60,7 @@ const LandingBhajanSection = () => {
 
   return (
     <>
-      <section className="py-16 bg-white border-t border-gray-100">
+      <section className="py-16 relative">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <div className="flex items-end justify-between mb-8">

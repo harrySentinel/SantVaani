@@ -79,7 +79,7 @@ const LandingBlogSection = () => {
 
   if (isLoading) {
     return (
-      <section className="py-16 bg-gray-50 border-t border-gray-100">
+      <section className="py-16 relative">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="h-8 bg-gray-200 rounded w-40 mb-8 animate-pulse" />
           <BlogGridSkeleton count={3} />
@@ -91,7 +91,7 @@ const LandingBlogSection = () => {
   if (featuredPosts.length === 0) return null
 
   return (
-    <section className="py-16 bg-gray-50 border-t border-gray-100">
+    <section className="py-16 relative">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex items-end justify-between mb-8">
@@ -116,7 +116,7 @@ const LandingBlogSection = () => {
         <div className="grid md:grid-cols-3 gap-6">
           {featuredPosts.map(post => (
             <Link key={post.id} to={`/blog/post/${post.slug}`} className="group">
-              <Card className="h-full hover:shadow-md transition-shadow duration-200 border border-gray-200 shadow-sm bg-white overflow-hidden">
+              <Card className="h-full hover:shadow-lg transition-all duration-200 border border-white/80 shadow-md bg-white/60 backdrop-blur-md overflow-hidden">
                 <CardContent className="p-5 space-y-3">
                   {/* Category */}
                   <div

@@ -73,14 +73,16 @@ const SpiritualFactBox = () => {
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6">
-      <div className="bg-orange-50 border border-orange-200 rounded-2xl p-8 md:p-10">
+      <div className="relative overflow-hidden bg-white/60 backdrop-blur-md border border-white/80 rounded-3xl shadow-md p-8 md:p-10">
+        <div className="absolute -top-6 -right-6 w-32 h-32 bg-orange-200 rounded-full blur-2xl opacity-50 pointer-events-none" />
+        <div className="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-orange-200/60 to-transparent" />
         <div className="flex items-center gap-3 mb-5">
-          <div className="w-9 h-9 rounded-full bg-orange-100 border border-orange-200 flex items-center justify-center flex-shrink-0">
-            <Lightbulb className="w-4 h-4 text-orange-600" />
+          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center flex-shrink-0">
+            <Lightbulb className="w-4 h-4 text-white" />
           </div>
           <div>
             <p className="text-xs font-semibold text-orange-600 uppercase tracking-widest">{t('didyouknow.title')}</p>
-            <p className="text-xs text-orange-400">{fact.category}</p>
+            <p className="text-xs text-orange-500">{fact.category}</p>
           </div>
         </div>
 

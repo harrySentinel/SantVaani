@@ -14,7 +14,7 @@ const LandingHoroscopeSection = () => {
   });
 
   return (
-    <section className="py-20 bg-white border-t border-gray-100">
+    <section className="py-20 relative">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid md:grid-cols-2 gap-12 items-center">
 
@@ -40,7 +40,7 @@ const LandingHoroscopeSection = () => {
             <Link to="/horoscope">
               <Button
                 size="lg"
-                className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-7 py-3 rounded-full mt-2 gap-2"
+                className="bg-orange-500 hover:bg-orange-600 text-white px-7 py-3 rounded-full mt-2 gap-2 shadow-md shadow-orange-200"
               >
                 {language === 'HI' ? 'आज का राशिफल देखें' : "View Today's Horoscope"}
                 <ArrowRight className="w-4 h-4" />
@@ -56,10 +56,13 @@ const LandingHoroscopeSection = () => {
               { icon: Star,     label: language === 'HI' ? 'मासिक'    : 'Monthly', sub: language === 'HI' ? 'मासिक अंतर्दृष्टि'     : 'Monthly insights' },
               { icon: Calendar, label: language === 'HI' ? '12 राशियां' : '12 Signs', sub: language === 'HI' ? 'सभी राशियों के लिए'   : 'All zodiac signs' },
             ].map(({ icon: Icon, label, sub }) => (
-              <div key={label} className="bg-orange-50 border border-orange-100 rounded-xl p-4 space-y-2">
-                <Icon className="w-5 h-5 text-orange-500" />
+              <div key={label} className="relative overflow-hidden bg-white/60 backdrop-blur-md border border-white/80 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow space-y-2">
+                <div className="absolute top-0 left-3 right-3 h-px bg-gradient-to-r from-transparent via-white to-transparent" />
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center mb-3">
+                  <Icon className="w-4 h-4 text-white" />
+                </div>
                 <p className="text-sm font-semibold text-gray-800">{label}</p>
-                <p className="text-xs text-gray-500">{sub}</p>
+                <p className="text-xs text-gray-400">{sub}</p>
               </div>
             ))}
           </div>

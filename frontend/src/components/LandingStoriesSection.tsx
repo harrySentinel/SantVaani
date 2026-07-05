@@ -50,7 +50,7 @@ const LandingStoriesSection = () => {
 
   if (isLoading) {
     return (
-      <section className="py-20 bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 relative overflow-hidden">
+      <section className="py-20 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="animate-pulse">
             <div className="h-10 bg-gray-200 rounded-lg mb-4 w-64 mx-auto"></div>
@@ -71,7 +71,7 @@ const LandingStoriesSection = () => {
   }
 
   return (
-    <section className="py-20 bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 relative overflow-hidden">
+    <section className="py-20 relative overflow-hidden">
       {/* Decorative Background Elements */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-orange-200 rounded-full filter blur-3xl opacity-20"></div>
       <div className="absolute bottom-0 left-0 w-64 h-64 bg-red-200 rounded-full filter blur-3xl opacity-20"></div>
@@ -102,7 +102,7 @@ const LandingStoriesSection = () => {
         <div className="grid md:grid-cols-3 gap-8 mb-12">
           {featuredBooks.map((book, index) => (
             <Link key={book.id} to={`/prabhu-ki-leelaayen/book/${book.slug}`} className="group">
-              <Card className="h-full hover:shadow-xl transition-shadow duration-300 border-0 shadow-md bg-white overflow-hidden relative">
+              <Card className="h-full hover:shadow-xl transition-all duration-300 border border-white/80 shadow-md bg-white/60 backdrop-blur-md overflow-hidden relative">
                 {/* Premium Badge for First Book */}
                 {index === 0 && (
                   <div className="absolute top-4 right-4 z-10">
