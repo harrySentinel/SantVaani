@@ -121,7 +121,7 @@ export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
       onClick={onClose}
     >
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} onTouchEnd={onClose} />
 
       {/* Panel */}
       <div

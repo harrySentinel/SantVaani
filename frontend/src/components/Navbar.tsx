@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Users, Heart, Sparkles, Book, Info, IndianRupee, Star, ChevronDown, ChevronRight, CalendarDays, LogIn, UserPlus, User, LogOut, BookOpen, BookMarked, Quote, Share2, Settings, Search } from 'lucide-react';
+import { Menu, X, Users, Heart, Sparkles, Book, Info, IndianRupee, Star, ChevronDown, ChevronRight, CalendarDays, LogIn, UserPlus, User, LogOut, BookOpen, BookMarked, Quote, Share2, Settings, Search, LayoutDashboard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -18,6 +18,8 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isMoreOpen, setIsMoreOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [profileExpanded, setProfileExpanded] = useState(false);
+  const [menuOpenCount, setMenuOpenCount] = useState(0);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { user, loading, signOut } = useAuth();
   const { language, toggleLanguage } = useLanguage();
@@ -44,9 +46,13 @@ export default function Navbar() {
     setIsMoreOpen(false);
   }, [location.pathname]);
 
-  // Lock body scroll when mobile menu is open
+  // Lock body scroll when mobile menu is open + track open count for animation
   useEffect(() => {
     document.body.style.overflow = isOpen ? 'hidden' : '';
+    if (isOpen) {
+      setProfileExpanded(false);
+      setMenuOpenCount(c => c + 1);
+    }
     return () => { document.body.style.overflow = ''; };
   }, [isOpen]);
 
@@ -316,9 +322,9 @@ export default function Navbar() {
             </button>
           </div>
 
-          {/* Nav Items */}
-          <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-2">
-            {allMenuItems.map((item) => {
+          {/* Nav Items — staggered animation */}
+          <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-2" key={menuOpenCount}>
+            {allMenuItems.map((item, index) => {
               const Icon = item.icon;
               const active = isActive(item.to);
               return (
@@ -326,6 +332,7 @@ export default function Navbar() {
                   key={item.to}
                   to={item.to}
                   onClick={() => setIsOpen(false)}
+                  style={{ animation: 'menuItemIn 0.28s ease forwards', animationDelay: `${index * 38}ms`, opacity: 0 }}
                   className={`flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-colors duration-150 ${
                     active
                       ? 'bg-orange-500 text-white shadow-md shadow-orange-200'
@@ -346,62 +353,74 @@ export default function Navbar() {
             })}
 
             {/* Auth section */}
-            <div className="pt-2 border-t border-orange-100 mt-2 space-y-2">
+            <div className="pt-2 border-t border-orange-100 mt-2 space-y-2"
+              style={{ animation: 'menuItemIn 0.28s ease forwards', animationDelay: `${allMenuItems.length * 38}ms`, opacity: 0 }}
+            >
               {loading ? (
                 <div className="h-14 bg-white rounded-2xl animate-pulse border border-gray-100" />
               ) : user ? (
                 <>
-                  {/* User card */}
-                  <div className="flex items-center gap-3 bg-white border border-gray-100 rounded-2xl px-4 py-3">
-                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+                  {/* Collapsible profile card */}
+                  <button
+                    onClick={() => setProfileExpanded(e => !e)}
+                    className="w-full flex items-center gap-3 bg-white border border-orange-200 rounded-2xl px-4 py-3 transition-colors hover:bg-orange-50"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
                       {(user.user_metadata?.name || user.email || 'U')[0].toUpperCase()}
                     </div>
-                    <div className="min-w-0 flex-1">
+                    <div className="min-w-0 flex-1 text-left">
                       <p className="text-sm font-semibold text-gray-800 truncate">
                         {user.user_metadata?.name || 'Account'}
                       </p>
-                      <p className="text-xs text-gray-400 truncate">{user.email}</p>
+                      <p className="text-xs text-orange-500 font-medium">
+                        {profileExpanded ? 'Tap to collapse' : 'Tap to manage'}
+                      </p>
                     </div>
-                  </div>
-                  <Link
-                    to="/dashboard"
-                    onClick={() => setIsOpen(false)}
-                    className="flex items-center gap-4 bg-white border border-gray-100 text-gray-800 hover:bg-orange-50 px-4 py-3.5 rounded-2xl transition-colors"
-                  >
-                    <div className="w-9 h-9 rounded-xl bg-orange-50 border border-orange-100 flex items-center justify-center flex-shrink-0">
-                      <User className="w-4 h-4 text-orange-500" />
-                    </div>
-                    <span className="flex-1 font-medium text-[15px]">Dashboard</span>
-                    <ChevronRight className="w-4 h-4 text-gray-300" />
-                  </Link>
-                  <Link
-                    to="/profile-settings"
-                    onClick={() => setIsOpen(false)}
-                    className="flex items-center gap-4 bg-white border border-gray-100 text-gray-800 hover:bg-orange-50 px-4 py-3.5 rounded-2xl transition-colors"
-                  >
-                    <div className="w-9 h-9 rounded-xl bg-orange-50 border border-orange-100 flex items-center justify-center flex-shrink-0">
-                      <Settings className="w-4 h-4 text-orange-500" />
-                    </div>
-                    <span className="flex-1 font-medium text-[15px]">Profile Settings</span>
-                    <ChevronRight className="w-4 h-4 text-gray-300" />
-                  </Link>
-                  <button
-                    onClick={async () => {
-                      try {
-                        setIsOpen(false);
-                        await signOut();
-                        window.location.href = '/';
-                      } catch (error) {
-                        console.error('Logout error:', error);
-                      }
-                    }}
-                    className="flex items-center gap-4 bg-white border border-red-100 text-red-600 hover:bg-red-50 px-4 py-3.5 rounded-2xl transition-colors w-full text-left"
-                  >
-                    <div className="w-9 h-9 rounded-xl bg-red-50 border border-red-100 flex items-center justify-center flex-shrink-0">
-                      <LogOut className="w-4 h-4 text-red-500" />
-                    </div>
-                    <span className="flex-1 font-medium text-[15px]">Logout</span>
+                    <ChevronDown className={`w-4 h-4 text-orange-400 transition-transform duration-300 ${profileExpanded ? 'rotate-180' : ''}`} />
                   </button>
+
+                  {/* Expandable options */}
+                  <div className={`overflow-hidden transition-all duration-300 ease-in-out space-y-2 ${profileExpanded ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'}`}>
+                    <Link
+                      to="/dashboard"
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-center gap-4 bg-white border border-gray-100 text-gray-800 hover:bg-orange-50 px-4 py-3.5 rounded-2xl transition-colors"
+                    >
+                      <div className="w-9 h-9 rounded-xl bg-orange-50 border border-orange-100 flex items-center justify-center flex-shrink-0">
+                        <LayoutDashboard className="w-4 h-4 text-orange-500" />
+                      </div>
+                      <span className="flex-1 font-medium text-[15px]">Dashboard</span>
+                      <ChevronRight className="w-4 h-4 text-gray-300" />
+                    </Link>
+                    <Link
+                      to="/profile-settings"
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-center gap-4 bg-white border border-gray-100 text-gray-800 hover:bg-orange-50 px-4 py-3.5 rounded-2xl transition-colors"
+                    >
+                      <div className="w-9 h-9 rounded-xl bg-orange-50 border border-orange-100 flex items-center justify-center flex-shrink-0">
+                        <Settings className="w-4 h-4 text-orange-500" />
+                      </div>
+                      <span className="flex-1 font-medium text-[15px]">Profile Settings</span>
+                      <ChevronRight className="w-4 h-4 text-gray-300" />
+                    </Link>
+                    <button
+                      onClick={async () => {
+                        try {
+                          setIsOpen(false);
+                          await signOut();
+                          window.location.href = '/';
+                        } catch (error) {
+                          console.error('Logout error:', error);
+                        }
+                      }}
+                      className="flex items-center gap-4 bg-white border border-red-100 text-red-600 hover:bg-red-50 px-4 py-3.5 rounded-2xl transition-colors w-full text-left"
+                    >
+                      <div className="w-9 h-9 rounded-xl bg-red-50 border border-red-100 flex items-center justify-center flex-shrink-0">
+                        <LogOut className="w-4 h-4 text-red-500" />
+                      </div>
+                      <span className="flex-1 font-medium text-[15px]">Logout</span>
+                    </button>
+                  </div>
                 </>
               ) : (
                 <>
