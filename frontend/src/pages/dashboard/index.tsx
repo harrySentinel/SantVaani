@@ -26,6 +26,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { eventsService, Event } from '@/lib/events';
 import DivineWelcomeLetter from '@/components/DivineWelcomeLetter';
 import { getUserBookmarks } from '@/services/blogSocialService';
+import { LoadingPage } from '@/components/ui/loading-spinner';
 
 const Dashboard = () => {
   const [userEvents, setUserEvents] = useState<Event[]>([]);
@@ -208,16 +209,7 @@ const Dashboard = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center space-y-3">
-          <span className="text-5xl text-orange-400 animate-pulse block" style={{ fontFamily: 'serif' }}>ॐ</span>
-          <p className="text-gray-400 text-sm">Loading your dashboard...</p>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <LoadingPage />;
 
   if (!user) {
     return null;

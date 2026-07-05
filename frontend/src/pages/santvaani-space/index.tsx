@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Loader2, Home, Sparkles } from 'lucide-react';
+import { LoadingPage } from '@/components/ui/loading-spinner';
 import { Toaster } from '@/components/ui/toaster';
 import { useToast } from '@/hooks/use-toast';
 import PostCard from '@/components/santvaani-space/PostCard';
@@ -85,18 +86,7 @@ const SantvaaniSpace = () => {
     navigate(`/santvaani-space/${postId}`);
   };
 
-  if (loading && page === 1) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-orange-50 via-white to-purple-50 flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="h-12 w-12 animate-spin text-orange-600 mx-auto" />
-          <p className="mt-4 text-gray-600">
-            {language === 'hi' ? 'लोड हो रहा है...' : 'Loading...'}
-          </p>
-        </div>
-      </div>
-    );
-  }
+  if (loading && page === 1) return <LoadingPage />;
 
   if (error && posts.length === 0) {
     return (

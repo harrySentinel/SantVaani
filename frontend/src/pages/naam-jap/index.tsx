@@ -22,6 +22,7 @@ import {
   LogIn,
   UserPlus
 } from 'lucide-react';
+import { LoadingPage } from '@/components/ui/loading-spinner';
 import { useToast } from '@/hooks/use-toast';
 import { Toaster } from '@/components/ui/toaster';
 import { Link } from 'react-router-dom';
@@ -273,20 +274,7 @@ const NaamJapTracker = () => {
   };
 
   // Show loading while checking authentication
-  if (authLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50">
-        <Navbar />
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="text-center">
-            <Loader2 className="w-12 h-12 animate-spin text-orange-600 mx-auto mb-4" />
-            <p className="text-gray-600">{language === 'HI' ? 'लोड हो रहा है...' : 'Loading...'}</p>
-          </div>
-        </div>
-        <Footer />
-      </div>
-    );
-  }
+  if (authLoading) return <LoadingPage />;
 
   // Show login prompt if user is not authenticated
   if (!user) {
@@ -401,20 +389,7 @@ const NaamJapTracker = () => {
   }
 
   // Show loading while fetching entries
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50">
-        <Navbar />
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="text-center">
-            <Loader2 className="w-12 h-12 animate-spin text-orange-600 mx-auto mb-4" />
-            <p className="text-gray-600">{language === 'HI' ? 'एंट्रीज़ लोड हो रही हैं...' : 'Loading entries...'}</p>
-          </div>
-        </div>
-        <Footer />
-      </div>
-    );
-  }
+  if (loading) return <LoadingPage />;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50">

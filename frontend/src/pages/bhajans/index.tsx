@@ -10,7 +10,8 @@ import CompactBhajanCard from '@/components/bhajan/CompactBhajanCard';
 import HorizontalBhajanSection from '@/components/bhajan/HorizontalBhajanSection';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Music, Loader2, Search, Flame, TrendingUp, Sparkles, LibraryBig } from 'lucide-react';
+import { Music, Search, Flame, TrendingUp, Sparkles, LibraryBig } from 'lucide-react';
+import { LoadingPage } from '@/components/ui/loading-spinner';
 import { Toaster } from '@/components/ui/toaster';
 import { supabase } from '@/lib/supabaseClient';
 import { usePagination } from '@/hooks/usePagination';
@@ -141,20 +142,7 @@ const Bhajans = () => {
     setSelectedBhajan(null);
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-        <Navbar />
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="text-center space-y-4">
-            <Loader2 className="w-12 h-12 animate-spin text-orange-600 mx-auto" />
-            <p className="text-lg text-gray-600">{t('bhajans.loading')}</p>
-          </div>
-        </div>
-        <Footer />
-      </div>
-    );
-  }
+  if (loading) return <LoadingPage />;
 
   if (error) {
     return (

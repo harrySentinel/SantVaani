@@ -3,6 +3,7 @@ import SEO from '@/components/SEO';
 import StructuredData from '@/components/StructuredData';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Quote, Heart, Loader2, Share2, Download, ChevronDown, Home, X } from 'lucide-react';
+import { LoadingPage } from '@/components/ui/loading-spinner';
 import { Toaster } from '@/components/ui/toaster';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabaseClient';
@@ -165,16 +166,7 @@ const Quotes = () => {
   };
 
   // Loading state
-  if (loading) {
-    return (
-      <div className="h-screen flex items-center justify-center bg-gradient-to-br from-purple-500 via-pink-500 to-red-500">
-        <div className="text-center space-y-4">
-          <Loader2 className="w-12 h-12 animate-spin text-white mx-auto" />
-          <p className="text-lg text-white font-medium">Loading divine wisdom...</p>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <LoadingPage />;
 
   // Error state
   if (error || quotes.length === 0) {

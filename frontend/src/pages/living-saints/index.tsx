@@ -8,7 +8,8 @@ import LivingSaintShareButton from '@/components/LivingSaintShareButton';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { ExternalLink, Users, Globe, Heart, Loader2, Search } from 'lucide-react';
+import { ExternalLink, Users, Globe, Heart, Search } from 'lucide-react';
+import { LoadingPage } from '@/components/ui/loading-spinner';
 import { usePagination } from '@/hooks/usePagination';
 import BeautifulPagination from '@/components/BeautifulPagination';
 
@@ -149,20 +150,7 @@ const LivingSaints = () => {
   };
 
   // Loading state
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50">
-        <Navbar />
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="flex flex-col items-center space-y-4">
-            <Loader2 className="w-8 h-8 animate-spin text-red-600" />
-            <p className="text-gray-600">{t('livingsaints.loading')}</p>
-          </div>
-        </div>
-        <Footer />
-      </div>
-    );
-  }
+  if (loading) return <LoadingPage />;
 
   // Error state
   if (error) {

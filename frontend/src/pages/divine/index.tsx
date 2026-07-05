@@ -8,7 +8,8 @@ import DivineFormShareButton from '@/components/DivineFormShareButton';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Sparkles, Crown, Shield, Zap, Loader2, Search } from 'lucide-react';
+import { Sparkles, Crown, Shield, Zap, Search } from 'lucide-react';
+import { LoadingPage } from '@/components/ui/loading-spinner';
 import { usePagination } from '@/hooks/usePagination';
 import BhajanPagination from '@/components/BhajanPagination';
 
@@ -119,20 +120,7 @@ const Divine = () => {
 
 
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-orange-50">
-        <Navbar />
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-center space-y-4">
-            <Loader2 className="w-12 h-12 animate-spin text-purple-600 mx-auto" />
-            <p className="text-lg text-gray-600">{t('divine.loading')}</p>
-          </div>
-        </div>
-        <Footer />
-      </div>
-    );
-  }
+  if (loading) return <LoadingPage />;
 
   if (error) {
     return (

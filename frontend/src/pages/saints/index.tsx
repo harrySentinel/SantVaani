@@ -9,6 +9,7 @@ import ShareButton from '@/components/ShareButton';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Heart, Calendar, MapPin, Search } from 'lucide-react';
+import { LoadingPage } from '@/components/ui/loading-spinner';
 import { Input } from '@/components/ui/input';
 import { supabase } from '@/lib/supabaseClient';
 import { usePagination } from '@/hooks/usePagination';
@@ -148,46 +149,7 @@ const Saints = () => {
   };
 
   // Loading state - matches your existing UI structure
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-white">
-        <Navbar />
-        
-        {/* Header */}
-        <section className="pt-20 pb-12 bg-gradient-to-r from-orange-100 to-orange-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="space-y-4"
-            >
-              <h1 className={`text-4xl md:text-5xl font-bold bg-gradient-to-r from-orange-600 to-orange-700 bg-clip-text text-transparent ${language === 'HI' ? 'pt-2' : ''}`}>
-                {t('saints.title')}
-              </h1>
-              <p className={`text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed ${language === 'HI' ? 'pt-1' : ''}`}>
-                {t('saints.subtitle')}
-              </p>
-              <div className="flex justify-center">
-                <Badge variant="secondary" className="bg-orange-100 text-orange-700 px-4 py-2">
-                  {t('saints.loading.badge')}
-                </Badge>
-              </div>
-            </motion.div>
-          </div>
-        </section>
-
-        {/* Loading Grid */}
-        <section className="py-16">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <SaintGridSkeleton count={6} />
-          </div>
-        </section>
-
-        <Footer />
-      </div>
-    );
-  }
+  if (loading) return <LoadingPage />;
 
   // Error state - matches your existing UI structure
   if (error) {
