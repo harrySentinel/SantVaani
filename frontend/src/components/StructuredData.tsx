@@ -1,12 +1,18 @@
 import { Helmet } from 'react-helmet-async';
 
+// ─── Organization ───────────────────────────────────────────────────────────
+
 interface OrganizationSchemaProps {
   type?: 'organization';
 }
 
+// ─── Website ─────────────────────────────────────────────────────────────────
+
 interface WebsiteSchemaProps {
   type?: 'website';
 }
+
+// ─── Article ─────────────────────────────────────────────────────────────────
 
 interface ArticleSchemaProps {
   type: 'article';
@@ -18,55 +24,112 @@ interface ArticleSchemaProps {
   author: string;
 }
 
-type StructuredDataProps = OrganizationSchemaProps | WebsiteSchemaProps | ArticleSchemaProps;
+// ─── Person (Saint) ──────────────────────────────────────────────────────────
+
+interface PersonSchemaProps {
+  type: 'person';
+  name: string;
+  alternateName?: string;
+  description: string;
+  image?: string;
+  birthDate?: string;
+  deathDate?: string;
+  knowsAbout?: string[];
+  sameAs?: string[];
+}
+
+// ─── FAQPage ─────────────────────────────────────────────────────────────────
+
+interface FAQSchemaProps {
+  type: 'faq';
+  items: { question: string; answer: string }[];
+}
+
+// ─── MusicPlaylist ───────────────────────────────────────────────────────────
+
+interface MusicPlaylistSchemaProps {
+  type: 'musicplaylist';
+  name: string;
+  description?: string;
+  numTracks?: number;
+  tracks?: { name: string; byArtist?: string }[];
+}
+
+// ─── CollectionPage ──────────────────────────────────────────────────────────
+
+interface CollectionPageSchemaProps {
+  type: 'collectionpage';
+  name: string;
+  description: string;
+  url: string;
+}
+
+type StructuredDataProps =
+  | OrganizationSchemaProps
+  | WebsiteSchemaProps
+  | ArticleSchemaProps
+  | PersonSchemaProps
+  | FAQSchemaProps
+  | MusicPlaylistSchemaProps
+  | CollectionPageSchemaProps;
 
 const StructuredData = (props: StructuredDataProps) => {
-  let schema;
+  let schema: object;
 
   if (!props.type || props.type === 'organization') {
-    // Organization Schema
     schema = {
       '@context': 'https://schema.org',
       '@type': 'Organization',
       name: 'Santvaani',
+      alternateName: 'संतवाणी',
       url: 'https://santvaani.com',
-      logo: 'https://santvaani.com/android-chrome-512x512.png',
-      description: 'A digital sanctuary dedicated to preserving and sharing the profound wisdom of India\'s greatest spiritual masters with seekers around the world.',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://santvaani.com/android-chrome-512x512.png',
+        width: 512,
+        height: 512,
+      },
+      description: "A global digital sanctuary dedicated to preserving and sharing the profound wisdom of India's greatest spiritual masters with seekers around the world.",
       sameAs: [
         'https://twitter.com/santvaani',
         'https://facebook.com/santvaani',
-        'https://instagram.com/santvaani'
+        'https://instagram.com/santvaani',
       ],
       contactPoint: {
         '@type': 'ContactPoint',
         contactType: 'Customer Service',
-        email: 'contact@santvaani.com'
-      }
+        email: 'contact@santvaani.com',
+        availableLanguage: ['English', 'Hindi'],
+      },
+      knowsAbout: ['Spirituality', 'Hinduism', 'Meditation', 'Bhajans', 'Indian Saints', 'Vedic Wisdom'],
     };
   } else if (props.type === 'website') {
-    // Website Schema
     schema = {
       '@context': 'https://schema.org',
       '@type': 'WebSite',
       name: 'Santvaani',
+      alternateName: 'संतवाणी',
       url: 'https://santvaani.com',
-      description: 'Discover the profound teachings and divine wisdom of India\'s greatest saints. A digital sanctuary for spiritual seekers.',
+      inLanguage: ['en', 'hi'],
+      description: "Discover the profound teachings and divine wisdom of India's greatest saints. A digital sanctuary for spiritual seekers.",
       publisher: {
         '@type': 'Organization',
         name: 'Santvaani',
         logo: {
           '@type': 'ImageObject',
-          url: 'https://santvaani.com/android-chrome-512x512.png'
-        }
+          url: 'https://santvaani.com/android-chrome-512x512.png',
+        },
       },
       potentialAction: {
         '@type': 'SearchAction',
-        target: 'https://santvaani.com/search?q={search_term_string}',
-        'query-input': 'required name=search_term_string'
-      }
+        target: {
+          '@type': 'EntryPoint',
+          urlTemplate: 'https://santvaani.com/?q={search_term_string}',
+        },
+        'query-input': 'required name=search_term_string',
+      },
     };
   } else if (props.type === 'article') {
-    // Article Schema
     schema = {
       '@context': 'https://schema.org',
       '@type': 'Article',
@@ -75,19 +138,82 @@ const StructuredData = (props: StructuredDataProps) => {
       image: props.image,
       datePublished: props.datePublished,
       dateModified: props.dateModified || props.datePublished,
+      inLanguage: ['en', 'hi'],
       author: {
         '@type': 'Person',
-        name: props.author
+        name: props.author,
       },
       publisher: {
         '@type': 'Organization',
         name: 'Santvaani',
         logo: {
           '@type': 'ImageObject',
-          url: 'https://santvaani.com/android-chrome-512x512.png'
-        }
-      }
+          url: 'https://santvaani.com/android-chrome-512x512.png',
+        },
+      },
     };
+  } else if (props.type === 'person') {
+    schema = {
+      '@context': 'https://schema.org',
+      '@type': 'Person',
+      name: props.name,
+      ...(props.alternateName && { alternateName: props.alternateName }),
+      description: props.description,
+      ...(props.image && { image: props.image }),
+      ...(props.birthDate && { birthDate: props.birthDate }),
+      ...(props.deathDate && { deathDate: props.deathDate }),
+      jobTitle: 'Spiritual Teacher',
+      nationality: 'Indian',
+      ...(props.knowsAbout && { knowsAbout: props.knowsAbout }),
+      ...(props.sameAs && { sameAs: props.sameAs }),
+      mainEntityOfPage: {
+        '@type': 'WebPage',
+        '@id': 'https://santvaani.com/saints',
+      },
+    };
+  } else if (props.type === 'faq') {
+    schema = {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: props.items.map(item => ({
+        '@type': 'Question',
+        name: item.question,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: item.answer,
+        },
+      })),
+    };
+  } else if (props.type === 'musicplaylist') {
+    schema = {
+      '@context': 'https://schema.org',
+      '@type': 'MusicPlaylist',
+      name: props.name,
+      ...(props.description && { description: props.description }),
+      ...(props.numTracks !== undefined && { numTracks: props.numTracks }),
+      ...(props.tracks && {
+        track: props.tracks.map(t => ({
+          '@type': 'MusicRecording',
+          name: t.name,
+          ...(t.byArtist && { byArtist: { '@type': 'MusicGroup', name: t.byArtist } }),
+          inLanguage: 'hi',
+        })),
+      }),
+    };
+  } else if (props.type === 'collectionpage') {
+    schema = {
+      '@context': 'https://schema.org',
+      '@type': 'CollectionPage',
+      name: props.name,
+      description: props.description,
+      url: props.url,
+      publisher: {
+        '@type': 'Organization',
+        name: 'Santvaani',
+      },
+    };
+  } else {
+    return null;
   }
 
   return (
@@ -99,7 +225,8 @@ const StructuredData = (props: StructuredDataProps) => {
   );
 };
 
-// Breadcrumb Schema Component
+// ─── Breadcrumb Schema ───────────────────────────────────────────────────────
+
 interface BreadcrumbItem {
   name: string;
   url: string;
@@ -113,8 +240,8 @@ export const BreadcrumbSchema = ({ items }: { items: BreadcrumbItem[] }) => {
       '@type': 'ListItem',
       position: index + 1,
       name: item.name,
-      item: item.url
-    }))
+      item: item.url,
+    })),
   };
 
   return (

@@ -54,12 +54,13 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-white">
       <SEO
-        title="Santvaani - Where Ancient Wisdom Meets Modern Hearts"
-        description="Discover the profound teachings and divine wisdom of India's greatest saints. Explore bhajans, spiritual quotes, daily horoscopes, and connect with a global community of seekers."
+        title="Santvaani - Spiritual Wisdom, Bhajans & Indian Saints"
+        description="Explore the teachings of India's greatest saints. Daily horoscopes, devotional bhajans, spiritual quotes, meditation guidance, and stories of divine wisdom — in English and Hindi."
         canonical="https://santvaani.com"
-        keywords="Indian saints, spirituality, bhajans, spiritual quotes, meditation, Hindu spirituality, daily horoscope, spiritual community, divine wisdom, sant vaani"
+        keywords="Indian saints, spirituality, bhajans, spiritual quotes, meditation, Hindu spirituality, daily horoscope, rashifal, spiritual community, divine wisdom, sant vaani, santvaani, vedic wisdom, kabir, meera bai, hanuman chalisa, krishna, shiva"
       />
       <StructuredData type="website" />
+      <StructuredData type="organization" />
       <Navbar />
       <NoticeBoard />
 

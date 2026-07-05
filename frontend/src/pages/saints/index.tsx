@@ -246,12 +246,17 @@ const Saints = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-white">
       <SEO
-        title="Great Saints - Discover India's Spiritual Masters"
-        description="Explore the profound wisdom and divine teachings of India's most revered spiritual masters including Meera Bai, Kabir Das, Tulsidas, and many more."
+        title="Indian Saints & Spiritual Masters - Wisdom & Teachings"
+        description="Explore the life, teachings, and divine wisdom of India's most revered spiritual masters — Meera Bai, Kabir Das, Tulsidas, Surdas, Adi Shankaracharya, and more. Available in English and Hindi."
         canonical="https://santvaani.com/saints"
-        keywords="Indian saints, spiritual masters, Meera Bai, Kabir Das, Tulsidas, Surdas, Sant Ravidas, spiritual teachings, Hindu saints, bhakti saints"
+        keywords="Indian saints, spiritual masters, Meera Bai, Kabir Das, Tulsidas, Surdas, Sant Ravidas, Adi Shankaracharya, Ramakrishna, Vivekananda, spiritual teachings, Hindu saints, bhakti saints, संत, भक्त, आध्यात्मिक गुरु"
       />
-      <StructuredData type="website" />
+      <StructuredData
+        type="collectionpage"
+        name="Indian Saints & Spiritual Masters"
+        description="A comprehensive collection of India's greatest saints, their life stories, teachings, and divine wisdom."
+        url="https://santvaani.com/saints"
+      />
       <BreadcrumbSchema
         items={[
           { name: 'Home', url: 'https://santvaani.com' },

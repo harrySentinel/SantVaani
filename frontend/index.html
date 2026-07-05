@@ -22,6 +22,11 @@
     <!-- Canonical URL -->
     <link rel="canonical" href="https://santvaani.com" />
 
+    <!-- hreflang for international & bilingual audience -->
+    <link rel="alternate" hreflang="en" href="https://santvaani.com/" />
+    <link rel="alternate" hreflang="hi" href="https://santvaani.com/" />
+    <link rel="alternate" hreflang="x-default" href="https://santvaani.com/" />
+
     <!-- PWA Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -53,6 +58,7 @@
     <meta property="og:image:height" content="512" />
     <meta property="og:image:alt" content="Santvaani - Spiritual Wisdom Platform" />
     <meta property="og:locale" content="en_US" />
+    <meta property="og:locale:alternate" content="hi_IN" />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@santvaani" />
@@ -72,14 +78,16 @@
       "@context": "https://schema.org",
       "@type": "WebSite",
       "name": "Santvaani",
+      "alternateName": "संतवाणी",
       "description": "Discover the profound teachings and divine wisdom of India's greatest saints. A digital sanctuary for spiritual seekers on their journey to enlightenment.",
       "url": "https://santvaani.com",
-      "sameAs": [
-        "https://twitter.com/santvaani"
-      ],
+      "inLanguage": ["en", "hi"],
       "potentialAction": {
         "@type": "SearchAction",
-        "target": "https://santvaani.com/search?q={search_term_string}",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://santvaani.com/?q={search_term_string}"
+        },
         "query-input": "required name=search_term_string"
       }
     }
@@ -90,19 +98,28 @@
       "@context": "https://schema.org",
       "@type": "Organization",
       "name": "Santvaani",
-      "description": "Digital sanctuary for spiritual wisdom and teachings of Indian saints",
+      "alternateName": "संतवाणी",
+      "description": "A global digital sanctuary dedicated to preserving and sharing the profound wisdom of India's greatest spiritual masters with seekers around the world.",
       "url": "https://santvaani.com",
-      "logo": "https://santvaani.com/favicon-32x32.png",
-      "foundingDate": "2024",
-      "address": {
-        "@type": "PostalAddress",
-        "addressCountry": "IN"
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://santvaani.com/android-chrome-512x512.png",
+        "width": 512,
+        "height": 512
       },
+      "foundingDate": "2024",
+      "sameAs": [
+        "https://twitter.com/santvaani",
+        "https://instagram.com/santvaani",
+        "https://facebook.com/santvaani"
+      ],
       "contactPoint": {
         "@type": "ContactPoint",
         "contactType": "customer service",
-        "availableLanguage": ["English", "Hindi"]
-      }
+        "availableLanguage": ["English", "Hindi"],
+        "email": "contact@santvaani.com"
+      },
+      "knowsAbout": ["Spirituality", "Hinduism", "Meditation", "Bhajans", "Indian Saints", "Vedic Wisdom", "Yoga"]
     }
     </script>
   </head>

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import SEO from '@/components/SEO';
+import StructuredData from '@/components/StructuredData';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -178,8 +180,22 @@ const HoroscopePage = () => {
   const selectedZodiac = zodiacSigns?.find(sign => sign.id === selectedSign);
   const currentHoroscope = horoscopes[activeTab as keyof typeof horoscopes];
 
+  const faqItems = [
+    { question: 'What is a spiritual horoscope?', answer: 'A spiritual horoscope combines Vedic astrology with spiritual guidance, offering insights into your daily, weekly, and monthly journey based on your zodiac sign and ancient wisdom.' },
+    { question: 'How often is the horoscope updated?', answer: 'Daily horoscopes are updated every day, weekly horoscopes every Monday, and monthly horoscopes on the first of each month.' },
+    { question: 'Which zodiac signs are covered?', answer: 'All 12 zodiac signs are covered: Aries, Taurus, Gemini, Cancer, Leo, Virgo, Libra, Scorpio, Sagittarius, Capricorn, Aquarius, and Pisces.' },
+    { question: 'Is the horoscope available in Hindi?', answer: 'Yes, all horoscope predictions are available in both English and Hindi (हिंदी) on Santvaani.' },
+  ];
+
   return (
     <div className="min-h-screen bg-white">
+      <SEO
+        title="Daily Horoscope & Spiritual Guidance - Vedic Astrology"
+        description="Get your daily, weekly, and monthly spiritual horoscope based on Vedic astrology. Personalized guidance for all 12 zodiac signs in English and Hindi."
+        canonical="https://santvaani.com/horoscope"
+        keywords="daily horoscope, vedic astrology, spiritual horoscope, zodiac signs, aries horoscope, taurus horoscope, gemini horoscope, cancer horoscope, leo horoscope, virgo horoscope, libra horoscope, scorpio horoscope, sagittarius horoscope, capricorn horoscope, aquarius horoscope, pisces horoscope, rashifal, राशिफल, jyotish"
+      />
+      <StructuredData type="faq" items={faqItems} />
       <Navbar />
 
       {/* Hero Section */}

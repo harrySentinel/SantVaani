@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import SEO from '@/components/SEO';
+import StructuredData from '@/components/StructuredData';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusicPlayer } from '@/contexts/MusicPlayerContext';
 import BhajanModal from '@/components/BhajanModal';
@@ -176,8 +178,23 @@ const Bhajans = () => {
     );
   }
 
+  const topTracks = bhajans.slice(0, 10).map(b => ({ name: b.title, byArtist: b.author }));
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      <SEO
+        title="Bhajans & Devotional Songs - Hindu Spiritual Music"
+        description="Listen to and read the lyrics of devotional bhajans, aartis, and spiritual songs. Explore Hanuman Chalisa, Jai Shri Ram, Krishna bhajans, Shiva stotras, and more in Hindi and English."
+        canonical="https://santvaani.com/bhajans"
+        keywords="bhajans, devotional songs, hindu music, hanuman chalisa, aarti, krishna bhajan, shiva stotram, ram bhajan, hindi devotional songs, spiritual music, kirtan, भजन, हनुमान चालीसा, आरती"
+      />
+      <StructuredData
+        type="musicplaylist"
+        name="Santvaani Bhajans — Devotional Hindu Music Collection"
+        description="A curated collection of Hindu devotional songs, bhajans, aartis, and stotras in Hindi and English."
+        numTracks={bhajans.length || undefined}
+        tracks={topTracks}
+      />
       <Navbar />
 
       {/* Header - Spotify Style */}

@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import SEO from '@/components/SEO';
+import StructuredData from '@/components/StructuredData';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Quote, Heart, Loader2, Share2, Download, ChevronDown, Home, X } from 'lucide-react';
 import { Toaster } from '@/components/ui/toaster';
@@ -195,6 +197,18 @@ const Quotes = () => {
 
   return (
     <div className="relative h-screen overflow-hidden">
+      <SEO
+        title="Spiritual Quotes by Indian Saints - Wisdom for the Soul"
+        description="Discover inspiring spiritual quotes and wisdom from India's greatest saints — Kabir Das, Meera Bai, Swami Vivekananda, Ramakrishna, and more. Available in English and Hindi."
+        canonical="https://santvaani.com/quotes"
+        keywords="spiritual quotes, saint quotes, kabir quotes, meera bai quotes, vivekananda quotes, hindi quotes, inspirational quotes, wisdom quotes, devotional quotes, आध्यात्मिक उद्धरण, संत वचन"
+      />
+      <StructuredData
+        type="collectionpage"
+        name="Spiritual Quotes by Indian Saints"
+        description="Inspiring quotes and divine wisdom from India's greatest spiritual masters, available in English and Hindi."
+        url="https://santvaani.com/quotes"
+      />
       {/* Reel Container */}
       <div
         ref={containerRef}

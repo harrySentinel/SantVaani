@@ -11,6 +11,7 @@ interface SEOProps {
   publishedTime?: string;
   modifiedTime?: string;
   noindex?: boolean;
+  lang?: 'en' | 'hi' | 'both';
 }
 
 const SEO = ({
@@ -23,7 +24,8 @@ const SEO = ({
   author = 'Santvaani',
   publishedTime,
   modifiedTime,
-  noindex = false
+  noindex = false,
+  lang = 'both',
 }: SEOProps) => {
   const url = canonical || `https://santvaani.com${window.location.pathname}`;
   const fullTitle = title.includes('Santvaani') ? title : `${title} | Santvaani`;
@@ -87,9 +89,16 @@ const SEO = ({
       <meta name="apple-mobile-web-app-capable" content="yes" />
       <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 
-      {/* Geo Meta Tags */}
-      <meta name="geo.region" content="IN" />
-      <meta name="geo.placename" content="India" />
+      {/* hreflang alternate links */}
+      {(lang === 'en' || lang === 'both') && (
+        <link rel="alternate" hreflang="en" href={url} />
+      )}
+      {(lang === 'hi' || lang === 'both') && (
+        <link rel="alternate" hreflang="hi" href={url} />
+      )}
+      {lang === 'both' && (
+        <link rel="alternate" hreflang="x-default" href={url} />
+      )}
     </Helmet>
   );
 };
