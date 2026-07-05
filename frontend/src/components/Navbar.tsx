@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Users, Heart, Sparkles, Book, Info, IndianRupee, Star, ChevronDown, CalendarDays, LogIn, UserPlus, User, LogOut, BookOpen, BookMarked, Quote, Share2, Settings, Search } from 'lucide-react';
+import { Menu, X, Users, Heart, Sparkles, Book, Info, IndianRupee, Star, ChevronDown, ChevronRight, CalendarDays, LogIn, UserPlus, User, LogOut, BookOpen, BookMarked, Quote, Share2, Settings, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -43,6 +43,12 @@ export default function Navbar() {
     setIsOpen(false);
     setIsMoreOpen(false);
   }, [location.pathname]);
+
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [isOpen]);
 
   // Close "More" dropdown when clicking outside
   useEffect(() => {
@@ -271,94 +277,162 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Mobile Menu — animated slide down */}
+      </div>
+
+      {/* Full-screen Mobile Menu Overlay */}
+      <div
+        className={`fixed inset-0 z-[60] lg:hidden transition-all duration-300 ease-in-out ${
+          isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+      >
+        {/* Backdrop */}
+        <div className="absolute inset-0 bg-black/20 backdrop-blur-[2px]" onClick={() => setIsOpen(false)} />
+
+        {/* Panel — slides in from right */}
         <div
-          className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-            isOpen ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'
+          className={`absolute top-0 right-0 h-full w-full max-w-sm bg-orange-50 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out ${
+            isOpen ? 'translate-x-0' : 'translate-x-full'
           }`}
         >
-          <div className="pb-4 border-t border-orange-100 mt-2">
-            <div className="flex flex-col space-y-1 pt-3">
-              {allMenuItems.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <Link
-                    key={item.to}
-                    to={item.to}
-                    className={mobileNavLinkClass(item.to)}
-                  >
-                    <Icon className="w-4 h-4" />
-                    <span>{language === 'EN' ? item.label : item.labelHi}</span>
-                  </Link>
-                );
-              })}
-
-              {/* Mobile Auth */}
-              <div className="pt-3 border-t border-orange-100 mt-2 space-y-1">
-                {loading ? (
-                  <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse mx-3" />
-                ) : user ? (
-                  <>
-                    <div className="flex items-center space-x-3 px-3 py-2">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
-                        {(user.user_metadata?.name || user.email || 'U')[0].toUpperCase()}
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-sm font-semibold text-gray-800 truncate">
-                          {user.user_metadata?.name || 'Account'}
-                        </p>
-                        <p className="text-xs text-gray-500 truncate">{user.email}</p>
-                      </div>
-                    </div>
-                    <Link
-                      to="/dashboard"
-                      className={mobileNavLinkClass('/dashboard')}
-                    >
-                      <User className="w-4 h-4" />
-                      <span>Dashboard</span>
-                    </Link>
-                    <Link
-                      to="/profile-settings"
-                      className={mobileNavLinkClass('/profile-settings')}
-                    >
-                      <Settings className="w-4 h-4" />
-                      <span>Profile Settings</span>
-                    </Link>
-                    <button
-                      onClick={async () => {
-                        try {
-                          await signOut();
-                          window.location.href = '/';
-                        } catch (error) {
-                          console.error('Logout error:', error);
-                        }
-                      }}
-                      className="flex items-center space-x-2 text-red-600 hover:text-red-700 transition-colors duration-200 px-3 py-2 rounded-lg hover:bg-red-50 w-full text-left font-medium"
-                    >
-                      <LogOut className="w-4 h-4" />
-                      <span>Logout</span>
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <Link
-                      to="/login"
-                      className={mobileNavLinkClass('/login')}
-                    >
-                      <LogIn className="w-4 h-4" />
-                      <span>Login</span>
-                    </Link>
-                    <Link
-                      to="/signup"
-                      className="flex items-center space-x-2 text-white bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 transition-colors duration-200 px-3 py-2 rounded-lg font-medium"
-                    >
-                      <UserPlus className="w-4 h-4" />
-                      <span>Sign Up</span>
-                    </Link>
-                  </>
-                )}
+          {/* Header */}
+          <div className="flex items-center justify-between px-5 pt-12 pb-6">
+            <Link to="/" onClick={() => setIsOpen(false)} className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center">
+                <span className="text-white font-bold text-sm">ॐ</span>
               </div>
+              <span className="text-xl font-bold text-orange-600">
+                {language === 'EN' ? 'Santvaani' : 'संतवाणी'}
+              </span>
+            </Link>
+            <button
+              onClick={() => setIsOpen(false)}
+              className="w-9 h-9 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:text-gray-900 transition-colors shadow-sm"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Nav Items */}
+          <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-2">
+            {allMenuItems.map((item) => {
+              const Icon = item.icon;
+              const active = isActive(item.to);
+              return (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  onClick={() => setIsOpen(false)}
+                  className={`flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-colors duration-150 ${
+                    active
+                      ? 'bg-orange-500 text-white shadow-md shadow-orange-200'
+                      : 'bg-white text-gray-800 hover:bg-orange-100 border border-gray-100'
+                  }`}
+                >
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                    active ? 'bg-white/20' : 'bg-orange-50 border border-orange-100'
+                  }`}>
+                    <Icon className={`w-4 h-4 ${active ? 'text-white' : 'text-orange-500'}`} />
+                  </div>
+                  <span className="flex-1 font-medium text-[15px]">
+                    {language === 'EN' ? item.label : item.labelHi}
+                  </span>
+                  <ChevronRight className={`w-4 h-4 ${active ? 'text-white/70' : 'text-gray-300'}`} />
+                </Link>
+              );
+            })}
+
+            {/* Auth section */}
+            <div className="pt-2 border-t border-orange-100 mt-2 space-y-2">
+              {loading ? (
+                <div className="h-14 bg-white rounded-2xl animate-pulse border border-gray-100" />
+              ) : user ? (
+                <>
+                  {/* User card */}
+                  <div className="flex items-center gap-3 bg-white border border-gray-100 rounded-2xl px-4 py-3">
+                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+                      {(user.user_metadata?.name || user.email || 'U')[0].toUpperCase()}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-semibold text-gray-800 truncate">
+                        {user.user_metadata?.name || 'Account'}
+                      </p>
+                      <p className="text-xs text-gray-400 truncate">{user.email}</p>
+                    </div>
+                  </div>
+                  <Link
+                    to="/dashboard"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center gap-4 bg-white border border-gray-100 text-gray-800 hover:bg-orange-50 px-4 py-3.5 rounded-2xl transition-colors"
+                  >
+                    <div className="w-9 h-9 rounded-xl bg-orange-50 border border-orange-100 flex items-center justify-center flex-shrink-0">
+                      <User className="w-4 h-4 text-orange-500" />
+                    </div>
+                    <span className="flex-1 font-medium text-[15px]">Dashboard</span>
+                    <ChevronRight className="w-4 h-4 text-gray-300" />
+                  </Link>
+                  <Link
+                    to="/profile-settings"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center gap-4 bg-white border border-gray-100 text-gray-800 hover:bg-orange-50 px-4 py-3.5 rounded-2xl transition-colors"
+                  >
+                    <div className="w-9 h-9 rounded-xl bg-orange-50 border border-orange-100 flex items-center justify-center flex-shrink-0">
+                      <Settings className="w-4 h-4 text-orange-500" />
+                    </div>
+                    <span className="flex-1 font-medium text-[15px]">Profile Settings</span>
+                    <ChevronRight className="w-4 h-4 text-gray-300" />
+                  </Link>
+                  <button
+                    onClick={async () => {
+                      try {
+                        setIsOpen(false);
+                        await signOut();
+                        window.location.href = '/';
+                      } catch (error) {
+                        console.error('Logout error:', error);
+                      }
+                    }}
+                    className="flex items-center gap-4 bg-white border border-red-100 text-red-600 hover:bg-red-50 px-4 py-3.5 rounded-2xl transition-colors w-full text-left"
+                  >
+                    <div className="w-9 h-9 rounded-xl bg-red-50 border border-red-100 flex items-center justify-center flex-shrink-0">
+                      <LogOut className="w-4 h-4 text-red-500" />
+                    </div>
+                    <span className="flex-1 font-medium text-[15px]">Logout</span>
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center gap-4 bg-white border border-gray-100 text-gray-800 hover:bg-orange-50 px-4 py-3.5 rounded-2xl transition-colors"
+                  >
+                    <div className="w-9 h-9 rounded-xl bg-orange-50 border border-orange-100 flex items-center justify-center flex-shrink-0">
+                      <LogIn className="w-4 h-4 text-orange-500" />
+                    </div>
+                    <span className="flex-1 font-medium text-[15px]">Login</span>
+                    <ChevronRight className="w-4 h-4 text-gray-300" />
+                  </Link>
+                  <Link
+                    to="/signup"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center gap-4 bg-orange-500 text-white hover:bg-orange-600 px-4 py-3.5 rounded-2xl transition-colors shadow-md shadow-orange-200"
+                  >
+                    <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
+                      <UserPlus className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="flex-1 font-medium text-[15px]">Sign Up</span>
+                    <ChevronRight className="w-4 h-4 text-white/70" />
+                  </Link>
+                </>
+              )}
             </div>
+          </div>
+
+          {/* Footer tagline */}
+          <div className="px-5 py-5 text-center border-t border-orange-100">
+            <p className="text-xs font-semibold text-orange-400 tracking-widest uppercase">
+              {language === 'EN' ? 'Peace · Wisdom · Devotion' : 'शांति · ज्ञान · भक्ति'}
+            </p>
           </div>
         </div>
       </div>
