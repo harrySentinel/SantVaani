@@ -162,7 +162,7 @@ const Bhajans = () => {
         <Navbar />
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center space-y-4">
-            <div className="text-red-500 text-6xl">⚠️</div>
+            <div className="text-red-400 text-5xl font-bold">!</div>
             <h2 className="text-2xl font-bold text-gray-800">Something went wrong</h2>
             <p className="text-gray-600">{error}</p>
             <button
@@ -203,7 +203,7 @@ const Bhajans = () => {
           <div className="space-y-4">
             <div className="flex items-center space-x-3 mb-2">
               <Music className="w-10 h-10 text-white/90" />
-              <span className="text-4xl">🎵</span>
+              <Music className="w-10 h-10 text-white/70" />
             </div>
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white">
               {t('bhajans.title')}

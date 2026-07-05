@@ -98,7 +98,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ className = '' }) => {
   const getBackendResponse = async (userMessage: string): Promise<string> => {
     try {
       setIsLoading(true);
-      if (backendStatus === 'disconnected') return 'Service is unavailable right now. Please try again later. 🙏';
+      if (backendStatus === 'disconnected') return 'Service is unavailable right now. Please try again later.';
 
       const response = await fetch(`${BACKEND_URL}/api/chat`, {
         method: 'POST',
@@ -109,7 +109,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ className = '' }) => {
 
       if (!response.ok) {
         const err = await response.json().catch(() => ({}));
-        if (response.status === 429) return err.message || 'Too many requests. Please wait a moment. ⏰';
+        if (response.status === 429) return err.message || 'Too many requests. Please wait a moment.';
         throw new Error(`Request failed: ${response.status}`);
       }
 
@@ -118,10 +118,10 @@ const ChatBot: React.FC<ChatBotProps> = ({ className = '' }) => {
       throw new Error('Invalid response format');
     } catch (error) {
       if (error instanceof Error) {
-        if (error.name === 'AbortError' || error.message.includes('timeout')) return 'Response timed out. Please try again. ⏱️';
-        if (error.message.includes('fetch') || error.message.includes('network')) return 'Check your internet connection and try again. 🌐';
+        if (error.name === 'AbortError' || error.message.includes('timeout')) return 'Response timed out. Please try again.';
+        if (error.message.includes('fetch') || error.message.includes('network')) return 'Check your internet connection and try again.';
       }
-      return `Please try again in a moment. 🙏\n\n"कर्मण्येवाधिकारस्ते मा फलेषु कदाचन" (Gita 2.47)\n\n"You have the right to act, but never to the fruits of action."`;
+      return `Please try again in a moment.\n\n"कर्मण्येवाधिकारस्ते मा फलेषु कदाचन" (Gita 2.47)\n\n"You have the right to act, but never to the fruits of action."`;
     } finally {
       setIsLoading(false);
     }
@@ -160,7 +160,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ className = '' }) => {
     } catch {
       setMessages(prev => [...prev, {
         id: (Date.now() + 1).toString(), type: 'bot',
-        content: `Sorry, a technical issue occurred. 🛠️\n\nPlease try again. 🙏`,
+        content: `Sorry, a technical issue occurred. Please try again.`,
         timestamp: new Date()
       }]);
       setIsTyping(false);

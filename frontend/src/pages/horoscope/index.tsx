@@ -4,26 +4,9 @@ import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
 import StructuredData from '@/components/StructuredData';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select';
-import {
-  Palette,
-  Hash,
-  Calendar,
-  Moon,
-  Sun,
-  RefreshCw,
-  Share2
-} from 'lucide-react';
+import { Palette, Hash, Sun, Moon, Calendar, RefreshCw, Share2, Sparkles, ChevronLeft } from 'lucide-react';
 
 interface ZodiacSign {
   id: string;
@@ -48,69 +31,60 @@ interface Horoscope {
   challenging_days?: string | null;
 }
 
+const FALLBACK_SIGNS: ZodiacSign[] = [
+  { id: 'aries',       name: 'Aries',       nameHi: 'मेष',      symbol: '♈', dates: 'Mar 21 – Apr 19' },
+  { id: 'taurus',      name: 'Taurus',      nameHi: 'वृषभ',     symbol: '♉', dates: 'Apr 20 – May 20' },
+  { id: 'gemini',      name: 'Gemini',      nameHi: 'मिथुन',    symbol: '♊', dates: 'May 21 – Jun 20' },
+  { id: 'cancer',      name: 'Cancer',      nameHi: 'कर्क',     symbol: '♋', dates: 'Jun 21 – Jul 22' },
+  { id: 'leo',         name: 'Leo',         nameHi: 'सिंह',     symbol: '♌', dates: 'Jul 23 – Aug 22' },
+  { id: 'virgo',       name: 'Virgo',       nameHi: 'कन्या',    symbol: '♍', dates: 'Aug 23 – Sep 22' },
+  { id: 'libra',       name: 'Libra',       nameHi: 'तुला',     symbol: '♎', dates: 'Sep 23 – Oct 22' },
+  { id: 'scorpio',     name: 'Scorpio',     nameHi: 'वृश्चिक', symbol: '♏', dates: 'Oct 23 – Nov 21' },
+  { id: 'sagittarius', name: 'Sagittarius', nameHi: 'धनु',      symbol: '♐', dates: 'Nov 22 – Dec 21' },
+  { id: 'capricorn',   name: 'Capricorn',   nameHi: 'मकर',      symbol: '♑', dates: 'Dec 22 – Jan 19' },
+  { id: 'aquarius',    name: 'Aquarius',    nameHi: 'कुम्भ',    symbol: '♒', dates: 'Jan 20 – Feb 18' },
+  { id: 'pisces',      name: 'Pisces',      nameHi: 'मीन',      symbol: '♓', dates: 'Feb 19 – Mar 20' },
+];
+
+const PERIOD_CONFIG = {
+  daily:   { icon: Sun,      label: 'Daily',   labelHi: 'दैनिक',   color: 'from-orange-500 to-rose-500' },
+  weekly:  { icon: Calendar, label: 'Weekly',  labelHi: 'साप्ताहिक', color: 'from-amber-500 to-orange-500' },
+  monthly: { icon: Moon,     label: 'Monthly', labelHi: 'मासिक',   color: 'from-purple-500 to-indigo-600' },
+};
+
 const HoroscopePage = () => {
   const { t, language } = useLanguage();
   const [zodiacSigns, setZodiacSigns] = useState<ZodiacSign[]>([]);
   const [selectedSign, setSelectedSign] = useState<string>('');
-  const [activeTab, setActiveTab] = useState<string>('daily');
-  const [horoscopes, setHoroscopes] = useState<{
-    daily?: Horoscope;
-    weekly?: Horoscope;
-    monthly?: Horoscope;
-  }>({});
-  const [loading, setLoading] = useState<{
-    daily: boolean;
-    weekly: boolean;
-    monthly: boolean;
-  }>({ daily: false, weekly: false, monthly: false });
+  const [activeTab, setActiveTab] = useState<'daily' | 'weekly' | 'monthly'>('daily');
+  const [horoscopes, setHoroscopes] = useState<{ daily?: Horoscope; weekly?: Horoscope; monthly?: Horoscope }>({});
+  const [loading, setLoading] = useState<{ daily: boolean; weekly: boolean; monthly: boolean }>({ daily: false, weekly: false, monthly: false });
   const [summaryLoading, setSummaryLoading] = useState(false);
-  const [summaries, setSummaries] = useState<{
-    daily?: string;
-    weekly?: string;
-    monthly?: string;
-  }>({});
-  const [showSummary, setShowSummary] = useState<{
-    daily: boolean;
-    weekly: boolean;
-    monthly: boolean;
-  }>({ daily: false, weekly: false, monthly: false });
+  const [summaries, setSummaries] = useState<{ daily?: string; weekly?: string; monthly?: string }>({});
+  const [showSummary, setShowSummary] = useState<{ daily: boolean; weekly: boolean; monthly: boolean }>({ daily: false, weekly: false, monthly: false });
 
-  // Fetch zodiac signs list
   useEffect(() => {
     const fetchZodiacSigns = async () => {
       try {
         const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'}/api/horoscope/zodiac/list`);
         const data = await response.json();
-        if (data.success && data.zodiacSigns) {
-          setZodiacSigns(data.zodiacSigns);
-        } else {
-          setZodiacSigns(FALLBACK_SIGNS);
-        }
-      } catch (error) {
-        console.error('Error fetching zodiac signs:', error);
+        setZodiacSigns(data.success && data.zodiacSigns ? data.zodiacSigns : FALLBACK_SIGNS);
+      } catch {
         setZodiacSigns(FALLBACK_SIGNS);
       }
     };
-
     fetchZodiacSigns();
   }, []);
 
-  // Fetch horoscope for specific period
   const fetchHoroscope = async (signId: string, period: string) => {
     if (!signId) return;
-
     setLoading(prev => ({ ...prev, [period]: true }));
     try {
       const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'}/api/horoscope/${signId}/${period}`);
       const data = await response.json();
-      if (data.success) {
-        setHoroscopes(prev => ({
-          ...prev,
-          [period]: data.horoscope
-        }));
-      }
-    } catch (error) {
-      console.error(`Error fetching ${period} horoscope:`, error);
+      if (data.success) setHoroscopes(prev => ({ ...prev, [period]: data.horoscope }));
+    } catch {
+      // silent
     } finally {
       setLoading(prev => ({ ...prev, [period]: false }));
     }
@@ -119,438 +93,290 @@ const HoroscopePage = () => {
   const handleSignSelect = (signId: string) => {
     setSelectedSign(signId);
     setHoroscopes({});
+    setSummaries({});
+    setShowSummary({ daily: false, weekly: false, monthly: false });
     fetchHoroscope(signId, activeTab);
   };
 
-  const handleTabChange = (tab: string) => {
+  const handleTabChange = (tab: 'daily' | 'weekly' | 'monthly') => {
     setActiveTab(tab);
     setShowSummary({ daily: false, weekly: false, monthly: false });
-    if (selectedSign && !horoscopes[tab as keyof typeof horoscopes]) {
-      fetchHoroscope(selectedSign, tab);
-    }
+    if (selectedSign && !horoscopes[tab]) fetchHoroscope(selectedSign, tab);
   };
 
-  // Summarize horoscope with AI
   const summarizeHoroscope = async (period: string) => {
     const horoscope = horoscopes[period as keyof typeof horoscopes];
-    if (!horoscope || !horoscope.prediction) return;
-
+    if (!horoscope?.prediction) return;
     if (summaries[period as keyof typeof summaries]) {
       setShowSummary(prev => ({ ...prev, [period]: !prev[period as keyof typeof prev] }));
       return;
     }
-
     setSummaryLoading(true);
     try {
       const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'}/api/horoscope/summarize`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          prediction: horoscope.prediction,
-          period: period,
-          zodiacSign: selectedSign
-        })
+        body: JSON.stringify({ prediction: horoscope.prediction, period, zodiacSign: selectedSign })
       });
-
       const data = await response.json();
-      console.log('Summary response:', data);
-
       if (data.success && data.summary) {
         setSummaries(prev => ({ ...prev, [period]: data.summary }));
         setShowSummary(prev => ({ ...prev, [period]: true }));
-      } else {
-        console.error('Failed to get summary:', data);
       }
-    } catch (error) {
-      console.error('Error summarizing horoscope:', error);
+    } catch {
+      // silent
     } finally {
       setSummaryLoading(false);
     }
   };
 
-  const getPeriodColor = (period: string) => {
-    switch(period) {
-      case 'daily': return 'from-orange-500 to-red-500';
-      case 'weekly': return 'from-orange-400 to-amber-500';
-      case 'monthly': return 'from-amber-500 to-orange-600';
-      default: return 'from-orange-500 to-red-500';
-    }
-  };
-
-  const selectedZodiac = zodiacSigns?.find(sign => sign.id === selectedSign);
-  const currentHoroscope = horoscopes[activeTab as keyof typeof horoscopes];
+  const selectedZodiac = zodiacSigns.find(s => s.id === selectedSign);
+  const currentHoroscope = horoscopes[activeTab];
+  const periodCfg = PERIOD_CONFIG[activeTab];
 
   const faqItems = [
     { question: 'What is a spiritual horoscope?', answer: 'A spiritual horoscope combines Vedic astrology with spiritual guidance, offering insights into your daily, weekly, and monthly journey based on your zodiac sign and ancient wisdom.' },
     { question: 'How often is the horoscope updated?', answer: 'Daily horoscopes are updated every day, weekly horoscopes every Monday, and monthly horoscopes on the first of each month.' },
     { question: 'Which zodiac signs are covered?', answer: 'All 12 zodiac signs are covered: Aries, Taurus, Gemini, Cancer, Leo, Virgo, Libra, Scorpio, Sagittarius, Capricorn, Aquarius, and Pisces.' },
-    { question: 'Is the horoscope available in Hindi?', answer: 'Yes, all horoscope predictions are available in both English and Hindi (हिंदी) on Santvaani.' },
+    { question: 'Is the horoscope available in Hindi?', answer: 'Yes, all horoscope predictions are available in both English and Hindi on Santvaani.' },
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-50">
       <SEO
         title="Daily Horoscope & Spiritual Guidance - Vedic Astrology"
         description="Get your daily, weekly, and monthly spiritual horoscope based on Vedic astrology. Personalized guidance for all 12 zodiac signs in English and Hindi."
         canonical="https://santvaani.com/horoscope"
-        keywords="daily horoscope, vedic astrology, spiritual horoscope, zodiac signs, aries horoscope, taurus horoscope, gemini horoscope, cancer horoscope, leo horoscope, virgo horoscope, libra horoscope, scorpio horoscope, sagittarius horoscope, capricorn horoscope, aquarius horoscope, pisces horoscope, rashifal, राशिफल, jyotish"
+        keywords="daily horoscope, vedic astrology, spiritual horoscope, zodiac signs, rashifal, राशिफल, jyotish, aries horoscope, taurus, gemini, cancer, leo, virgo, libra, scorpio, sagittarius, capricorn, aquarius, pisces"
       />
       <StructuredData type="faq" items={faqItems} />
       <Navbar />
 
-      {/* Hero Section */}
-      <section className="pt-20 pb-14 bg-white border-b border-orange-100">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="space-y-4">
-            <span
-              className="text-5xl text-orange-300 block leading-none mb-3"
-              style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
-            >
-              ॐ
-            </span>
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight">
-              {t('horoscope.title')}
-            </h1>
-            <p className="text-base text-gray-400 max-w-xl mx-auto leading-relaxed">
-              {t('horoscope.subtitle')}
+      {/* ── Hero ── */}
+      <section className="relative pt-16 pb-20 overflow-hidden bg-gradient-to-br from-gray-900 via-slate-800 to-orange-950">
+        {/* Subtle star pattern overlay */}
+        <div className="absolute inset-0 opacity-20"
+          style={{ backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)', backgroundSize: '40px 40px' }}
+        />
+        <div className="relative max-w-3xl mx-auto px-4 sm:px-6 text-center pt-10 pb-4">
+          <p className="text-orange-300 text-xs font-semibold tracking-[0.3em] uppercase mb-4">
+            {language === 'EN' ? 'Vedic Astrology' : 'वैदिक ज्योतिष'}
+          </p>
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">
+            {t('horoscope.title')}
+          </h1>
+          <p className="text-gray-400 text-base max-w-lg mx-auto leading-relaxed">
+            {t('horoscope.subtitle')}
+          </p>
+          {language === 'EN' && (
+            <p className="text-orange-400 text-sm mt-2">
+              अपनी राशि चुनें और व्यक्तिगत मार्गदर्शन पाएं
             </p>
-            {language === 'EN' && (
-              <p className="text-sm text-orange-500">
-                आपके लिए ज्योतिषीय भविष्यवाणी और मार्गदर्शन
-              </p>
-            )}
-            <div className="flex justify-center pt-1">
-              <span className="border border-orange-200 text-orange-600 px-4 py-1 rounded-full text-xs font-medium tracking-wide">
-                {t('horoscope.badge')}
-              </span>
-            </div>
-          </div>
+          )}
         </div>
       </section>
 
-      {/* Main Content */}
-      <section className="py-16">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* ── Main ── */}
+      <section className="max-w-5xl mx-auto px-4 sm:px-6 pb-20 -mt-8 relative z-10">
 
-          {/* Zodiac Sign Selector */}
-          <div className="mb-8">
-            <div className="bg-white border border-orange-100 rounded-2xl p-6 shadow-sm">
-              <div className="text-center mb-5">
-                <h2 className="text-lg font-semibold text-gray-800">{t('horoscope.select.title')}</h2>
-                <p className="text-gray-400 text-sm mt-0.5">{t('horoscope.select.subtitle')}</p>
-              </div>
-              <div className="space-y-5">
-                <Select value={selectedSign} onValueChange={handleSignSelect}>
-                  <SelectTrigger className="w-full max-w-sm mx-auto border-orange-200 focus:ring-orange-300 text-base h-12 rounded-xl">
-                    <SelectValue placeholder={t('horoscope.select.placeholder')} />
-                  </SelectTrigger>
-                  <SelectContent className="max-h-80 overflow-y-auto">
-                    {zodiacSigns.map((sign) => (
-                      <SelectItem
-                        key={sign.id}
-                        value={sign.id}
-                        className="py-2.5 px-3 cursor-pointer hover:bg-orange-50 focus:bg-orange-50"
-                      >
-                        <div className="flex items-center space-x-3">
-                          <span className="text-lg">{sign.symbol}</span>
-                          <div className="flex flex-col">
-                            <span className="text-sm font-medium text-gray-800">
-                              {language === 'EN' ? (
-                                <>{sign.name} <span className="text-orange-500 font-normal">· {sign.nameHi}</span></>
-                              ) : (
-                                <>{sign.nameHi} <span className="text-orange-500 font-normal">· {sign.name}</span></>
-                              )}
-                            </span>
-                            <span className="text-xs text-gray-400">{sign.dates}</span>
-                          </div>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-
-                {selectedZodiac && (
-                  <div className="flex items-center justify-center gap-5 py-4 border-t border-orange-50">
-                    <div className="w-16 h-16 rounded-full bg-orange-50 border border-orange-100 flex items-center justify-center text-3xl flex-shrink-0">
-                      {selectedZodiac.symbol}
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-bold text-gray-900 leading-tight">
-                        {language === 'EN' ? selectedZodiac.name : selectedZodiac.nameHi}
-                      </h3>
-                      <p className="text-orange-500 text-sm font-medium">
-                        {language === 'EN' ? selectedZodiac.nameHi : selectedZodiac.name}
-                      </p>
-                      <p className="text-xs text-gray-400 mt-0.5">{selectedZodiac.dates}</p>
-                    </div>
-                  </div>
-                )}
-              </div>
+        {!selectedSign ? (
+          /* ── Zodiac Grid ── */
+          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+            <div className="px-6 pt-6 pb-4 border-b border-gray-100 text-center">
+              <h2 className="text-lg font-semibold text-gray-900">{t('horoscope.select.title')}</h2>
+              <p className="text-gray-400 text-sm mt-1">{t('horoscope.select.subtitle')}</p>
+            </div>
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-px bg-gray-100">
+              {(zodiacSigns.length ? zodiacSigns : FALLBACK_SIGNS).map(sign => (
+                <button
+                  key={sign.id}
+                  onClick={() => handleSignSelect(sign.id)}
+                  className="bg-white flex flex-col items-center gap-1.5 py-5 px-2 hover:bg-orange-50 hover:text-orange-600 transition-colors group"
+                >
+                  <span className="text-3xl text-gray-500 group-hover:text-orange-500 transition-colors leading-none">
+                    {sign.symbol}
+                  </span>
+                  <span className="text-xs font-semibold text-gray-800 group-hover:text-orange-700">
+                    {language === 'EN' ? sign.name : sign.nameHi}
+                  </span>
+                  <span className="text-[10px] text-gray-400 leading-tight text-center">
+                    {sign.dates}
+                  </span>
+                </button>
+              ))}
             </div>
           </div>
+        ) : (
+          /* ── Prediction View ── */
+          <div className="space-y-5">
+            {/* Back + Sign Header */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+              <div className={`bg-gradient-to-r ${periodCfg.color} px-6 py-5 flex items-center justify-between`}>
+                <button
+                  onClick={() => setSelectedSign('')}
+                  className="flex items-center gap-1.5 text-white/80 hover:text-white text-sm font-medium transition-colors"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  {language === 'EN' ? 'All Signs' : 'सभी राशियां'}
+                </button>
+                <div className="text-center">
+                  <div className="text-4xl text-white/90 leading-none mb-1">{selectedZodiac?.symbol}</div>
+                  <h2 className="text-white font-bold text-lg leading-tight">
+                    {language === 'EN' ? selectedZodiac?.name : selectedZodiac?.nameHi}
+                  </h2>
+                  <p className="text-white/70 text-xs mt-0.5">{selectedZodiac?.dates}</p>
+                </div>
+                <div className="w-20" />
+              </div>
 
-          {selectedSign && (
-            <div>
               {/* Period Tabs */}
-              <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-                <div className="flex justify-center mb-6">
-                  <TabsList className="grid grid-cols-3 w-full max-w-md">
-                    <TabsTrigger value="daily" className="flex items-center space-x-2">
-                      <Sun className="w-4 h-4" />
-                      <span>{t('horoscope.tabs.daily')}</span>
-                    </TabsTrigger>
-                    <TabsTrigger value="weekly" className="flex items-center space-x-2">
-                      <Calendar className="w-4 h-4" />
-                      <span>{t('horoscope.tabs.weekly')}</span>
-                    </TabsTrigger>
-                    <TabsTrigger value="monthly" className="flex items-center space-x-2">
-                      <Moon className="w-4 h-4" />
-                      <span>{t('horoscope.tabs.monthly')}</span>
-                    </TabsTrigger>
-                  </TabsList>
+              <div className="flex border-t border-gray-100">
+                {(Object.entries(PERIOD_CONFIG) as [string, typeof PERIOD_CONFIG['daily']][]).map(([key, cfg]) => {
+                  const Icon = cfg.icon;
+                  const isActive = activeTab === key;
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => handleTabChange(key as 'daily' | 'weekly' | 'monthly')}
+                      className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium transition-colors border-b-2 ${
+                        isActive
+                          ? 'border-orange-500 text-orange-600 bg-orange-50'
+                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                      }`}
+                    >
+                      <Icon className="w-4 h-4" />
+                      {language === 'EN' ? cfg.label : cfg.labelHi}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Prediction Content */}
+            {loading[activeTab] ? (
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-16 text-center">
+                <span className="text-5xl text-orange-300 block mb-4" style={{ fontFamily: 'serif' }}>ॐ</span>
+                <p className="text-gray-400 text-sm animate-pulse">{t('horoscope.loading')}</p>
+              </div>
+            ) : currentHoroscope ? (
+              <div className="space-y-4">
+                {/* Prediction Card */}
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                  {currentHoroscope.period_theme && (
+                    <div className="px-6 pt-5 pb-0">
+                      <Badge className="bg-orange-100 text-orange-700 border-0 text-xs font-semibold">
+                        {currentHoroscope.period_theme}
+                      </Badge>
+                    </div>
+                  )}
+                  <div className="px-6 py-5">
+                    <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
+                      {t('horoscope.prediction.title')}
+                    </h3>
+                    <p className="text-gray-800 leading-relaxed text-[15px]">
+                      {currentHoroscope.prediction}
+                    </p>
+
+                    {currentHoroscope.prediction_hi && (
+                      <div className="mt-4 border-l-4 border-orange-200 pl-4">
+                        <p className="text-gray-500 text-sm italic leading-relaxed">
+                          {currentHoroscope.prediction_hi}
+                        </p>
+                      </div>
+                    )}
+
+                    {currentHoroscope.spiritual_advice && (
+                      <div className="mt-4 bg-amber-50 rounded-xl p-4 border border-amber-100">
+                        <p className="text-sm text-amber-800 leading-relaxed">
+                          <span className="font-semibold">{t('horoscope.spiritual.guidance')}</span>{' '}
+                          {currentHoroscope.spiritual_advice}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* AI Summary */}
+                    <div className="mt-5 pt-4 border-t border-gray-100 flex items-center justify-between gap-4">
+                      <span className="text-xs text-gray-400">{t('horoscope.summary.prompt')}</span>
+                      <Button
+                        onClick={() => summarizeHoroscope(activeTab)}
+                        variant="outline"
+                        size="sm"
+                        disabled={summaryLoading}
+                        className="border-orange-200 text-orange-600 hover:bg-orange-50 flex-shrink-0"
+                      >
+                        {summaryLoading ? (
+                          <><RefreshCw className="w-3 h-3 mr-1.5 animate-spin" />{t('horoscope.summary.analyzing')}</>
+                        ) : (
+                          <><Sparkles className="w-3 h-3 mr-1.5" />{t('horoscope.summary.button')}</>
+                        )}
+                      </Button>
+                    </div>
+                    {showSummary[activeTab] && summaries[activeTab] && (
+                      <div className="mt-3 bg-orange-50 rounded-xl p-4 border border-orange-100">
+                        <p className="text-xs font-semibold text-orange-700 mb-1.5">{t('horoscope.summary.title')}</p>
+                        <p className="text-orange-800 text-sm leading-relaxed">{summaries[activeTab]}</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                {/* Tab Contents */}
-                {['daily', 'weekly', 'monthly'].map((period) => (
-                  <TabsContent key={period} value={period} className="mt-6">
-                    {loading[period as keyof typeof loading] ? (
-                      <Card className="border-orange-100 shadow-sm bg-white">
-                        <CardContent className="p-10">
-                          <div className="text-center space-y-3">
-                            <span className="text-4xl text-orange-400 animate-pulse block" style={{ fontFamily: 'serif' }}>ॐ</span>
-                            <p className="text-gray-400 text-sm">{t('horoscope.loading')}</p>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ) : currentHoroscope && activeTab === period ? (
-                      <HoroscopeDisplay
-                        horoscope={currentHoroscope}
-                        period={activeTab}
-                        zodiac={selectedZodiac}
-                        getPeriodColor={getPeriodColor}
-                        onSummarize={() => summarizeHoroscope(activeTab)}
-                        summaryLoading={summaryLoading}
-                        summary={summaries[activeTab as keyof typeof summaries]}
-                        showSummary={showSummary[activeTab as keyof typeof showSummary]}
-                        t={t}
-                        language={language}
-                      />
-                    ) : (
-                      <Card className="border-orange-100 shadow-sm bg-white">
-                        <CardContent className="p-10">
-                          <div className="text-center space-y-3">
-                            <span className="text-4xl block">✨</span>
-                            <p className="text-gray-400 text-sm">
-                              {period === 'daily' ? t('horoscope.empty.daily') :
-                               period === 'weekly' ? t('horoscope.empty.weekly') :
-                               t('horoscope.empty.monthly')}
-                            </p>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    )}
-                  </TabsContent>
-                ))}
-              </Tabs>
-            </div>
-          )}
+                {/* Lucky Elements */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 text-center">
+                    <Palette className="w-6 h-6 text-orange-400 mx-auto mb-2" />
+                    <p className="text-xs text-gray-400 mb-2">{t('horoscope.lucky.color')}</p>
+                    <span className="inline-block bg-orange-50 border border-orange-100 text-orange-700 text-sm font-semibold px-4 py-1.5 rounded-full">
+                      {currentHoroscope.lucky_color}
+                    </span>
+                  </div>
+                  <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 text-center">
+                    <Hash className="w-6 h-6 text-orange-400 mx-auto mb-2" />
+                    <p className="text-xs text-gray-400 mb-2">{t('horoscope.lucky.number')}</p>
+                    <span className="inline-block bg-amber-50 border border-amber-100 text-amber-700 text-3xl font-bold px-6 py-1 rounded-full">
+                      {currentHoroscope.lucky_number}
+                    </span>
+                  </div>
+                </div>
 
-          {/* Empty State */}
-          {!selectedSign && (
-            <div className="text-center py-16">
-              <div className="flex justify-center gap-3 mb-6 text-2xl text-gray-300">
-                <span>♈</span><span>♉</span><span>♊</span><span>♋</span><span>♌</span><span>♍</span>
+                {/* Share */}
+                <div className="text-center pb-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-gray-200 text-gray-600 hover:bg-gray-50 gap-2"
+                    onClick={() => {
+                      if (navigator.share) {
+                        navigator.share({
+                          title: `${selectedZodiac?.name} ${activeTab} Horoscope`,
+                          text: currentHoroscope.prediction,
+                          url: window.location.href,
+                        });
+                      } else {
+                        navigator.clipboard.writeText(`${currentHoroscope.prediction}\n\n— ${selectedZodiac?.name} ${activeTab} Horoscope from Santvaani`);
+                      }
+                    }}
+                  >
+                    <Share2 className="w-4 h-4" />
+                    {t('horoscope.share.button')}
+                  </Button>
+                </div>
               </div>
-              <h2 className="text-xl font-semibold text-gray-700 mb-2">{t('horoscope.welcome.title')}</h2>
-              <p className="text-gray-400 text-sm max-w-sm mx-auto leading-relaxed">
-                {t('horoscope.welcome.description')}
-              </p>
-              {language === 'EN' && (
-                <p className="text-orange-400 mt-2 text-xs">
-                  अपनी राशि चुनकर व्यक्तिगत भविष्यवाणी प्राप्त करें
+            ) : (
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-16 text-center">
+                <p className="text-gray-400 text-sm">
+                  {activeTab === 'daily' ? t('horoscope.empty.daily') :
+                   activeTab === 'weekly' ? t('horoscope.empty.weekly') :
+                   t('horoscope.empty.monthly')}
                 </p>
-              )}
-              <div className="flex justify-center gap-3 mt-6 text-2xl text-gray-300">
-                <span>♎</span><span>♏</span><span>♐</span><span>♑</span><span>♒</span><span>♓</span>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        )}
       </section>
 
       <Footer />
     </div>
   );
 };
-
-// Horoscope Display Component
-const HoroscopeDisplay = ({
-  horoscope,
-  period,
-  zodiac,
-  getPeriodColor,
-  onSummarize,
-  summaryLoading,
-  summary,
-  showSummary,
-  t,
-  language
-}: {
-  horoscope: Horoscope;
-  period: string;
-  zodiac: ZodiacSign | undefined;
-  getPeriodColor: (period: string) => string;
-  onSummarize: () => void;
-  summaryLoading: boolean;
-  summary?: string;
-  showSummary: boolean;
-  t: (key: string) => string;
-  language: string;
-}) => {
-  return (
-    <div className="space-y-5">
-      {/* Period Header */}
-      <Card className={`border-0 shadow-md bg-gradient-to-r ${getPeriodColor(period)} text-white`}>
-        <CardContent className="p-6 text-center">
-          <h3 className="text-2xl font-bold capitalize mb-1">
-            {period === 'daily' ? t('horoscope.period.daily.title') :
-             period === 'weekly' ? t('horoscope.period.weekly.title') :
-             t('horoscope.period.monthly.title')} {language === 'EN' ? zodiac?.name : zodiac?.nameHi}
-          </h3>
-          <p className="opacity-85 text-sm">
-            {period === 'daily' ? t('horoscope.period.daily.subtitle') :
-             period === 'weekly' ? t('horoscope.period.weekly.subtitle') :
-             t('horoscope.period.monthly.subtitle')}
-          </p>
-          {horoscope.period_theme && (
-            <Badge variant="secondary" className="bg-white/20 text-white mt-2 border-0">
-              {horoscope.period_theme}
-            </Badge>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Prediction */}
-      <Card className="border-orange-100 shadow-sm bg-white">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-gray-800 text-base">
-            {t('horoscope.prediction.title')}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-gray-700 leading-relaxed">{horoscope.prediction}</p>
-
-          {horoscope.prediction_hi && (
-            <p className="text-gray-500 italic leading-relaxed border-l-4 border-orange-200 pl-4 text-sm">
-              {horoscope.prediction_hi}
-            </p>
-          )}
-
-          {/* AI Summarizer Section */}
-          <div className="border-t border-gray-100 pt-4">
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-500">{t('horoscope.summary.prompt')}</span>
-              <Button
-                onClick={onSummarize}
-                variant="outline"
-                size="sm"
-                disabled={summaryLoading}
-                className="border-orange-200 text-orange-600 hover:bg-orange-50"
-              >
-                {summaryLoading ? (
-                  <>
-                    <RefreshCw className="w-3 h-3 mr-2 animate-spin" />
-                    {t('horoscope.summary.analyzing')}
-                  </>
-                ) : (
-                  <>
-                    <span className="mr-1.5 text-xs">✨</span>
-                    {t('horoscope.summary.button')}
-                  </>
-                )}
-              </Button>
-            </div>
-
-            {/* AI Summary Display */}
-            {showSummary && summary && (
-              <div className="mt-3 bg-orange-50 rounded-lg p-4 border-l-4 border-orange-400">
-                <h4 className="font-semibold text-orange-800 text-sm mb-2">{t('horoscope.summary.title')}</h4>
-                <p className="text-orange-700 leading-relaxed text-sm font-medium">{summary}</p>
-              </div>
-            )}
-          </div>
-
-          {horoscope.spiritual_advice && (
-            <div className="bg-amber-50 rounded-lg p-4 border-l-4 border-amber-400">
-              <p className="text-sm text-gray-700">
-                <strong>{t('horoscope.spiritual.guidance')}</strong> {horoscope.spiritual_advice}
-              </p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Lucky Elements */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card className="border-orange-100 shadow-sm bg-white">
-          <CardContent className="p-6 text-center">
-            <Palette className="w-7 h-7 text-orange-500 mx-auto mb-3" />
-            <p className="text-sm text-gray-500 mb-2">{t('horoscope.lucky.color')}</p>
-            <span className="inline-block bg-orange-100 text-orange-700 text-base px-4 py-1.5 rounded-full font-medium">
-              {horoscope.lucky_color}
-            </span>
-          </CardContent>
-        </Card>
-
-        <Card className="border-orange-100 shadow-sm bg-white">
-          <CardContent className="p-6 text-center">
-            <Hash className="w-7 h-7 text-orange-500 mx-auto mb-3" />
-            <p className="text-sm text-gray-500 mb-2">{t('horoscope.lucky.number')}</p>
-            <span className="inline-block bg-amber-100 text-amber-700 text-2xl font-bold px-6 py-1.5 rounded-full">
-              {horoscope.lucky_number}
-            </span>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Share Button */}
-      <div className="text-center pt-2">
-        <Button
-          variant="outline"
-          className="border-orange-200 text-orange-600 hover:bg-orange-50"
-          onClick={() => {
-            if (navigator.share) {
-              navigator.share({
-                title: `${zodiac?.name} ${period} Horoscope`,
-                text: horoscope.prediction,
-                url: window.location.href
-              });
-            } else {
-              navigator.clipboard.writeText(`${horoscope.prediction}\n\n- ${zodiac?.name} ${period} Horoscope from Santvaani`);
-            }
-          }}
-        >
-          <Share2 className="w-4 h-4 mr-2" />
-          {t('horoscope.share.button')}
-        </Button>
-      </div>
-    </div>
-  );
-};
-
-const FALLBACK_SIGNS: ZodiacSign[] = [
-  { id: 'aries', name: 'Aries', nameHi: 'मेष', symbol: '♈', dates: 'Mar 21 - Apr 19' },
-  { id: 'taurus', name: 'Taurus', nameHi: 'वृषभ', symbol: '♉', dates: 'Apr 20 - May 20' },
-  { id: 'gemini', name: 'Gemini', nameHi: 'मिथुन', symbol: '♊', dates: 'May 21 - Jun 20' },
-  { id: 'cancer', name: 'Cancer', nameHi: 'कर्क', symbol: '♋', dates: 'Jun 21 - Jul 22' },
-  { id: 'leo', name: 'Leo', nameHi: 'सिंह', symbol: '♌', dates: 'Jul 23 - Aug 22' },
-  { id: 'virgo', name: 'Virgo', nameHi: 'कन्या', symbol: '♍', dates: 'Aug 23 - Sep 22' },
-  { id: 'libra', name: 'Libra', nameHi: 'तुला', symbol: '♎', dates: 'Sep 23 - Oct 22' },
-  { id: 'scorpio', name: 'Scorpio', nameHi: 'वृश्चिक', symbol: '♏', dates: 'Oct 23 - Nov 21' },
-  { id: 'sagittarius', name: 'Sagittarius', nameHi: 'धनु', symbol: '♐', dates: 'Nov 22 - Dec 21' },
-  { id: 'capricorn', name: 'Capricorn', nameHi: 'मकर', symbol: '♑', dates: 'Dec 22 - Jan 19' },
-  { id: 'aquarius', name: 'Aquarius', nameHi: 'कुम्भ', symbol: '♒', dates: 'Jan 20 - Feb 18' },
-  { id: 'pisces', name: 'Pisces', nameHi: 'मीन', symbol: '♓', dates: 'Feb 19 - Mar 20' }
-];
 
 export default HoroscopePage;
