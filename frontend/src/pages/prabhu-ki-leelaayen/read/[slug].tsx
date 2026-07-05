@@ -3,6 +3,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import ReadingProgressBar from '@/components/ReadingProgressBar';
 import {
   Home, X, Moon, Sun, ZoomIn, ZoomOut, Maximize, Minimize, Maximize2, Minimize2, ChevronRight, ChevronLeft,
   Languages, CheckCircle, ArrowUp, ChevronDown, Type, Settings, BookOpen, LogIn, TrendingUp
@@ -330,6 +331,7 @@ const BookReader: React.FC = () => {
       }}
       onTouchEnd={handleTouchEnd}
     >
+      <ReadingProgressBar targetRef={containerRef} />
       {/* Top Controls */}
       <div
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${

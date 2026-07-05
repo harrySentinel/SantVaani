@@ -14,6 +14,8 @@ import { supabase } from '@/lib/supabaseClient';
 import { usePagination } from '@/hooks/usePagination';
 import BeautifulPagination from '@/components/BeautifulPagination';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { SaintGridSkeleton } from '@/components/SkeletonCards';
+import EmptyState from '@/components/EmptyState';
 
 interface Saint {
   id: string;
@@ -178,30 +180,7 @@ const Saints = () => {
         {/* Loading Grid */}
         <section className="py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {[...Array(6)].map((_, index) => (
-                <div key={index} className="animate-pulse">
-                  <Card className="border-0 shadow-lg bg-white/90 backdrop-blur-sm overflow-hidden">
-                    <div className="bg-gray-300 w-full h-48"></div>
-                    <CardContent className="p-6 space-y-4">
-                      <div className="space-y-2">
-                        <div className="h-6 bg-gray-300 rounded w-3/4"></div>
-                        <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <div className="h-4 bg-gray-200 rounded w-1/3"></div>
-                        <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-                      </div>
-                      <div className="space-y-2">
-                        <div className="h-4 bg-gray-200 rounded"></div>
-                        <div className="h-4 bg-gray-200 rounded w-5/6"></div>
-                      </div>
-                      <div className="h-4 bg-gray-200 rounded w-1/3"></div>
-                    </CardContent>
-                  </Card>
-                </div>
-              ))}
-            </div>
+            <SaintGridSkeleton count={6} />
           </div>
         </section>
 
@@ -347,6 +326,14 @@ const Saints = () => {
       {/* Saints Grid */}
       <section id="saints-grid" className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {pagination.totalItems === 0 && searchQuery ? (
+            <EmptyState
+              icon={Search}
+              title={t('saints.search.no.results')}
+              description={`No saints found matching "${searchQuery}". Try a different name or keyword.`}
+              action={{ label: 'Clear Search', onClick: () => setSearchQuery('') }}
+            />
+          ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {pagination.currentItems.map((saint, index) => (
               <motion.div
@@ -424,6 +411,7 @@ const Saints = () => {
               </motion.div>
             ))}
           </div>
+          )}
         </div>
 
         {/* Pagination */}

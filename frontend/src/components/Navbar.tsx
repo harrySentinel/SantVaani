@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
-import { Menu, X, Users, Heart, Sparkles, Book, Info, IndianRupee, Calendar, Star, ChevronDown, CalendarDays, LogIn, UserPlus, User, LogOut, BookOpen, BookMarked, Quote, Share2 } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { Menu, X, Users, Heart, Sparkles, Book, Info, IndianRupee, Star, ChevronDown, CalendarDays, LogIn, UserPlus, User, LogOut, BookOpen, BookMarked, Quote, Share2, Settings, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -12,31 +12,50 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import GlobalSearch from '@/components/GlobalSearch';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isMoreOpen, setIsMoreOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { user, loading, signOut } = useAuth();
   const { language, toggleLanguage } = useLanguage();
+  const location = useLocation();
 
-  // Close dropdown when clicking outside
+  // Cmd+K / Ctrl+K to open search
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsSearchOpen(true);
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, []);
+
+  const isActive = (path: string) =>
+    location.pathname === path || location.pathname.startsWith(path + '/');
+
+  // Close mobile menu and dropdowns on route change
+  useEffect(() => {
+    setIsOpen(false);
+    setIsMoreOpen(false);
+  }, [location.pathname]);
+
+  // Close "More" dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsMoreOpen(false);
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Primary navigation items (most important)
   const primaryItems = [
-    // { to: '/daily-guide', label: 'Daily Guide', labelHi: 'दैनिक मार्गदर्शन', icon: Calendar }, // Hidden - Under development
     { to: '/horoscope', label: 'Horoscope', labelHi: 'राशिफल', icon: Star },
     { to: '/events', label: 'Events', labelHi: 'कार्यक्रम', icon: CalendarDays },
     { to: '/saints', label: 'Saints', labelHi: 'संत', icon: Users },
@@ -45,7 +64,6 @@ export default function Navbar() {
     { to: '/prabhu-ki-leelaayen', label: 'Divine Stories', labelHi: 'दिव्य कथाएं', icon: BookMarked },
   ];
 
-  // Secondary navigation items (in dropdown/mobile menu)
   const secondaryItems = [
     { to: '/living-saints', label: 'Contemporary Saints', labelHi: 'समकालीन संत', icon: Heart },
     { to: '/divine', label: 'Divine Forms', labelHi: 'दिव्य रूप', icon: Sparkles },
@@ -57,12 +75,26 @@ export default function Navbar() {
 
   const allMenuItems = [...primaryItems, ...secondaryItems];
 
+  const navLinkClass = (path: string) =>
+    `flex items-center space-x-1 transition-colors duration-200 px-3 py-2 rounded-lg text-sm font-medium ${
+      isActive(path)
+        ? 'text-orange-600 bg-orange-50 font-semibold'
+        : 'text-gray-700 hover:text-orange-600 hover:bg-orange-50'
+    }`;
+
+  const mobileNavLinkClass = (path: string) =>
+    `flex items-center space-x-2 transition-colors duration-200 px-3 py-2 rounded-lg font-medium ${
+      isActive(path)
+        ? 'text-orange-600 bg-orange-50 font-semibold'
+        : 'text-gray-700 hover:text-orange-600 hover:bg-orange-50'
+    }`;
+
   return (
     <nav className="bg-white/95 backdrop-blur-sm border-b border-orange-100 sticky top-0 z-50 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
+          <Link to="/" className="flex items-center space-x-2 flex-shrink-0">
             <div className="w-8 h-8 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center">
               <span className="text-white font-bold text-sm">ॐ</span>
             </div>
@@ -71,20 +103,28 @@ export default function Navbar() {
             </span>
           </Link>
 
+          {/* Desktop search pill */}
+          <button
+            onClick={() => setIsSearchOpen(true)}
+            className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-gray-200 bg-gray-50 hover:bg-orange-50 hover:border-orange-200 text-gray-400 hover:text-orange-500 text-sm transition-all duration-200 group"
+          >
+            <Search className="w-4 h-4" />
+            <span className="text-gray-400 group-hover:text-orange-400">
+              {language === 'EN' ? 'Search…' : 'खोजें…'}
+            </span>
+            <kbd className="hidden lg:flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-white border border-gray-200 text-xs font-mono text-gray-400 ml-1">
+              ⌘K
+            </kbd>
+          </button>
+
           {/* Desktop Menu */}
-          <div className="hidden lg:flex items-center space-x-4">
+          <div className="hidden lg:flex items-center space-x-1">
             {primaryItems.map((item) => {
               const Icon = item.icon;
               return (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  className="flex items-center space-x-1 text-gray-700 hover:text-orange-600 transition-colors duration-200 px-3 py-2 rounded-lg hover:bg-orange-50"
-                >
+                <Link key={item.to} to={item.to} className={navLinkClass(item.to)}>
                   <Icon className="w-4 h-4" />
-                  <span className="text-sm font-medium">
-                    {language === 'EN' ? item.label : item.labelHi}
-                  </span>
+                  <span>{language === 'EN' ? item.label : item.labelHi}</span>
                 </Link>
               );
             })}
@@ -94,16 +134,18 @@ export default function Navbar() {
               <Button
                 variant="ghost"
                 onClick={() => setIsMoreOpen(!isMoreOpen)}
-                className="flex items-center space-x-1 text-gray-700 hover:text-orange-600 transition-colors duration-200 px-3 py-2 rounded-lg hover:bg-orange-50"
+                className={`flex items-center space-x-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
+                  secondaryItems.some((i) => isActive(i.to))
+                    ? 'text-orange-600 bg-orange-50 font-semibold'
+                    : 'text-gray-700 hover:text-orange-600 hover:bg-orange-50'
+                }`}
               >
-                <span className="text-sm font-medium">
-                  {language === 'EN' ? 'More' : 'और'}
-                </span>
-                <ChevronDown className={`w-4 h-4 transition-transform ${isMoreOpen ? 'rotate-180' : ''}`} />
+                <span>{language === 'EN' ? 'More' : 'और'}</span>
+                <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isMoreOpen ? 'rotate-180' : ''}`} />
               </Button>
 
               {isMoreOpen && (
-                <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-orange-100 py-2 z-50">
+                <div className="absolute top-full right-0 mt-2 w-52 bg-white rounded-xl shadow-lg border border-orange-100 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                   {secondaryItems.map((item) => {
                     const Icon = item.icon;
                     return (
@@ -111,12 +153,14 @@ export default function Navbar() {
                         key={item.to}
                         to={item.to}
                         onClick={() => setIsMoreOpen(false)}
-                        className="flex items-center space-x-2 text-gray-700 hover:text-orange-600 hover:bg-orange-50 transition-colors duration-200 px-4 py-2"
+                        className={`flex items-center space-x-2 px-4 py-2 text-sm transition-colors duration-150 ${
+                          isActive(item.to)
+                            ? 'text-orange-600 bg-orange-50 font-semibold'
+                            : 'text-gray-700 hover:text-orange-600 hover:bg-orange-50'
+                        }`}
                       >
                         <Icon className="w-4 h-4" />
-                        <span className="text-sm font-medium">
-                          {language === 'EN' ? item.label : item.labelHi}
-                        </span>
+                        <span className="font-medium">{language === 'EN' ? item.label : item.labelHi}</span>
                       </Link>
                     );
                   })}
@@ -124,25 +168,38 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* Authentication Buttons */}
-            <div className="flex items-center space-x-2">
+            {/* Auth */}
+            <div className="flex items-center space-x-2 ml-2">
               {loading ? (
-                <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse"></div>
+                <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse" />
               ) : user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className="flex items-center space-x-2">
-                      <User className="w-4 h-4" />
-                      <span className="hidden md:inline">{user.user_metadata?.name || 'User'}</span>
+                    <Button variant="ghost" size="sm" className="flex items-center space-x-2 px-3">
+                      <div className="w-7 h-7 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white text-xs font-bold">
+                        {(user.user_metadata?.name || user.email || 'U')[0].toUpperCase()}
+                      </div>
+                      <span className="hidden md:inline text-sm font-medium text-gray-700">
+                        {user.user_metadata?.name?.split(' ')[0] || 'Account'}
+                      </span>
+                      <ChevronDown className="w-3 h-3 text-gray-500" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48">
-                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuContent align="end" className="w-52">
+                    <DropdownMenuLabel className="text-xs text-gray-500 font-normal truncate">
+                      {user.email}
+                    </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
-                      <Link to="/dashboard" className="flex items-center">
+                      <Link to="/dashboard" className="flex items-center cursor-pointer">
                         <User className="w-4 h-4 mr-2" />
                         Dashboard
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/profile-settings" className="flex items-center cursor-pointer">
+                        <Settings className="w-4 h-4 mr-2" />
+                        Profile Settings
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
@@ -155,7 +212,7 @@ export default function Navbar() {
                           console.error('Logout error:', error);
                         }
                       }}
-                      className="text-red-600 focus:text-red-600"
+                      className="text-red-600 focus:text-red-600 cursor-pointer"
                     >
                       <LogOut className="w-4 h-4 mr-2" />
                       Logout
@@ -170,7 +227,7 @@ export default function Navbar() {
                       <span>Login</span>
                     </Link>
                   </Button>
-                  <Button asChild variant="outline" size="sm" className="border-orange-200 text-orange-600 hover:bg-orange-50">
+                  <Button asChild size="sm" className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white">
                     <Link to="/signup" className="flex items-center space-x-1">
                       <UserPlus className="w-4 h-4" />
                       <span>Sign Up</span>
@@ -183,16 +240,24 @@ export default function Navbar() {
 
           {/* Language Toggle & Mobile Menu Button */}
           <div className="flex items-center space-x-2">
+            {/* Mobile search icon */}
+            <button
+              onClick={() => setIsSearchOpen(true)}
+              className="md:hidden p-2 rounded-lg text-gray-500 hover:text-orange-600 hover:bg-orange-50 transition-colors"
+              aria-label="Search"
+            >
+              <Search className="w-5 h-5" />
+            </button>
+
             <Button
               onClick={toggleLanguage}
               variant="outline"
               size="sm"
-              className="border-orange-200 text-orange-600 hover:bg-orange-50"
+              className="border-orange-200 text-orange-600 hover:bg-orange-50 text-xs font-semibold"
             >
-              {language}
+              {language === 'EN' ? 'हिं' : 'EN'}
             </Button>
 
-            {/* Mobile menu button */}
             <div className="lg:hidden">
               <Button
                 onClick={() => setIsOpen(!isOpen)}
@@ -206,82 +271,99 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Mobile Menu */}
-        {isOpen && (
-          <div className="lg:hidden pb-4 border-t border-orange-100 mt-2">
-            <div className="flex flex-col space-y-2 pt-4">
+        {/* Mobile Menu — animated slide down */}
+        <div
+          className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${
+            isOpen ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'
+          }`}
+        >
+          <div className="pb-4 border-t border-orange-100 mt-2">
+            <div className="flex flex-col space-y-1 pt-3">
               {allMenuItems.map((item) => {
                 const Icon = item.icon;
                 return (
                   <Link
                     key={item.to}
                     to={item.to}
-                    onClick={() => setIsOpen(false)}
-                    className="flex items-center space-x-2 text-gray-700 hover:text-orange-600 transition-colors duration-200 px-3 py-2 rounded-lg hover:bg-orange-50"
+                    className={mobileNavLinkClass(item.to)}
                   >
                     <Icon className="w-4 h-4" />
-                    <span className="font-medium">
-                      {language === 'EN' ? item.label : item.labelHi}
-                    </span>
+                    <span>{language === 'EN' ? item.label : item.labelHi}</span>
                   </Link>
                 );
               })}
 
-              {/* Mobile Auth Buttons */}
-              <div className="pt-4 border-t border-orange-100 mt-4">
+              {/* Mobile Auth */}
+              <div className="pt-3 border-t border-orange-100 mt-2 space-y-1">
                 {loading ? (
-                  <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse mx-3"></div>
+                  <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse mx-3" />
                 ) : user ? (
-                  <div className="space-y-2">
+                  <>
+                    <div className="flex items-center space-x-3 px-3 py-2">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+                        {(user.user_metadata?.name || user.email || 'U')[0].toUpperCase()}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-gray-800 truncate">
+                          {user.user_metadata?.name || 'Account'}
+                        </p>
+                        <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                      </div>
+                    </div>
                     <Link
                       to="/dashboard"
-                      onClick={() => setIsOpen(false)}
-                      className="flex items-center space-x-2 text-gray-700 hover:text-orange-600 transition-colors duration-200 px-3 py-2 rounded-lg hover:bg-orange-50"
+                      className={mobileNavLinkClass('/dashboard')}
                     >
                       <User className="w-4 h-4" />
-                      <span className="font-medium">Dashboard</span>
+                      <span>Dashboard</span>
+                    </Link>
+                    <Link
+                      to="/profile-settings"
+                      className={mobileNavLinkClass('/profile-settings')}
+                    >
+                      <Settings className="w-4 h-4" />
+                      <span>Profile Settings</span>
                     </Link>
                     <button
                       onClick={async () => {
                         try {
                           await signOut();
-                          setIsOpen(false);
                           window.location.href = '/';
                         } catch (error) {
                           console.error('Logout error:', error);
                         }
                       }}
-                      className="flex items-center space-x-2 text-red-600 hover:text-red-700 transition-colors duration-200 px-3 py-2 rounded-lg hover:bg-red-50 w-full text-left"
+                      className="flex items-center space-x-2 text-red-600 hover:text-red-700 transition-colors duration-200 px-3 py-2 rounded-lg hover:bg-red-50 w-full text-left font-medium"
                     >
                       <LogOut className="w-4 h-4" />
-                      <span className="font-medium">Logout</span>
+                      <span>Logout</span>
                     </button>
-                  </div>
+                  </>
                 ) : (
-                  <div className="space-y-2">
+                  <>
                     <Link
                       to="/login"
-                      onClick={() => setIsOpen(false)}
-                      className="flex items-center space-x-2 text-gray-700 hover:text-orange-600 transition-colors duration-200 px-3 py-2 rounded-lg hover:bg-orange-50"
+                      className={mobileNavLinkClass('/login')}
                     >
                       <LogIn className="w-4 h-4" />
-                      <span className="font-medium">Login</span>
+                      <span>Login</span>
                     </Link>
                     <Link
                       to="/signup"
-                      onClick={() => setIsOpen(false)}
-                      className="flex items-center space-x-2 text-orange-600 hover:text-orange-700 transition-colors duration-200 px-3 py-2 rounded-lg hover:bg-orange-50 border border-orange-200"
+                      className="flex items-center space-x-2 text-white bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 transition-colors duration-200 px-3 py-2 rounded-lg font-medium"
                     >
                       <UserPlus className="w-4 h-4" />
-                      <span className="font-medium">Sign Up</span>
+                      <span>Sign Up</span>
                     </Link>
-                  </div>
+                  </>
                 )}
               </div>
             </div>
           </div>
-        )}
+        </div>
       </div>
+
+      <GlobalSearch isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </nav>
   );
 }

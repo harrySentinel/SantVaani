@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { BookOpen, Clock, Calendar, ArrowRight, Sparkles } from 'lucide-react'
 import { supabase } from '@/lib/supabaseClient'
 import { useLanguage } from '@/contexts/LanguageContext'
+import { BlogGridSkeleton } from '@/components/SkeletonCards'
 
 interface BlogPost {
   id: string
@@ -123,15 +124,11 @@ const LandingBlogSection = () => {
     return (
       <section className="py-16 bg-gradient-to-br from-orange-50 via-white to-orange-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="animate-pulse">
-            <div className="h-10 bg-gray-200 rounded-lg mb-4 w-64 mx-auto"></div>
-            <div className="h-6 bg-gray-200 rounded-lg mb-12 w-96 mx-auto"></div>
-            <div className="grid md:grid-cols-3 gap-6">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="h-96 bg-gray-200 rounded-xl"></div>
-              ))}
-            </div>
+          <div className="text-center mb-10 space-y-3">
+            <div className="h-8 bg-gray-200 rounded-lg w-56 mx-auto animate-pulse" />
+            <div className="h-5 bg-gray-200 rounded-lg w-80 mx-auto animate-pulse" />
           </div>
+          <BlogGridSkeleton count={3} />
         </div>
       </section>
     )

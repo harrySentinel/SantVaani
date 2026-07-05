@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Music, ArrowRight, Play, Flame, Sparkles, Loader2 } from 'lucide-react';
+import { Music, ArrowRight, Play, Flame, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import CompactBhajanCard from '@/components/bhajan/CompactBhajanCard';
 import BhajanModal from '@/components/BhajanModal';
 import { supabase } from '@/lib/supabaseClient';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { BhajanGridSkeleton } from '@/components/SkeletonCards';
 
 interface Bhajan {
   id: string;
@@ -76,9 +77,7 @@ const LandingBhajanSection = () => {
     return (
       <section className="py-16 bg-gradient-to-br from-orange-50 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-8 h-8 animate-spin text-green-600" />
-          </div>
+          <BhajanGridSkeleton count={6} />
         </div>
       </section>
     );

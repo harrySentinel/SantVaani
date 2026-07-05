@@ -22,6 +22,8 @@ import { useServerBlogView } from '@/hooks/useServerBlogView';
 import LikeButton from '@/components/blog/LikeButton';
 import BookmarkButton from '@/components/blog/BookmarkButton';
 import CommentsSection from '@/components/blog/CommentsSection';
+import ReadingProgressBar from '@/components/ReadingProgressBar';
+import Breadcrumb from '@/components/Breadcrumb';
 
 const BlogPostDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -373,28 +375,17 @@ Lord Ram's teachings remind us that true strength lies not in power or wealth, b
       )}
 
       <div className="min-h-screen bg-gradient-to-br from-orange-100 via-amber-50 to-red-50">
+        <ReadingProgressBar />
         {post && <SEOHead post={post} />}
         <Navbar />
 
-      {/* Breadcrumbs */}
-      <div className="bg-white border-b border-orange-100">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <nav className="flex items-center space-x-2 text-sm text-gray-500">
-            <Link to="/" className="hover:text-orange-600">Home</Link>
-            <span>/</span>
-            <Link to="/blog" className="hover:text-orange-600">Blog</Link>
-            <span>/</span>
-            <Link
-              to={`/blog/category/${post.category.slug}`}
-              className="hover:text-orange-600"
-            >
-              {post.category.name}
-            </Link>
-            <span>/</span>
-            <span className="text-gray-700 truncate max-w-xs">{post.title}</span>
-          </nav>
-        </div>
-      </div>
+        <Breadcrumb
+          items={[
+            { label: 'Blog', to: '/blog' },
+            { label: post.category.name, to: `/blog/category/${post.category.slug}` },
+            { label: post.title },
+          ]}
+        />
 
       <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Article Header */}

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Loader2, Home } from 'lucide-react';
+import { Loader2, Home, Sparkles } from 'lucide-react';
 import { Toaster } from '@/components/ui/toaster';
 import { useToast } from '@/hooks/use-toast';
 import PostCard from '@/components/santvaani-space/PostCard';
 import axios from 'axios';
+import EmptyState from '@/components/EmptyState';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -152,22 +153,14 @@ const SantvaaniSpace = () => {
       {/* Posts Feed - Clean & Centered */}
       <div className="max-w-2xl mx-auto px-4 py-8">
         {posts.length === 0 ? (
-          <div className="text-center py-20 bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-gray-100">
-            <div className="text-8xl mb-8 animate-bounce">🌸</div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">
-              {language === 'hi' ? 'कोई पोस्ट नहीं' : 'No Posts Yet'}
-            </h3>
-            <p className="text-gray-600 text-lg mb-6">
-              {language === 'hi'
-                ? 'जल्द ही आध्यात्मिक सामग्री आ रही है'
-                : 'Spiritual content coming soon'}
-            </p>
-            <div className="inline-block px-6 py-3 bg-gradient-to-r from-orange-100 to-purple-100 rounded-full">
-              <p className="text-sm text-gray-700 font-medium">
-                {language === 'hi' ? 'शांति से प्रतीक्षा करें' : 'Stay peaceful, stay connected'}
-              </p>
-            </div>
-          </div>
+          <EmptyState
+            icon={Sparkles}
+            title={language === 'hi' ? 'कोई पोस्ट नहीं' : 'No Posts Yet'}
+            description={language === 'hi'
+              ? 'जल्द ही आध्यात्मिक सामग्री आ रही है। शांति से प्रतीक्षा करें।'
+              : 'Spiritual content is coming soon. Stay peaceful, stay connected.'}
+            action={{ label: language === 'hi' ? 'होम पर जाएं' : 'Go Home', to: '/' }}
+          />
         ) : (
           <div className="space-y-7">
             {posts.map((post) => (

@@ -13,6 +13,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabaseClient';
 import { useBookProgress } from '@/hooks/useReadingProgress';
+import Breadcrumb from '@/components/Breadcrumb';
 
 interface Book {
   id: string;
@@ -108,6 +109,12 @@ const BookDetail: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50">
       <Navbar />
+      <Breadcrumb
+        items={[
+          { label: language === 'HI' ? 'दिव्य कथाएं' : 'Divine Stories', to: '/prabhu-ki-leelaayen' },
+          { label: language === 'HI' ? (book.title_hi || book.title) : book.title },
+        ]}
+      />
 
       {/* Book Header */}
       <section className="relative py-16 overflow-hidden">

@@ -18,6 +18,7 @@ import YouTubePlayer from "@/components/music/YouTubePlayer";
 import MiniPlayer from "@/components/music/MiniPlayer";
 import FullPlayer from "@/components/music/FullPlayer";
 import KeyboardShortcuts from "@/components/music/KeyboardShortcuts";
+import ScrollToTop from "@/components/ScrollToTop";
 
 // Lazy load pages for better code splitting
 const Index = lazy(() => import("./pages/Index"));
@@ -47,6 +48,8 @@ const PrabhuKiLeelaayen_Book = lazy(() => import("./pages/prabhu-ki-leelaayen/bo
 const PrabhuKiLeelaayen_Read = lazy(() => import("./pages/prabhu-ki-leelaayen/read/[slug]"));
 const SantvaaniSpace = lazy(() => import("./pages/santvaani-space/index"));
 const SantvaaniSpacePost = lazy(() => import("./pages/santvaani-space/[postId]"));
+const PrivacyPolicy = lazy(() => import("./pages/privacy-policy"));
+const TermsOfService = lazy(() => import("./pages/terms-of-service"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
@@ -110,6 +113,8 @@ const App = () => {
                           <Route path="/prabhu-ki-leelaayen/read/:slug" element={<PrabhuKiLeelaayen_Read />} />
                           <Route path="/santvaani-space" element={<SantvaaniSpace />} />
                           <Route path="/santvaani-space/:postId" element={<SantvaaniSpacePost />} />
+                          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                          <Route path="/terms-of-service" element={<TermsOfService />} />
                           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                           <Route path="*" element={<NotFound />} />
                         </Routes>
@@ -120,6 +125,7 @@ const App = () => {
                       <MiniPlayer />
                       <FullPlayer />
                       <KeyboardShortcuts />
+                      <ScrollToTop />
                     </AnalyticsProvider>
                   </BrowserRouter>
                 </TooltipProvider>
