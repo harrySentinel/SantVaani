@@ -1,4 +1,6 @@
+import Lottie from 'lottie-react';
 import { cn } from "@/lib/utils";
+import animationData from '@/assets/loading.json';
 
 interface LoadingSpinnerProps {
   size?: "sm" | "md" | "lg" | "xl";
@@ -6,37 +8,30 @@ interface LoadingSpinnerProps {
   text?: string;
 }
 
-const omSizeClasses = {
-  sm: "text-2xl",
-  md: "text-4xl",
-  lg: "text-6xl",
-  xl: "text-8xl"
+const sizeClasses = {
+  sm: "w-12 h-12",
+  md: "w-20 h-20",
+  lg: "w-28 h-28",
+  xl: "w-40 h-40",
 };
 
 const textSizeClasses = {
   sm: "text-xs",
   md: "text-sm",
   lg: "text-sm",
-  xl: "text-sm"
+  xl: "text-sm",
 };
 
 export const LoadingSpinner = ({
   size = "md",
   className,
-  text
+  text,
 }: LoadingSpinnerProps) => {
   return (
-    <div className={cn("flex flex-col items-center justify-center space-y-3", className)}>
-      <span
-        className={cn("text-orange-400 animate-pulse block leading-none", omSizeClasses[size])}
-        style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
-      >
-        ॐ
-      </span>
+    <div className={cn("flex flex-col items-center justify-center space-y-2", className)}>
+      <Lottie animationData={animationData} loop className={sizeClasses[size]} />
       {text && (
-        <p className={cn("text-gray-400 tracking-wide", textSizeClasses[size])}>
-          {text}
-        </p>
+        <p className={cn("text-gray-400 tracking-wide", textSizeClasses[size])}>{text}</p>
       )}
     </div>
   );
@@ -62,21 +57,9 @@ export const LoadingCard = ({ className }: { className?: string }) => (
 
 export const LoadingPage = ({ text = "Loading Santvaani..." }: { text?: string }) => (
   <div className="min-h-screen flex items-center justify-center bg-white">
-    <div className="text-center space-y-5">
-      <span
-        className="text-8xl text-orange-400 animate-pulse block leading-none"
-        style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
-      >
-        ॐ
-      </span>
-      <div className="space-y-2">
-        <p className="text-gray-400 text-sm tracking-widest">{text}</p>
-        <div className="flex justify-center items-center gap-1.5">
-          <span className="w-1.5 h-1.5 rounded-full bg-orange-300 animate-bounce" style={{ animationDelay: '0ms' }} />
-          <span className="w-1.5 h-1.5 rounded-full bg-orange-300 animate-bounce" style={{ animationDelay: '180ms' }} />
-          <span className="w-1.5 h-1.5 rounded-full bg-orange-300 animate-bounce" style={{ animationDelay: '360ms' }} />
-        </div>
-      </div>
+    <div className="flex flex-col items-center gap-3">
+      <Lottie animationData={animationData} loop className="w-36 h-36" />
+      <p className="text-gray-400 text-sm tracking-widest">{text}</p>
     </div>
   </div>
 );
