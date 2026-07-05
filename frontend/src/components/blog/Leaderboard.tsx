@@ -213,7 +213,7 @@ export default function Leaderboard({ limit = 10, className = '' }: LeaderboardP
                   }
                 `}
                 >
-                  🏆 {leader.total_badges}
+                  <Trophy className="w-3 h-3 inline mr-1" />{leader.total_badges}
                 </div>
               )}
             </div>

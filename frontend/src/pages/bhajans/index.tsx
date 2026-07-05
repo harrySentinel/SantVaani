@@ -277,7 +277,7 @@ const Bhajans = () => {
             {/* Results */}
             {bhajanPagination.totalItems === 0 && searchQuery ? (
               <div className="text-center py-20">
-                <div className="text-gray-300 text-7xl mb-6">🔍</div>
+                <div className="flex justify-center mb-6"><Search className="w-16 h-16 text-gray-200" /></div>
                 <h3 className="text-2xl font-semibold text-gray-700 mb-2">No Results Found</h3>
                 <p className="text-gray-500">Try different keywords or browse all bhajans</p>
                 <button

@@ -331,7 +331,7 @@ export const BlogReader: React.FC<BlogReaderProps> = ({
             ) : (
               <div className={`${isDarkMode ? 'bg-orange-50 dark:bg-gray-800' : 'bg-orange-50'} border-l-4 border-orange-500 p-6 rounded-r-xl`}>
                 <p className={`text-lg mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>
-                  🙏 यह लेख हिंदी में जल्द ही उपलब्ध होगा।
+                  यह लेख हिंदी में जल्द ही उपलब्ध होगा।
                 </p>
                 <p className={`text-base ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                   कृपया अंग्रेजी संस्करण पढ़ें या जल्द ही हिंदी अनुवाद के लिए वापस आएं।

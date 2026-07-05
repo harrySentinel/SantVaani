@@ -56,7 +56,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ post, featured = false, compact = f
                       color: post.category.color
                     }}
                   >
-                    {post.category.icon} {post.category.name}
+                    {post.category.name}
                   </span>
                 </div>
                 <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 mb-2">
@@ -98,7 +98,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ post, featured = false, compact = f
             {post.featured && (
               <div className="absolute top-4 left-4">
                 <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-500 text-white">
-                  ✨ Featured
+                  Featured
                 </span>
               </div>
             )}
@@ -107,7 +107,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ post, featured = false, compact = f
                 className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium text-white"
                 style={{ backgroundColor: post.category.color }}
               >
-                {post.category.icon} {post.category.name}
+                {post.category.name}
               </span>
             </div>
           </div>
@@ -124,11 +124,11 @@ const BlogCard: React.FC<BlogCardProps> = ({ post, featured = false, compact = f
                     color: post.category.color
                   }}
                 >
-                  {post.category.icon} {post.category.name}
+                  {post.category.name}
                 </span>
                 {post.featured && (
                   <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
-                    ✨ Featured
+                    Featured
                   </span>
                 )}
               </div>

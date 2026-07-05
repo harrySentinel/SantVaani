@@ -74,15 +74,15 @@ const BlogIndex: React.FC = () => {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="space-y-8">
             <div className="flex justify-center items-center space-x-3 mb-6">
-              <span className="text-4xl animate-pulse">🕉️</span>
-              <Heart className="w-6 h-6 text-orange-400 animate-pulse" />
-              <span className="text-4xl animate-pulse">📿</span>
+              <span className="text-4xl text-orange-400 leading-none select-none" style={{ fontFamily: 'serif' }}>ॐ</span>
+              <Heart className="w-5 h-5 text-orange-300" />
+              <BookOpen className="w-5 h-5 text-orange-300" />
             </div>
             <h1 className="text-3xl md:text-4xl font-light mb-6 text-gray-800">
               {contentLanguage === 'hi' ? 'आध्यात्मिक ज्ञान' : 'Spiritual Wisdom'}
               {contentLanguage && (
-                <span className="ml-3 text-xl">
-                  {contentLanguage === 'hi' ? '🇮🇳' : '🌍'}
+                <span className="ml-3 text-base font-semibold text-orange-400">
+                  {contentLanguage === 'hi' ? 'हिं' : 'EN'}
                 </span>
               )}
             </h1>
@@ -149,7 +149,7 @@ const BlogIndex: React.FC = () => {
             <Link key={post.id} to={`/blog/post/${post.slug}`} className="block">
               <Card className="group hover:shadow-lg transition-all duration-300 border-0 shadow-sm bg-white cursor-pointer">
                 <div className="h-40 rounded-t-lg flex items-center justify-center" style={{ backgroundColor: post.category?.color + '20' || '#fb923c20' }}>
-                  <span className="text-3xl">{post.category?.icon || '💫'}</span>
+                  <BookOpen className="w-10 h-10 opacity-40" style={{ color: post.category?.color || '#f97316' }} />
                 </div>
                 <CardContent className="p-6">
                   <div className="flex items-center mb-2">
@@ -167,7 +167,7 @@ const BlogIndex: React.FC = () => {
                     <span>{post.readingTime} min read</span>
                     <div className="flex items-center space-x-2">
                       <span>{post.viewCount} views</span>
-                      <span className="text-orange-400">🕉️</span>
+                      <span className="text-orange-400 font-serif text-sm leading-none">ॐ</span>
                     </div>
                   </div>
                   {post.spiritualQuotes && post.spiritualQuotes.length > 0 && (
