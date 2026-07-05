@@ -96,6 +96,7 @@ export default function Navbar() {
     }`;
 
   return (
+    <>
     <nav className="bg-white/95 backdrop-blur-sm border-b border-orange-100 sticky top-0 z-50 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
@@ -279,6 +280,9 @@ export default function Navbar() {
 
       </div>
 
+      <GlobalSearch isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+    </nav>
+
       {/* Full-screen Mobile Menu Overlay */}
       <div
         className={`fixed inset-0 z-[60] lg:hidden transition-all duration-300 ease-in-out ${
@@ -437,7 +441,6 @@ export default function Navbar() {
         </div>
       </div>
 
-      <GlobalSearch isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
-    </nav>
+    </>
   );
 }
