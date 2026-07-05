@@ -78,7 +78,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onClick }) => {
                     }}
                   />
                   <div className="hidden w-full h-full rounded-full bg-gradient-to-br from-orange-400 to-purple-600 flex items-center justify-center">
-                    <span className="text-white text-lg">🕉️</span>
+                    <span className="text-white text-lg leading-none" style={{ fontFamily: 'serif' }}>ॐ</span>
                   </div>
                 </div>
               </div>
@@ -88,7 +88,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onClick }) => {
               <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-orange-400 via-pink-500 to-purple-600 p-[2px]">
                 <div className="bg-white rounded-full w-full h-full p-[2px] flex items-center justify-center">
                   <div className="w-full h-full rounded-full bg-gradient-to-br from-orange-400 to-purple-600 flex items-center justify-center">
-                    <span className="text-white text-lg">🕉️</span>
+                    <span className="text-white text-lg leading-none" style={{ fontFamily: 'serif' }}>ॐ</span>
                   </div>
                 </div>
               </div>

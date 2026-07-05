@@ -30,7 +30,7 @@ const AshramContactForm = () => {
     { value: 'ashram', label: 'Vridh Ashram (Old Age Home)', icon: '🏡' },
     { value: 'orphanage', label: 'Orphanage', icon: '👶' },
     { value: 'dharamshala', label: 'Dharamshala', icon: '🏛️' },
-    { value: 'temple', label: 'Temple Trust', icon: '🕉️' },
+    { value: 'temple', label: 'Temple Trust', icon: 'ॐ' },
     { value: 'gaushala', label: 'Gaushala', icon: '🐄' },
     { value: 'other', label: 'Other Religious Organization', icon: '🙏' }
   ];

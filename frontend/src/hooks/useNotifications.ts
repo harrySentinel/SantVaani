@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { toast } from '@/hooks/use-toast';
 
 export interface NotificationSettings {
@@ -39,7 +39,7 @@ export const useNotifications = () => {
       
       if (result === 'granted') {
         toast({
-          title: '🔔 Notifications Enabled!',
+          title: 'ðŸ”” Notifications Enabled!',
           description: 'You will now receive daily spiritual blessings',
           duration: 4000
         });
@@ -64,8 +64,8 @@ export const useNotifications = () => {
 
   const showWelcomeNotification = () => {
     if (permission === 'granted') {
-      new Notification('🕉️ Welcome to Santvaani Daily Guide!', {
-        body: 'You will receive spiritual guidance every morning and evening. Om Shanti! 🙏',
+      new Notification('ðŸ•‰ï¸ Welcome to Santvaani Daily Guide!', {
+        body: 'You will receive spiritual guidance every morning and evening. Om Shanti! ðŸ™',
         icon: '/favicon.ico',
         badge: '/favicon.ico',
         tag: 'welcome'
@@ -115,7 +115,7 @@ export const useNotifications = () => {
     }
 
     toast({
-      title: '✅ Notifications Scheduled',
+      title: 'âœ… Notifications Scheduled',
       description: 'Your spiritual reminders are now active',
       duration: 3000
     });
@@ -127,23 +127,23 @@ export const useNotifications = () => {
     
     const morningMessages = [
       {
-        title: '🌅 Good Morning! Rise and Shine',
-        body: 'Start your day with gratitude. Today\'s mantra: Om Namah Shivaya 🕉️'
+        title: 'ðŸŒ… Good Morning! Rise and Shine',
+        body: 'Start your day with gratitude. Today\'s mantra: Om Namah Shivaya ðŸ•‰ï¸'
       },
       {
-        title: '☀️ Spiritual Awakening Time',
-        body: 'The divine light within you is ready to shine. Begin with meditation 🧘‍♂️'
+        title: 'â˜€ï¸ Spiritual Awakening Time',
+        body: 'The divine light within you is ready to shine. Begin with meditation ðŸ§˜â€â™‚ï¸'
       },
       {
-        title: '🙏 Morning Blessings',
+        title: 'ðŸ™ Morning Blessings',
         body: 'May your day be filled with peace, joy, and spiritual growth'
       },
       {
-        title: '🕉️ Daily Mantra Reminder',
+        title: 'ðŸ•‰ï¸ Daily Mantra Reminder',
         body: 'Chant "Gayatri Mantra" for wisdom and divine guidance'
       },
       {
-        title: '🌸 Sacred Morning',
+        title: 'ðŸŒ¸ Sacred Morning',
         body: 'Every sunrise is a gift. Express gratitude and set positive intentions'
       }
     ];
@@ -169,23 +169,23 @@ export const useNotifications = () => {
   const scheduleEveningReminders = () => {
     const eveningMessages = [
       {
-        title: '🌙 Evening Peace',
-        body: 'As the sun sets, light a diya and reflect on today\'s blessings 🪔'
+        title: 'ðŸŒ™ Evening Peace',
+        body: 'As the sun sets, light a diya and reflect on today\'s blessings ðŸª”'
       },
       {
-        title: '🕯️ Aarti Time',
+        title: 'ðŸ•¯ï¸ Aarti Time',
         body: 'Time for evening prayers. Connect with the divine within'
       },
       {
-        title: '⭐ Gratitude Practice',
+        title: 'â­ Gratitude Practice',
         body: 'Before sleep, thank the universe for today\'s experiences'
       },
       {
-        title: '🎶 Bhajan Reminder',
+        title: 'ðŸŽ¶ Bhajan Reminder',
         body: 'Listen to devotional songs and purify your soul'
       },
       {
-        title: '🧘‍♀️ Evening Meditation',
+        title: 'ðŸ§˜â€â™€ï¸ Evening Meditation',
         body: 'End your day with inner peace and divine connection'
       }
     ];
@@ -201,12 +201,12 @@ export const useNotifications = () => {
     // Festival reminders would be based on Hindu calendar API
     const festivalReminders = [
       {
-        title: '🎉 Diwali Approaching!',
+        title: 'ðŸŽ‰ Diwali Approaching!',
         body: '15 days left! Start preparing for the Festival of Lights',
         days: 15
       },
       {
-        title: '🪔 Karva Chauth Tomorrow',
+        title: 'ðŸª” Karva Chauth Tomorrow',
         body: 'Married women prepare for the sacred fast',
         days: 1  
       }
@@ -222,7 +222,7 @@ export const useNotifications = () => {
   const scheduleEkadashiReminders = () => {
     // Ekadashi occurs twice a month (11th day of lunar cycle)
     setTimeout(() => {
-      showNotification('📿 Ekadashi Tomorrow', {
+      showNotification('ðŸ“¿ Ekadashi Tomorrow', {
         body: 'Prepare for spiritual fasting and Lord Vishnu worship'
       });
     }, 20000);
@@ -246,16 +246,16 @@ export const useNotifications = () => {
   const showPreviewNotification = () => {
     const previews = [
       {
-        title: '🕉️ Santvaani Morning Blessing',
-        body: 'Good morning! Today\'s mantra: Om Namah Shivaya. Have a blessed day! 🙏'
+        title: 'ðŸ•‰ï¸ Santvaani Morning Blessing',
+        body: 'Good morning! Today\'s mantra: Om Namah Shivaya. Have a blessed day! ðŸ™'
       },
       {
-        title: '🌅 Daily Spiritual Wisdom',
+        title: 'ðŸŒ… Daily Spiritual Wisdom',
         body: 'The mind is everything. What you think you become. - Buddha'
       },
       {
-        title: '🔔 Festival Alert',
-        body: 'Diwali is in 7 days! Start your preparations for the Festival of Lights 🪔'
+        title: 'ðŸ”” Festival Alert',
+        body: 'Diwali is in 7 days! Start your preparations for the Festival of Lights ðŸª”'
       }
     ];
 

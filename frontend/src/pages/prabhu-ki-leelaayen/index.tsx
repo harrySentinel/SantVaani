@@ -73,7 +73,7 @@ const Leelaayen: React.FC = () => {
             {/* Sacred Symbol */}
             <div className="flex justify-center items-center gap-4">
               <Sparkles className="w-6 h-6 text-orange-500 animate-pulse" />
-              <span className="text-5xl animate-pulse">🕉️</span>
+              <span className="text-5xl text-orange-400 leading-none select-none" style={{ fontFamily: 'serif' }}>ॐ</span>
               <Sparkles className="w-6 h-6 text-orange-500 animate-pulse" />
             </div>
 

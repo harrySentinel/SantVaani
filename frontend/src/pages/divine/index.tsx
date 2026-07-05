@@ -152,9 +152,8 @@ const Divine = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="space-y-4">
             <div className="flex justify-center items-center space-x-2 mb-4">
-              <span className="text-3xl">🕉️</span>
-              <Sparkles className="w-8 h-8 text-purple-500 animate-pulse" />
-              <span className="text-3xl">🔱</span>
+              <span className="text-3xl text-orange-400 leading-none select-none" style={{ fontFamily: 'serif' }}>ॐ</span>
+              <Sparkles className="w-8 h-8 text-amber-500 animate-pulse" />
             </div>
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-600 to-orange-600 bg-clip-text text-transparent pt-2">
               {t('divine.title')}

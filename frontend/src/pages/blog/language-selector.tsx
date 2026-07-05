@@ -31,9 +31,9 @@ const BlogLanguageSelector: React.FC = () => {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="space-y-8">
             <div className="flex justify-center items-center space-x-3 mb-6">
-              <span className="text-5xl animate-pulse">🕉️</span>
-              <Heart className="w-7 h-7 text-orange-400 animate-pulse" />
-              <span className="text-5xl animate-pulse">📿</span>
+              <span className="text-5xl text-orange-400 leading-none select-none" style={{ fontFamily: 'serif' }}>ॐ</span>
+              <Heart className="w-6 h-6 text-orange-300" />
+              <BookOpen className="w-6 h-6 text-orange-300" />
             </div>
 
             <h1 className="text-4xl md:text-5xl font-light mb-6 text-gray-800">
@@ -87,7 +87,7 @@ const BlogLanguageSelector: React.FC = () => {
                     <span>Articles</span>
                   </div>
                   <span>•</span>
-                  <span className="text-orange-500">🕉️ मोक्ष</span>
+                  <span className="text-orange-500">मोक्ष</span>
                 </div>
 
                 {/* CTA */}
@@ -130,7 +130,7 @@ const BlogLanguageSelector: React.FC = () => {
                     <span>Articles</span>
                   </div>
                   <span>•</span>
-                  <span className="text-orange-500">🕉️ Moksha</span>
+                  <span className="text-orange-500">Moksha</span>
                 </div>
 
                 {/* CTA */}

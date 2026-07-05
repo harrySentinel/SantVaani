@@ -28,7 +28,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
       return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-orange-100">
           <div className="text-center p-8 bg-white rounded-lg shadow-lg max-w-md mx-4">
-            <div className="text-6xl mb-4">🕉️</div>
+            <div className="text-6xl mb-4 text-orange-400 leading-none select-none" style={{ fontFamily: 'serif' }}>ॐ</div>
             <h2 className="text-2xl font-bold text-orange-800 mb-4">
               कुछ तकनीकी समस्या हुई है
             </h2>
