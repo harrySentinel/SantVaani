@@ -73,8 +73,8 @@ export default function HeroSection() {
 
       {/* Background images — mobile vs desktop */}
       <div
-        className="absolute inset-0 bg-no-repeat bg-top md:hidden"
-        style={{ backgroundImage: "url('/mb_bckg.png')", backgroundSize: '100% auto' }}
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat md:hidden"
+        style={{ backgroundImage: "url('/mb_bckg.png')" }}
       />
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat hidden md:block"
