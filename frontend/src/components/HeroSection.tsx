@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowDown, Heart, Music, BookOpen, RefreshCw } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/lib/supabaseClient';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Quote {
   id: string;
@@ -23,12 +24,21 @@ const FALLBACK_QUOTE: Quote = {
 
 const ROTATE_INTERVAL = 8000;
 
+const fadeUp = {
+  hidden: { opacity: 0, y: 24 },
+  visible: (delay = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1], delay },
+  }),
+};
+
 export default function HeroSection() {
   const { t, language } = useLanguage();
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [currentQuote, setCurrentQuote] = useState<Quote | null>(null);
-  const [visible, setVisible] = useState(true);
   const [quoteLoading, setQuoteLoading] = useState(true);
+  const [quoteKey, setQuoteKey] = useState(0);
 
   useEffect(() => {
     const fetchQuotes = async () => {
@@ -52,15 +62,17 @@ export default function HeroSection() {
 
   const rotateQuote = useCallback(() => {
     if (quotes.length < 2) return;
-    setVisible(false);
-    setTimeout(() => {
-      setCurrentQuote((prev) => {
-        const idx = quotes.findIndex((q) => q.id === prev?.id);
-        return quotes[(idx + 1) % quotes.length];
-      });
-      setVisible(true);
-    }, 400);
+    setCurrentQuote((prev) => {
+      const idx = quotes.findIndex((q) => q.id === prev?.id);
+      return quotes[(idx + 1) % quotes.length];
+    });
+    setQuoteKey((k) => k + 1);
   }, [quotes]);
+
+  const jumpToQuote = (q: Quote) => {
+    setCurrentQuote(q);
+    setQuoteKey((k) => k + 1);
+  };
 
   useEffect(() => {
     if (quotes.length < 2) return;
@@ -71,7 +83,7 @@ export default function HeroSection() {
   return (
     <section className="relative min-h-screen overflow-hidden">
 
-      {/* Background images — mobile vs desktop */}
+      {/* Background images */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat md:hidden"
         style={{ backgroundImage: "url('/mb_bckg.png')" }}
@@ -81,166 +93,209 @@ export default function HeroSection() {
         style={{ backgroundImage: "url('/dsk_bckg.png')" }}
       />
 
-      {/* Light warm overlay for text legibility */}
-      <div className="absolute inset-0 bg-gradient-to-b from-white/50 via-orange-50/25 to-white/65" />
-
-      {/* Soft vignette on sides to focus center content */}
-      <div className="absolute inset-0 bg-gradient-to-r from-white/30 via-transparent to-white/30 pointer-events-none" />
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/20" />
 
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
-        <div className="text-center space-y-10">
+        <div className="text-center space-y-8">
 
           {/* OM */}
-          <div className="flex justify-center">
+          <motion.div
+            className="flex justify-center"
+            initial={{ opacity: 0, scale: 0.6 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+          >
             <span
               className="text-7xl leading-none select-none"
-              style={{ fontFamily: 'serif', color: '#f97316', filter: 'drop-shadow(0 0 20px rgba(249,115,22,0.35))' }}
+              style={{ fontFamily: 'serif', color: '#f97316', filter: 'drop-shadow(0 0 28px rgba(249,115,22,0.5))' }}
             >
               ॐ
             </span>
-          </div>
+          </motion.div>
 
           {/* Heading */}
-          <div className="space-y-3">
-            <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-orange-500 via-orange-600 to-amber-600 bg-clip-text text-transparent leading-tight">
+          <motion.div className="space-y-2" variants={fadeUp} custom={0.15} initial="hidden" animate="visible">
+            <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-orange-500 via-orange-600 to-amber-600 bg-clip-text text-transparent leading-tight drop-shadow-sm">
               {t('site.name')}
             </h1>
             {language === 'EN' && (
-              <p className="text-2xl text-orange-400/60 font-medium tracking-wide">संतवाणी</p>
+              <p className="text-2xl text-orange-300 font-medium tracking-wide drop-shadow-sm">संतवाणी</p>
             )}
-          </div>
+          </motion.div>
 
           {/* Tagline */}
-          <div className="max-w-2xl mx-auto space-y-3">
-            <h2 className="text-2xl md:text-3xl text-gray-800 font-semibold leading-relaxed">
+          <motion.div className="max-w-2xl mx-auto space-y-2" variants={fadeUp} custom={0.3} initial="hidden" animate="visible">
+            <h2 className="text-2xl md:text-3xl font-semibold leading-relaxed drop-shadow-sm"
+              style={{ color: 'rgba(30,20,10,0.85)', textShadow: '0 1px 12px rgba(255,255,255,0.4)' }}>
               {language === 'EN' ? (
-                <>Where Ancient Wisdom Meets <span className="text-orange-500">Modern Hearts</span></>
+                <>Where Ancient Wisdom Meets{' '}
+                  <span className="text-orange-500 drop-shadow-sm">Modern Hearts</span>
+                </>
               ) : (
                 <>जहाँ <span className="text-orange-500">प्राचीन ज्ञान</span> मिलता है <span className="text-orange-500">आधुनिक हृदयों</span> से</>
               )}
             </h2>
-            <p className="text-base text-gray-500 leading-relaxed max-w-xl mx-auto">
+            <p className="text-base leading-relaxed max-w-xl mx-auto"
+              style={{ color: 'rgba(40,25,10,0.7)', textShadow: '0 1px 8px rgba(255,255,255,0.5)' }}>
               {t('hero.description.main')}
             </p>
-          </div>
+          </motion.div>
 
-          {/* Glass Quote Card */}
-          <div className="max-w-2xl mx-auto">
+          {/* Quote Card */}
+          <motion.div
+            className="max-w-2xl mx-auto"
+            variants={fadeUp} custom={0.45} initial="hidden" animate="visible"
+          >
             {quoteLoading ? (
-              <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-8 border border-white/80 shadow-lg space-y-4 animate-pulse">
-                <div className="h-3 bg-orange-100 rounded-full w-1/4 mx-auto" />
+              <div className="rounded-3xl p-7 border border-white/20 space-y-4 animate-pulse"
+                style={{ background: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(20px)' }}>
+                <div className="h-2.5 bg-white/20 rounded-full w-1/4 mx-auto" />
                 <div className="space-y-2">
-                  <div className="h-4 bg-orange-50 rounded-full w-full" />
-                  <div className="h-4 bg-orange-50 rounded-full w-5/6 mx-auto" />
-                  <div className="h-4 bg-orange-50 rounded-full w-3/4 mx-auto" />
+                  <div className="h-4 bg-white/15 rounded-full w-full" />
+                  <div className="h-4 bg-white/15 rounded-full w-5/6 mx-auto" />
+                  <div className="h-4 bg-white/15 rounded-full w-3/4 mx-auto" />
                 </div>
-                <div className="h-3 bg-orange-50 rounded-full w-1/3 ml-auto" />
+                <div className="h-2.5 bg-white/15 rounded-full w-1/3 ml-auto" />
               </div>
             ) : currentQuote ? (
-              <div className="relative bg-white/70 backdrop-blur-xl rounded-3xl p-8 border border-white/90 shadow-[0_8px_32px_rgba(249,115,22,0.12),0_2px_8px_rgba(0,0,0,0.06)] overflow-hidden">
-                {/* Inner top highlight */}
-                <div className="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-orange-200/60 to-transparent" />
-                {/* Subtle warm tint bottom-right */}
-                <div className="absolute -bottom-8 -right-8 w-32 h-32 bg-orange-200 rounded-full blur-2xl opacity-40 pointer-events-none" />
+              <div
+                className="relative rounded-3xl p-7 border border-white/25 overflow-hidden"
+                style={{
+                  background: 'rgba(255, 248, 235, 0.18)',
+                  backdropFilter: 'blur(24px)',
+                  WebkitBackdropFilter: 'blur(24px)',
+                  boxShadow: '0 8px 32px rgba(249,115,22,0.15), inset 0 1px 0 rgba(255,255,255,0.3)',
+                }}
+              >
+                {/* Inner shimmer */}
+                <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent" />
 
-                <div className="flex items-center justify-between mb-5 relative z-10">
-                  <span className="text-[11px] font-semibold text-orange-500 bg-orange-50/80 border border-orange-200/60 px-3 py-1 rounded-full tracking-widest uppercase backdrop-blur-sm">
+                {/* Header */}
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-[10px] font-bold tracking-widest uppercase px-3 py-1 rounded-full border border-orange-300/40"
+                    style={{ color: 'rgba(249,115,22,0.9)', background: 'rgba(249,115,22,0.12)' }}>
                     {currentQuote.category || 'Divine Wisdom'}
                   </span>
                   {quotes.length > 1 && (
-                    <button
-                      onClick={rotateQuote}
-                      className="p-1.5 rounded-full text-gray-400 hover:text-orange-500 hover:bg-orange-50 transition-colors"
-                    >
-                      <RefreshCw className="w-4 h-4" />
+                    <button onClick={rotateQuote}
+                      className="p-1.5 rounded-full transition-all duration-200 hover:scale-110"
+                      style={{ color: 'rgba(249,115,22,0.7)', background: 'rgba(249,115,22,0.1)' }}>
+                      <RefreshCw className="w-3.5 h-3.5" />
                     </button>
                   )}
                 </div>
 
-                <div className="space-y-3 relative z-10" style={{ opacity: visible ? 1 : 0, transition: 'opacity 0.4s ease-in-out' }}>
-                  <div className="text-4xl text-orange-300/50 font-serif leading-none select-none">"</div>
-                  <p className="text-lg md:text-xl text-gray-800 italic leading-relaxed font-medium">
-                    {language === 'EN' ? currentQuote.text : currentQuote.text_hi}
-                  </p>
-                  <p className="text-sm text-gray-400 text-right not-italic font-medium tracking-wide">
-                    — {currentQuote.author}
-                  </p>
-                </div>
+                {/* Quote text with AnimatePresence for smooth swap */}
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={quoteKey}
+                    initial={{ opacity: 0, y: 10, filter: 'blur(4px)' }}
+                    animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                    exit={{ opacity: 0, y: -10, filter: 'blur(4px)' }}
+                    transition={{ duration: 0.5, ease: 'easeInOut' }}
+                    className="space-y-3"
+                  >
+                    <div className="text-5xl leading-none select-none font-serif"
+                      style={{ color: 'rgba(249,115,22,0.35)' }}>"</div>
+                    <p className="text-base md:text-lg italic leading-relaxed font-medium"
+                      style={{ color: 'rgba(30,15,5,0.85)', textShadow: '0 1px 6px rgba(255,255,255,0.3)' }}>
+                      {language === 'EN' ? currentQuote.text : currentQuote.text_hi}
+                    </p>
+                    <p className="text-sm text-right not-italic font-semibold tracking-wide"
+                      style={{ color: 'rgba(249,115,22,0.8)' }}>
+                      — {currentQuote.author}
+                    </p>
+                  </motion.div>
+                </AnimatePresence>
 
+                {/* Dots */}
                 {quotes.length > 1 && (
-                  <div className="flex justify-center gap-1.5 mt-6 relative z-10">
-                    {quotes.slice(0, Math.min(quotes.length, 8)).map((q) => (
+                  <div className="flex justify-center gap-1.5 mt-5">
+                    {quotes.slice(0, Math.min(quotes.length, 8)).map((q, i) => (
                       <button
                         key={q.id}
-                        onClick={() => { setVisible(false); setTimeout(() => { setCurrentQuote(q); setVisible(true); }, 400); }}
-                        className={`h-1 rounded-full transition-all duration-300 ${
-                          q.id === currentQuote.id ? 'w-6 bg-orange-400' : 'w-1.5 bg-orange-200 hover:bg-orange-300'
-                        }`}
+                        onClick={() => jumpToQuote(q)}
+                        className="h-1 rounded-full transition-all duration-300"
+                        style={{
+                          width: q.id === currentQuote?.id ? '24px' : '6px',
+                          background: q.id === currentQuote?.id ? 'rgba(249,115,22,0.8)' : 'rgba(249,115,22,0.25)',
+                        }}
                       />
                     ))}
                   </div>
                 )}
               </div>
             ) : null}
-          </div>
+          </motion.div>
 
           {/* Stats */}
-          <div className="flex flex-wrap justify-center gap-3">
+          <motion.div
+            className="flex flex-wrap justify-center gap-3"
+            variants={fadeUp} custom={0.6} initial="hidden" animate="visible"
+          >
             {[
               { label: language === 'EN' ? 'Saints' : 'संत', value: '100+' },
               { label: language === 'EN' ? 'Bhajans' : 'भजन', value: '500+' },
               { label: language === 'EN' ? 'Quotes' : 'उद्धरण', value: '1000+' },
               { label: language === 'EN' ? 'Seekers' : 'साधक', value: '10k+' },
-            ].map((stat) => (
-              <div
+            ].map((stat, i) => (
+              <motion.div
                 key={stat.label}
-                className="flex items-center gap-2.5 bg-white/70 backdrop-blur-md border border-white/90 px-5 py-2.5 rounded-full shadow-sm"
+                initial={{ opacity: 0, scale: 0.85 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.65 + i * 0.07, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                className="flex items-center gap-2.5 px-5 py-2.5 rounded-full border border-white/25"
+                style={{
+                  background: 'rgba(255,248,235,0.2)',
+                  backdropFilter: 'blur(12px)',
+                  WebkitBackdropFilter: 'blur(12px)',
+                  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.3)',
+                }}
               >
-                <span className="text-lg font-bold text-orange-500">{stat.value}</span>
-                <span className="text-sm text-gray-500 font-medium">{stat.label}</span>
-              </div>
+                <span className="text-lg font-bold text-orange-500 drop-shadow-sm">{stat.value}</span>
+                <span className="text-sm font-medium" style={{ color: 'rgba(30,15,5,0.75)' }}>{stat.label}</span>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
 
           {/* CTAs */}
-          <div className="flex flex-col sm:flex-row gap-3 justify-center items-center pt-2">
+          <motion.div
+            className="flex flex-col sm:flex-row gap-3 justify-center items-center pt-2"
+            variants={fadeUp} custom={0.75} initial="hidden" animate="visible"
+          >
             <Link to="/saints">
-              <Button
-                size="lg"
-                className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 rounded-full shadow-lg shadow-orange-200 transition-all duration-200"
-              >
+              <Button size="lg"
+                className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 rounded-full shadow-lg shadow-orange-900/20 transition-all duration-200 hover:scale-105">
                 <Heart className="w-5 h-5 mr-2" />
                 {t('hero.button.saints')}
               </Button>
             </Link>
-
             <Link to="/bhajans">
-              <Button
-                variant="outline"
-                size="lg"
-                className="border-orange-200 text-orange-600 hover:bg-orange-50/80 px-8 py-3 rounded-full bg-white/50 backdrop-blur-sm transition-all duration-200"
-              >
+              <Button variant="outline" size="lg"
+                className="px-8 py-3 rounded-full transition-all duration-200 hover:scale-105 border-white/40 text-orange-700 hover:bg-white/20"
+                style={{ background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(8px)' }}>
                 <Music className="w-5 h-5 mr-2" />
                 {language === 'EN' ? 'Listen Bhajans' : 'भजन सुनें'}
               </Button>
             </Link>
-
             <Link to="/blog">
-              <Button
-                variant="ghost"
-                size="lg"
-                className="text-gray-500 hover:text-orange-600 hover:bg-orange-50/80 px-8 py-3 rounded-full transition-all duration-200"
-              >
+              <Button variant="ghost" size="lg"
+                className="px-8 py-3 rounded-full transition-all duration-200 hover:scale-105 hover:bg-white/20 text-orange-800">
                 <BookOpen className="w-5 h-5 mr-2" />
                 {language === 'EN' ? 'Read Blog' : 'ब्लॉग पढ़ें'}
               </Button>
             </Link>
-          </div>
+          </motion.div>
 
           {/* Scroll cue */}
-          <div className="pt-8">
-            <ArrowDown className="w-5 h-5 text-orange-300 mx-auto animate-bounce" />
-          </div>
+          <motion.div
+            className="pt-6"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2, duration: 0.8 }}
+          >
+            <ArrowDown className="w-5 h-5 mx-auto animate-bounce" style={{ color: 'rgba(249,115,22,0.6)' }} />
+          </motion.div>
+
         </div>
       </div>
     </section>
