@@ -157,7 +157,7 @@ export default function HeroSection() {
                   )}
                 </div>
 
-                <div className="space-y-3 transition-opacity duration-400 relative z-10" style={{ opacity: visible ? 1 : 0 }}>
+                <div className="space-y-3 relative z-10" style={{ opacity: visible ? 1 : 0, transition: 'opacity 0.4s ease-in-out' }}>
                   <div className="text-4xl text-orange-300/50 font-serif leading-none select-none">"</div>
                   <p className="text-lg md:text-xl text-gray-800 italic leading-relaxed font-medium">
                     {language === 'EN' ? currentQuote.text : currentQuote.text_hi}
