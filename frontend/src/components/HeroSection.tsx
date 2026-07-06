@@ -93,8 +93,9 @@ export default function HeroSection() {
         style={{ backgroundImage: "url('/dsk_bckg.png')" }}
       />
 
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/20" />
+      {/* Strong warm overlay — washes image to soft watercolor so content reads cleanly */}
+      <div className="absolute inset-0 bg-gradient-to-b from-orange-50/80 via-amber-50/65 to-orange-50/80" />
+      <div className="absolute inset-0 bg-white/40" />
 
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
         <div className="text-center space-y-8">
@@ -127,7 +128,7 @@ export default function HeroSection() {
           {/* Tagline */}
           <motion.div className="max-w-2xl mx-auto space-y-2" variants={fadeUp} custom={0.3} initial="hidden" animate="visible">
             <h2 className="text-2xl md:text-3xl font-semibold leading-relaxed drop-shadow-sm"
-              style={{ color: 'rgba(30,20,10,0.85)', textShadow: '0 1px 12px rgba(255,255,255,0.4)' }}>
+              style={{ color: 'rgba(30,20,10,0.9)' }}>
               {language === 'EN' ? (
                 <>Where Ancient Wisdom Meets{' '}
                   <span className="text-orange-500 drop-shadow-sm">Modern Hearts</span>
@@ -137,7 +138,7 @@ export default function HeroSection() {
               )}
             </h2>
             <p className="text-base leading-relaxed max-w-xl mx-auto"
-              style={{ color: 'rgba(40,25,10,0.7)', textShadow: '0 1px 8px rgba(255,255,255,0.5)' }}>
+              style={{ color: 'rgba(40,25,10,0.65)' }}>
               {t('hero.description.main')}
             </p>
           </motion.div>
@@ -149,7 +150,7 @@ export default function HeroSection() {
           >
             {quoteLoading ? (
               <div className="rounded-3xl p-7 border border-white/20 space-y-4 animate-pulse"
-                style={{ background: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(20px)' }}>
+                style={{ background: 'rgba(255,251,245,0.5)', backdropFilter: 'blur(20px)' }}>
                 <div className="h-2.5 bg-white/20 rounded-full w-1/4 mx-auto" />
                 <div className="space-y-2">
                   <div className="h-4 bg-white/15 rounded-full w-full" />
@@ -162,10 +163,10 @@ export default function HeroSection() {
               <div
                 className="relative rounded-3xl p-7 border border-white/25 overflow-hidden"
                 style={{
-                  background: 'rgba(255, 248, 235, 0.18)',
-                  backdropFilter: 'blur(24px)',
-                  WebkitBackdropFilter: 'blur(24px)',
-                  boxShadow: '0 8px 32px rgba(249,115,22,0.15), inset 0 1px 0 rgba(255,255,255,0.3)',
+                  background: 'rgba(255, 251, 245, 0.55)',
+                  backdropFilter: 'blur(20px)',
+                  WebkitBackdropFilter: 'blur(20px)',
+                  boxShadow: '0 8px 32px rgba(249,115,22,0.12), inset 0 1px 0 rgba(255,255,255,0.7)',
                 }}
               >
                 {/* Inner shimmer */}
@@ -247,10 +248,10 @@ export default function HeroSection() {
                 transition={{ delay: 0.65 + i * 0.07, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                 className="flex items-center gap-2.5 px-5 py-2.5 rounded-full border border-white/25"
                 style={{
-                  background: 'rgba(255,248,235,0.2)',
+                  background: 'rgba(255,251,245,0.55)',
                   backdropFilter: 'blur(12px)',
                   WebkitBackdropFilter: 'blur(12px)',
-                  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.3)',
+                  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.7)',
                 }}
               >
                 <span className="text-lg font-bold text-orange-500 drop-shadow-sm">{stat.value}</span>
