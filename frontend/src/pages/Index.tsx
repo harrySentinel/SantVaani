@@ -85,7 +85,7 @@ const Index = () => {
       <HeroSection />
 
       {/* Smooth hero → body transition */}
-      <div className="h-16 bg-gradient-to-b from-[#fdf8f2] to-[#faf8f5] -mt-1" />
+      <div className="h-16 bg-gradient-to-b from-white/80 to-[#faf8f5] -mt-1" />
 
       {/* ── Page body ── */}
       <div className="relative bg-[#faf8f5] overflow-hidden">

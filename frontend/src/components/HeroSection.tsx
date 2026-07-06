@@ -69,26 +69,23 @@ export default function HeroSection() {
   }, [quotes, rotateQuote]);
 
   return (
-    <section className="relative min-h-screen overflow-hidden bg-[#fdf8f2]">
+    <section className="relative min-h-screen overflow-hidden">
 
-      {/* Warm saffron gradient base */}
-      <div className="absolute inset-0 bg-gradient-to-br from-orange-50 via-[#fdf8f2] to-amber-50/60" />
-
-      {/* Ambient glow orbs — give glass cards something to blur against */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-[-5%] left-[-10%] w-[550px] h-[550px] bg-orange-300 rounded-full blur-[140px] opacity-25" />
-        <div className="absolute top-[30%] right-[-8%] w-[450px] h-[450px] bg-amber-300 rounded-full blur-[120px] opacity-20" />
-        <div className="absolute bottom-[0%] left-[30%] w-[500px] h-[350px] bg-orange-200 rounded-full blur-[100px] opacity-30" />
-      </div>
-
-      {/* Subtle dot grid */}
+      {/* Background images — mobile vs desktop */}
       <div
-        className="absolute inset-0 opacity-[0.03] pointer-events-none"
-        style={{
-          backgroundImage: 'radial-gradient(circle, #ea580c 1px, transparent 1px)',
-          backgroundSize: '36px 36px',
-        }}
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat md:hidden"
+        style={{ backgroundImage: "url('/mb_bckg.png')" }}
       />
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat hidden md:block"
+        style={{ backgroundImage: "url('/dsk_bckg.png')" }}
+      />
+
+      {/* Light warm overlay for text legibility */}
+      <div className="absolute inset-0 bg-gradient-to-b from-white/50 via-orange-50/25 to-white/65" />
+
+      {/* Soft vignette on sides to focus center content */}
+      <div className="absolute inset-0 bg-gradient-to-r from-white/30 via-transparent to-white/30 pointer-events-none" />
 
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
         <div className="text-center space-y-10">
@@ -140,7 +137,7 @@ export default function HeroSection() {
                 <div className="h-3 bg-orange-50 rounded-full w-1/3 ml-auto" />
               </div>
             ) : currentQuote ? (
-              <div className="relative bg-white/60 backdrop-blur-xl rounded-3xl p-8 border border-white/80 shadow-[0_8px_32px_rgba(249,115,22,0.08),0_2px_8px_rgba(0,0,0,0.04)] overflow-hidden">
+              <div className="relative bg-white/70 backdrop-blur-xl rounded-3xl p-8 border border-white/90 shadow-[0_8px_32px_rgba(249,115,22,0.12),0_2px_8px_rgba(0,0,0,0.06)] overflow-hidden">
                 {/* Inner top highlight */}
                 <div className="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-orange-200/60 to-transparent" />
                 {/* Subtle warm tint bottom-right */}
@@ -197,7 +194,7 @@ export default function HeroSection() {
             ].map((stat) => (
               <div
                 key={stat.label}
-                className="flex items-center gap-2.5 bg-white/60 backdrop-blur-sm border border-white/80 px-5 py-2.5 rounded-full shadow-sm"
+                className="flex items-center gap-2.5 bg-white/70 backdrop-blur-md border border-white/90 px-5 py-2.5 rounded-full shadow-sm"
               >
                 <span className="text-lg font-bold text-orange-500">{stat.value}</span>
                 <span className="text-sm text-gray-500 font-medium">{stat.label}</span>
