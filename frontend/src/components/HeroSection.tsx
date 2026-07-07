@@ -93,9 +93,9 @@ export default function HeroSection() {
         style={{ backgroundImage: "url('/dsk_bckg.png')" }}
       />
 
-      {/* Strong warm overlay — washes image to soft watercolor so content reads cleanly */}
-      <div className="absolute inset-0 bg-gradient-to-b from-orange-50/80 via-amber-50/65 to-orange-50/80" />
-      <div className="absolute inset-0 bg-white/40" />
+      {/* Warm overlay — stronger on mobile to prevent background dominating */}
+      <div className="absolute inset-0 bg-gradient-to-b from-orange-50/85 via-amber-50/75 to-orange-50/85" />
+      <div className="absolute inset-0 bg-white/55 md:bg-white/40" />
 
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
         <div className="text-center space-y-8">
