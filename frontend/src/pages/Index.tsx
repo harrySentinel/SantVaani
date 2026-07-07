@@ -116,17 +116,47 @@ const Index = () => {
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {/* Mobile: horizontal cards. Desktop: 3-column vertical grid */}
+            <div className="flex flex-col md:grid md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5">
               {features.map((feature) => {
                 const Icon = feature.icon;
                 return (
                   <Link key={feature.to} to={feature.to} className="group">
-                    <div className={`relative bg-white/65 backdrop-blur-md border border-white/80 rounded-2xl overflow-hidden shadow-[0_2px_16px_rgba(0,0,0,0.06)] transition-all duration-300 hover:shadow-[0_8px_32px_rgba(0,0,0,0.1)] hover:bg-white/85 hover:-translate-y-0.5 ${feature.shadow}`}>
-                      {/* Colored accent top bar */}
-                      <div className={`h-1 w-full bg-gradient-to-r ${feature.accent}`} />
+
+                    {/* ── Mobile card (horizontal) ── */}
+                    <div className={`md:hidden flex items-stretch rounded-2xl overflow-hidden transition-all duration-200 active:scale-[0.98] ${feature.shadow}`}
+                      style={{
+                        background: 'rgba(255,255,255,0.82)',
+                        boxShadow: '0 1px 8px rgba(0,0,0,0.06), 0 0 0 1px rgba(255,255,255,0.7)',
+                      }}>
+                      {/* Colored sidebar with icon */}
+                      <div className={`w-16 flex-shrink-0 bg-gradient-to-b ${feature.gradient} flex items-center justify-center`}>
+                        <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center">
+                          <Icon className="w-4 h-4 text-white" />
+                        </div>
+                      </div>
+                      {/* Content */}
+                      <div className="flex-1 px-4 py-4 flex items-center justify-between gap-3">
+                        <div className="space-y-0.5 min-w-0">
+                          <h3 className="text-sm font-semibold text-gray-800 group-hover:text-orange-600 transition-colors leading-snug">
+                            {feature.title}
+                          </h3>
+                          <p className="text-xs text-gray-400 leading-relaxed line-clamp-2">{feature.description}</p>
+                        </div>
+                        <ArrowRight className="w-4 h-4 text-gray-300 flex-shrink-0 group-hover:text-orange-400 transition-all duration-200 group-hover:translate-x-0.5" />
+                      </div>
+                    </div>
+
+                    {/* ── Desktop card (vertical) ── */}
+                    <div className={`hidden md:block relative rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1 ${feature.shadow}`}
+                      style={{
+                        background: 'rgba(255,255,255,0.78)',
+                        backdropFilter: 'blur(12px)',
+                        boxShadow: '0 2px 16px rgba(0,0,0,0.06), 0 0 0 1px rgba(255,255,255,0.7)',
+                      }}>
+                      {/* Top gradient strip — thicker, more impactful */}
+                      <div className={`h-1.5 w-full bg-gradient-to-r ${feature.accent}`} />
                       <div className="p-6 space-y-4">
-                        {/* Inner highlight */}
-                        <div className="absolute top-1 left-4 right-4 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent" />
                         <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center shadow-md`}>
                           <Icon className="w-5 h-5 text-white" />
                         </div>
@@ -139,6 +169,7 @@ const Index = () => {
                         </div>
                       </div>
                     </div>
+
                   </Link>
                 );
               })}
