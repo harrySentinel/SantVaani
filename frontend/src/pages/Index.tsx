@@ -121,7 +121,7 @@ const Index = () => {
               {features.map((feature) => {
                 const Icon = feature.icon;
                 return (
-                  <Link key={feature.to} to={feature.to} className="group">
+                  <Link key={feature.to} to={feature.to} className="group md:flex md:flex-col">
 
                     {/* ── Mobile card (horizontal) ── */}
                     <div className={`md:hidden flex items-stretch rounded-2xl overflow-hidden transition-all duration-200 active:scale-[0.98] ${feature.shadow}`}
@@ -148,7 +148,7 @@ const Index = () => {
                     </div>
 
                     {/* ── Desktop card (vertical) ── */}
-                    <div className={`hidden md:block relative rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1 ${feature.shadow}`}
+                    <div className={`hidden md:flex md:flex-col relative rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1 md:h-full ${feature.shadow}`}
                       style={{
                         background: 'rgba(255,255,255,0.78)',
                         backdropFilter: 'blur(12px)',
