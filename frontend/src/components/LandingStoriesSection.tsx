@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { BookMarked, BookOpen, Eye, ArrowRight, Crown } from 'lucide-react'
@@ -99,10 +100,18 @@ const LandingStoriesSection = () => {
         </div>
 
         {/* Books Grid */}
-        <div className="grid md:grid-cols-3 gap-8 mb-12">
+        <div className="flex flex-wrap justify-center gap-8 mb-12">
           {featuredBooks.map((book, index) => (
-            <Link key={book.id} to={`/prabhu-ki-leelaayen/book/${book.slug}`} className="group">
-              <Card className="h-full hover:shadow-xl transition-all duration-300 border border-white/80 shadow-md bg-white/60 backdrop-blur-md overflow-hidden relative">
+            <motion.div
+              key={book.id}
+              initial={{ opacity: 0, y: 28 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.5, ease: 'easeOut', delay: index * 0.1 }}
+              className="w-full sm:w-[340px]"
+            >
+            <Link key={book.id} to={`/prabhu-ki-leelaayen/book/${book.slug}`} className="group block h-full">
+              <Card className="h-full hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-white/80 shadow-md bg-white/60 backdrop-blur-md overflow-hidden relative rounded-2xl">
                 {/* Premium Badge for First Book */}
                 {index === 0 && (
                   <div className="absolute top-4 right-4 z-10">
@@ -173,6 +182,7 @@ const LandingStoriesSection = () => {
                 </CardContent>
               </Card>
             </Link>
+            </motion.div>
           ))}
         </div>
 

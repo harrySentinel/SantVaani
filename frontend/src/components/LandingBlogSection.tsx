@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import { Card, CardContent } from '@/components/ui/card'
 import { Clock, Calendar, ArrowRight, BookOpen } from 'lucide-react'
 import { supabase } from '@/lib/supabaseClient'
@@ -113,10 +114,22 @@ const LandingBlogSection = () => {
         </div>
 
         {/* Cards */}
-        <div className="grid md:grid-cols-3 gap-6">
-          {featuredPosts.map(post => (
-            <Link key={post.id} to={`/blog/post/${post.slug}`} className="group">
-              <Card className="h-full hover:shadow-lg transition-all duration-200 border border-white/80 shadow-md bg-white/60 backdrop-blur-md overflow-hidden">
+        <div className="flex flex-wrap justify-center gap-6">
+          {featuredPosts.map((post, index) => (
+            <motion.div
+              key={post.id}
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.5, ease: 'easeOut', delay: index * 0.08 }}
+              className="w-full sm:w-[340px] h-full"
+            >
+            <Link key={post.id} to={`/blog/post/${post.slug}`} className="group block h-full">
+              <Card className="h-full hover:shadow-lg hover:-translate-y-1 transition-all duration-200 border border-white/80 shadow-md bg-white/60 backdrop-blur-md overflow-hidden rounded-2xl">
+                <div
+                  className="h-1 w-full"
+                  style={{ background: `linear-gradient(90deg, ${post.category.color}, transparent)` }}
+                />
                 <CardContent className="p-5 space-y-3">
                   {/* Category */}
                   <div
@@ -166,6 +179,7 @@ const LandingBlogSection = () => {
                 </CardContent>
               </Card>
             </Link>
+            </motion.div>
           ))}
         </div>
 
