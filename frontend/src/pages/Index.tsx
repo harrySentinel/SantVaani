@@ -1,4 +1,5 @@
 import { useState, Suspense, lazy } from 'react';
+import { motion } from 'framer-motion';
 import HeroSection from '@/components/HeroSection';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -106,7 +107,7 @@ const Index = () => {
         {/* ── Features ── */}
         <section className="relative py-16">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="mb-12">
+            <div className="mb-10">
               <SectionLabel>{language === 'EN' ? 'Explore' : 'खोजें'}</SectionLabel>
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 leading-tight">
                 {language === 'EN' ? 'Sacred Wisdom' : 'पवित्र ज्ञान'}
@@ -116,61 +117,65 @@ const Index = () => {
               </p>
             </div>
 
-            {/* Mobile: horizontal cards. Desktop: 3-column vertical grid */}
-            <div className="flex flex-col md:grid md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5">
-              {features.map((feature) => {
+            {/* Bento grid: first card wide on desktop; horizontal cards on mobile */}
+            <div className="flex flex-col md:grid md:grid-cols-2 gap-3 md:gap-5">
+              {features.map((feature, idx) => {
                 const Icon = feature.icon;
+                const wide = idx === 0;
                 return (
-                  <Link key={feature.to} to={feature.to} className="group md:flex md:flex-col">
+                  <motion.div
+                    key={feature.to}
+                    initial={{ opacity: 0, y: 24 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.2 }}
+                    transition={{ duration: 0.5, ease: 'easeOut', delay: idx * 0.08 }}
+                    className={`${wide ? 'md:col-span-2 ' : ''}h-full`}
+                  >
+                    <Link to={feature.to} className="group block h-full">
 
-                    {/* ── Mobile card (horizontal) ── */}
-                    <div className={`md:hidden flex items-stretch rounded-2xl overflow-hidden transition-all duration-200 active:scale-[0.98] ${feature.shadow}`}
-                      style={{
-                        background: 'rgba(255,255,255,0.82)',
-                        boxShadow: '0 1px 8px rgba(0,0,0,0.06), 0 0 0 1px rgba(255,255,255,0.7)',
-                      }}>
-                      {/* Colored sidebar with icon */}
-                      <div className={`w-16 flex-shrink-0 bg-gradient-to-b ${feature.gradient} flex items-center justify-center`}>
-                        <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center">
-                          <Icon className="w-4 h-4 text-white" />
+                      {/* ── Mobile card (horizontal) ── */}
+                      <div className={`md:hidden relative flex items-stretch rounded-2xl overflow-hidden transition-transform duration-200 active:scale-[0.98] ${feature.shadow}`}>
+                        <div className={`w-16 flex-shrink-0 bg-gradient-to-b ${feature.gradient} flex items-center justify-center`}>
+                          <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center">
+                            <Icon className="w-4 h-4 text-white" />
+                          </div>
+                        </div>
+                        <div className="relative flex-1 px-4 py-4 flex items-center justify-between gap-3"
+                          style={{ background: 'rgba(255,255,255,0.85)' }}>
+                          <div className="space-y-0.5 min-w-0">
+                            <h3 className="text-sm font-semibold text-gray-800 leading-snug">{feature.title}</h3>
+                            <p className="text-xs text-gray-400 leading-relaxed line-clamp-2">{feature.description}</p>
+                          </div>
+                          <ArrowRight className="w-4 h-4 text-gray-300 flex-shrink-0 transition-transform duration-200 group-active:translate-x-0.5" />
+                        </div>
+                        <div className={`absolute -top-8 -right-8 w-28 h-28 rounded-full blur-2xl opacity-20 pointer-events-none bg-gradient-to-br ${feature.gradient}`} />
+                      </div>
+
+                      {/* ── Desktop card ── */}
+                      <div className={`hidden md:flex relative rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1 h-full ${feature.shadow} ${wide ? 'md:flex-row md:items-center' : 'md:flex-col'}`}
+                        style={{
+                          background: 'rgba(255,255,255,0.8)',
+                          backdropFilter: 'blur(12px)',
+                          boxShadow: '0 2px 16px rgba(0,0,0,0.06), 0 0 0 1px rgba(255,255,255,0.7)',
+                        }}>
+                        <div className={`absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r ${feature.accent}`} />
+                        <div className={`absolute -top-10 -right-10 w-40 h-40 rounded-full blur-3xl opacity-20 pointer-events-none bg-gradient-to-br ${feature.gradient}`} />
+                        <div className={`relative flex-1 p-6 ${wide ? 'md:flex md:items-center md:gap-6 md:p-7' : 'space-y-4'}`}>
+                          <div className={`bg-gradient-to-br ${feature.gradient} flex items-center justify-center shadow-md flex-shrink-0 ${wide ? 'w-14 h-14 rounded-2xl' : 'w-11 h-11 rounded-xl'}`}>
+                            <Icon className={wide ? 'w-6 h-6 text-white' : 'w-5 h-5 text-white'} />
+                          </div>
+                          <div className="flex-1 space-y-1.5">
+                            <h3 className="text-base font-semibold text-gray-800 group-hover:text-orange-600 transition-colors flex items-center justify-between">
+                              {feature.title}
+                              <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-orange-400 transition-all duration-200 group-hover:translate-x-0.5" />
+                            </h3>
+                            <p className="text-sm text-gray-500 leading-relaxed">{feature.description}</p>
+                          </div>
                         </div>
                       </div>
-                      {/* Content */}
-                      <div className="flex-1 px-4 py-4 flex items-center justify-between gap-3">
-                        <div className="space-y-0.5 min-w-0">
-                          <h3 className="text-sm font-semibold text-gray-800 group-hover:text-orange-600 transition-colors leading-snug">
-                            {feature.title}
-                          </h3>
-                          <p className="text-xs text-gray-400 leading-relaxed line-clamp-2">{feature.description}</p>
-                        </div>
-                        <ArrowRight className="w-4 h-4 text-gray-300 flex-shrink-0 group-hover:text-orange-400 transition-all duration-200 group-hover:translate-x-0.5" />
-                      </div>
-                    </div>
 
-                    {/* ── Desktop card (vertical) ── */}
-                    <div className={`hidden md:flex md:flex-col relative rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1 md:h-full ${feature.shadow}`}
-                      style={{
-                        background: 'rgba(255,255,255,0.78)',
-                        backdropFilter: 'blur(12px)',
-                        boxShadow: '0 2px 16px rgba(0,0,0,0.06), 0 0 0 1px rgba(255,255,255,0.7)',
-                      }}>
-                      {/* Top gradient strip — thicker, more impactful */}
-                      <div className={`h-1.5 w-full bg-gradient-to-r ${feature.accent}`} />
-                      <div className="p-6 space-y-4">
-                        <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center shadow-md`}>
-                          <Icon className="w-5 h-5 text-white" />
-                        </div>
-                        <div className="space-y-1.5">
-                          <h3 className="text-base font-semibold text-gray-800 group-hover:text-orange-600 transition-colors flex items-center justify-between">
-                            {feature.title}
-                            <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-orange-400 transition-all duration-200 group-hover:translate-x-0.5" />
-                          </h3>
-                          <p className="text-sm text-gray-500 leading-relaxed">{feature.description}</p>
-                        </div>
-                      </div>
-                    </div>
-
-                  </Link>
+                    </Link>
+                  </motion.div>
                 );
               })}
             </div>
