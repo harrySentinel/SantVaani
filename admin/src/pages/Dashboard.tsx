@@ -1,4 +1,4 @@
-import { Users, Heart, Sparkles, Music, Quote, TrendingUp, Lightbulb, RefreshCw, Loader2 } from 'lucide-react'
+import { Users, Sparkles, Music, Quote, TrendingUp, Lightbulb, RefreshCw, Loader2 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import DatabaseTest from '@/components/DatabaseTest'
 import { useRecentActivity } from '@/hooks/useRecentActivity'
@@ -23,15 +23,6 @@ export default function Dashboard() {
       icon: Users,
       color: 'bg-blue-500',
       route: '/saints'
-    },
-    {
-      name: 'Living Saints', 
-      value: tableCounts.living_saints.toString(),
-      change: `${tableCounts.living_saints} total`,
-      changeType: 'neutral',
-      icon: Heart,
-      color: 'bg-red-500',
-      route: '/living-saints'
     },
     {
       name: 'Divine Forms',
@@ -154,7 +145,6 @@ export default function Dashboard() {
                   <div key={activity.id} className="flex items-start space-x-3">
                     <div className={`flex-shrink-0 w-2 h-2 mt-2 rounded-full ${
                       activity.type === 'saint' ? 'bg-blue-500' :
-                      activity.type === 'living-saint' ? 'bg-red-500' :
                       activity.type === 'bhajan' ? 'bg-green-500' :
                       activity.type === 'quote' ? 'bg-orange-500' :
                       activity.type === 'spiritual-fact' ? 'bg-yellow-500' : 
@@ -190,18 +180,6 @@ export default function Dashboard() {
                   <Users className="h-5 w-5 text-gray-400 group-hover:text-blue-500" />
                   <span className="ml-3 text-sm font-medium text-gray-700 group-hover:text-blue-700">
                     Manage Saints
-                  </span>
-                </div>
-              </button>
-              
-              <button 
-                onClick={() => handleQuickAction('/living-saints')}
-                className="w-full text-left p-3 rounded-lg border-2 border-dashed border-gray-300 hover:border-red-400 hover:bg-red-50 transition-colors group"
-              >
-                <div className="flex items-center">
-                  <Heart className="h-5 w-5 text-gray-400 group-hover:text-red-500" />
-                  <span className="ml-3 text-sm font-medium text-gray-700 group-hover:text-red-700">
-                    Manage Living Saints
                   </span>
                 </div>
               </button>

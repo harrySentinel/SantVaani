@@ -63,3 +63,5 @@ upcoming_changes.md
 *.md
 !README.md
 !**/README.md
+
+.vercel

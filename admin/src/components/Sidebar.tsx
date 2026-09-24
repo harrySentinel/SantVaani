@@ -2,7 +2,6 @@ import { NavLink } from 'react-router-dom'
 import {
   LayoutDashboard,
   Users,
-  Heart,
   Sparkles,
   Music,
   Quote,
@@ -37,13 +36,6 @@ const navigation = [
     icon: Users,
     description: 'Manage saints biographies',
     count: 25 // Will be dynamic
-  },
-  {
-    name: 'Living Saints',
-    href: '/living-saints', 
-    icon: Heart,
-    description: 'Contemporary spiritual masters',
-    count: 12
   },
   {
     name: 'Divine Forms',

@@ -6,7 +6,6 @@ import Layout from '@/components/Layout'
 import SplashScreen from '@/components/SplashScreen'
 import Dashboard from '@/pages/Dashboard'
 import SaintsPage from '@/pages/Saints'
-import LivingSaintsPage from '@/pages/LivingSaints'
 import DivineFormsPage from '@/pages/DivineForms'
 import BhajansPage from '@/pages/Bhajans'
 import QuotesPage from '@/pages/Quotes'
@@ -39,9 +38,6 @@ function App() {
 
               {/* Content Management Pages */}
               <Route path="saints" element={<SaintsPage />} />
-
-              {/* Living Saints Management */}
-              <Route path="living-saints" element={<LivingSaintsPage />} />
 
               {/* Divine Forms Management */}
               <Route path="divine-forms" element={<DivineFormsPage />} />

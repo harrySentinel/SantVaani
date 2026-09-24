@@ -400,6 +400,28 @@ const Saints = () => {
         />
       </section>
 
+      {/* Featured Jeevani */}
+      <section className="pb-4">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <a
+            href="/jeevani"
+            className="group flex items-center justify-between gap-4 bg-white/90 backdrop-blur-sm border border-orange-100 rounded-2xl px-6 py-5 shadow-md hover:shadow-lg transition-all duration-300"
+          >
+            <div>
+              <p className="text-xs font-bold text-orange-500 uppercase tracking-widest mb-1">
+                {language === 'HI' ? 'जीवनी' : 'Jeevani'}
+              </p>
+              <h3 className="text-lg font-semibold text-gray-800 group-hover:text-orange-600 transition-colors">
+                {language === 'HI' ? 'प्रेमानंद जी महाराज — जीवन व शिक्षाएं' : 'Premanand Ji Maharaj — Life & Teachings'}
+              </h3>
+            </div>
+            <span className="flex-shrink-0 text-orange-600 font-medium text-sm">
+              {language === 'HI' ? 'पढ़ें →' : 'Read →'}
+            </span>
+          </a>
+        </div>
+      </section>
+
       {/* Call to Action */}
       <section className="py-16 bg-gradient-to-r from-orange-100 to-orange-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
@@ -409,10 +431,7 @@ const Saints = () => {
           <p className={`text-lg text-gray-600 ${language === 'HI' ? 'pt-1' : ''}`}>
             {t('saints.cta.subtitle')}
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="/living-saints" className="inline-flex items-center justify-center px-6 py-3 bg-orange-600 text-white rounded-full hover:bg-orange-700 transition-colors">
-              {t('saints.cta.living.saints')}
-            </a>
+          <div className="flex justify-center">
             <a href="/divine" className="inline-flex items-center justify-center px-6 py-3 border-2 border-orange-600 text-orange-600 rounded-full hover:bg-orange-50 transition-colors">
               {t('saints.cta.divine.forms')}
             </a>

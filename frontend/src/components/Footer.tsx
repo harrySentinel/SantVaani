@@ -41,7 +41,6 @@ export default function Footer() {
 
   const exploreLinks = [
     { to: '/saints', label: language === 'EN' ? 'Saints' : 'संत' },
-    { to: '/living-saints', label: language === 'EN' ? 'Contemporary Saints' : 'समकालीन संत' },
     { to: '/divine', label: language === 'EN' ? 'Divine Forms' : 'दिव्य रूप' },
     { to: '/bhajans', label: language === 'EN' ? 'Bhajans' : 'भजन' },
     { to: '/quotes', label: language === 'EN' ? 'Quotes' : 'उद्धरण' },

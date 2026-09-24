@@ -3,7 +3,7 @@ import { supabase, TABLES } from '@/lib/supabase'
 
 interface ActivityItem {
   id: string
-  type: 'saint' | 'living-saint' | 'divine-form' | 'bhajan' | 'quote' | 'spiritual-fact'
+  type: 'saint' | 'divine-form' | 'bhajan' | 'quote' | 'spiritual-fact'
   action: 'added' | 'updated'
   item: string
   time: string
@@ -13,7 +13,6 @@ interface ActivityItem {
 
 interface TableCounts {
   saints: number
-  living_saints: number
   divine_forms: number
   bhajans: number
   quotes: number
@@ -24,7 +23,6 @@ export function useRecentActivity() {
   const [recentActivity, setRecentActivity] = useState<ActivityItem[]>([])
   const [tableCounts, setTableCounts] = useState<TableCounts>({
     saints: 0,
-    living_saints: 0,
     divine_forms: 0,
     bhajans: 0,
     quotes: 0,
@@ -37,7 +35,6 @@ export function useRecentActivity() {
     try {
       const tables = [
         { name: 'saints', key: 'saints' as keyof TableCounts },
-        { name: 'living_saints', key: 'living_saints' as keyof TableCounts },
         { name: 'divine_forms', key: 'divine_forms' as keyof TableCounts },
         { name: 'bhajans', key: 'bhajans' as keyof TableCounts },
         { name: 'quotes', key: 'quotes' as keyof TableCounts },
@@ -80,7 +77,6 @@ export function useRecentActivity() {
 
       const tables = [
         { name: 'saints', type: 'saint' as const, nameField: 'name' },
-        { name: 'living_saints', type: 'living-saint' as const, nameField: 'name' },
         { name: 'divine_forms', type: 'divine-form' as const, nameField: 'name' },
         { name: 'bhajans', type: 'bhajan' as const, nameField: 'title' },
         { name: 'quotes', type: 'quote' as const, nameField: 'text' },

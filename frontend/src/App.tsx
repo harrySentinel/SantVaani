@@ -18,7 +18,7 @@ import ScrollToTop from "@/components/ScrollToTop";
 // Lazy load pages for better code splitting
 const Index = lazy(() => import("./pages/Index"));
 const Saints = lazy(() => import("./pages/saints/index"));
-const LivingSaints = lazy(() => import("./pages/living-saints/index"));
+const Jeevani = lazy(() => import("./pages/jeevani/index"));
 const Divine = lazy(() => import("./pages/divine/index"));
 const Bhajans = lazy(() => import("./pages/bhajans/index"));
 const Quotes = lazy(() => import("./pages/quotes/index"));
@@ -81,7 +81,7 @@ const App = () => {
                         <Routes>
                           <Route path="/" element={<Index />} />
                           <Route path="/saints" element={<Saints />} />
-                          <Route path="/living-saints" element={<LivingSaints />} />
+                          <Route path="/jeevani" element={<Jeevani />} />
                           <Route path="/divine" element={<Divine />} />
                           <Route path="/bhajans" element={<Bhajans />} />
                           <Route path="/quotes" element={<Quotes />} />

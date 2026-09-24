@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabaseClient';
 
 export interface SearchResult {
   id: string;
-  type: 'saints' | 'living_saints' | 'divine_forms' | 'bhajans' | 'quotes';
+  type: 'saints' | 'divine_forms' | 'bhajans' | 'quotes';
   title: string;
   title_hi?: string;
   description: string;
@@ -71,35 +71,6 @@ class SearchService {
       }));
     } catch (error) {
       console.error('Error searching saints:', error);
-      return [];
-    }
-  }
-
-  // Search Living Saints
-  async searchLivingSaints(query: string, limit: number = 10): Promise<SearchResult[]> {
-    try {
-      const { data, error } = await supabase
-        .from('living_saints')
-        .select('*')
-        .or(`name.ilike.%${query}%,name_hi.ilike.%${query}%,specialty.ilike.%${query}%,specialty_hi.ilike.%${query}%,organization.ilike.%${query}%,current_location.ilike.%${query}%,current_location_hi.ilike.%${query}%,description.ilike.%${query}%,description_hi.ilike.%${query}%`)
-        .limit(limit);
-
-      if (error) throw error;
-
-      return (data || []).map(saint => ({
-        id: saint.id,
-        type: 'living_saints' as const,
-        title: saint.name || '',
-        title_hi: saint.name_hi,
-        description: saint.description || saint.specialty || '',
-        description_hi: saint.description_hi || saint.specialty_hi,
-        image: saint.image,
-        category: saint.organization,
-        author: saint.name,
-        specialty: saint.specialty
-      }));
-    } catch (error) {
-      console.error('Error searching living saints:', error);
       return [];
     }
   }
@@ -197,16 +168,13 @@ class SearchService {
     
     try {
       const searchPromises: Promise<SearchResult[]>[] = [];
-      const itemsPerType = Math.ceil(limit / 5); // Distribute across 5 content types
+      const itemsPerType = Math.ceil(limit / 4); // Distribute across 4 content types
 
       // If type filter is specified, only search that type
       if (filters.type && filters.type !== 'all') {
         switch (filters.type) {
           case 'saints':
             searchPromises.push(this.searchSaints(query, limit));
-            break;
-          case 'living_saints':
-            searchPromises.push(this.searchLivingSaints(query, limit));
             break;
           case 'divine_forms':
             searchPromises.push(this.searchDivineForms(query, limit));
@@ -222,7 +190,6 @@ class SearchService {
         // Search all types
         searchPromises.push(
           this.searchSaints(query, itemsPerType),
-          this.searchLivingSaints(query, itemsPerType),
           this.searchDivineForms(query, itemsPerType),
           this.searchBhajans(query, itemsPerType),
           this.searchQuotes(query, itemsPerType)
@@ -307,16 +274,15 @@ class SearchService {
       const suggestions = new Set<string>();
 
       // Get suggestions from different content types
-      const [saints, livingSaints, divineForms, bhajans, quotes] = await Promise.all([
+      const [saints, divineForms, bhajans, quotes] = await Promise.all([
         this.searchSaints(query, 3),
-        this.searchLivingSaints(query, 3),
         this.searchDivineForms(query, 3),
         this.searchBhajans(query, 3),
         this.searchQuotes(query, 3)
       ]);
 
       // Add titles as suggestions
-      [...saints, ...livingSaints, ...divineForms, ...bhajans, ...quotes]
+      [...saints, ...divineForms, ...bhajans, ...quotes]
         .forEach(result => {
           suggestions.add(result.title);
           if (result.title_hi) suggestions.add(result.title_hi);

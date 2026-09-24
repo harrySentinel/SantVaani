@@ -2603,13 +2603,6 @@ app.get('/api/sitemap.xml', async (req, res) => {
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
-  <url>
-    <loc>https://santvaani.com/living-saints</loc>
-    <lastmod>${today}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-
   <!-- Divine Forms -->
   <url>
     <loc>https://santvaani.com/divine</loc>

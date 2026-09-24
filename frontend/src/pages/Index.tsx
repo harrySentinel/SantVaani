@@ -7,7 +7,7 @@ import SEO from '@/components/SEO';
 import StructuredData from '@/components/StructuredData';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Users, Heart, Star, ArrowRight, Video, MessageSquare, Sparkles } from 'lucide-react';
+import { Users, Star, ArrowRight, Video, MessageSquare, Sparkles } from 'lucide-react';
 import VisitorCounter from '@/components/VisitorCounter';
 import SpiritualFactBox from '@/components/SpiritualFactBox';
 import FeedbackForm from '@/components/FeedbackForm';
@@ -43,15 +43,6 @@ const Index = () => {
       gradient: 'from-orange-500 to-amber-500',
       accent: 'from-orange-400 to-amber-400',
       shadow: 'hover:shadow-orange-100',
-    },
-    {
-      icon: Heart,
-      title: t('livingsaints.title'),
-      description: t('livingsaints.subtitle'),
-      to: '/living-saints',
-      gradient: 'from-rose-500 to-orange-500',
-      accent: 'from-rose-400 to-orange-400',
-      shadow: 'hover:shadow-rose-100',
     },
     {
       icon: Star,
@@ -119,7 +110,7 @@ const Index = () => {
             <div className="flex flex-col md:grid md:grid-cols-2 gap-3 md:gap-5">
               {features.map((feature, idx) => {
                 const Icon = feature.icon;
-                const wide = idx === 0;
+                const wide = false;
                 return (
                   <motion.div
                     key={feature.to}

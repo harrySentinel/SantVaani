@@ -304,7 +304,7 @@ const EMAIL_TEMPLATES = {
                   </div>
                   <div class="feature-content">
                     <div class="feature-title">Museum of Saints & Divine Forms</div>
-                    <div class="feature-desc">Explore the lives of living saints and learn about various divine manifestations</div>
+                    <div class="feature-desc">Explore the lives and teachings of revered saints and learn about divine manifestations</div>
                   </div>
                 </div>
 
