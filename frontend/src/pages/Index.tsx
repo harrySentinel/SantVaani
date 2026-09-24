@@ -233,7 +233,13 @@ const Index = () => {
         <section className="relative py-20">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <div className="space-y-8">
-              <div className="space-y-3">
+              <motion.div
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.4 }}
+                transition={{ duration: 0.5, ease: 'easeOut' }}
+                className="space-y-3"
+              >
                 <div className="flex items-center justify-center gap-2 mb-4">
                   <span className="w-1.5 h-1.5 rounded-full bg-orange-400" />
                   <p className="text-xs font-bold text-orange-500 uppercase tracking-widest">
@@ -243,10 +249,16 @@ const Index = () => {
                 </div>
                 <h2 className="text-3xl md:text-4xl font-bold text-gray-800 leading-tight">{t('mission.title')}</h2>
                 <p className="text-gray-500 leading-relaxed max-w-2xl mx-auto">{t('mission.description')}</p>
-              </div>
+              </motion.div>
 
               {/* Quote card */}
-              <div className="relative bg-white/55 backdrop-blur-md border border-white/70 rounded-3xl p-10 shadow-[0_4px_32px_rgba(249,115,22,0.08)] overflow-hidden">
+              <motion.div
+                initial={{ opacity: 0, y: 28, scale: 0.98 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.55, ease: 'easeOut', delay: 0.1 }}
+                className="relative bg-white/55 backdrop-blur-md border border-white/70 rounded-3xl p-10 shadow-[0_4px_32px_rgba(249,115,22,0.08)] overflow-hidden"
+              >
                 <div className="absolute top-0 left-10 right-10 h-px bg-gradient-to-r from-transparent via-orange-300/50 to-transparent" />
                 <div className="absolute -top-8 -right-8 w-40 h-40 bg-orange-200 rounded-full blur-3xl opacity-40 pointer-events-none" />
                 <div className="absolute -bottom-8 -left-8 w-40 h-40 bg-amber-200 rounded-full blur-3xl opacity-30 pointer-events-none" />
@@ -257,9 +269,15 @@ const Index = () => {
                 <p className="text-base text-orange-500 mt-4 font-medium relative z-10">
                   {t('mission.quote.english')}
                 </p>
-              </div>
+              </motion.div>
 
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.5 }}
+                transition={{ duration: 0.45, ease: 'easeOut', delay: 0.2 }}
+                className="flex flex-col sm:flex-row gap-4 justify-center"
+              >
                 <Link to="/about">
                   <Button size="lg" variant="outline"
                     className="border-2 border-orange-300 text-orange-600 hover:bg-orange-50 px-8 py-3 rounded-full bg-white/60 backdrop-blur-sm"
@@ -273,7 +291,7 @@ const Index = () => {
                   <MessageSquare className="w-4 h-4 mr-2" />
                   {t('mission.feedback')}
                 </Button>
-              </div>
+              </motion.div>
             </div>
           </div>
         </section>
