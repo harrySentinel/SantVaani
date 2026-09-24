@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Copy, Quote, Play, ExternalLink, Youtube } from 'lucide-react';
+import { X, Copy, Quote } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
@@ -63,28 +63,6 @@ const BhajanModal: React.FC<BhajanModalProps> = ({ bhajan, isOpen, onClose }) =>
         description: CopyToClipboard.getErrorMessage(),
         variant: "destructive",
         duration: 4000,
-      });
-    }
-  };
-
-  const handleListenOnYouTube = () => {
-    if (!bhajan?.youtube_url) {
-      const searchQuery = `${bhajan?.title} bhajan devotional song`.replace(/\s+/g, '+');
-      const searchUrl = `https://www.youtube.com/results?search_query=${searchQuery}`;
-      window.open(searchUrl, '_blank');
-
-      toast({
-        title: "🎵 Redirecting to YouTube",
-        description: "Opening YouTube search for this bhajan",
-        duration: 2000,
-      });
-    } else {
-      window.open(bhajan.youtube_url, '_blank');
-
-      toast({
-        title: "🎵 Opening YouTube",
-        description: "Listen to this beautiful bhajan",
-        duration: 2000,
       });
     }
   };
@@ -249,35 +227,6 @@ const BhajanModal: React.FC<BhajanModalProps> = ({ bhajan, isOpen, onClose }) =>
                     <p className="text-gray-700 leading-relaxed text-base md:text-lg italic">
                       {bhajan.meaning}
                     </p>
-                  </motion.div>
-
-                  {/* YouTube Section */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="bg-gradient-to-br from-red-50 to-orange-50 rounded-2xl p-6 md:p-8 shadow-md border border-red-200/50"
-                  >
-                    <div className="text-center space-y-4">
-                      <div className="flex justify-center items-center space-x-2">
-                        <Youtube className="w-8 h-8 text-red-500 animate-pulse" />
-                        <Play className="w-6 h-6 text-red-500" />
-                      </div>
-                      <h3 className="text-xl font-semibold text-gray-800">
-                        Experience on YouTube
-                      </h3>
-                      <p className="text-gray-600 max-w-md mx-auto">
-                        Listen to this sacred bhajan and let the divine vibrations fill your heart with peace and devotion.
-                      </p>
-                      <Button
-                        onClick={handleListenOnYouTube}
-                        className="group bg-red-500 hover:bg-red-600 text-white rounded-full px-6 py-3 shadow-lg transition-all hover:shadow-xl hover:scale-105"
-                      >
-                        <Youtube className="w-5 h-5 mr-2" />
-                        Open in YouTube
-                        <ExternalLink className="w-4 h-4 ml-2 opacity-70 group-hover:opacity-100 transition-opacity" />
-                      </Button>
-                    </div>
                   </motion.div>
 
                 </div>
