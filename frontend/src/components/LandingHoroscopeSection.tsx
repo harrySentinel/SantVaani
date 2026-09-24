@@ -70,92 +70,97 @@ const LandingHoroscopeSection = () => {
   ];
 
   return (
-    <section className="py-20 relative">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-20 relative overflow-hidden">
+      {/* Starfield */}
+      {STARS.map((star, i) => (
+        <span
+          key={i}
+          className="absolute rounded-full bg-orange-300/60 animate-pulse pointer-events-none"
+          style={{ top: star.top, left: star.left, width: star.s, height: star.s, animationDelay: star.d, animationDuration: '3s' }}
+        />
+      ))}
+
+      {/* Ambient wash */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage:
+            'radial-gradient(560px 320px at 88% 12%, rgba(251,191,36,0.12), transparent 70%), radial-gradient(520px 300px at 8% 88%, rgba(251,146,60,0.10), transparent 70%)',
+        }}
+      />
+
+      {/* Rotating zodiac wheel */}
+      <div className="absolute -right-24 top-1/2 -translate-y-1/2 w-[380px] h-[380px] md:w-[440px] md:h-[440px] text-orange-200 opacity-60 pointer-events-none">
         <motion.div
-          initial={{ opacity: 0, y: 28 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.6, ease: 'easeOut' }}
-          className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-[#fcf7ee] via-[#f9f0e0] to-[#f5e7d0] border border-orange-100/70 p-8 md:p-14 shadow-[0_24px_64px_rgba(180,120,40,0.14)]"
+          animate={{ rotate: 360 }}
+          transition={{ duration: 90, repeat: Infinity, ease: 'linear' }}
+          className="w-full h-full"
         >
-          {/* Starfield */}
-          {STARS.map((star, i) => (
-            <span
-              key={i}
-              className="absolute rounded-full bg-orange-300/70 animate-pulse pointer-events-none"
-              style={{ top: star.top, left: star.left, width: star.s, height: star.s, animationDelay: star.d, animationDuration: '3s' }}
-            />
-          ))}
+          <ZodiacWheel />
+        </motion.div>
+      </div>
 
-          {/* Ambient glows */}
-          <div className="absolute -top-28 -right-20 w-96 h-96 rounded-full bg-orange-200/60 blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-32 -left-24 w-96 h-96 rounded-full bg-amber-200/50 blur-3xl pointer-events-none" />
-
-          {/* Rotating zodiac wheel */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative z-10 grid md:grid-cols-2 gap-10 md:gap-12 items-center">
+          {/* Left — text */}
           <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 90, repeat: Infinity, ease: 'linear' }}
-            className="absolute -right-28 -bottom-28 w-[440px] h-[440px] text-orange-300 opacity-25 pointer-events-none"
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.55, ease: 'easeOut' }}
+            className="space-y-5"
           >
-            <ZodiacWheel />
+            <p className="text-xs font-semibold text-orange-500 uppercase tracking-widest">
+              {language === 'HI' ? 'वैदिक ज्योतिष' : 'Vedic Astrology'}
+            </p>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 leading-tight">
+              {language === 'HI' ? 'दैनिक राशिफल' : 'Daily Horoscope'}
+            </h2>
+            <p className="text-gray-500 leading-relaxed">
+              {language === 'HI'
+                ? 'जानें कि आज तारे आपके लिए क्या लेकर आए हैं। वैदिक ज्योतिष पर आधारित व्यक्तिगत मार्गदर्शन प्राप्त करें।'
+                : 'Discover what the stars hold for you today. Get personalized guidance grounded in ancient Vedic wisdom.'}
+            </p>
+
+            <div className="inline-flex items-center gap-2 text-sm text-gray-500 bg-white/70 border border-orange-100 backdrop-blur-sm rounded-full px-4 py-2 shadow-sm">
+              <Calendar className="w-4 h-4 text-orange-500" />
+              <span>{today}</span>
+            </div>
+
+            <div>
+              <Link to="/horoscope">
+                <Button
+                  size="lg"
+                  className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold px-7 py-3 rounded-full mt-2 gap-2 shadow-lg shadow-orange-200"
+                >
+                  {language === 'HI' ? 'आज का राशिफल देखें' : "View Today's Horoscope"}
+                  <ArrowRight className="w-4 h-4" />
+                </Button>
+              </Link>
+            </div>
           </motion.div>
 
-          <div className="relative z-10 grid md:grid-cols-2 gap-10 md:gap-12 items-center">
-            {/* Left — text */}
-            <div className="space-y-5">
-              <p className="text-xs font-semibold text-orange-500 uppercase tracking-widest">
-                {language === 'HI' ? 'वैदिक ज्योतिष' : 'Vedic Astrology'}
-              </p>
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 leading-tight">
-                {language === 'HI' ? 'दैनिक राशिफल' : 'Daily Horoscope'}
-              </h2>
-              <p className="text-gray-600 leading-relaxed">
-                {language === 'HI'
-                  ? 'जानें कि आज तारे आपके लिए क्या लेकर आए हैं। वैदिक ज्योतिष पर आधारित व्यक्तिगत मार्गदर्शन प्राप्त करें।'
-                  : 'Discover what the stars hold for you today. Get personalized guidance grounded in ancient Vedic wisdom.'}
-              </p>
-
-              <div className="inline-flex items-center gap-2 text-sm text-gray-700 bg-white/70 border border-orange-100 backdrop-blur-sm rounded-full px-4 py-2">
-                <Calendar className="w-4 h-4 text-orange-500" />
-                <span>{today}</span>
-              </div>
-
-              <div>
-                <Link to="/horoscope">
-                  <Button
-                    size="lg"
-                    className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold px-7 py-3 rounded-full mt-2 gap-2 shadow-lg shadow-orange-200"
-                  >
-                    {language === 'HI' ? 'आज का राशिफल देखें' : "View Today's Horoscope"}
-                    <ArrowRight className="w-4 h-4" />
-                  </Button>
-                </Link>
-              </div>
-            </div>
-
-            {/* Right — tiles */}
-            <div className="grid grid-cols-2 gap-4">
-              {tiles.map(({ icon: Icon, label, sub }, idx) => (
-                <motion.div
-                  key={label}
-                  initial={{ opacity: 0, y: 18 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.3 }}
-                  transition={{ duration: 0.45, ease: 'easeOut', delay: 0.15 + idx * 0.08 }}
-                  className="relative overflow-hidden bg-white/70 backdrop-blur-md border border-orange-100/80 rounded-2xl p-5 space-y-2 shadow-sm"
-                >
-                  <div className="absolute top-0 left-3 right-3 h-px bg-gradient-to-r from-transparent via-orange-200/70 to-transparent" />
-                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center mb-3 shadow-md shadow-orange-200">
-                    <Icon className="w-4 h-4 text-white" />
-                  </div>
-                  <p className="text-sm font-semibold text-gray-800">{label}</p>
-                  <p className="text-xs text-gray-500">{sub}</p>
-                </motion.div>
-              ))}
-            </div>
+          {/* Right — tiles */}
+          <div className="grid grid-cols-2 gap-4">
+            {tiles.map(({ icon: Icon, label, sub }, idx) => (
+              <motion.div
+                key={label}
+                initial={{ opacity: 0, y: 18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.45, ease: 'easeOut', delay: 0.15 + idx * 0.08 }}
+                className="relative overflow-hidden bg-white/60 backdrop-blur-md border border-white/80 rounded-2xl p-5 space-y-2 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+              >
+                <div className="absolute top-0 left-3 right-3 h-px bg-gradient-to-r from-transparent via-orange-200/70 to-transparent" />
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center mb-3 shadow-md shadow-orange-200">
+                  <Icon className="w-4 h-4 text-white" />
+                </div>
+                <p className="text-sm font-semibold text-gray-800">{label}</p>
+                <p className="text-xs text-gray-500">{sub}</p>
+              </motion.div>
+            ))}
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

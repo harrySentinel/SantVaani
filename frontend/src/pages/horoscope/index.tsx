@@ -157,13 +157,15 @@ const HoroscopePage = () => {
       <Navbar />
 
       {/* ── Hero ── */}
-      <section className="relative pt-16 pb-20 overflow-hidden bg-gradient-to-br from-[#fcf7ee] via-[#f9f0e0] to-[#f5e7d0]">
-        {/* Subtle star pattern overlay */}
-        <div className="absolute inset-0 opacity-40"
-          style={{ backgroundImage: 'radial-gradient(circle, rgba(249,115,22,0.14) 1px, transparent 1px)', backgroundSize: '40px 40px' }}
+      <section className="relative pt-16 pb-20">
+        {/* Ambient wash */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage:
+              'radial-gradient(640px 360px at 50% 28%, rgba(251,191,36,0.12), transparent 70%), radial-gradient(480px 280px at 12% 80%, rgba(251,146,60,0.08), transparent 70%)',
+          }}
         />
-        <div className="absolute -top-28 right-0 w-96 h-96 rounded-full bg-orange-200/60 blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-32 -left-24 w-96 h-96 rounded-full bg-amber-200/50 blur-3xl pointer-events-none" />
         <div className="relative max-w-3xl mx-auto px-4 sm:px-6 text-center pt-10 pb-4">
           <p className="text-orange-500 text-xs font-semibold tracking-[0.3em] uppercase mb-4">
             {language === 'EN' ? 'Vedic Astrology' : 'वैदिक ज्योतिष'}
@@ -171,7 +173,7 @@ const HoroscopePage = () => {
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">
             {t('horoscope.title')}
           </h1>
-          <p className="text-gray-600 text-base max-w-lg mx-auto leading-relaxed">
+          <p className="text-gray-500 text-base max-w-lg mx-auto leading-relaxed">
             {t('horoscope.subtitle')}
           </p>
           {language === 'EN' && (
