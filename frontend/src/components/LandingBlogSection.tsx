@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Card, CardContent } from '@/components/ui/card'
 import { Clock, Calendar, ArrowRight, BookOpen } from 'lucide-react'
 import { supabase } from '@/lib/supabaseClient'
 import { useLanguage } from '@/contexts/LanguageContext'
@@ -39,7 +38,7 @@ const LandingBlogSection = () => {
             blog_categories (id, name, icon, color)`)
           .eq('language', contentLanguage)
           .order('published_at', { ascending: false })
-          .limit(3)
+          .limit(8)
 
         if (!error && (!data || data.length === 0)) {
           const fallback = await supabase
@@ -47,7 +46,7 @@ const LandingBlogSection = () => {
             .select(`id, title, excerpt, slug, published_at, reading_time, spiritual_quotes,
               blog_categories (id, name, icon, color)`)
             .order('published_at', { ascending: false })
-            .limit(3)
+            .limit(8)
           data = fallback.data
           error = fallback.error
         }
@@ -80,7 +79,7 @@ const LandingBlogSection = () => {
 
   if (isLoading) {
     return (
-      <section className="py-16 relative">
+      <section id="blog" className="py-12 md:py-16 relative scroll-mt-32">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="h-8 bg-gray-200 rounded w-40 mb-8 animate-pulse" />
           <BlogGridSkeleton count={3} />
@@ -92,10 +91,16 @@ const LandingBlogSection = () => {
   if (featuredPosts.length === 0) return null
 
   return (
-    <section className="py-16 relative">
+    <section id="blog" className="py-12 md:py-16 relative scroll-mt-32">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="flex items-end justify-between mb-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+          className="flex items-end justify-between mb-8"
+        >
           <div className="space-y-1">
             <p className="text-xs font-semibold text-orange-500 uppercase tracking-widest">
               {language === 'HI' ? 'लेख' : 'Articles'}
@@ -111,27 +116,34 @@ const LandingBlogSection = () => {
             {language === 'HI' ? 'सभी लेख' : 'All articles'}
             <ArrowRight className="w-4 h-4" />
           </Link>
-        </div>
+        </motion.div>
 
-        {/* Cards */}
-        <div className="flex flex-wrap justify-center gap-6">
+        {/* Swipeable row */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.55, ease: 'easeOut', delay: 0.1 }}
+          className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
           {featuredPosts.map((post, index) => (
-            <motion.div
+            <Link
               key={post.id}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.5, ease: 'easeOut', delay: index * 0.08 }}
-              className="w-full sm:w-[340px] h-full"
+              to={`/blog/post/${post.slug}`}
+              className="group block w-64 sm:w-72 flex-shrink-0 snap-start"
             >
-            <Link key={post.id} to={`/blog/post/${post.slug}`} className="group block h-full">
-              <Card className="h-full hover:shadow-lg hover:-translate-y-1 transition-all duration-200 border border-white/80 shadow-md bg-white/60 backdrop-blur-md overflow-hidden rounded-2xl">
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ delay: index * 0.05 }}
+                className="h-full bg-white/70 backdrop-blur-md border border-white/80 rounded-2xl overflow-hidden shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
+              >
                 <div
                   className="h-1 w-full"
                   style={{ background: `linear-gradient(90deg, ${post.category.color}, transparent)` }}
                 />
-                <CardContent className="p-5 space-y-3">
-                  {/* Category */}
+                <div className="p-4 space-y-2.5">
                   <div
                     className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold"
                     style={{
@@ -143,28 +155,16 @@ const LandingBlogSection = () => {
                     {post.category.name}
                   </div>
 
-                  {/* Title */}
-                  <h3 className="text-base font-bold text-gray-900 group-hover:text-orange-600 transition-colors line-clamp-2 leading-snug">
+                  <h3 className="text-sm font-bold text-gray-900 group-hover:text-orange-600 transition-colors line-clamp-2 leading-snug">
                     {post.title}
                   </h3>
 
-                  {/* Excerpt */}
-                  <p className="text-gray-500 text-sm leading-relaxed line-clamp-3">
+                  <p className="text-gray-500 text-xs leading-relaxed line-clamp-2">
                     {post.excerpt}
                   </p>
 
-                  {/* Quote */}
-                  {post.spiritualQuotes && post.spiritualQuotes.length > 0 && (
-                    <div className="border-l-2 border-orange-300 pl-3">
-                      <p className="text-xs italic text-orange-700 line-clamp-2">
-                        "{post.spiritualQuotes[0]}"
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Meta */}
-                  <div className="flex items-center justify-between text-xs text-gray-400 pt-2 border-t border-gray-100">
-                    <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-between text-[11px] text-gray-400 pt-2 border-t border-gray-100">
+                    <div className="flex items-center gap-2.5">
                       <span className="flex items-center gap-1">
                         <Calendar className="w-3 h-3" />
                         {formatDate(post.publishedAt)}
@@ -176,12 +176,11 @@ const LandingBlogSection = () => {
                     </div>
                     <ArrowRight className="w-3.5 h-3.5 text-orange-400 group-hover:translate-x-0.5 transition-transform" />
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </motion.div>
             </Link>
-            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         {/* CTA */}
         <div className="text-center mt-8">

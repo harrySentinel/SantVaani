@@ -70,7 +70,7 @@ const LandingHoroscopeSection = () => {
   ];
 
   return (
-    <section className="py-20 relative overflow-hidden">
+    <section id="horoscope" className="py-12 md:py-20 relative overflow-hidden scroll-mt-32">
       {/* Starfield */}
       {STARS.map((star, i) => (
         <span

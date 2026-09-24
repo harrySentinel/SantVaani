@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Card, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import { BookMarked, BookOpen, Eye, ArrowRight, Crown } from 'lucide-react'
 import { supabase } from '@/lib/supabaseClient'
 import { useLanguage } from '@/contexts/LanguageContext'
@@ -35,7 +33,7 @@ const LandingStoriesSection = () => {
           .select('*')
           .eq('published', true)
           .order('views', { ascending: false })
-          .limit(3)
+          .limit(8)
 
         if (error) throw error
         setFeaturedBooks(data || [])
@@ -51,79 +49,71 @@ const LandingStoriesSection = () => {
 
   if (isLoading) {
     return (
-      <section className="py-20 relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="animate-pulse">
-            <div className="h-10 bg-gray-200 rounded-lg mb-4 w-64 mx-auto"></div>
-            <div className="h-6 bg-gray-200 rounded-lg mb-12 w-96 mx-auto"></div>
-            <div className="grid md:grid-cols-3 gap-6">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="h-96 bg-gray-200 rounded-xl"></div>
-              ))}
-            </div>
+      <section id="stories" className="py-12 md:py-16 relative scroll-mt-32">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="h-8 bg-gray-200 rounded w-40 mb-8 animate-pulse" />
+          <div className="flex gap-4 overflow-hidden">
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="w-40 sm:w-44 md:w-48 flex-shrink-0 h-64 bg-gray-200 rounded-2xl animate-pulse" />
+            ))}
           </div>
         </div>
       </section>
     )
   }
 
-  if (featuredBooks.length === 0) {
-    return null
-  }
+  if (featuredBooks.length === 0) return null
 
   return (
-    <section className="py-20 relative overflow-hidden">
-      {/* Decorative Background Elements */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-orange-200 rounded-full filter blur-3xl opacity-20"></div>
-      <div className="absolute bottom-0 left-0 w-64 h-64 bg-red-200 rounded-full filter blur-3xl opacity-20"></div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        {/* Section Header */}
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-100 to-orange-100 rounded-full mb-4 border border-orange-200">
-            <Crown className="w-4 h-4 text-orange-600" />
-            <span className="text-sm font-semibold text-orange-700">
+    <section id="stories" className="py-12 md:py-16 relative scroll-mt-32">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+          className="flex items-end justify-between mb-8"
+        >
+          <div className="space-y-1">
+            <p className="text-xs font-semibold text-orange-500 uppercase tracking-widest">
               {language === 'HI' ? 'विशेष संग्रह' : 'Exclusive Collection'}
-            </span>
+            </p>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+              {language === 'HI' ? 'प्रभु की दिव्य कथाएं' : 'Divine Stories of the Lord'}
+            </h2>
           </div>
+          <Link
+            to="/prabhu-ki-leelaayen"
+            className="flex items-center gap-1.5 text-sm font-medium text-orange-600 hover:text-orange-700 transition-colors"
+          >
+            {language === 'HI' ? 'सभी देखें' : 'View all'}
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </motion.div>
 
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4" style={{ fontFamily: language === 'HI' ? "'Noto Sans Devanagari', sans-serif" : 'inherit' }}>
-            {language === 'HI'
-              ? 'प्रभु की दिव्य कथाएं'
-              : 'Divine Stories of the Lord'}
-          </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            {language === 'HI'
-              ? 'महाभारत, रामायण और अन्य पवित्र ग्रंथों की कहानियां - पढ़ें और अपने जीवन को धन्य करें'
-              : 'Sacred tales from Mahabharata, Ramayana and divine scriptures - Read and enrich your spiritual journey'}
-          </p>
-        </div>
-
-        {/* Books Grid */}
-        <div className="flex flex-wrap justify-center gap-8 mb-12">
+        {/* Swipeable row */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.55, ease: 'easeOut', delay: 0.1 }}
+          className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
           {featuredBooks.map((book, index) => (
-            <motion.div
+            <Link
               key={book.id}
-              initial={{ opacity: 0, y: 28 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.5, ease: 'easeOut', delay: index * 0.1 }}
-              className="w-full sm:w-[340px]"
+              to={`/prabhu-ki-leelaayen/book/${book.slug}`}
+              className="group block w-40 sm:w-44 md:w-48 flex-shrink-0 snap-start"
             >
-            <Link key={book.id} to={`/prabhu-ki-leelaayen/book/${book.slug}`} className="group block h-full">
-              <Card className="h-full hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-white/80 shadow-md bg-white/60 backdrop-blur-md overflow-hidden relative rounded-2xl">
-                {/* Premium Badge for First Book */}
-                {index === 0 && (
-                  <div className="absolute top-4 right-4 z-10">
-                    <div className="bg-gradient-to-r from-amber-400 to-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg">
-                      <Crown className="w-3 h-3" />
-                      {language === 'HI' ? 'लोकप्रिय' : 'Popular'}
-                    </div>
-                  </div>
-                )}
-
-                {/* Book Cover */}
-                <div className="relative h-64 overflow-hidden bg-gradient-to-br from-orange-100 to-red-100">
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ delay: index * 0.05 }}
+                className="relative overflow-hidden rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-200"
+              >
+                <div className="relative aspect-[3/4] bg-gradient-to-br from-orange-100 to-red-100 overflow-hidden">
                   {book.cover_image ? (
                     <img
                       src={book.cover_image}
@@ -132,71 +122,55 @@ const LandingStoriesSection = () => {
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-orange-400 to-red-600">
-                      <BookOpen className="w-20 h-20 text-white opacity-80" />
+                      <BookOpen className="w-10 h-10 text-white opacity-80" />
                     </div>
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
 
-                  {/* Chapter Count Badge */}
-                  <div className="absolute bottom-4 left-4">
-                    <div className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-semibold text-orange-600 flex items-center gap-1">
-                      <BookMarked className="w-3 h-3" />
-                      {book.total_chapters} {language === 'HI' ? 'अध्याय' : 'Chapters'}
+                  {index === 0 && (
+                    <div className="absolute top-2 right-2 bg-gradient-to-r from-amber-400 to-orange-500 text-white px-2 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1 shadow">
+                      <Crown className="w-2.5 h-2.5" />
+                      {language === 'HI' ? 'लोकप्रिय' : 'Popular'}
+                    </div>
+                  )}
+
+                  <div className="absolute bottom-0 left-0 right-0 p-3 space-y-0.5">
+                    <p className="text-[10px] text-orange-200 font-medium line-clamp-1">
+                      {language === 'HI' ? book.author_hi : book.author}
+                    </p>
+                    <h3 className="text-white text-sm font-semibold leading-snug line-clamp-2">
+                      {language === 'HI' ? book.title_hi : book.title}
+                    </h3>
+                    <div className="flex items-center gap-2 text-[10px] text-white/70 pt-0.5">
+                      <span className="flex items-center gap-1">
+                        <BookMarked className="w-2.5 h-2.5" />
+                        {book.total_chapters}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Eye className="w-2.5 h-2.5" />
+                        {book.views.toLocaleString()}
+                      </span>
                     </div>
                   </div>
                 </div>
-
-                {/* Book Info */}
-                <CardContent className="p-6">
-                  <div className="space-y-3">
-                    {/* Author */}
-                    <p className="text-sm text-orange-600 font-medium">
-                      {language === 'HI' ? book.author_hi : book.author}
-                    </p>
-
-                    {/* Title */}
-                    <h3
-                      className="text-2xl font-bold text-gray-900 group-hover:text-orange-600 transition-colors line-clamp-2"
-                      style={{ fontFamily: language === 'HI' ? "'Noto Sans Devanagari', sans-serif" : 'inherit' }}
-                    >
-                      {language === 'HI' ? book.title_hi : book.title}
-                    </h3>
-
-                    {/* Description */}
-                    <p className="text-gray-600 text-sm leading-relaxed line-clamp-3">
-                      {language === 'HI' ? book.description_hi : book.description}
-                    </p>
-
-                    {/* Stats */}
-                    <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                      <div className="flex items-center gap-1 text-sm text-gray-500">
-                        <Eye className="w-4 h-4" />
-                        <span>{book.views.toLocaleString()}</span>
-                      </div>
-                      <div className="flex items-center gap-1 text-orange-600 font-medium text-sm group-hover:gap-2 transition-all">
-                        <span>{language === 'HI' ? 'पढ़ें' : 'Read Now'}</span>
-                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              </motion.div>
             </Link>
-            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
-        {/* Call to Action */}
-        <div className="text-center">
+        {/* Bottom row */}
+        <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-100">
+          <p className="text-sm text-gray-400 flex items-center gap-2">
+            <BookOpen className="w-4 h-4 text-orange-400" />
+            {language === 'HI'
+              ? 'महाभारत, रामायण और अन्य पवित्र ग्रंथों की कहानियां'
+              : 'Sacred tales from Mahabharata, Ramayana & scriptures'}
+          </p>
           <Link to="/prabhu-ki-leelaayen">
-            <Button
-              size="lg"
-              className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-7 py-3 rounded-full gap-2"
-            >
-              <BookMarked className="w-4 h-4" />
-              {language === 'HI' ? 'सभी कहानियां देखें' : 'Explore All Stories'}
+            <button className="flex items-center gap-2 text-sm font-semibold text-white bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 px-5 py-2.5 rounded-full transition-colors">
+              {language === 'HI' ? 'सभी कहानियां' : 'All Stories'}
               <ArrowRight className="w-4 h-4" />
-            </Button>
+            </button>
           </Link>
         </div>
       </div>

@@ -7,7 +7,7 @@ import SEO from '@/components/SEO';
 import StructuredData from '@/components/StructuredData';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Users, Star, ArrowRight, Video, MessageSquare, Sparkles } from 'lucide-react';
+import { Users, Star, ArrowRight, Video, MessageSquare, Sparkles, Music2, Moon, Flame, Share2, BookMarked, BookOpen, ScrollText } from 'lucide-react';
 import VisitorCounter from '@/components/VisitorCounter';
 import SpiritualFactBox from '@/components/SpiritualFactBox';
 import FeedbackForm from '@/components/FeedbackForm';
@@ -55,6 +55,16 @@ const Index = () => {
     },
   ];
 
+  const quickLinks = [
+    { id: 'bhajans', to: '#bhajans', icon: Music2, label: { EN: 'Bhajans', HI: 'भजन' } },
+    { id: 'horoscope', to: '#horoscope', icon: Moon, label: { EN: 'Horoscope', HI: 'राशिफल' } },
+    { id: 'naam-jap', to: '#naam-jap', icon: Flame, label: { EN: 'Naam Jap', HI: 'नाम जप' } },
+    { id: 'space', to: '#space', icon: Share2, label: { EN: 'Space', HI: 'स्पेस' } },
+    { id: 'stories', to: '#stories', icon: BookMarked, label: { EN: 'Stories', HI: 'कथाएं' } },
+    { id: 'blog', to: '#blog', icon: BookOpen, label: { EN: 'Blog', HI: 'ब्लॉग' } },
+    { id: 'jeevani', to: '/jeevani', icon: ScrollText, label: { EN: 'Jeevani', HI: 'जीवनी' } },
+  ];
+
   return (
     <div className="min-h-screen bg-[#faf8f5]">
       <SEO
@@ -79,6 +89,27 @@ const Index = () => {
       {/* Smooth hero → body transition */}
       <div className="h-16 bg-gradient-to-b from-white/80 to-[#faf8f5] -mt-1" />
 
+      {/* ── Quick-nav chips ── */}
+      <div className="sticky top-16 z-20 bg-[#faf8f5]/90 backdrop-blur-md border-b border-orange-100/60">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <nav className="flex gap-2 overflow-x-auto py-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {quickLinks.map(link => {
+              const Icon = link.icon;
+              return (
+                <a
+                  key={link.id}
+                  href={link.to}
+                  className="flex-shrink-0 flex items-center gap-1.5 text-xs font-semibold text-orange-600 bg-orange-50 border border-orange-100 hover:bg-orange-100 transition-colors rounded-full px-4 py-2"
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  {link.label[language === 'HI' ? 'HI' : 'EN']}
+                </a>
+              );
+            })}
+          </nav>
+        </div>
+      </div>
+
       {/* ── Page body ── */}
       <div className="relative bg-[#faf8f5] overflow-hidden">
 
@@ -89,12 +120,12 @@ const Index = () => {
         </div>
 
         {/* ── Spiritual Fact ── */}
-        <section className="relative py-14 px-4">
+        <section className="relative py-10 md:py-14 px-4">
           <SpiritualFactBox />
         </section>
 
         {/* ── Features ── */}
-        <section className="relative py-16">
+        <section className="relative py-12 md:py-16">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="mb-10">
               <SectionLabel>{language === 'EN' ? 'Explore' : 'खोजें'}</SectionLabel>
@@ -172,7 +203,7 @@ const Index = () => {
         </section>
 
         {/* ── Live Bhajans ── */}
-        <section className="relative py-10">
+        <section className="relative py-10 md:py-12">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="relative bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl px-8 py-7 shadow-[0_8px_32px_rgba(249,115,22,0.25)] overflow-hidden">
               {/* Noise texture overlay */}
@@ -212,14 +243,14 @@ const Index = () => {
         <LandingBlogSection />
 
         {/* ── Visitor Counter ── */}
-        <section className="relative py-14">
+        <section className="relative py-10 md:py-14">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <VisitorCounter />
           </div>
         </section>
 
         {/* ── Mission ── */}
-        <section className="relative py-20">
+        <section className="relative py-14 md:py-20">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <div className="space-y-8">
               <motion.div
