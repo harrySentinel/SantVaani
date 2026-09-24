@@ -50,7 +50,7 @@ const FALLBACK_SIGNS: ZodiacSign[] = [
 const PERIOD_CONFIG = {
   daily:   { icon: Sun,      label: 'Daily',   labelHi: 'दैनिक',   color: 'from-orange-500 to-rose-500' },
   weekly:  { icon: Calendar, label: 'Weekly',  labelHi: 'साप्ताहिक', color: 'from-amber-500 to-orange-500' },
-  monthly: { icon: Moon,     label: 'Monthly', labelHi: 'मासिक',   color: 'from-purple-500 to-indigo-600' },
+  monthly: { icon: Moon,     label: 'Monthly', labelHi: 'मासिक',   color: 'from-red-500 to-rose-600' },
 };
 
 // Force text presentation so zodiac glyphs render as stylable characters, not platform emoji
@@ -157,13 +157,13 @@ const HoroscopePage = () => {
       <Navbar />
 
       {/* ── Hero ── */}
-      <section className="relative pt-16 pb-20 overflow-hidden bg-gradient-to-br from-[#241a52] via-[#181136] to-[#0d0a24]">
+      <section className="relative pt-16 pb-20 overflow-hidden bg-gradient-to-br from-[#331409] via-[#220e07] to-[#150804]">
         {/* Subtle star pattern overlay */}
         <div className="absolute inset-0 opacity-15"
           style={{ backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)', backgroundSize: '40px 40px' }}
         />
-        <div className="absolute -top-28 right-0 w-96 h-96 rounded-full bg-purple-500/20 blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-32 -left-24 w-96 h-96 rounded-full bg-orange-500/10 blur-3xl pointer-events-none" />
+        <div className="absolute -top-28 right-0 w-96 h-96 rounded-full bg-orange-500/20 blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-32 -left-24 w-96 h-96 rounded-full bg-amber-400/10 blur-3xl pointer-events-none" />
         <div className="relative max-w-3xl mx-auto px-4 sm:px-6 text-center pt-10 pb-4">
           <p className="text-amber-300 text-xs font-semibold tracking-[0.3em] uppercase mb-4">
             {language === 'EN' ? 'Vedic Astrology' : 'वैदिक ज्योतिष'}
@@ -171,7 +171,7 @@ const HoroscopePage = () => {
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">
             {t('horoscope.title')}
           </h1>
-          <p className="text-indigo-200/80 text-base max-w-lg mx-auto leading-relaxed">
+          <p className="text-orange-100/80 text-base max-w-lg mx-auto leading-relaxed">
             {t('horoscope.subtitle')}
           </p>
           {language === 'EN' && (
@@ -191,7 +191,7 @@ const HoroscopePage = () => {
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.55, ease: 'easeOut' }}
-            className="bg-white/70 backdrop-blur-md border border-white/70 rounded-3xl shadow-[0_16px_48px_rgba(23,15,60,0.12)] overflow-hidden"
+            className="bg-white/70 backdrop-blur-md border border-white/70 rounded-3xl shadow-[0_16px_48px_rgba(140,60,15,0.10)] overflow-hidden"
           >
             <div className="px-6 pt-6 pb-4 border-b border-gray-100 text-center">
               <h2 className="text-lg font-semibold text-gray-900">{t('horoscope.select.title')}</h2>
@@ -208,7 +208,7 @@ const HoroscopePage = () => {
                   onClick={() => handleSignSelect(sign.id)}
                   className="group rounded-2xl flex flex-col items-center gap-2 py-4 px-2 hover:bg-orange-50/80 hover:-translate-y-0.5 transition-all duration-200"
                 >
-                  <span className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white text-xl flex items-center justify-center shadow-md shadow-indigo-200/70 group-hover:scale-105 group-hover:shadow-lg transition-all duration-200">
+                  <span className="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-400 to-amber-500 text-white text-xl flex items-center justify-center shadow-md shadow-orange-200/70 group-hover:scale-105 group-hover:shadow-lg transition-all duration-200">
                     {glyph(sign.symbol)}
                   </span>
                   <span className="text-xs font-semibold text-gray-800 group-hover:text-orange-700">

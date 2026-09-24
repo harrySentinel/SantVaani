@@ -77,7 +77,7 @@ const LandingHoroscopeSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
-          className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-[#241a52] via-[#181136] to-[#0d0a24] p-8 md:p-14 shadow-[0_24px_64px_rgba(23,15,60,0.35)]"
+          className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-[#331409] via-[#220e07] to-[#150804] p-8 md:p-14 shadow-[0_24px_64px_rgba(140,60,15,0.30)]"
         >
           {/* Starfield */}
           {STARS.map((star, i) => (
@@ -89,14 +89,14 @@ const LandingHoroscopeSection = () => {
           ))}
 
           {/* Ambient glows */}
-          <div className="absolute -top-28 -right-20 w-96 h-96 rounded-full bg-purple-500/20 blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-32 -left-24 w-96 h-96 rounded-full bg-orange-500/10 blur-3xl pointer-events-none" />
+          <div className="absolute -top-28 -right-20 w-96 h-96 rounded-full bg-orange-500/20 blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-32 -left-24 w-96 h-96 rounded-full bg-amber-400/10 blur-3xl pointer-events-none" />
 
           {/* Rotating zodiac wheel */}
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 90, repeat: Infinity, ease: 'linear' }}
-            className="absolute -right-28 -bottom-28 w-[440px] h-[440px] text-indigo-300 opacity-[0.18] pointer-events-none"
+            className="absolute -right-28 -bottom-28 w-[440px] h-[440px] text-amber-200 opacity-[0.18] pointer-events-none"
           >
             <ZodiacWheel />
           </motion.div>
@@ -110,13 +110,13 @@ const LandingHoroscopeSection = () => {
               <h2 className="text-3xl md:text-4xl font-bold text-white leading-tight">
                 {language === 'HI' ? 'दैनिक राशिफल' : 'Daily Horoscope'}
               </h2>
-              <p className="text-indigo-200/80 leading-relaxed">
+              <p className="text-orange-100/80 leading-relaxed">
                 {language === 'HI'
                   ? 'जानें कि आज तारे आपके लिए क्या लेकर आए हैं। वैदिक ज्योतिष पर आधारित व्यक्तिगत मार्गदर्शन प्राप्त करें।'
                   : 'Discover what the stars hold for you today. Get personalized guidance grounded in ancient Vedic wisdom.'}
               </p>
 
-              <div className="inline-flex items-center gap-2 text-sm text-indigo-100 bg-white/10 border border-white/15 backdrop-blur-sm rounded-full px-4 py-2">
+              <div className="inline-flex items-center gap-2 text-sm text-orange-100 bg-white/10 border border-white/15 backdrop-blur-sm rounded-full px-4 py-2">
                 <Calendar className="w-4 h-4 text-amber-300" />
                 <span>{today}</span>
               </div>
@@ -150,7 +150,7 @@ const LandingHoroscopeSection = () => {
                     <Icon className="w-4 h-4 text-white" />
                   </div>
                   <p className="text-sm font-semibold text-white">{label}</p>
-                  <p className="text-xs text-indigo-200/70">{sub}</p>
+                  <p className="text-xs text-orange-100/70">{sub}</p>
                 </motion.div>
               ))}
             </div>
