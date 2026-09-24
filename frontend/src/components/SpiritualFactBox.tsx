@@ -101,51 +101,28 @@ const SpiritualFactBox = () => {
       className="max-w-4xl mx-auto px-4 sm:px-6"
     >
       <div
-        className="relative overflow-hidden rounded-[26px]"
-        style={{
-          background: 'linear-gradient(150deg, rgba(255,253,250,0.92) 0%, rgba(255,245,230,0.74) 100%)',
-          backdropFilter: 'blur(24px)',
-          WebkitBackdropFilter: 'blur(24px)',
-          boxShadow:
-            '0 0 0 1px rgba(255,255,255,0.75), 0 18px 50px -12px rgba(234,88,0,0.28), inset 0 1px 0 rgba(255,255,255,0.95)',
-        }}
+        className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white"
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
       >
-        {/* Ambient glows */}
-        <div className="absolute -top-16 -right-10 w-52 h-52 bg-orange-300 rounded-full blur-[85px] opacity-45 pointer-events-none" />
-        <div className="absolute -bottom-20 -left-12 w-52 h-52 bg-amber-200 rounded-full blur-[85px] opacity-35 pointer-events-none" />
-
         {/* OM watermark */}
         <span
-          className="absolute -bottom-12 right-2 text-[170px] leading-none select-none pointer-events-none hidden sm:block"
-          style={{ color: 'rgba(249,115,22,0.055)', fontFamily: 'serif' }}
+          className="absolute -bottom-12 right-2 text-[170px] leading-none select-none pointer-events-none hidden sm:block font-serif"
+          style={{ color: 'rgba(249,115,22,0.04)' }}
         >
           ॐ
         </span>
 
-        {/* Top shimmer line */}
-        <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-orange-300/60 to-transparent" />
-
         {/* Header */}
         <div className="relative z-10 flex items-center gap-3 px-5 sm:px-7 pt-5 sm:pt-6">
-          <div className="relative flex-shrink-0">
-            <div
-              className="absolute inset-0 rounded-2xl"
-              style={{ background: 'radial-gradient(circle, rgba(249,115,22,0.3) 0%, transparent 70%)' }}
-            />
-            <div
-              className="relative w-11 h-11 rounded-[14px] bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center"
-              style={{ boxShadow: '0 6px 18px rgba(234,88,0,0.4)' }}
-            >
-              <Lightbulb className="w-5 h-5 text-white" />
-            </div>
+          <div className="w-10 h-10 rounded-full border border-orange-200 flex items-center justify-center flex-shrink-0">
+            <Lightbulb className="w-4 h-4 text-orange-500" />
           </div>
           <div className="min-w-0">
             <p className="text-[13px] font-bold text-gray-900 leading-tight">
               {t('didyouknow.title')}
             </p>
-            <p className="text-[11px] font-semibold text-orange-500 uppercase tracking-[0.12em] truncate">
+            <p className="text-[13px] font-medium text-orange-600 tracking-wide truncate">
               {fact.category || (language === 'HI' ? 'आध्यात्मिक' : 'Spiritual')}
             </p>
           </div>

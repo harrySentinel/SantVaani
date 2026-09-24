@@ -65,7 +65,7 @@ const LandingStoriesSection = () => {
   if (featuredBooks.length === 0) return null
 
   return (
-    <section id="stories" className="py-12 md:py-16 relative scroll-mt-32">
+    <section id="stories" className="py-12 md:py-16 relative scroll-mt-32 border-t border-gray-200">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
@@ -76,10 +76,10 @@ const LandingStoriesSection = () => {
           className="flex items-end justify-between mb-8"
         >
           <div className="space-y-1">
-            <p className="text-xs font-semibold text-orange-500 uppercase tracking-widest">
+            <p className="text-[13px] font-medium text-orange-600 tracking-wide">
               {language === 'HI' ? 'विशेष संग्रह' : 'Exclusive Collection'}
             </p>
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+            <h2 className="font-serif text-2xl md:text-3xl font-bold text-[#241a12]">
               {language === 'HI' ? 'प्रभु की दिव्य कथाएं' : 'Divine Stories of the Lord'}
             </h2>
           </div>
@@ -167,7 +167,7 @@ const LandingStoriesSection = () => {
               : 'Sacred tales from Mahabharata, Ramayana & scriptures'}
           </p>
           <Link to="/prabhu-ki-leelaayen">
-            <button className="flex items-center gap-2 text-sm font-semibold text-white bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 px-5 py-2.5 rounded-full transition-colors">
+            <button className="flex items-center gap-2 text-sm font-semibold text-white bg-[#241a12] hover:bg-[#3a2b1c] px-5 py-2.5 rounded-full transition-colors">
               {language === 'HI' ? 'सभी कहानियां' : 'All Stories'}
               <ArrowRight className="w-4 h-4" />
             </button>

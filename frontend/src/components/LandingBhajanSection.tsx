@@ -60,7 +60,7 @@ const LandingBhajanSection = () => {
 
   return (
     <>
-      <section id="bhajans" className="py-12 md:py-16 relative scroll-mt-32">
+      <section id="bhajans" className="py-12 md:py-16 relative scroll-mt-32 border-t border-gray-200">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <motion.div
@@ -71,10 +71,10 @@ const LandingBhajanSection = () => {
             className="flex items-end justify-between mb-8"
           >
             <div className="space-y-1">
-              <p className="text-xs font-semibold text-orange-500 uppercase tracking-widest">
+              <p className="text-[13px] font-medium text-orange-600 tracking-wide">
                 {language === 'HI' ? 'पाठ संग्रह' : 'Lyrics Library'}
               </p>
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+              <h2 className="font-serif text-2xl md:text-3xl font-bold text-[#241a12]">
                 {language === 'HI' ? 'पवित्र भजन साहित्य' : 'Sacred Bhajan Lyrics'}
               </h2>
             </div>
@@ -115,7 +115,7 @@ const LandingBhajanSection = () => {
                 : 'Read in देवनागरी & transliteration, with meanings'}
             </p>
             <Link to="/bhajans">
-              <button className="flex items-center gap-2 text-sm font-semibold text-white bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 px-5 py-2.5 rounded-full transition-colors">
+              <button className="flex items-center gap-2 text-sm font-semibold text-white bg-[#241a12] hover:bg-[#3a2b1c] px-5 py-2.5 rounded-full transition-colors">
                 {language === 'HI' ? 'सभी भजन' : 'All Bhajans'}
                 <ArrowRight className="w-4 h-4" />
               </button>

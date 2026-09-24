@@ -90,23 +90,22 @@ const VisitorCounter: React.FC<VisitorCounterProps> = ({ className = '' }) => {
         whileInView={{ opacity: 1, y: 0, scale: 1 }}
         viewport={{ once: true, amount: 0.4 }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
-        className="relative flex items-center gap-6 overflow-hidden bg-white/70 backdrop-blur-md border border-white/80 rounded-3xl px-8 py-6 shadow-[0_8px_32px_rgba(249,115,22,0.10)]"
+        className="flex items-center gap-6 border border-gray-200 rounded-2xl px-8 py-6"
       >
-        <div className="absolute -top-10 -left-10 w-32 h-32 bg-orange-200/50 rounded-full blur-2xl pointer-events-none" />
-        <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-400 to-amber-500 shadow-md shadow-orange-200 flex items-center justify-center flex-shrink-0">
-          <Users className="w-5 h-5 text-white" />
+        <div className="w-11 h-11 rounded-full border border-orange-200 flex items-center justify-center flex-shrink-0">
+          <Users className="w-5 h-5 text-orange-500" />
         </div>
-        <div className="relative">
+        <div>
           {isLoading ? (
             <div className="h-8 w-20 bg-gray-100 rounded animate-pulse mb-1" />
           ) : (
-            <p className="text-4xl font-bold leading-none bg-gradient-to-r from-orange-500 to-amber-500 bg-clip-text text-transparent">{formatNumber(displayCount)}</p>
+            <p className="font-serif text-4xl font-bold leading-none text-[#241a12]">{formatNumber(displayCount)}</p>
           )}
           <p className="text-sm text-gray-500 mt-1">
             {displayCount.toLocaleString()} seekers on Santvaani
           </p>
         </div>
-        <div className="relative pl-6 border-l border-orange-100 hidden sm:block">
+        <div className="pl-6 border-l border-gray-200 hidden sm:block">
           <p className="text-orange-400 text-lg font-medium" style={{ fontFamily: 'serif' }}>ॐ</p>
           <p className="text-xs text-gray-400 mt-0.5">हर आत्मा का स्वागत है</p>
         </div>

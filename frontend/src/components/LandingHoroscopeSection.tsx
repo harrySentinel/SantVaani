@@ -1,29 +1,9 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Star, ArrowRight, Calendar, Moon, Sun } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const ZODIAC = ['♈', '♉', '♊', '♋', '♌', '♍', '♎', '♏', '♐', '♑', '♒', '♓'];
-
-const STARS = [
-  { top: '6%', left: '8%', s: 2, d: '0s' },
-  { top: '12%', left: '28%', s: 1.5, d: '1.2s' },
-  { top: '9%', left: '52%', s: 2.5, d: '0.6s' },
-  { top: '18%', left: '71%', s: 1.5, d: '2s' },
-  { top: '7%', left: '88%', s: 2, d: '1.6s' },
-  { top: '31%', left: '15%', s: 1.5, d: '0.9s' },
-  { top: '38%', left: '44%', s: 2, d: '2.4s' },
-  { top: '29%', left: '63%', s: 1.5, d: '0.3s' },
-  { top: '44%', left: '84%', s: 2.5, d: '1.8s' },
-  { top: '58%', left: '6%', s: 2, d: '1.1s' },
-  { top: '64%', left: '33%', s: 1.5, d: '2.8s' },
-  { top: '55%', left: '57%', s: 2, d: '0.5s' },
-  { top: '71%', left: '76%', s: 1.5, d: '1.4s' },
-  { top: '83%', left: '18%', s: 2, d: '2.2s' },
-  { top: '88%', left: '47%', s: 1.5, d: '0.8s' },
-  { top: '79%', left: '91%', s: 2, d: '1.9s' },
-];
 
 const ZodiacWheel = () => (
   <svg viewBox="0 0 420 420" className="w-full h-full">
@@ -70,27 +50,9 @@ const LandingHoroscopeSection = () => {
   ];
 
   return (
-    <section id="horoscope" className="py-12 md:py-20 relative overflow-hidden scroll-mt-32">
-      {/* Starfield */}
-      {STARS.map((star, i) => (
-        <span
-          key={i}
-          className="absolute rounded-full bg-orange-300/60 animate-pulse pointer-events-none"
-          style={{ top: star.top, left: star.left, width: star.s, height: star.s, animationDelay: star.d, animationDuration: '3s' }}
-        />
-      ))}
-
-      {/* Ambient wash */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          backgroundImage:
-            'radial-gradient(560px 320px at 88% 12%, rgba(251,191,36,0.12), transparent 70%), radial-gradient(520px 300px at 8% 88%, rgba(251,146,60,0.10), transparent 70%)',
-        }}
-      />
-
+    <section id="horoscope" className="py-12 md:py-20 relative overflow-hidden scroll-mt-32 border-t border-gray-200">
       {/* Rotating zodiac wheel */}
-      <div className="absolute -right-24 top-1/2 -translate-y-1/2 w-[380px] h-[380px] md:w-[440px] md:h-[440px] text-orange-200 opacity-60 pointer-events-none">
+      <div className="absolute -right-24 top-1/2 -translate-y-1/2 w-[380px] h-[380px] md:w-[440px] md:h-[440px] text-orange-200 opacity-50 pointer-events-none">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 90, repeat: Infinity, ease: 'linear' }}
@@ -110,10 +72,10 @@ const LandingHoroscopeSection = () => {
             transition={{ duration: 0.55, ease: 'easeOut' }}
             className="space-y-5"
           >
-            <p className="text-xs font-semibold text-orange-500 uppercase tracking-widest">
+            <p className="text-[13px] font-medium text-orange-600 tracking-wide">
               {language === 'HI' ? 'वैदिक ज्योतिष' : 'Vedic Astrology'}
             </p>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 leading-tight">
+            <h2 className="font-serif text-3xl md:text-4xl font-bold text-[#241a12] leading-tight">
               {language === 'HI' ? 'दैनिक राशिफल' : 'Daily Horoscope'}
             </h2>
             <p className="text-gray-500 leading-relaxed">
@@ -122,20 +84,18 @@ const LandingHoroscopeSection = () => {
                 : 'Discover what the stars hold for you today. Get personalized guidance grounded in ancient Vedic wisdom.'}
             </p>
 
-            <div className="inline-flex items-center gap-2 text-sm text-gray-500 bg-white/70 border border-orange-100 backdrop-blur-sm rounded-full px-4 py-2 shadow-sm">
+            <div className="inline-flex items-center gap-2 text-sm text-gray-500 border border-gray-200 rounded-full px-4 py-2">
               <Calendar className="w-4 h-4 text-orange-500" />
               <span>{today}</span>
             </div>
 
             <div>
-              <Link to="/horoscope">
-                <Button
-                  size="lg"
-                  className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold px-7 py-3 rounded-full mt-2 gap-2 shadow-lg shadow-orange-200"
-                >
-                  {language === 'HI' ? 'आज का राशिफल देखें' : "View Today's Horoscope"}
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
+              <Link
+                to="/horoscope"
+                className="inline-flex items-center gap-2 text-sm font-semibold text-white bg-[#241a12] hover:bg-[#3a2b1c] transition-colors px-7 py-3 rounded-full mt-2"
+              >
+                {language === 'HI' ? 'आज का राशिफल देखें' : "View Today's Horoscope"}
+                <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
           </motion.div>
@@ -149,12 +109,9 @@ const LandingHoroscopeSection = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.3 }}
                 transition={{ duration: 0.45, ease: 'easeOut', delay: 0.15 + idx * 0.08 }}
-                className="relative overflow-hidden bg-white/60 backdrop-blur-md border border-white/80 rounded-2xl p-5 space-y-2 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+                className="bg-white border border-gray-200 rounded-2xl p-5 space-y-2 hover:-translate-y-0.5 hover:shadow-sm transition-all duration-200"
               >
-                <div className="absolute top-0 left-3 right-3 h-px bg-gradient-to-r from-transparent via-orange-200/70 to-transparent" />
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center mb-3 shadow-md shadow-orange-200">
-                  <Icon className="w-4 h-4 text-white" />
-                </div>
+                <Icon className="w-5 h-5 text-orange-500 mb-2" />
                 <p className="text-sm font-semibold text-gray-800">{label}</p>
                 <p className="text-xs text-gray-500">{sub}</p>
               </motion.div>

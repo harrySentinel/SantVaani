@@ -91,7 +91,7 @@ const LandingBlogSection = () => {
   if (featuredPosts.length === 0) return null
 
   return (
-    <section id="blog" className="py-12 md:py-16 relative scroll-mt-32">
+    <section id="blog" className="py-12 md:py-16 relative scroll-mt-32 border-t border-gray-200">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
@@ -102,10 +102,10 @@ const LandingBlogSection = () => {
           className="flex items-end justify-between mb-8"
         >
           <div className="space-y-1">
-            <p className="text-xs font-semibold text-orange-500 uppercase tracking-widest">
+            <p className="text-[13px] font-medium text-orange-600 tracking-wide">
               {language === 'HI' ? 'लेख' : 'Articles'}
             </p>
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+            <h2 className="font-serif text-2xl md:text-3xl font-bold text-[#241a12]">
               {language === 'HI' ? 'आध्यात्मिक ब्लॉग' : 'Spiritual Blog'}
             </h2>
           </div>
@@ -185,7 +185,7 @@ const LandingBlogSection = () => {
         {/* CTA */}
         <div className="text-center mt-8">
           <Link to="/blog">
-            <button className="inline-flex items-center gap-2 text-sm font-semibold text-orange-600 border border-orange-300 hover:bg-orange-50 px-6 py-2.5 rounded-full transition-colors">
+            <button className="inline-flex items-center gap-2 text-sm font-semibold text-[#241a12] border border-gray-300 hover:bg-gray-50 px-6 py-2.5 rounded-full transition-colors">
               <BookOpen className="w-4 h-4" />
               {language === 'HI' ? 'सभी लेख पढ़ें' : 'Read all articles'}
             </button>
