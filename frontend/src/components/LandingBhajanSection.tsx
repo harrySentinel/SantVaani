@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Music, ArrowRight } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { BookOpen, ArrowRight } from 'lucide-react';
 import CompactBhajanCard from '@/components/bhajan/CompactBhajanCard';
 import BhajanModal from '@/components/BhajanModal';
 import { supabase } from '@/lib/supabaseClient';
@@ -31,12 +32,11 @@ const LandingBhajanSection = () => {
       try {
         const { data, error } = await supabase
           .from('bhajans')
-          .select('id, title, title_hi, category, youtube_url, author')
-          .not('youtube_url', 'is', null)
-          .order('created_at', { ascending: false })
-          .limit(6);
+          .select('*')
+          .order('created_at', { ascending: true })
+          .limit(10);
         if (error) throw error;
-        setBhajans((data || []).map(b => ({ ...b, lyrics: '', lyrics_hi: '', meaning: '' })));
+        setBhajans(data || []);
       } catch {
         setBhajans([]);
       } finally {
@@ -63,13 +63,19 @@ const LandingBhajanSection = () => {
       <section className="py-16 relative">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
-          <div className="flex items-end justify-between mb-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.4 }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+            className="flex items-end justify-between mb-8"
+          >
             <div className="space-y-1">
               <p className="text-xs font-semibold text-orange-500 uppercase tracking-widest">
-                {language === 'HI' ? 'संगीत' : 'Music'}
+                {language === 'HI' ? 'पाठ संग्रह' : 'Lyrics Library'}
               </p>
               <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
-                {language === 'HI' ? 'पवित्र भजन' : 'Sacred Bhajans'}
+                {language === 'HI' ? 'पवित्र भजन साहित्य' : 'Sacred Bhajan Lyrics'}
               </h2>
             </div>
             <Link
@@ -79,28 +85,34 @@ const LandingBhajanSection = () => {
               {language === 'HI' ? 'सभी देखें' : 'View all'}
               <ArrowRight className="w-4 h-4" />
             </Link>
-          </div>
+          </motion.div>
 
-          {/* Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+          {/* Swipeable row */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.55, ease: 'easeOut', delay: 0.1 }}
+            className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          >
             {bhajans.map((bhajan, index) => (
-              <CompactBhajanCard
-                key={bhajan.id}
-                bhajan={bhajan}
-                onClick={() => { setSelectedBhajan(bhajan); setIsModalOpen(true); }}
-                playlist={bhajans}
-                index={index}
-              />
+              <div key={bhajan.id} className="w-40 sm:w-44 md:w-48 flex-shrink-0 snap-start">
+                <CompactBhajanCard
+                  bhajan={bhajan}
+                  onClick={() => { setSelectedBhajan(bhajan); setIsModalOpen(true); }}
+                  index={index}
+                />
+              </div>
             ))}
-          </div>
+          </motion.div>
 
           {/* Bottom row */}
           <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-100">
             <p className="text-sm text-gray-400 flex items-center gap-2">
-              <Music className="w-4 h-4 text-orange-400" />
+              <BookOpen className="w-4 h-4 text-orange-400" />
               {language === 'HI'
-                ? 'गीत, अर्थ और YouTube प्लेयर के साथ'
-                : 'Lyrics, meanings and YouTube playback'}
+                ? 'देवनागरी और transliteration में अर्थ सहित पढ़ें'
+                : 'Read in देवनागरी & transliteration, with meanings'}
             </p>
             <Link to="/bhajans">
               <button className="flex items-center gap-2 text-sm font-semibold text-white bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 px-5 py-2.5 rounded-full transition-colors">
