@@ -146,7 +146,7 @@ const HoroscopePage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-orange-50/30">
+    <div className="min-h-screen bg-gradient-to-b from-[#faf6ee] via-white to-orange-50/30">
       <SEO
         title="Daily Horoscope & Spiritual Guidance - Vedic Astrology"
         description="Get your daily, weekly, and monthly spiritual horoscope based on Vedic astrology. Personalized guidance for all 12 zodiac signs in English and Hindi."
@@ -157,25 +157,25 @@ const HoroscopePage = () => {
       <Navbar />
 
       {/* ── Hero ── */}
-      <section className="relative pt-16 pb-20 overflow-hidden bg-gradient-to-br from-[#331409] via-[#220e07] to-[#150804]">
+      <section className="relative pt-16 pb-20 overflow-hidden bg-gradient-to-br from-[#fcf7ee] via-[#f9f0e0] to-[#f5e7d0]">
         {/* Subtle star pattern overlay */}
-        <div className="absolute inset-0 opacity-15"
-          style={{ backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)', backgroundSize: '40px 40px' }}
+        <div className="absolute inset-0 opacity-40"
+          style={{ backgroundImage: 'radial-gradient(circle, rgba(249,115,22,0.14) 1px, transparent 1px)', backgroundSize: '40px 40px' }}
         />
-        <div className="absolute -top-28 right-0 w-96 h-96 rounded-full bg-orange-500/20 blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-32 -left-24 w-96 h-96 rounded-full bg-amber-400/10 blur-3xl pointer-events-none" />
+        <div className="absolute -top-28 right-0 w-96 h-96 rounded-full bg-orange-200/60 blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-32 -left-24 w-96 h-96 rounded-full bg-amber-200/50 blur-3xl pointer-events-none" />
         <div className="relative max-w-3xl mx-auto px-4 sm:px-6 text-center pt-10 pb-4">
-          <p className="text-amber-300 text-xs font-semibold tracking-[0.3em] uppercase mb-4">
+          <p className="text-orange-500 text-xs font-semibold tracking-[0.3em] uppercase mb-4">
             {language === 'EN' ? 'Vedic Astrology' : 'वैदिक ज्योतिष'}
           </p>
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">
             {t('horoscope.title')}
           </h1>
-          <p className="text-orange-100/80 text-base max-w-lg mx-auto leading-relaxed">
+          <p className="text-gray-600 text-base max-w-lg mx-auto leading-relaxed">
             {t('horoscope.subtitle')}
           </p>
           {language === 'EN' && (
-            <p className="text-orange-300 text-sm mt-2">
+            <p className="text-orange-500 text-sm mt-2">
               अपनी राशि चुनें और व्यक्तिगत मार्गदर्शन पाएं
             </p>
           )}

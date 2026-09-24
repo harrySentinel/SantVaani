@@ -77,26 +77,26 @@ const LandingHoroscopeSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
-          className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-[#331409] via-[#220e07] to-[#150804] p-8 md:p-14 shadow-[0_24px_64px_rgba(140,60,15,0.30)]"
+          className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-[#fcf7ee] via-[#f9f0e0] to-[#f5e7d0] border border-orange-100/70 p-8 md:p-14 shadow-[0_24px_64px_rgba(180,120,40,0.14)]"
         >
           {/* Starfield */}
           {STARS.map((star, i) => (
             <span
               key={i}
-              className="absolute rounded-full bg-white animate-pulse pointer-events-none"
+              className="absolute rounded-full bg-orange-300/70 animate-pulse pointer-events-none"
               style={{ top: star.top, left: star.left, width: star.s, height: star.s, animationDelay: star.d, animationDuration: '3s' }}
             />
           ))}
 
           {/* Ambient glows */}
-          <div className="absolute -top-28 -right-20 w-96 h-96 rounded-full bg-orange-500/20 blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-32 -left-24 w-96 h-96 rounded-full bg-amber-400/10 blur-3xl pointer-events-none" />
+          <div className="absolute -top-28 -right-20 w-96 h-96 rounded-full bg-orange-200/60 blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-32 -left-24 w-96 h-96 rounded-full bg-amber-200/50 blur-3xl pointer-events-none" />
 
           {/* Rotating zodiac wheel */}
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 90, repeat: Infinity, ease: 'linear' }}
-            className="absolute -right-28 -bottom-28 w-[440px] h-[440px] text-amber-200 opacity-[0.18] pointer-events-none"
+            className="absolute -right-28 -bottom-28 w-[440px] h-[440px] text-orange-300 opacity-25 pointer-events-none"
           >
             <ZodiacWheel />
           </motion.div>
@@ -104,20 +104,20 @@ const LandingHoroscopeSection = () => {
           <div className="relative z-10 grid md:grid-cols-2 gap-10 md:gap-12 items-center">
             {/* Left — text */}
             <div className="space-y-5">
-              <p className="text-xs font-semibold text-amber-300 uppercase tracking-widest">
+              <p className="text-xs font-semibold text-orange-500 uppercase tracking-widest">
                 {language === 'HI' ? 'वैदिक ज्योतिष' : 'Vedic Astrology'}
               </p>
-              <h2 className="text-3xl md:text-4xl font-bold text-white leading-tight">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 leading-tight">
                 {language === 'HI' ? 'दैनिक राशिफल' : 'Daily Horoscope'}
               </h2>
-              <p className="text-orange-100/80 leading-relaxed">
+              <p className="text-gray-600 leading-relaxed">
                 {language === 'HI'
                   ? 'जानें कि आज तारे आपके लिए क्या लेकर आए हैं। वैदिक ज्योतिष पर आधारित व्यक्तिगत मार्गदर्शन प्राप्त करें।'
                   : 'Discover what the stars hold for you today. Get personalized guidance grounded in ancient Vedic wisdom.'}
               </p>
 
-              <div className="inline-flex items-center gap-2 text-sm text-orange-100 bg-white/10 border border-white/15 backdrop-blur-sm rounded-full px-4 py-2">
-                <Calendar className="w-4 h-4 text-amber-300" />
+              <div className="inline-flex items-center gap-2 text-sm text-gray-700 bg-white/70 border border-orange-100 backdrop-blur-sm rounded-full px-4 py-2">
+                <Calendar className="w-4 h-4 text-orange-500" />
                 <span>{today}</span>
               </div>
 
@@ -125,7 +125,7 @@ const LandingHoroscopeSection = () => {
                 <Link to="/horoscope">
                   <Button
                     size="lg"
-                    className="bg-gradient-to-r from-orange-400 to-amber-300 hover:from-orange-500 hover:to-amber-400 text-gray-900 font-bold px-7 py-3 rounded-full mt-2 gap-2 shadow-lg shadow-orange-900/30"
+                    className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold px-7 py-3 rounded-full mt-2 gap-2 shadow-lg shadow-orange-200"
                   >
                     {language === 'HI' ? 'आज का राशिफल देखें' : "View Today's Horoscope"}
                     <ArrowRight className="w-4 h-4" />
@@ -143,14 +143,14 @@ const LandingHoroscopeSection = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: 0.3 }}
                   transition={{ duration: 0.45, ease: 'easeOut', delay: 0.15 + idx * 0.08 }}
-                  className="relative overflow-hidden bg-white/[0.06] backdrop-blur-md border border-white/10 rounded-2xl p-5 space-y-2"
+                  className="relative overflow-hidden bg-white/70 backdrop-blur-md border border-orange-100/80 rounded-2xl p-5 space-y-2 shadow-sm"
                 >
-                  <div className="absolute top-0 left-3 right-3 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
-                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center mb-3 shadow-md shadow-orange-900/30">
+                  <div className="absolute top-0 left-3 right-3 h-px bg-gradient-to-r from-transparent via-orange-200/70 to-transparent" />
+                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center mb-3 shadow-md shadow-orange-200">
                     <Icon className="w-4 h-4 text-white" />
                   </div>
-                  <p className="text-sm font-semibold text-white">{label}</p>
-                  <p className="text-xs text-orange-100/70">{sub}</p>
+                  <p className="text-sm font-semibold text-gray-800">{label}</p>
+                  <p className="text-xs text-gray-500">{sub}</p>
                 </motion.div>
               ))}
             </div>
