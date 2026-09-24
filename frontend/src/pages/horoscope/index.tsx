@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
@@ -51,6 +52,9 @@ const PERIOD_CONFIG = {
   weekly:  { icon: Calendar, label: 'Weekly',  labelHi: 'साप्ताहिक', color: 'from-amber-500 to-orange-500' },
   monthly: { icon: Moon,     label: 'Monthly', labelHi: 'मासिक',   color: 'from-purple-500 to-indigo-600' },
 };
+
+// Force text presentation so zodiac glyphs render as stylable characters, not platform emoji
+const glyph = (s: string) => s.replace(/[\uFE0E\uFE0F]/g, '') + '\uFE0E';
 
 const HoroscopePage = () => {
   const { t, language } = useLanguage();
@@ -142,7 +146,7 @@ const HoroscopePage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-orange-50/30">
       <SEO
         title="Daily Horoscope & Spiritual Guidance - Vedic Astrology"
         description="Get your daily, weekly, and monthly spiritual horoscope based on Vedic astrology. Personalized guidance for all 12 zodiac signs in English and Hindi."
@@ -153,23 +157,25 @@ const HoroscopePage = () => {
       <Navbar />
 
       {/* ── Hero ── */}
-      <section className="relative pt-16 pb-20 overflow-hidden bg-gradient-to-br from-gray-900 via-slate-800 to-orange-950">
+      <section className="relative pt-16 pb-20 overflow-hidden bg-gradient-to-br from-[#241a52] via-[#181136] to-[#0d0a24]">
         {/* Subtle star pattern overlay */}
-        <div className="absolute inset-0 opacity-20"
+        <div className="absolute inset-0 opacity-15"
           style={{ backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)', backgroundSize: '40px 40px' }}
         />
+        <div className="absolute -top-28 right-0 w-96 h-96 rounded-full bg-purple-500/20 blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-32 -left-24 w-96 h-96 rounded-full bg-orange-500/10 blur-3xl pointer-events-none" />
         <div className="relative max-w-3xl mx-auto px-4 sm:px-6 text-center pt-10 pb-4">
-          <p className="text-orange-300 text-xs font-semibold tracking-[0.3em] uppercase mb-4">
+          <p className="text-amber-300 text-xs font-semibold tracking-[0.3em] uppercase mb-4">
             {language === 'EN' ? 'Vedic Astrology' : 'वैदिक ज्योतिष'}
           </p>
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">
             {t('horoscope.title')}
           </h1>
-          <p className="text-gray-400 text-base max-w-lg mx-auto leading-relaxed">
+          <p className="text-indigo-200/80 text-base max-w-lg mx-auto leading-relaxed">
             {t('horoscope.subtitle')}
           </p>
           {language === 'EN' && (
-            <p className="text-orange-400 text-sm mt-2">
+            <p className="text-orange-300 text-sm mt-2">
               अपनी राशि चुनें और व्यक्तिगत मार्गदर्शन पाएं
             </p>
           )}
@@ -181,20 +187,29 @@ const HoroscopePage = () => {
 
         {!selectedSign ? (
           /* ── Zodiac Grid ── */
-          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.55, ease: 'easeOut' }}
+            className="bg-white/70 backdrop-blur-md border border-white/70 rounded-3xl shadow-[0_16px_48px_rgba(23,15,60,0.12)] overflow-hidden"
+          >
             <div className="px-6 pt-6 pb-4 border-b border-gray-100 text-center">
               <h2 className="text-lg font-semibold text-gray-900">{t('horoscope.select.title')}</h2>
               <p className="text-gray-400 text-sm mt-1">{t('horoscope.select.subtitle')}</p>
             </div>
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-px bg-gray-100">
-              {(zodiacSigns.length ? zodiacSigns : FALLBACK_SIGNS).map(sign => (
-                <button
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 p-3">
+              {(zodiacSigns.length ? zodiacSigns : FALLBACK_SIGNS).map((sign, index) => (
+                <motion.button
                   key={sign.id}
+                  initial={{ opacity: 0, y: 14 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, ease: 'easeOut', delay: 0.1 + index * 0.04 }}
+                  whileTap={{ scale: 0.95 }}
                   onClick={() => handleSignSelect(sign.id)}
-                  className="bg-white flex flex-col items-center gap-1.5 py-5 px-2 hover:bg-orange-50 hover:text-orange-600 transition-colors group"
+                  className="group rounded-2xl flex flex-col items-center gap-2 py-4 px-2 hover:bg-orange-50/80 hover:-translate-y-0.5 transition-all duration-200"
                 >
-                  <span className="text-3xl text-gray-500 group-hover:text-orange-500 transition-colors leading-none">
-                    {sign.symbol}
+                  <span className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white text-xl flex items-center justify-center shadow-md shadow-indigo-200/70 group-hover:scale-105 group-hover:shadow-lg transition-all duration-200">
+                    {glyph(sign.symbol)}
                   </span>
                   <span className="text-xs font-semibold text-gray-800 group-hover:text-orange-700">
                     {language === 'EN' ? sign.name : sign.nameHi}
@@ -202,15 +217,15 @@ const HoroscopePage = () => {
                   <span className="text-[10px] text-gray-400 leading-tight text-center">
                     {sign.dates}
                   </span>
-                </button>
+                </motion.button>
               ))}
             </div>
-          </div>
+          </motion.div>
         ) : (
           /* ── Prediction View ── */
           <div className="space-y-5">
             {/* Back + Sign Header */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="bg-white/80 backdrop-blur-md rounded-3xl shadow-sm border border-white/70 overflow-hidden">
               <div className={`bg-gradient-to-r ${periodCfg.color} px-6 py-5 flex items-center justify-between`}>
                 <button
                   onClick={() => setSelectedSign('')}
@@ -220,7 +235,7 @@ const HoroscopePage = () => {
                   {language === 'EN' ? 'All Signs' : 'सभी राशियां'}
                 </button>
                 <div className="text-center">
-                  <div className="text-4xl text-white/90 leading-none mb-1">{selectedZodiac?.symbol}</div>
+                  <div className="text-4xl text-white/90 leading-none mb-1">{glyph(selectedZodiac?.symbol || '')}</div>
                   <h2 className="text-white font-bold text-lg leading-tight">
                     {language === 'EN' ? selectedZodiac?.name : selectedZodiac?.nameHi}
                   </h2>
@@ -253,15 +268,21 @@ const HoroscopePage = () => {
             </div>
 
             {/* Prediction Content */}
+            <motion.div
+              key={`${selectedSign}-${activeTab}`}
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, ease: 'easeOut' }}
+            >
             {loading[activeTab] ? (
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-16 text-center">
+              <div className="bg-white/80 backdrop-blur-md rounded-3xl shadow-sm border border-white/70 p-16 text-center">
                 <span className="text-5xl text-orange-300 block mb-4" style={{ fontFamily: 'serif' }}>ॐ</span>
                 <p className="text-gray-400 text-sm animate-pulse">{t('horoscope.loading')}</p>
               </div>
             ) : currentHoroscope ? (
               <div className="space-y-4">
                 {/* Prediction Card */}
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <div className="bg-white/80 backdrop-blur-md rounded-3xl shadow-sm border border-white/70 overflow-hidden">
                   {currentHoroscope.period_theme && (
                     <div className="px-6 pt-5 pb-0">
                       <Badge className="bg-orange-100 text-orange-700 border-0 text-xs font-semibold">
@@ -322,15 +343,19 @@ const HoroscopePage = () => {
 
                 {/* Lucky Elements */}
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 text-center">
-                    <Palette className="w-6 h-6 text-orange-400 mx-auto mb-2" />
+                  <div className="bg-white/80 backdrop-blur-md rounded-3xl shadow-sm border border-white/70 p-5 text-center">
+                    <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-orange-400 to-amber-500 text-white flex items-center justify-center mx-auto mb-3 shadow-md shadow-orange-200">
+                      <Palette className="w-5 h-5" />
+                    </div>
                     <p className="text-xs text-gray-400 mb-2">{t('horoscope.lucky.color')}</p>
                     <span className="inline-block bg-orange-50 border border-orange-100 text-orange-700 text-sm font-semibold px-4 py-1.5 rounded-full">
                       {currentHoroscope.lucky_color}
                     </span>
                   </div>
-                  <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 text-center">
-                    <Hash className="w-6 h-6 text-orange-400 mx-auto mb-2" />
+                  <div className="bg-white/80 backdrop-blur-md rounded-3xl shadow-sm border border-white/70 p-5 text-center">
+                    <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 text-white flex items-center justify-center mx-auto mb-3 shadow-md shadow-amber-200">
+                      <Hash className="w-5 h-5" />
+                    </div>
                     <p className="text-xs text-gray-400 mb-2">{t('horoscope.lucky.number')}</p>
                     <span className="inline-block bg-amber-50 border border-amber-100 text-amber-700 text-3xl font-bold px-6 py-1 rounded-full">
                       {currentHoroscope.lucky_number}
@@ -362,7 +387,7 @@ const HoroscopePage = () => {
                 </div>
               </div>
             ) : (
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-16 text-center">
+              <div className="bg-white/80 backdrop-blur-md rounded-3xl shadow-sm border border-white/70 p-16 text-center">
                 <p className="text-gray-400 text-sm">
                   {activeTab === 'daily' ? t('horoscope.empty.daily') :
                    activeTab === 'weekly' ? t('horoscope.empty.weekly') :
@@ -370,6 +395,7 @@ const HoroscopePage = () => {
                 </p>
               </div>
             )}
+            </motion.div>
           </div>
         )}
       </section>

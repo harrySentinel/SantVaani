@@ -44,7 +44,7 @@ const ZodiacWheel = () => (
             x={210 + 172 * cos} y={210 + 172 * sin}
             fontSize="17" fill="currentColor" textAnchor="middle" dominantBaseline="central" opacity="0.85"
           >
-            {glyph}
+            {glyph + '︎'}
           </text>
         </g>
       );
