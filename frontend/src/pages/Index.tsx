@@ -94,9 +94,7 @@ const Index = () => {
         {/* Ambient blobs */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div className="absolute top-[2%]  left-[-6%]  w-[600px] h-[600px] bg-orange-200  rounded-full blur-[130px] opacity-35" />
-          <div className="absolute top-[25%] right-[-4%] w-[450px] h-[450px] bg-amber-200  rounded-full blur-[110px] opacity-28" />
-          <div className="absolute top-[55%] left-[18%] w-[650px] h-[420px] bg-orange-100  rounded-full blur-[140px] opacity-40" />
-          <div className="absolute top-[78%] right-[8%] w-[500px] h-[500px] bg-yellow-100  rounded-full blur-[120px] opacity-32" />
+          <div className="absolute top-[25%] right-[-4%] w-[450px] h-[450px] bg-orange-100 rounded-full blur-[110px] opacity-16" />
         </div>
 
         {/* ── Spiritual Fact ── */}
