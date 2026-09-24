@@ -11,13 +11,8 @@ import { lazy } from "react";
 import { getFCMToken, onFCMMessage } from "@/lib/firebase";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
-import { MusicPlayerProvider } from "@/contexts/MusicPlayerContext";
 import AnalyticsProvider from "@/components/AnalyticsProvider";
 import { HelmetProvider } from "react-helmet-async";
-import YouTubePlayer from "@/components/music/YouTubePlayer";
-import MiniPlayer from "@/components/music/MiniPlayer";
-import FullPlayer from "@/components/music/FullPlayer";
-import KeyboardShortcuts from "@/components/music/KeyboardShortcuts";
 import ScrollToTop from "@/components/ScrollToTop";
 
 // Lazy load pages for better code splitting
@@ -76,8 +71,7 @@ const App = () => {
       <HelmetProvider>
         <LanguageProvider>
           <AuthProvider>
-            <MusicPlayerProvider>
-              <QueryClientProvider client={queryClient}>
+            <QueryClientProvider client={queryClient}>
                 <TooltipProvider>
                   <Toaster />
                   <Sonner />
@@ -120,17 +114,11 @@ const App = () => {
                         </Routes>
                       </Suspense>
 
-                      {/* Music Player Components */}
-                      <YouTubePlayer />
-                      <MiniPlayer />
-                      <FullPlayer />
-                      <KeyboardShortcuts />
                       <ScrollToTop />
                     </AnalyticsProvider>
                   </BrowserRouter>
                 </TooltipProvider>
               </QueryClientProvider>
-            </MusicPlayerProvider>
           </AuthProvider>
         </LanguageProvider>
       </HelmetProvider>

@@ -1,12 +1,8 @@
 import React from 'react';
-import { Play, Pause, Music } from 'lucide-react';
+import { BookOpen, Youtube } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { useMusicPlayer } from '@/contexts/MusicPlayerContext';
-import { useAuth } from '@/contexts/AuthContext';
 import FavoriteButton from './FavoriteButton';
 import { getGradientClass } from '@/utils/categoryGradients';
-import { recordBhajanPlay } from '@/services/bhajanEngagementService';
 
 interface Bhajan {
   id: string;
@@ -30,23 +26,9 @@ interface CompactBhajanCardProps {
 const CompactBhajanCard: React.FC<CompactBhajanCardProps> = ({
   bhajan,
   onClick,
-  playlist = [],
   index = 0,
 }) => {
-  const { playBhajan, currentBhajan, isPlaying, togglePlayPause } = useMusicPlayer();
-  const { user } = useAuth();
-  const isCurrentlyPlaying = currentBhajan?.id === bhajan.id && isPlaying;
   const gradientClass = getGradientClass(bhajan.category);
-
-  const handlePlayClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (currentBhajan?.id === bhajan.id) {
-      togglePlayPause();
-    } else {
-      playBhajan(bhajan, playlist.length > 0 ? playlist : [bhajan]);
-      recordBhajanPlay(bhajan.id, user?.id);
-    }
-  };
 
   return (
     <motion.div
@@ -61,30 +43,14 @@ const CompactBhajanCard: React.FC<CompactBhajanCardProps> = ({
       >
         {/* Card cover */}
         <div className={`${gradientClass} aspect-square flex items-center justify-center relative`}>
-          {/* Subtle icon background — no emoji */}
-          <Music className="w-12 h-12 text-white/25" />
+          <BookOpen className="w-12 h-12 text-white/25" />
 
-          {/* Play overlay */}
-          {bhajan.youtube_url && (
-            <div className={`absolute inset-0 flex items-center justify-center bg-black/35 backdrop-blur-[2px] transition-opacity duration-200 ${
-              isCurrentlyPlaying ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-            }`}>
-              <Button
-                onClick={handlePlayClick}
-                size="icon"
-                className={`w-12 h-12 rounded-full shadow-lg transition-colors duration-150 ${
-                  isCurrentlyPlaying
-                    ? 'bg-orange-500 hover:bg-orange-600 text-white'
-                    : 'bg-white hover:bg-orange-50 text-gray-900'
-                }`}
-              >
-                {isCurrentlyPlaying
-                  ? <Pause className="w-5 h-5" fill="currentColor" />
-                  : <Play className="w-5 h-5 ml-0.5" fill="currentColor" />
-                }
-              </Button>
-            </div>
-          )}
+          {/* Read-lyrics hover overlay */}
+          <div className="absolute inset-0 flex items-center justify-center bg-black/35 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            <span className="px-4 py-2 rounded-full bg-white text-gray-900 text-xs font-semibold shadow-lg">
+              Read Lyrics
+            </span>
+          </div>
 
           {/* Favorite — top right */}
           <div
@@ -94,13 +60,18 @@ const CompactBhajanCard: React.FC<CompactBhajanCardProps> = ({
             <FavoriteButton bhajanId={bhajan.id} bhajanTitle={bhajan.title} size="sm" variant="minimal" />
           </div>
 
-          {/* Playing bars indicator */}
-          {isCurrentlyPlaying && (
-            <div className="absolute bottom-2 left-2 flex items-end gap-0.5">
-              {[0, 150, 300].map(delay => (
-                <div key={delay} className="w-1 bg-white rounded-full animate-pulse" style={{ height: delay === 150 ? 16 : 12, animationDelay: `${delay}ms` }} />
-              ))}
-            </div>
+          {/* Listen on YouTube — bottom right */}
+          {bhajan.youtube_url && (
+            <a
+              href={bhajan.youtube_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={e => e.stopPropagation()}
+              aria-label={`Listen to ${bhajan.title} on YouTube`}
+              className="absolute bottom-2 right-2 p-2 rounded-full bg-white/90 text-red-600 hover:bg-white transition-colors z-10 shadow"
+            >
+              <Youtube className="w-4 h-4" />
+            </a>
           )}
         </div>
 

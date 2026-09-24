@@ -4,19 +4,16 @@ import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
 import StructuredData from '@/components/StructuredData';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useMusicPlayer } from '@/contexts/MusicPlayerContext';
 import BhajanModal from '@/components/BhajanModal';
 import CompactBhajanCard from '@/components/bhajan/CompactBhajanCard';
-import HorizontalBhajanSection from '@/components/bhajan/HorizontalBhajanSection';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Music, Search, Flame, TrendingUp, Sparkles, LibraryBig } from 'lucide-react';
+import { BookOpen, Search, LibraryBig } from 'lucide-react';
 import { LoadingPage } from '@/components/ui/loading-spinner';
 import { Toaster } from '@/components/ui/toaster';
 import { supabase } from '@/lib/supabaseClient';
 import { usePagination } from '@/hooks/usePagination';
 import BhajanPagination from '@/components/BhajanPagination';
-import { getTrendingBhajans, getPopularBhajans, recordBhajanPlay } from '@/services/bhajanEngagementService';
 
 interface Bhajan {
   id: string;
@@ -36,8 +33,6 @@ const Bhajans = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [bhajans, setBhajans] = useState<Bhajan[]>([]);
   const [filteredBhajans, setFilteredBhajans] = useState<Bhajan[]>([]);
-  const [trendingBhajans, setTrendingBhajans] = useState<any[]>([]);
-  const [popularBhajans, setPopularBhajans] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -63,24 +58,8 @@ const Bhajans = () => {
     }
   };
 
-  // Fetch trending and popular bhajans
-  const fetchEngagementData = async () => {
-    try {
-      const [trendingData, popularData] = await Promise.all([
-        getTrendingBhajans(10),
-        getPopularBhajans(10)
-      ]);
-
-      setTrendingBhajans(trendingData.trending || []);
-      setPopularBhajans(popularData.popular || []);
-    } catch (err) {
-      console.error('Error fetching engagement data:', err);
-    }
-  };
-
   useEffect(() => {
     fetchBhajans();
-    fetchEngagementData();
   }, []);
 
   // Filter bhajans
@@ -124,17 +103,9 @@ const Bhajans = () => {
     }
   };
 
-  const handleBhajanClick = async (bhajan: Bhajan) => {
-    console.log('Bhajan clicked:', bhajan.title);
+  const handleBhajanClick = (bhajan: Bhajan) => {
     setSelectedBhajan(bhajan);
     setIsModalOpen(true);
-
-    // Record play event (non-blocking)
-    try {
-      await recordBhajanPlay(bhajan.id);
-    } catch (err) {
-      console.error('Error recording play:', err);
-    }
   };
 
   const handleCloseModal = () => {
@@ -171,8 +142,8 @@ const Bhajans = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <SEO
-        title="Bhajans & Devotional Songs - Hindu Spiritual Music"
-        description="Listen to and read the lyrics of devotional bhajans, aartis, and spiritual songs. Explore Hanuman Chalisa, Jai Shri Ram, Krishna bhajans, Shiva stotras, and more in Hindi and English."
+        title="Bhajan Lyrics Library - Read Devotional Song Lyrics"
+        description="Read the lyrics of devotional bhajans, aartis, and stotras in Devanagari and transliteration, with spiritual meanings. Explore Hanuman Chalisa, Jai Shri Ram, Krishna bhajans, Shiva stotras, and more."
         canonical="https://santvaani.com/bhajans"
         keywords="bhajans, devotional songs, hindu music, hanuman chalisa, aarti, krishna bhajan, shiva stotram, ram bhajan, hindi devotional songs, spiritual music, kirtan, भजन, हनुमान चालीसा, आरती"
       />
@@ -185,13 +156,12 @@ const Bhajans = () => {
       />
       <Navbar />
 
-      {/* Header - Spotify Style */}
+      {/* Header - Lyrics Library */}
       <section className="pt-20 pb-8 bg-gradient-to-b from-orange-500 to-orange-600">
         <div className="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="space-y-4">
             <div className="flex items-center space-x-3 mb-2">
-              <Music className="w-10 h-10 text-white/90" />
-              <Music className="w-10 h-10 text-white/70" />
+              <BookOpen className="w-10 h-10 text-white/90" />
             </div>
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white">
               {t('bhajans.title')}
@@ -206,29 +176,7 @@ const Bhajans = () => {
         </div>
       </section>
 
-      {/* Trending Section - Horizontal Scroll */}
-      {trendingBhajans.length > 0 && (
-        <HorizontalBhajanSection
-          title="Trending This Week"
-          icon={<Flame className="w-7 h-7 text-orange-500 animate-pulse" />}
-          bhajans={trendingBhajans}
-          onBhajanClick={handleBhajanClick}
-          bgClass="bg-gradient-to-r from-orange-50 via-yellow-50 to-amber-50"
-        />
-      )}
-
-      {/* Popular Section - Horizontal Scroll */}
-      {popularBhajans.length > 0 && (
-        <HorizontalBhajanSection
-          title="Most Popular"
-          icon={<TrendingUp className="w-7 h-7 text-purple-500" />}
-          bhajans={popularBhajans}
-          onBhajanClick={handleBhajanClick}
-          bgClass="bg-gradient-to-r from-purple-50 via-pink-50 to-rose-50"
-        />
-      )}
-
-      {/* Main Content - All Bhajans Grid */}
+      {/* Main Content - Lyrics Library Grid */}
       <section className="py-12 bg-gradient-to-br from-gray-50 to-white">
         <div className="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="space-y-8">
@@ -237,7 +185,7 @@ const Bhajans = () => {
               <div className="flex items-center space-x-3">
                 <LibraryBig className="w-7 h-7 text-gray-700" />
                 <h2 className="text-3xl md:text-4xl font-bold text-gray-800">
-                  All Bhajans
+                  Bhajan Lyrics Library
                 </h2>
               </div>
             </div>
@@ -289,7 +237,7 @@ const Bhajans = () => {
               </div>
             ) : bhajans.length === 0 ? (
               <div className="text-center py-20">
-                <Music className="w-20 h-20 text-gray-300 mx-auto mb-6" />
+                <BookOpen className="w-20 h-20 text-gray-300 mx-auto mb-6" />
                 <p className="text-gray-500 text-lg">No bhajans available yet</p>
                 <p className="text-gray-400 text-sm mt-2">Check back soon for sacred melodies</p>
               </div>

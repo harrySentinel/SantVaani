@@ -1,16 +1,13 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Music, Copy, Quote, Play, ExternalLink, Youtube, Heart, Share2 } from 'lucide-react';
+import { X, Copy, Quote, Play, ExternalLink, Youtube } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { CopyToClipboard } from '@/utils/copyUtils';
 import { getGradientClass, getCategoryIcon } from '@/utils/categoryGradients';
-import { useMusicPlayer } from '@/contexts/MusicPlayerContext';
-import { useAuth } from '@/contexts/AuthContext';
 import FavoriteButton from './bhajan/FavoriteButton';
 import BhajanShareButton from './BhajanShareButton';
-import { recordBhajanPlay } from '@/services/bhajanEngagementService';
 
 interface Bhajan {
   id: string;
@@ -32,8 +29,6 @@ interface BhajanModalProps {
 
 const BhajanModal: React.FC<BhajanModalProps> = ({ bhajan, isOpen, onClose }) => {
   const { toast } = useToast();
-  const { playBhajan, currentBhajan, isPlaying, togglePlayPause } = useMusicPlayer();
-  const { user } = useAuth();
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
@@ -72,22 +67,6 @@ const BhajanModal: React.FC<BhajanModalProps> = ({ bhajan, isOpen, onClose }) =>
     }
   };
 
-  const handlePlayClick = () => {
-    if (!bhajan) return;
-
-    if (currentBhajan?.id === bhajan.id) {
-      togglePlayPause();
-    } else {
-      playBhajan(bhajan, [bhajan]);
-      recordBhajanPlay(bhajan.id, user?.id);
-      toast({
-        title: "🎵 Now Playing",
-        description: bhajan.title,
-        duration: 2000,
-      });
-    }
-  };
-
   const handleListenOnYouTube = () => {
     if (!bhajan?.youtube_url) {
       const searchQuery = `${bhajan?.title} bhajan devotional song`.replace(/\s+/g, '+');
@@ -112,7 +91,6 @@ const BhajanModal: React.FC<BhajanModalProps> = ({ bhajan, isOpen, onClose }) =>
 
   if (!bhajan) return null;
 
-  const isCurrentlyPlaying = currentBhajan?.id === bhajan.id && isPlaying;
   const gradientClass = getGradientClass(bhajan.category);
   const categoryIcon = getCategoryIcon(bhajan.category);
 
@@ -175,30 +153,6 @@ const BhajanModal: React.FC<BhajanModalProps> = ({ bhajan, isOpen, onClose }) =>
 
                 {/* Action Buttons */}
                 <div className="flex flex-wrap items-center gap-3 pt-4">
-                  {bhajan.youtube_url && (
-                    <Button
-                      onClick={handlePlayClick}
-                      size="lg"
-                      className={`rounded-full font-semibold px-8 shadow-lg transition-all ${
-                        isCurrentlyPlaying
-                          ? 'bg-green-500 hover:bg-green-600 text-white'
-                          : 'bg-white text-gray-900 hover:bg-gray-100'
-                      }`}
-                    >
-                      {isCurrentlyPlaying ? (
-                        <>
-                          <Music className="w-5 h-5 mr-2 animate-pulse" />
-                          Playing
-                        </>
-                      ) : (
-                        <>
-                          <Play className="w-5 h-5 mr-2" />
-                          Play Now
-                        </>
-                      )}
-                    </Button>
-                  )}
-
                   <div onClick={(e) => e.stopPropagation()}>
                     <FavoriteButton
                       bhajanId={bhajan.id}
