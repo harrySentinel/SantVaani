@@ -1,7 +1,56 @@
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { Star, ArrowRight, Calendar, Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
+
+const ZODIAC = ['♈', '♉', '♊', '♋', '♌', '♍', '♎', '♏', '♐', '♑', '♒', '♓'];
+
+const STARS = [
+  { top: '6%', left: '8%', s: 2, d: '0s' },
+  { top: '12%', left: '28%', s: 1.5, d: '1.2s' },
+  { top: '9%', left: '52%', s: 2.5, d: '0.6s' },
+  { top: '18%', left: '71%', s: 1.5, d: '2s' },
+  { top: '7%', left: '88%', s: 2, d: '1.6s' },
+  { top: '31%', left: '15%', s: 1.5, d: '0.9s' },
+  { top: '38%', left: '44%', s: 2, d: '2.4s' },
+  { top: '29%', left: '63%', s: 1.5, d: '0.3s' },
+  { top: '44%', left: '84%', s: 2.5, d: '1.8s' },
+  { top: '58%', left: '6%', s: 2, d: '1.1s' },
+  { top: '64%', left: '33%', s: 1.5, d: '2.8s' },
+  { top: '55%', left: '57%', s: 2, d: '0.5s' },
+  { top: '71%', left: '76%', s: 1.5, d: '1.4s' },
+  { top: '83%', left: '18%', s: 2, d: '2.2s' },
+  { top: '88%', left: '47%', s: 1.5, d: '0.8s' },
+  { top: '79%', left: '91%', s: 2, d: '1.9s' },
+];
+
+const ZodiacWheel = () => (
+  <svg viewBox="0 0 420 420" className="w-full h-full">
+    <circle cx="210" cy="210" r="200" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.5" />
+    <circle cx="210" cy="210" r="150" fill="none" stroke="currentColor" strokeWidth="0.75" opacity="0.35" />
+    {ZODIAC.map((glyph, i) => {
+      const a = ((i * 30 - 90) * Math.PI) / 180;
+      const cos = Math.cos(a);
+      const sin = Math.sin(a);
+      return (
+        <g key={glyph}>
+          <line
+            x1={210 + 192 * cos} y1={210 + 192 * sin}
+            x2={210 + 200 * cos} y2={210 + 200 * sin}
+            stroke="currentColor" strokeWidth="1" opacity="0.5"
+          />
+          <text
+            x={210 + 172 * cos} y={210 + 172 * sin}
+            fontSize="17" fill="currentColor" textAnchor="middle" dominantBaseline="central" opacity="0.85"
+          >
+            {glyph}
+          </text>
+        </g>
+      );
+    })}
+  </svg>
+);
 
 const LandingHoroscopeSection = () => {
   const { language } = useLanguage();
@@ -13,60 +62,100 @@ const LandingHoroscopeSection = () => {
     day: 'numeric',
   });
 
+  const tiles = [
+    { icon: Sun, label: language === 'HI' ? 'दैनिक' : 'Daily', sub: language === 'HI' ? 'आज का मार्गदर्शन' : "Today's guidance" },
+    { icon: Moon, label: language === 'HI' ? 'साप्ताहिक' : 'Weekly', sub: language === 'HI' ? 'इस सप्ताह का दृष्टिकोण' : "This week's outlook" },
+    { icon: Star, label: language === 'HI' ? 'मासिक' : 'Monthly', sub: language === 'HI' ? 'मासिक अंतर्दृष्टि' : 'Monthly insights' },
+    { icon: Calendar, label: language === 'HI' ? '12 राशियां' : '12 Signs', sub: language === 'HI' ? 'सभी राशियों के लिए' : 'All zodiac signs' },
+  ];
+
   return (
     <section className="py-20 relative">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid md:grid-cols-2 gap-12 items-center">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 28 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+          className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-[#241a52] via-[#181136] to-[#0d0a24] p-8 md:p-14 shadow-[0_24px_64px_rgba(23,15,60,0.35)]"
+        >
+          {/* Starfield */}
+          {STARS.map((star, i) => (
+            <span
+              key={i}
+              className="absolute rounded-full bg-white animate-pulse pointer-events-none"
+              style={{ top: star.top, left: star.left, width: star.s, height: star.s, animationDelay: star.d, animationDuration: '3s' }}
+            />
+          ))}
 
-          {/* Left — text */}
-          <div className="space-y-5">
-            <p className="text-xs font-semibold text-orange-500 uppercase tracking-widest">
-              {language === 'HI' ? 'वैदिक ज्योतिष' : 'Vedic Astrology'}
-            </p>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 leading-tight">
-              {language === 'HI' ? 'दैनिक राशिफल' : 'Daily Horoscope'}
-            </h2>
-            <p className="text-gray-500 leading-relaxed">
-              {language === 'HI'
-                ? 'जानें कि आज तारे आपके लिए क्या लेकर आए हैं। वैदिक ज्योतिष पर आधारित व्यक्तिगत मार्गदर्शन प्राप्त करें।'
-                : 'Discover what the stars hold for you today. Get personalized guidance grounded in ancient Vedic wisdom.'}
-            </p>
+          {/* Ambient glows */}
+          <div className="absolute -top-28 -right-20 w-96 h-96 rounded-full bg-purple-500/20 blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-32 -left-24 w-96 h-96 rounded-full bg-orange-500/10 blur-3xl pointer-events-none" />
 
-            <div className="flex items-center gap-2 text-sm text-gray-400">
-              <Calendar className="w-4 h-4 text-orange-400" />
-              <span>{today}</span>
+          {/* Rotating zodiac wheel */}
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 90, repeat: Infinity, ease: 'linear' }}
+            className="absolute -right-28 -bottom-28 w-[440px] h-[440px] text-indigo-300 opacity-[0.18] pointer-events-none"
+          >
+            <ZodiacWheel />
+          </motion.div>
+
+          <div className="relative z-10 grid md:grid-cols-2 gap-10 md:gap-12 items-center">
+            {/* Left — text */}
+            <div className="space-y-5">
+              <p className="text-xs font-semibold text-amber-300 uppercase tracking-widest">
+                {language === 'HI' ? 'वैदिक ज्योतिष' : 'Vedic Astrology'}
+              </p>
+              <h2 className="text-3xl md:text-4xl font-bold text-white leading-tight">
+                {language === 'HI' ? 'दैनिक राशिफल' : 'Daily Horoscope'}
+              </h2>
+              <p className="text-indigo-200/80 leading-relaxed">
+                {language === 'HI'
+                  ? 'जानें कि आज तारे आपके लिए क्या लेकर आए हैं। वैदिक ज्योतिष पर आधारित व्यक्तिगत मार्गदर्शन प्राप्त करें।'
+                  : 'Discover what the stars hold for you today. Get personalized guidance grounded in ancient Vedic wisdom.'}
+              </p>
+
+              <div className="inline-flex items-center gap-2 text-sm text-indigo-100 bg-white/10 border border-white/15 backdrop-blur-sm rounded-full px-4 py-2">
+                <Calendar className="w-4 h-4 text-amber-300" />
+                <span>{today}</span>
+              </div>
+
+              <div>
+                <Link to="/horoscope">
+                  <Button
+                    size="lg"
+                    className="bg-gradient-to-r from-orange-400 to-amber-300 hover:from-orange-500 hover:to-amber-400 text-gray-900 font-bold px-7 py-3 rounded-full mt-2 gap-2 shadow-lg shadow-orange-900/30"
+                  >
+                    {language === 'HI' ? 'आज का राशिफल देखें' : "View Today's Horoscope"}
+                    <ArrowRight className="w-4 h-4" />
+                  </Button>
+                </Link>
+              </div>
             </div>
 
-            <Link to="/horoscope">
-              <Button
-                size="lg"
-                className="bg-orange-500 hover:bg-orange-600 text-white px-7 py-3 rounded-full mt-2 gap-2 shadow-md shadow-orange-200"
-              >
-                {language === 'HI' ? 'आज का राशिफल देखें' : "View Today's Horoscope"}
-                <ArrowRight className="w-4 h-4" />
-              </Button>
-            </Link>
+            {/* Right — tiles */}
+            <div className="grid grid-cols-2 gap-4">
+              {tiles.map(({ icon: Icon, label, sub }, idx) => (
+                <motion.div
+                  key={label}
+                  initial={{ opacity: 0, y: 18 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.3 }}
+                  transition={{ duration: 0.45, ease: 'easeOut', delay: 0.15 + idx * 0.08 }}
+                  className="relative overflow-hidden bg-white/[0.06] backdrop-blur-md border border-white/10 rounded-2xl p-5 space-y-2"
+                >
+                  <div className="absolute top-0 left-3 right-3 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center mb-3 shadow-md shadow-orange-900/30">
+                    <Icon className="w-4 h-4 text-white" />
+                  </div>
+                  <p className="text-sm font-semibold text-white">{label}</p>
+                  <p className="text-xs text-indigo-200/70">{sub}</p>
+                </motion.div>
+              ))}
+            </div>
           </div>
-
-          {/* Right — visual */}
-          <div className="grid grid-cols-2 gap-4">
-            {[
-              { icon: Sun,      label: language === 'HI' ? 'दैनिक'    : 'Daily',   sub: language === 'HI' ? 'आज का मार्गदर्शन'     : 'Today\'s guidance' },
-              { icon: Moon,     label: language === 'HI' ? 'साप्ताहिक' : 'Weekly',  sub: language === 'HI' ? 'इस सप्ताह का दृष्टिकोण' : 'This week\'s outlook' },
-              { icon: Star,     label: language === 'HI' ? 'मासिक'    : 'Monthly', sub: language === 'HI' ? 'मासिक अंतर्दृष्टि'     : 'Monthly insights' },
-              { icon: Calendar, label: language === 'HI' ? '12 राशियां' : '12 Signs', sub: language === 'HI' ? 'सभी राशियों के लिए'   : 'All zodiac signs' },
-            ].map(({ icon: Icon, label, sub }) => (
-              <div key={label} className="relative overflow-hidden bg-white/60 backdrop-blur-md border border-white/80 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow space-y-2">
-                <div className="absolute top-0 left-3 right-3 h-px bg-gradient-to-r from-transparent via-white to-transparent" />
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center mb-3">
-                  <Icon className="w-4 h-4 text-white" />
-                </div>
-                <p className="text-sm font-semibold text-gray-800">{label}</p>
-                <p className="text-xs text-gray-400">{sub}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
