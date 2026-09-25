@@ -90,3 +90,21 @@ export const getCategories = cache(async () => {
   const { data } = await supabase.from('blog_categories').select('id, name, slug, icon, color, description');
   return data ?? [];
 });
+
+export const getCategory = cache(async (slug: string) => {
+  const { data } = await supabase.from('blog_categories').select('id, name, slug, icon, color, description').eq('slug', slug).maybeSingle();
+  return data;
+});
+
+// Categories that actually have published posts, with counts, for the filter chips.
+export const getCategoryChips = cache(async () => {
+  const posts = await getPosts();
+  const byCategory = new Map<string, { slug: string; name: string; color: string; count: number }>();
+  for (const p of posts) {
+    if (!p.category.slug) continue;
+    const entry = byCategory.get(p.category.slug) ?? { slug: p.category.slug, name: p.category.name, color: p.category.color, count: 0 };
+    entry.count += 1;
+    byCategory.set(p.category.slug, entry);
+  }
+  return [...byCategory.values()].sort((a, b) => b.count - a.count);
+});
