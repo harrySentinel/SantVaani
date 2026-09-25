@@ -1,7 +1,7 @@
 import { supabase } from '@/lib/supabaseClient';
 import axios from 'axios';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
 
 // Helper to get auth header
 const getAuthHeader = async () => {
