@@ -10,7 +10,7 @@ export async function generateStaticParams() {
 }
 
 const snippet = (text: string | null | undefined, max = 155) => {
-  const t = (text || '').replace(/\s+/g, ' ').trim();
+  const t = (text || '').replace(/\*+/g, '').replace(/\s+/g, ' ').trim();
   return t.length > max ? `${t.slice(0, max - 1).trimEnd()}…` : t;
 };
 
@@ -56,7 +56,7 @@ export default async function SaintPage(props: PageProps<'/saints/[slug]'>) {
       '@type': 'Person',
       name: saint.name,
       alternateName: saint.name_hi || undefined,
-      description: saint.description || undefined,
+      description: saint.description?.replace(/\*+/g, '') || undefined,
       image: saint.image_url || undefined,
       knowsAbout: saint.specialty || undefined,
       homeLocation: saint.region ? { '@type': 'Place', name: saint.region } : undefined,
@@ -76,7 +76,7 @@ export default async function SaintPage(props: PageProps<'/saints/[slug]'>) {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />
-      <SaintDetail saint={saint} related={related} />
+      <SaintDetail saint={saint} related={related} prev={data.prev} next={data.next} />
     </>
   );
 }

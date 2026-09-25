@@ -27,9 +27,19 @@ interface Saint {
   specialty_hi: string | null
   biography: string | null
   biography_hi: string | null
+  slug?: string | null
   created_at: string
   updated_at: string | null
 }
+
+// Same rule the website uses for /saints/<slug> addresses.
+const slugify = (name: string) =>
+  name
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
 
 interface SaintFormProps {
   saint?: Saint | null
@@ -51,6 +61,7 @@ export default function SaintForm({ saint, isOpen, onClose, onSave }: SaintFormP
     specialty_hi: '',
     biography: '',
     biography_hi: '',
+    slug: '',
   })
 
   // Update form data when saint prop changes
@@ -68,6 +79,7 @@ export default function SaintForm({ saint, isOpen, onClose, onSave }: SaintFormP
         specialty_hi: saint.specialty_hi || '',
         biography: saint.biography || '',
         biography_hi: saint.biography_hi || '',
+        slug: saint.slug || '',
       })
     } else {
       // Reset form for new saint
@@ -83,9 +95,19 @@ export default function SaintForm({ saint, isOpen, onClose, onSave }: SaintFormP
         specialty_hi: '',
         biography: '',
         biography_hi: '',
+        slug: '',
       })
     }
   }, [saint, isOpen])
+
+  // The slug column arrives with the add_saint_slugs migration; until then the form saves as before.
+  const [slugSupported, setSlugSupported] = useState(false)
+  const [slugEdited, setSlugEdited] = useState(false)
+  useEffect(() => {
+    if (!isOpen) return
+    setSlugEdited(!!saint?.slug)
+    supabase.from(TABLES.SAINTS).select('slug').limit(1).then(({ error }) => setSlugSupported(!error))
+  }, [isOpen, saint])
 
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
@@ -117,7 +139,8 @@ export default function SaintForm({ saint, isOpen, onClose, onSave }: SaintFormP
         specialty: formData.specialty.trim() || '',
         specialty_hi: formData.specialty_hi.trim() || '',
         biography: formData.biography.trim() || '',
-        biography_hi: formData.biography_hi.trim() || ''
+        biography_hi: formData.biography_hi.trim() || '',
+        ...(slugSupported ? { slug: slugify(formData.slug || formData.name) } : {})
       }
 
       console.log('💾 Saving saint data:', dataToSave)
@@ -213,7 +236,10 @@ export default function SaintForm({ saint, isOpen, onClose, onSave }: SaintFormP
               <Input
                 id="name"
                 value={formData.name}
-                onChange={(e) => handleInputChange('name', e.target.value)}
+                onChange={(e) => {
+                  handleInputChange('name', e.target.value)
+                  if (slugSupported && !slugEdited) handleInputChange('slug', slugify(e.target.value))
+                }}
                 placeholder="e.g., Sant Tukaram"
                 required
               />
@@ -230,6 +256,25 @@ export default function SaintForm({ saint, isOpen, onClose, onSave }: SaintFormP
               />
             </div>
           </div>
+
+          {slugSupported && (
+            <div>
+              <Label htmlFor="slug">Page address</Label>
+              <div className="flex items-center rounded-md border border-input focus-within:ring-2 focus-within:ring-ring">
+                <span className="pl-3 text-sm text-muted-foreground whitespace-nowrap">santvaani.com/saints/</span>
+                <input
+                  id="slug"
+                  value={formData.slug}
+                  onChange={(e) => { setSlugEdited(true); handleInputChange('slug', slugify(e.target.value)) }}
+                  placeholder="meera-bai"
+                  className="flex-1 min-w-0 bg-transparent px-1 py-2 text-sm outline-none"
+                />
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Changing this breaks links people have already shared. Leave it as is for existing saints.
+              </p>
+            </div>
+          )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Period */}
