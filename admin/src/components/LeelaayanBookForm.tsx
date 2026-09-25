@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { useToast } from '@/hooks/use-toast'
 import { supabase } from '@/lib/supabase'
-import { Loader2 } from 'lucide-react'
+import { Loader2, Upload, X } from 'lucide-react'
 
 interface Book {
   id: string
@@ -44,7 +44,45 @@ export default function LeelaayanBookForm({ book, onSuccess, onCancel }: Leelaay
     published: false,
     is_santvaani_original: false
   })
+  const [uploading, setUploading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
+
+  const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      toast({ title: 'Not an image', description: 'Choose a JPG, PNG or WebP file.', variant: 'destructive' })
+      return
+    }
+    if (file.size > 8 * 1024 * 1024) {
+      toast({ title: 'File too large', description: 'Cover images must be under 8 MB.', variant: 'destructive' })
+      return
+    }
+
+    try {
+      setUploading(true)
+      const ext = file.name.split('.').pop()?.toLowerCase() || 'png'
+      const base = formData.slug || 'book'
+      const filePath = `book-covers/${base}-${Date.now()}.${ext}`
+
+      const { error } = await supabase.storage
+        .from('santvaani-assets')
+        .upload(filePath, file, { cacheControl: '31536000', upsert: false, contentType: file.type })
+      if (error) throw error
+
+      const { data: { publicUrl } } = supabase.storage.from('santvaani-assets').getPublicUrl(filePath)
+      setFormData(prev => ({ ...prev, cover_image: publicUrl }))
+      toast({ title: 'Cover uploaded', description: 'Save the book to apply it.' })
+    } catch (error: any) {
+      console.error('Error uploading cover:', error)
+      toast({ title: 'Upload failed', description: error.message || 'Could not upload the cover image.', variant: 'destructive' })
+    } finally {
+      setUploading(false)
+    }
+  }
 
   useEffect(() => {
     if (book) {
@@ -229,18 +267,59 @@ export default function LeelaayanBookForm({ book, onSuccess, onCancel }: Leelaay
 
       {/* Cover Image */}
       <div>
-        <Label htmlFor="cover_image">Cover Image URL</Label>
-        <Input
-          id="cover_image"
-          value={formData.cover_image}
-          onChange={(e) => setFormData(prev => ({ ...prev, cover_image: e.target.value }))}
-          placeholder="https://example.com/cover.jpg"
-        />
-        {formData.cover_image && (
-          <div className="mt-2">
-            <img src={formData.cover_image} alt="Cover preview" className="w-32 h-48 object-cover rounded shadow" />
+        <Label>Cover Image</Label>
+        <p className="text-xs text-gray-500 mt-1 mb-3">
+          Portrait (2:3) works best, e.g. 1024×1536. JPG, PNG or WebP, up to 8 MB. Leave empty to use the plain typeset cover.
+        </p>
+
+        <div className="flex flex-col sm:flex-row gap-4 items-start">
+          {formData.cover_image && (
+            <div className="relative flex-shrink-0">
+              <img
+                src={formData.cover_image}
+                alt="Cover preview"
+                className="w-36 h-auto rounded-md border shadow"
+              />
+              <button
+                type="button"
+                onClick={() => setFormData(prev => ({ ...prev, cover_image: '' }))}
+                className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-white border shadow flex items-center justify-center text-gray-600 hover:text-red-600"
+                aria-label="Remove cover image"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+
+          <div className="flex-1 w-full space-y-3">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="hidden"
+              onChange={handleCoverUpload}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+            >
+              {uploading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
+              {uploading ? 'Uploading…' : formData.cover_image ? 'Replace image' : 'Upload image'}
+            </Button>
+
+            <div>
+              <Label htmlFor="cover_image" className="text-xs text-gray-500">Or paste an image URL</Label>
+              <Input
+                id="cover_image"
+                value={formData.cover_image}
+                onChange={(e) => setFormData(prev => ({ ...prev, cover_image: e.target.value }))}
+                placeholder="https://example.com/cover.jpg"
+              />
+            </div>
           </div>
-        )}
+        </div>
       </div>
 
       {/* Published Toggle */}
@@ -279,7 +358,7 @@ export default function LeelaayanBookForm({ book, onSuccess, onCancel }: Leelaay
         </Button>
         <Button
           type="submit"
-          disabled={loading}
+          disabled={loading || uploading}
           className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
         >
           {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
