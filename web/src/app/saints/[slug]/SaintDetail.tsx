@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import NextLink from 'next/link';
+import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Hourglass, MapPin, Sparkles, Share2 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -134,7 +135,11 @@ export default function SaintDetail({ saint, related, prev, next, content }: Sai
         </div>
       </header>
 
-      <div className="md:max-w-6xl md:mx-auto md:px-8 md:pt-10 md:grid md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:gap-14">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.35, ease: 'easeOut' }}
+        className="md:max-w-6xl md:mx-auto md:px-8 md:pt-10 md:grid md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:gap-14">
         {/* ── Portrait ── */}
         <div className="md:sticky md:top-24 md:self-start">
           <div ref={heroRef} className="relative">
@@ -326,7 +331,7 @@ export default function SaintDetail({ saint, related, prev, next, content }: Sai
           </nav>
           <div ref={endRef} aria-hidden="true" />
         </div>
-      </div>
+      </motion.div>
 
       {/* Phones: the main action lives in a bottom bar, like an app. */}
       <div

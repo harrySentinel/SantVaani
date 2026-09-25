@@ -113,7 +113,7 @@ export default function SaintsGallery({ saints }: { saints: GallerySaint[] }) {
               <li key={s.id} hidden={!shown}>
                 <NextLink
                   href={`/saints/${s.slug}`}
-                  className="group relative block overflow-hidden rounded-2xl bg-[#f1e7d8] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ea580c] focus-visible:ring-offset-2 focus-visible:ring-offset-[#faf8f5]"
+                  className="group relative block overflow-hidden rounded-2xl bg-[#f1e7d8] transition-transform duration-150 active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ea580c] focus-visible:ring-offset-2 focus-visible:ring-offset-[#faf8f5]"
                 >
                   {s.image_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
