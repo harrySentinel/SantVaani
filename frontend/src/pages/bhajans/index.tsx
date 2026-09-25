@@ -306,8 +306,8 @@ const Bhajans = () => {
             <a href="/saints" className="inline-flex items-center justify-center px-6 py-3 bg-orange-600 text-white rounded-full hover:bg-orange-700 transition-colors">
               Saints' Teachings
             </a>
-            <a href="/quotes" className="inline-flex items-center justify-center px-6 py-3 border-2 border-orange-600 text-orange-600 rounded-full hover:bg-orange-50 transition-colors">
-              Divine Quotes
+            <a href="/live-bhajans" className="inline-flex items-center justify-center px-6 py-3 border-2 border-orange-600 text-orange-600 rounded-full hover:bg-orange-50 transition-colors">
+              Live Bhajans
             </a>
           </div>
         </div>

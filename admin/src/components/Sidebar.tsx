@@ -4,7 +4,6 @@ import {
   Users,
   Sparkles,
   Music,
-  Quote,
   Lightbulb,
   Calendar,
   Bell,
@@ -52,13 +51,6 @@ const navigation = [
     count: 8
   },
   {
-    name: 'Quotes',
-    href: '/quotes',
-    icon: Quote,
-    description: 'Spiritual wisdom and sayings',
-    count: 45
-  },
-  {
     name: 'SantVaani Space',
     href: '/santvaani-space',
     icon: Share2,
@@ -83,7 +75,7 @@ const navigation = [
     name: 'Notice Board',
     href: '/notices',
     icon: Bell,
-    description: 'Manage daily quotes and announcements',
+    description: 'Manage announcements',
     count: 0
   },
   {

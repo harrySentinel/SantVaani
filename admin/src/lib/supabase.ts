@@ -19,7 +19,6 @@ export const TABLES = {
   LIVING_SAINTS: 'living_saints',
   DIVINE_FORMS: 'divine_forms',
   BHAJANS: 'bhajans',
-  QUOTES: 'quotes',
   EVENTS: 'events',
   NOTICES: 'notices',
   BLOG_POSTS: 'blog_posts'

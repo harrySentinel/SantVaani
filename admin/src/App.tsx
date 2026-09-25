@@ -8,7 +8,6 @@ import Dashboard from '@/pages/Dashboard'
 import SaintsPage from '@/pages/Saints'
 import DivineFormsPage from '@/pages/DivineForms'
 import BhajansPage from '@/pages/Bhajans'
-import QuotesPage from '@/pages/Quotes'
 import SpiritualFactsPage from '@/pages/SpiritualFacts'
 import EventsPage from '@/pages/Events'
 import NoticesPage from '@/pages/Notices'
@@ -44,9 +43,6 @@ function App() {
 
               {/* Bhajans Management */}
               <Route path="bhajans" element={<BhajansPage />} />
-
-              {/* Quotes Management */}
-              <Route path="quotes" element={<QuotesPage />} />
 
               {/* Spiritual Facts Management */}
               <Route path="spiritual-facts" element={<SpiritualFactsPage />} />

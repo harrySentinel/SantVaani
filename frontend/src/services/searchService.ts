@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabaseClient';
 
 export interface SearchResult {
   id: string;
-  type: 'saints' | 'divine_forms' | 'bhajans' | 'quotes';
+  type: 'saints' | 'divine_forms' | 'bhajans';
   title: string;
   title_hi?: string;
   description: string;
@@ -133,42 +133,13 @@ class SearchService {
     }
   }
 
-  // Search Quotes
-  async searchQuotes(query: string, limit: number = 10): Promise<SearchResult[]> {
-    try {
-      const { data, error } = await supabase
-        .from('quotes')
-        .select('*')
-        .or(`text.ilike.%${query}%,text_hi.ilike.%${query}%,author.ilike.%${query}%,category.ilike.%${query}%`)
-        .limit(limit);
-
-      if (error) throw error;
-
-      return (data || []).map(quote => ({
-        id: quote.id,
-        type: 'quotes' as const,
-        title: `Quote by ${quote.author || 'Unknown'}`,
-        title_hi: quote.author ? `${quote.author} का उद्धरण` : 'अज्ञात का उद्धरण',
-        description: quote.text || '',
-        description_hi: quote.text_hi || '',
-        image: undefined,
-        category: quote.category,
-        author: quote.author,
-        specialty: quote.category
-      }));
-    } catch (error) {
-      console.error('Error searching quotes:', error);
-      return [];
-    }
-  }
-
   // Unified Search - searches all content types
   async search(options: SearchOptions): Promise<SearchResponse> {
     const { query, filters = {}, limit = 20, offset = 0 } = options;
     
     try {
       const searchPromises: Promise<SearchResult[]>[] = [];
-      const itemsPerType = Math.ceil(limit / 4); // Distribute across 4 content types
+      const itemsPerType = Math.ceil(limit / 3);
 
       // If type filter is specified, only search that type
       if (filters.type && filters.type !== 'all') {
@@ -182,17 +153,13 @@ class SearchService {
           case 'bhajans':
             searchPromises.push(this.searchBhajans(query, limit));
             break;
-          case 'quotes':
-            searchPromises.push(this.searchQuotes(query, limit));
-            break;
         }
       } else {
         // Search all types
         searchPromises.push(
           this.searchSaints(query, itemsPerType),
           this.searchDivineForms(query, itemsPerType),
-          this.searchBhajans(query, itemsPerType),
-          this.searchQuotes(query, itemsPerType)
+          this.searchBhajans(query, itemsPerType)
         );
       }
 
@@ -274,15 +241,14 @@ class SearchService {
       const suggestions = new Set<string>();
 
       // Get suggestions from different content types
-      const [saints, divineForms, bhajans, quotes] = await Promise.all([
+      const [saints, divineForms, bhajans] = await Promise.all([
         this.searchSaints(query, 3),
         this.searchDivineForms(query, 3),
-        this.searchBhajans(query, 3),
-        this.searchQuotes(query, 3)
+        this.searchBhajans(query, 3)
       ]);
 
       // Add titles as suggestions
-      [...saints, ...divineForms, ...bhajans, ...quotes]
+      [...saints, ...divineForms, ...bhajans]
         .forEach(result => {
           suggestions.add(result.title);
           if (result.title_hi) suggestions.add(result.title_hi);

@@ -184,11 +184,11 @@ const translations: Translations = {
     'events.community.quote.english': 'In unity lies strength in this age',
 
     // Bhajans Page
-    'bhajans.title': 'Bhajans & Quotes',
-    'bhajans.subtitle': 'Immerse yourself in sacred melodies and profound wisdom through our collection of devotional songs and inspiring spiritual quotes from the great masters.',
+    'bhajans.title': 'Sacred Bhajans',
+    'bhajans.subtitle': 'Immerse yourself in sacred melodies through our collection of devotional songs from the great masters.',
     'bhajans.loading': 'Loading sacred content...',
     'bhajans.error.title': 'Error Loading Content',
-    'bhajans.error.message': 'Unable to load bhajans and quotes. Please try again later.',
+    'bhajans.error.message': 'Unable to load bhajans. Please try again later.',
     'bhajans.error.retry': 'Try Again',
     'bhajans.songs.count': 'Sacred Songs',
     'bhajans.quotes.count': 'Divine Quotes',
@@ -480,11 +480,11 @@ const translations: Translations = {
     'events.community.quote.english': 'इस युग में एकता में शक्ति है',
 
     // Bhajans Page
-    'bhajans.title': 'भजन और उद्धरण',
-    'bhajans.subtitle': 'महान गुरुओं के भक्ति गीतों और प्रेरणादायक आध्यात्मिक उद्धरणों के हमारे संग्रह के माध्यम से पवित्र मधुर स्वरों और गहन ज्ञान में डूब जाइए।',
+    'bhajans.title': 'पवित्र भजन',
+    'bhajans.subtitle': 'महान गुरुओं के भक्ति गीतों के हमारे संग्रह के माध्यम से पवित्र मधुर स्वरों में डूब जाइए।',
     'bhajans.loading': 'पवित्र सामग्री लोड हो रही है...',
     'bhajans.error.title': 'सामग्री लोड करने में त्रुटि',
-    'bhajans.error.message': 'भजन और उद्धरण लोड करने में असमर्थ। कृपया बाद में पुनः प्रयास करें।',
+    'bhajans.error.message': 'भजन लोड करने में असमर्थ। कृपया बाद में पुनः प्रयास करें।',
     'bhajans.error.retry': 'पुनः प्रयास करें',
     'bhajans.songs.count': 'पवित्र गीत',
     'bhajans.quotes.count': 'दिव्य उद्धरण',

@@ -3,7 +3,7 @@ import { supabase, TABLES } from '@/lib/supabase'
 
 interface ActivityItem {
   id: string
-  type: 'saint' | 'divine-form' | 'bhajan' | 'quote' | 'spiritual-fact'
+  type: 'saint' | 'divine-form' | 'bhajan' | 'spiritual-fact'
   action: 'added' | 'updated'
   item: string
   time: string
@@ -15,7 +15,6 @@ interface TableCounts {
   saints: number
   divine_forms: number
   bhajans: number
-  quotes: number
   spiritual_facts: number
 }
 
@@ -25,7 +24,6 @@ export function useRecentActivity() {
     saints: 0,
     divine_forms: 0,
     bhajans: 0,
-    quotes: 0,
     spiritual_facts: 0
   })
   const [loading, setLoading] = useState(true)
@@ -37,7 +35,6 @@ export function useRecentActivity() {
         { name: 'saints', key: 'saints' as keyof TableCounts },
         { name: 'divine_forms', key: 'divine_forms' as keyof TableCounts },
         { name: 'bhajans', key: 'bhajans' as keyof TableCounts },
-        { name: 'quotes', key: 'quotes' as keyof TableCounts },
         { name: 'spiritual_facts', key: 'spiritual_facts' as keyof TableCounts }
       ]
 
@@ -79,7 +76,6 @@ export function useRecentActivity() {
         { name: 'saints', type: 'saint' as const, nameField: 'name' },
         { name: 'divine_forms', type: 'divine-form' as const, nameField: 'name' },
         { name: 'bhajans', type: 'bhajan' as const, nameField: 'title' },
-        { name: 'quotes', type: 'quote' as const, nameField: 'text' },
         { name: 'spiritual_facts', type: 'spiritual-fact' as const, nameField: 'text' }
       ]
 
@@ -95,7 +91,7 @@ export function useRecentActivity() {
             if (!error && data) {
               data.forEach((item: any) => {
                 const itemName = item[table.nameField]
-                const displayName = table.type === 'quote' || table.type === 'spiritual-fact' 
+                const displayName = table.type === 'spiritual-fact' 
                   ? (itemName?.length > 50 ? itemName.substring(0, 50) + '...' : itemName)
                   : itemName
 

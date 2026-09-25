@@ -9,6 +9,11 @@
       "has": [{ "type": "host", "value": "santvaani.vercel.app" }],
       "destination": "https://santvaani.com/:path*",
       "permanent": true
+    },
+    {
+      "source": "/quotes",
+      "destination": "/",
+      "permanent": true
     }
   ],
   "rewrites": [

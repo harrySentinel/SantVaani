@@ -1,4 +1,4 @@
-import { Users, Sparkles, Music, Quote, TrendingUp, Lightbulb, RefreshCw, Loader2 } from 'lucide-react'
+import { Users, Sparkles, Music, TrendingUp, Lightbulb, RefreshCw, Loader2 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import DatabaseTest from '@/components/DatabaseTest'
 import { useRecentActivity } from '@/hooks/useRecentActivity'
@@ -41,15 +41,6 @@ export default function Dashboard() {
       icon: Music,
       color: 'bg-green-500',
       route: '/bhajans'
-    },
-    {
-      name: 'Quotes',
-      value: tableCounts.quotes.toString(),
-      change: `${tableCounts.quotes} total`,
-      changeType: 'neutral',
-      icon: Quote,
-      color: 'bg-orange-500',
-      route: '/quotes'
     },
     {
       name: 'Spiritual Facts',
@@ -146,7 +137,6 @@ export default function Dashboard() {
                     <div className={`flex-shrink-0 w-2 h-2 mt-2 rounded-full ${
                       activity.type === 'saint' ? 'bg-blue-500' :
                       activity.type === 'bhajan' ? 'bg-green-500' :
-                      activity.type === 'quote' ? 'bg-orange-500' :
                       activity.type === 'spiritual-fact' ? 'bg-yellow-500' : 
                       'bg-purple-500'
                     }`}></div>
@@ -204,18 +194,6 @@ export default function Dashboard() {
                   <Music className="h-5 w-5 text-gray-400 group-hover:text-green-500" />
                   <span className="ml-3 text-sm font-medium text-gray-700 group-hover:text-green-700">
                     Manage Bhajans
-                  </span>
-                </div>
-              </button>
-              
-              <button 
-                onClick={() => handleQuickAction('/quotes')}
-                className="w-full text-left p-3 rounded-lg border-2 border-dashed border-gray-300 hover:border-orange-400 hover:bg-orange-50 transition-colors group"
-              >
-                <div className="flex items-center">
-                  <Quote className="h-5 w-5 text-gray-400 group-hover:text-orange-500" />
-                  <span className="ml-3 text-sm font-medium text-gray-700 group-hover:text-orange-700">
-                    Manage Quotes
                   </span>
                 </div>
               </button>

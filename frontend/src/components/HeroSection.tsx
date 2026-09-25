@@ -1,28 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowDown, Heart, Music, BookOpen, RotateCcw } from 'lucide-react';
+import { ArrowDown, Heart, Music, BookOpen } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { supabase } from '@/lib/supabaseClient';
-import { motion, AnimatePresence } from 'framer-motion';
-
-interface Quote {
-  id: string;
-  text: string;
-  text_hi: string;
-  author: string;
-  category: string;
-}
-
-const FALLBACK_QUOTE: Quote = {
-  id: 'fallback',
-  text: "In truth, this world is not separate at all — everywhere, in every form, it is only Lord Shri Krishna who plays His divine lila.",
-  text_hi: "वस्तुतः यह प्रपंच है ही नहीं। सदा, सर्वत्र, सर्वरूपों में एकमात्र श्रीकृष्ण ही लीलायमान हैं।",
-  author: "Sai Ji",
-  category: "Divine Wisdom",
-};
-
-const ROTATE_INTERVAL = 8000;
+import { motion } from 'framer-motion';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 28 },
@@ -35,50 +15,6 @@ const fadeUp = {
 
 export default function HeroSection() {
   const { t, language } = useLanguage();
-  const [quotes, setQuotes] = useState<Quote[]>([]);
-  const [currentQuote, setCurrentQuote] = useState<Quote | null>(null);
-  const [quoteLoading, setQuoteLoading] = useState(true);
-  const [quoteKey, setQuoteKey] = useState(0);
-
-  useEffect(() => {
-    const fetchQuotes = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('quotes')
-          .select('id, text, text_hi, author, category')
-          .limit(50);
-        if (error || !data || data.length === 0) throw new Error();
-        const shuffled = [...data].sort(() => Math.random() - 0.5);
-        setQuotes(shuffled);
-        setCurrentQuote(shuffled[0]);
-      } catch {
-        setCurrentQuote(FALLBACK_QUOTE);
-      } finally {
-        setQuoteLoading(false);
-      }
-    };
-    fetchQuotes();
-  }, []);
-
-  const rotateQuote = useCallback(() => {
-    if (quotes.length < 2) return;
-    setCurrentQuote((prev) => {
-      const idx = quotes.findIndex((q) => q.id === prev?.id);
-      return quotes[(idx + 1) % quotes.length];
-    });
-    setQuoteKey((k) => k + 1);
-  }, [quotes]);
-
-  const jumpToQuote = (q: Quote) => {
-    setCurrentQuote(q);
-    setQuoteKey((k) => k + 1);
-  };
-
-  useEffect(() => {
-    if (quotes.length < 2) return;
-    const timer = setInterval(rotateQuote, ROTATE_INTERVAL);
-    return () => clearInterval(timer);
-  }, [quotes, rotateQuote]);
 
   return (
     <section className="relative min-h-screen overflow-hidden">
@@ -157,123 +93,6 @@ export default function HeroSection() {
             </p>
           </motion.div>
 
-          {/* ── Quote Card ── */}
-          <motion.div
-            className="max-w-xl mx-auto"
-            variants={fadeUp} custom={0.45} initial="hidden" animate="visible"
-          >
-            {quoteLoading ? (
-              <div className="rounded-2xl p-6 space-y-4 animate-pulse"
-                style={{
-                  background: 'rgba(255,252,248,0.68)',
-                  backdropFilter: 'blur(24px)',
-                  boxShadow: '0 0 0 1px rgba(255,255,255,0.55), 0 4px 24px rgba(249,115,22,0.08)',
-                }}>
-                <div className="h-2 bg-orange-100 rounded-full w-1/4" />
-                <div className="space-y-2.5">
-                  <div className="h-3.5 bg-orange-50 rounded-full w-full" />
-                  <div className="h-3.5 bg-orange-50 rounded-full w-5/6" />
-                  <div className="h-3.5 bg-orange-50 rounded-full w-3/4" />
-                </div>
-                <div className="h-2 bg-orange-100 rounded-full w-1/4 ml-auto" />
-              </div>
-            ) : currentQuote ? (
-              <div
-                className="relative rounded-2xl overflow-hidden"
-                style={{
-                  background: 'linear-gradient(145deg, rgba(255,252,248,0.78) 0%, rgba(255,246,232,0.62) 100%)',
-                  backdropFilter: 'blur(28px)',
-                  WebkitBackdropFilter: 'blur(28px)',
-                  boxShadow: '0 0 0 1px rgba(255,255,255,0.6), 0 4px 32px rgba(249,115,22,0.10), inset 0 1px 0 rgba(255,255,255,0.95)',
-                }}
-              >
-                {/* Top shimmer line */}
-                <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-orange-200/70 to-transparent" />
-
-                {/* Watermark decorative quote glyph */}
-                <div
-                  className="absolute -top-3 left-4 text-[88px] leading-none select-none pointer-events-none font-serif"
-                  style={{ color: 'rgba(249,115,22,0.09)', fontFamily: 'Georgia, "Times New Roman", serif' }}
-                >
-                  ❝
-                </div>
-
-                <div className="px-6 pt-5 pb-5">
-                  {/* Category row */}
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-orange-400 flex-shrink-0" />
-                      <span
-                        className="text-[10px] font-bold tracking-[0.14em] uppercase"
-                        style={{ color: 'rgba(234,88,0,0.85)' }}
-                      >
-                        {currentQuote.category || 'Divine Wisdom'}
-                      </span>
-                    </div>
-                    {quotes.length > 1 && (
-                      <button
-                        onClick={rotateQuote}
-                        className="p-1.5 rounded-full transition-all duration-200 hover:scale-110 active:scale-95"
-                        style={{ color: 'rgba(249,115,22,0.6)', background: 'rgba(249,115,22,0.08)' }}
-                        aria-label="Next quote"
-                      >
-                        <RotateCcw className="w-3.5 h-3.5" />
-                      </button>
-                    )}
-                  </div>
-
-                  {/* Animated quote body */}
-                  <AnimatePresence mode="wait">
-                    <motion.div
-                      key={quoteKey}
-                      initial={{ opacity: 0, y: 8, filter: 'blur(5px)' }}
-                      animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                      exit={{ opacity: 0, y: -8, filter: 'blur(5px)' }}
-                      transition={{ duration: 0.45, ease: 'easeInOut' }}
-                    >
-                      <p
-                        className="text-base md:text-[17px] italic leading-[1.75] font-medium"
-                        style={{ color: 'rgba(22,10,2,0.82)' }}
-                      >
-                        {language === 'EN' ? currentQuote.text : currentQuote.text_hi}
-                      </p>
-
-                      {/* Divider + author */}
-                      <div className="flex items-center gap-3 mt-4 pt-4"
-                        style={{ borderTop: '1px solid rgba(249,115,22,0.12)' }}>
-                        <div className="w-5 h-px flex-shrink-0" style={{ background: 'rgba(249,115,22,0.4)' }} />
-                        <p className="text-xs font-bold tracking-widest uppercase"
-                          style={{ color: 'rgba(234,88,0,0.8)' }}>
-                          {currentQuote.author}
-                        </p>
-                      </div>
-                    </motion.div>
-                  </AnimatePresence>
-
-                  {/* Progress dots */}
-                  {quotes.length > 1 && (
-                    <div className="flex justify-center gap-1.5 mt-4">
-                      {quotes.slice(0, Math.min(quotes.length, 8)).map((q) => (
-                        <button
-                          key={q.id}
-                          onClick={() => jumpToQuote(q)}
-                          className="h-[3px] rounded-full transition-all duration-300"
-                          style={{
-                            width: q.id === currentQuote?.id ? '20px' : '5px',
-                            background: q.id === currentQuote?.id ? 'rgba(234,88,0,0.75)' : 'rgba(249,115,22,0.2)',
-                          }}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* Bottom shimmer line */}
-                <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-orange-100/60 to-transparent" />
-              </div>
-            ) : null}
-          </motion.div>
-
           {/* ── Stats pills ── */}
           <motion.div
             className="flex flex-wrap justify-center gap-2.5"
@@ -282,7 +101,6 @@ export default function HeroSection() {
             {[
               { label: language === 'EN' ? 'Saints' : 'संत', value: '100+' },
               { label: language === 'EN' ? 'Bhajans' : 'भजन', value: '500+' },
-              { label: language === 'EN' ? 'Quotes' : 'उद्धरण', value: '1000+' },
               { label: language === 'EN' ? 'Seekers' : 'साधक', value: '10k+' },
             ].map((stat, i) => (
               <motion.div

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, X, Users, Sparkles, Music, Quote, Loader2, TrendingUp, ArrowRight } from 'lucide-react';
+import { Search, X, Users, Sparkles, Music, Loader2, TrendingUp, ArrowRight } from 'lucide-react';
 import { searchService, SearchResult } from '@/services/searchService';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -14,7 +14,6 @@ const TYPE_META: Record<SearchResult['type'], {
   saints:       { icon: Users,    label: 'Saint',       labelHi: 'संत',       path: '/saints', color: 'text-orange-600 bg-orange-50' },
   divine_forms: { icon: Sparkles, label: 'Divine Form', labelHi: 'दिव्य रूप', path: '/divine', color: 'text-amber-600 bg-amber-50' },
   bhajans:      { icon: Music,    label: 'Bhajan',           labelHi: 'भजन',          path: '/bhajans',       color: 'text-green-600 bg-green-50' },
-  quotes:       { icon: Quote,    label: 'Quote',            labelHi: 'उद्धरण',       path: '/quotes',        color: 'text-purple-600 bg-purple-50' },
 };
 
 const POPULAR = ['Meera Bai', 'Kabir Das', 'Hanuman Chalisa', 'Krishna', 'Tulsidas', 'Shiva', 'Ganga Aarti', 'Radha Krishna'];
@@ -139,7 +138,7 @@ export default function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
             value={query}
             onChange={handleQueryChange}
             onKeyDown={handleKeyDown}
-            placeholder={language === 'EN' ? 'Search saints, bhajans, quotes…' : 'संत, भजन, उद्धरण खोजें…'}
+            placeholder={language === 'EN' ? 'Search saints, bhajans, divine forms…' : 'संत, भजन, दिव्य रूप खोजें…'}
             className="flex-1 text-base text-gray-900 placeholder-gray-400 bg-transparent outline-none"
           />
           {query && (

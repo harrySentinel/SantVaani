@@ -43,7 +43,6 @@ export default function Footer() {
     { to: '/saints', label: language === 'EN' ? 'Saints' : 'संत' },
     { to: '/divine', label: language === 'EN' ? 'Divine Forms' : 'दिव्य रूप' },
     { to: '/bhajans', label: language === 'EN' ? 'Bhajans' : 'भजन' },
-    { to: '/quotes', label: language === 'EN' ? 'Quotes' : 'उद्धरण' },
     { to: '/horoscope', label: language === 'EN' ? 'Horoscope' : 'राशिफल' },
   ];
 
@@ -68,8 +67,8 @@ export default function Footer() {
               </h3>
               <p className="text-gray-400 text-sm mt-1">
                 {language === 'EN'
-                  ? 'Quotes, events & bhajans delivered to your inbox.'
-                  : 'उद्धरण, कार्यक्रम और भजन आपके इनबॉक्स में।'}
+                  ? 'Wisdom, events & bhajans delivered to your inbox.'
+                  : 'ज्ञान, कार्यक्रम और भजन आपके इनबॉक्स में।'}
               </p>
             </div>
             <form onSubmit={handleSubscribe} className="flex w-full md:w-auto gap-2">

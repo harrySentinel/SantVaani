@@ -146,22 +146,6 @@ export default function BulkImport({
             }
             break
 
-          case 'quotes':
-            if (!item.quote_text) {
-              errors.push(`Item ${index + 1}: Quote text is required`)
-              return
-            }
-            transformedItem = {
-              quote_text: item.quote_text,
-              quote_hi: item.quote_hi || '',
-              author: item.author || '',
-              source: item.source || '',
-              category: item.category || '',
-              tags: Array.isArray(item.tags) ? item.tags :
-                   (item.tags ? item.tags.split(',').map((t: string) => t.trim()) : null)
-            }
-            break
-
           case 'spiritual_facts':
             if (!item.text) {
               errors.push(`Item ${index + 1}: Fact text is required`)
