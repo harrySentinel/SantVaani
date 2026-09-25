@@ -24,6 +24,8 @@ export default {
 				serif: ['Playfair Display', 'Georgia', 'serif'],
 				display: ['Playfair Display', 'Georgia', 'serif'],
 				quote: ['Crimson Text', 'Georgia', 'serif'],
+				tiro: ['"Tiro Devanagari Hindi"', 'Georgia', 'serif'],
+				mukta: ['Mukta', 'system-ui', 'sans-serif'],
 			},
 			colors: {
 				border: 'hsl(var(--border))',

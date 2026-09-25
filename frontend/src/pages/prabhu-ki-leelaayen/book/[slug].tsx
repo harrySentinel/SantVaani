@@ -1,14 +1,17 @@
 // Book Detail Page - Shows chapters list for a book
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { motion, useReducedMotion } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { BookOpen, ChevronRight, Loader2, Check } from 'lucide-react';
+import SEO from '@/components/SEO';
+import { BookOpen, ChevronLeft, ArrowRight, Check, ListOrdered, Languages, Share2, Loader2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabaseClient';
 import { useBookProgress } from '@/hooks/useReadingProgress';
-import Breadcrumb from '@/components/Breadcrumb';
+import { useToast } from '@/hooks/use-toast';
+import { nativeShare, copyToClipboard } from '@/utils/shareUtils';
 
 interface Book {
   id: string;
@@ -36,18 +39,38 @@ interface Chapter {
   views: number;
 }
 
-const devanagari = { fontFamily: "'Noto Sans Devanagari', sans-serif" };
+const PAGE = '#faf8f5';
+
+const focusRing = 'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ea580c] focus-visible:ring-offset-2 focus-visible:ring-offset-[#faf8f5]';
+
+const coverShadow = 'shadow-[0_24px_48px_-16px_rgba(36,26,18,0.45)]';
+
+const BookCover = ({ title, author }: { title: string; author: string; }) => (
+  <div className={`w-full aspect-[2/3] rounded-md bg-[#f1e7d8] border border-[#e4d6c1] ${coverShadow} flex flex-col justify-between text-center px-5 py-8`}>
+    <span className="font-tiro text-lg text-[#c2410c]">ॐ</span>
+    <div className="space-y-4">
+      <div className="w-10 h-px bg-[#241a12]/25 mx-auto" />
+      <p className="font-tiro text-[1.7rem] leading-tight text-[#241a12]">{title}</p>
+      <div className="w-10 h-px bg-[#241a12]/25 mx-auto" />
+    </div>
+    <p className="text-xs tracking-wide text-[#241a12]/60">{author}</p>
+  </div>
+);
 
 const BookDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  const { language } = useLanguage();
+  const { language, toggleLanguage } = useLanguage();
   const { user } = useAuth();
+  const { toast } = useToast();
+  const reduceMotion = useReducedMotion();
   const HI = language === 'HI';
 
   const [book, setBook] = useState<Book | null>(null);
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [loading, setLoading] = useState(true);
+  const [expanded, setExpanded] = useState(false);
+  const contentsRef = useRef<HTMLElement>(null);
 
   const { progress, getChapterStatus, isChapterCompleted } = useBookProgress(book?.id);
 
@@ -92,8 +115,8 @@ const BookDetail: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#faf8f5]">
-        <Loader2 className="w-8 h-8 text-orange-500 animate-spin" />
+      <div className="min-h-screen flex items-center justify-center" style={{ background: PAGE }}>
+        <Loader2 className="w-8 h-8 text-[#ea580c] animate-spin" />
       </div>
     );
   }
@@ -102,194 +125,214 @@ const BookDetail: React.FC = () => {
 
   const title = HI ? book.title_hi || book.title : book.title;
   const author = HI ? book.author_hi || book.author : book.author;
-  const showAuthor = !!author && !(book.is_santvaani_original && /santvaani|संतवाणी/i.test(author));
   const description = HI ? book.description_hi || book.description : book.description;
   const chapterCount = chapters.length || book.total_chapters;
-  const titleFont = HI ? devanagari : undefined;
+  const isHouseAuthor = /santvaani|संतवाणी/i.test(author || '');
 
   const summary = user ? progress.summary : null;
   const started = !!summary && summary.chapters_read > 0;
   const finished = started && summary!.progress_percentage >= 100;
   const nextChapter = chapters.find(ch => !isChapterCompleted(ch.id)) ?? chapters[0];
-
+  const primaryTarget = finished ? chapters[0] : nextChapter;
   const primaryLabel = finished
     ? (HI ? 'फिर से पढ़ें' : 'Read again')
     : started
-      ? (HI ? `पढ़ना जारी रखें · अध्याय ${nextChapter?.chapter_number}` : `Continue · Chapter ${nextChapter?.chapter_number}`)
+      ? (HI ? `अध्याय ${nextChapter?.chapter_number} से जारी रखें` : `Continue with chapter ${nextChapter?.chapter_number}`)
       : (HI ? 'पढ़ना शुरू करें' : 'Start reading');
-  const primaryTarget = finished ? chapters[0] : nextChapter;
+
+  const handleShare = async () => {
+    const url = window.location.href;
+    const shared = await nativeShare({ title, description: description || title, url });
+    if (shared) return;
+    if (await copyToClipboard(url)) {
+      toast({ title: HI ? 'लिंक कॉपी हो गया' : 'Link copied' });
+    }
+  };
+
+  const chaptersLabel = HI
+    ? `${chapterCount} अध्याय`
+    : `${chapterCount} ${chapterCount === 1 ? 'chapter' : 'chapters'}`;
 
   return (
-    <div className="min-h-screen bg-[#faf8f5]">
-      <Navbar />
-      <Breadcrumb
-        items={[
-          { label: HI ? 'दिव्य कथाएं' : 'Divine Stories', to: '/prabhu-ki-leelaayen' },
-          { label: title },
-        ]}
+    <div className="min-h-screen font-mukta text-[#241a12]" style={{ background: PAGE }}>
+      <SEO
+        title={`${book.title} — Divine Stories | Santvaani`}
+        description={book.description || `Read ${book.title} on Santvaani.`}
+        canonical={`https://santvaani.com/prabhu-ki-leelaayen/book/${book.slug}`}
+        ogImage={book.cover_image || undefined}
+        ogType="article"
       />
+      <Navbar />
 
-      {/* ── Book header ── */}
-      <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-12 md:pt-10 md:pb-16">
-        <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-center md:items-start">
-          {/* Cover */}
-          <div className="w-40 sm:w-48 md:w-56 flex-shrink-0">
+      {/* ── Hero ── */}
+      <header>
+        <div className="max-w-xl mx-auto px-5 pt-5">
+          <Link
+            to="/prabhu-ki-leelaayen"
+            className={`inline-flex items-center gap-1 -ml-1 rounded-full px-1 py-1 text-sm text-[#7a6a5c] hover:text-[#241a12] transition-colors ${focusRing}`}
+          >
+            <ChevronLeft className="w-4 h-4" />
+            {HI ? 'दिव्य कथाएं' : 'Divine Stories'}
+          </Link>
+
+          <motion.div
+            className="mt-6 mx-auto w-48 sm:w-56"
+            initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          >
             {book.cover_image ? (
               <img
                 src={book.cover_image}
                 alt={title}
-                className="w-full aspect-[2/3] object-cover rounded-md shadow-[0_18px_40px_-12px_rgba(36,26,18,0.35)]"
+                className={`w-full h-auto rounded-md ${coverShadow}`}
               />
             ) : (
-              <div className="w-full aspect-[2/3] rounded-md bg-[#f1e7d8] border border-[#e4d6c1] shadow-[0_18px_40px_-12px_rgba(36,26,18,0.35)] flex flex-col items-center justify-between text-center px-4 py-6">
-                <span className="font-serif text-orange-500 text-lg">ॐ</span>
-                <div className="space-y-3">
-                  <div className="w-8 h-px bg-[#241a12]/30 mx-auto" />
-                  <p className="font-serif text-xl md:text-2xl font-bold text-[#241a12] leading-tight" style={titleFont}>
-                    {title}
-                  </p>
-                  <div className="w-8 h-px bg-[#241a12]/30 mx-auto" />
-                </div>
-                <p className="text-[10px] tracking-[0.2em] uppercase text-[#241a12]/60">{author}</p>
-              </div>
+              <BookCover title={title} author={book.is_santvaani_original || isHouseAuthor ? 'Santvaani' : author} />
             )}
-          </div>
+          </motion.div>
 
-          {/* Info */}
-          <div className="flex-1 w-full text-center md:text-left">
-            {book.is_santvaani_original && (
-              <p className="text-[13px] font-medium text-orange-600 tracking-wide mb-2">
-                {HI ? 'संतवाणी ओरिजिनल' : 'A Santvaani Original'}
-              </p>
-            )}
-
-            <h1 className="font-serif text-4xl md:text-5xl font-bold text-[#241a12] leading-[1.1]" style={titleFont}>
-              {title}
-            </h1>
-
-            <p className="mt-3 text-sm text-gray-500">
-              {showAuthor && <span>{HI ? `${author} द्वारा` : `by ${author}`}</span>}
-              {showAuthor && <span className="mx-2 text-gray-300">·</span>}
-              <span>
-                {chapterCount} {HI ? 'अध्याय' : chapterCount === 1 ? 'chapter' : 'chapters'}
-              </span>
-              <span className="mx-2 text-gray-300">·</span>
-              <span>
-                {book.views.toLocaleString()} {HI ? 'पाठक' : 'reads'}
-              </span>
-            </p>
-
-            {description && (
-              <p className="mt-5 text-gray-600 leading-relaxed max-w-xl mx-auto md:mx-0">
-                {description}
-              </p>
-            )}
-
-            {/* Progress */}
-            {started && (
-              <div className="mt-6 max-w-sm mx-auto md:mx-0">
-                <div className="h-1 rounded-full bg-[#241a12]/10 overflow-hidden">
-                  <div
-                    className="h-full rounded-full bg-orange-500 transition-all duration-700"
-                    style={{ width: `${Math.min(summary!.progress_percentage, 100)}%` }}
-                  />
-                </div>
-                <p className="mt-2 text-xs text-gray-500">
-                  {finished
-                    ? (HI ? 'आपने यह पुस्तक पूरी कर ली है' : 'You finished this book')
-                    : HI
-                      ? `${summary!.chapters_completed} / ${chapterCount} अध्याय पढ़े`
-                      : `${summary!.chapters_completed} of ${chapterCount} chapters read`}
-                </p>
-              </div>
-            )}
-
-            {/* Actions */}
-            {primaryTarget && (
-              <div className="mt-7 flex flex-col sm:flex-row items-center gap-4 justify-center md:justify-start">
-                <button
-                  onClick={() => navigate(`/prabhu-ki-leelaayen/read/${primaryTarget.slug}`)}
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 text-sm font-semibold text-white bg-[#241a12] hover:bg-[#3a2b1c] transition-colors px-8 py-3.5 rounded-full"
-                >
-                  <BookOpen className="w-4 h-4" />
-                  {primaryLabel}
-                </button>
-                {!user && (
-                  <Link
-                    to="/login"
-                    className="text-sm text-gray-500 hover:text-[#241a12] transition-colors"
-                  >
-                    {HI ? 'अपनी प्रगति सहेजने के लिए लॉगिन करें' : 'Sign in to save your place'}
-                  </Link>
-                )}
-              </div>
-            )}
-          </div>
+          <h1 className="mt-8 text-center font-tiro font-normal tracking-normal text-[2.6rem] sm:text-5xl leading-[1.15] text-[#241a12]">
+            {title}
+          </h1>
         </div>
-      </section>
 
-      {/* ── Chapters ── */}
-      <section className="border-t border-gray-200">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
-          <div className="flex items-baseline justify-between mb-6">
-            <h2 className="font-serif text-2xl md:text-3xl font-bold text-[#241a12]">
-              {HI ? 'अध्याय' : 'Contents'}
-            </h2>
-            <span className="text-sm text-gray-400">
-              {chapterCount} {HI ? 'अध्याय' : chapterCount === 1 ? 'chapter' : 'chapters'}
-            </span>
+        <div className="max-w-xl mx-auto px-5 pt-3 text-center">
+          <p className="text-[15px] text-[#7a6a5c]">
+            {book.is_santvaani_original
+              ? (HI ? 'संतवाणी ओरिजिनल' : 'A Santvaani original')
+              : !isHouseAuthor && author
+                ? (HI ? `${author} द्वारा` : `By ${author}`)
+                : null}
+          </p>
+
+          {primaryTarget && (
+            <button
+              onClick={() => navigate(`/prabhu-ki-leelaayen/read/${primaryTarget.slug}`)}
+              className={`mt-6 w-full h-14 rounded-full bg-[#ea580c] hover:bg-[#d24e0a] active:scale-[0.99] transition text-white text-lg font-semibold inline-flex items-center justify-center gap-2.5 ${focusRing}`}
+            >
+              <BookOpen className="w-5 h-5" />
+              {primaryLabel}
+            </button>
+          )}
+
+          {started && (
+            <div className="mt-4 flex items-center gap-3 text-sm text-[#7a6a5c]">
+              <span className="flex-1 h-1.5 rounded-full bg-[#241a12]/10 overflow-hidden">
+                <span
+                  className="block h-full rounded-full bg-[#ea580c]"
+                  style={{ width: `${Math.min(summary!.progress_percentage, 100)}%` }}
+                />
+              </span>
+              <span className="tabular-nums">{Math.round(summary!.progress_percentage)}%</span>
+            </div>
+          )}
+
+          {!user && (
+            <p className="mt-3 text-sm text-[#7a6a5c]">
+              <Link to="/login" className={`underline underline-offset-4 decoration-[#7a6a5c]/50 hover:text-[#241a12] rounded ${focusRing}`}>
+                {HI ? 'लॉगिन करें' : 'Sign in'}
+              </Link>{' '}
+              {HI ? 'ताकि आपकी प्रगति सहेजी रहे' : 'to keep your place between visits'}
+            </p>
+          )}
+        </div>
+      </header>
+
+      <main className="max-w-xl mx-auto px-5 pb-20">
+        {/* Description */}
+        {description && (
+          <div className="mt-8">
+            <p className={`text-[17px] leading-relaxed text-[#241a12]/85 ${expanded ? '' : 'line-clamp-3'}`}>
+              {description}
+            </p>
+            {description.length > 150 && (
+              <button
+                onClick={() => setExpanded(e => !e)}
+                className={`mt-1 text-sm font-semibold text-[#c2410c] rounded ${focusRing}`}
+              >
+                {expanded ? (HI ? 'कम दिखाएं' : 'Show less') : (HI ? 'और पढ़ें' : 'Read more')}
+              </button>
+            )}
           </div>
+        )}
+
+        {/* Actions */}
+        <div className="mt-8 grid grid-cols-3 gap-2">
+          {[
+            { icon: ListOrdered, label: HI ? 'अध्याय सूची' : 'Contents', onClick: () => contentsRef.current?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' }) },
+            { icon: Languages, label: HI ? 'English में' : 'हिंदी में', onClick: toggleLanguage },
+            { icon: Share2, label: HI ? 'साझा करें' : 'Share', onClick: handleShare },
+          ].map(({ icon: Icon, label, onClick }) => (
+            <button
+              key={label}
+              onClick={onClick}
+              className={`flex flex-col items-center gap-2 rounded-2xl py-3 text-[#241a12]/85 hover:bg-[#241a12]/5 transition-colors ${focusRing}`}
+            >
+              <Icon className="w-6 h-6" strokeWidth={1.75} />
+              <span className="text-[15px]">{label}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Chapters */}
+        <section ref={contentsRef} className="mt-10 scroll-mt-24" aria-labelledby="contents-heading">
+          <h2 id="contents-heading" className="font-mukta tracking-normal text-2xl font-semibold pb-4 border-b border-[#241a12]/10">
+            {chaptersLabel}
+          </h2>
 
           {chapters.length > 0 ? (
-            <ol className="border-t border-gray-200">
+            <ol>
               {chapters.map(chapter => {
                 const done = !!user && isChapterCompleted(chapter.id);
                 const reading = !!user && !done && getChapterStatus(chapter.id) === 'reading';
                 return (
-                  <li key={chapter.id}>
+                  <li key={chapter.id} className="border-b border-[#241a12]/10">
                     <Link
                       to={`/prabhu-ki-leelaayen/read/${chapter.slug}`}
-                      className="group flex items-center gap-4 md:gap-8 py-5 md:py-6 border-b border-gray-200 -mx-4 px-4 sm:mx-0 sm:px-2 hover:bg-orange-50/40 transition-colors"
+                      className={`group flex items-center gap-4 py-5 -mx-2 px-2 rounded-xl hover:bg-[#ea580c]/[0.05] transition-colors ${focusRing}`}
                     >
-                      <span className="font-serif text-xl md:text-2xl text-orange-300 group-hover:text-orange-500 transition-colors w-8 flex-shrink-0">
-                        {String(chapter.chapter_number).padStart(2, '0')}
-                      </span>
+                      <span className="w-6 flex-shrink-0 text-lg text-[#7a6a5c] tabular-nums">{chapter.chapter_number}</span>
                       <div className="flex-1 min-w-0">
-                        <h3
-                          className="text-base md:text-lg font-semibold text-[#241a12] group-hover:text-orange-600 transition-colors line-clamp-2"
-                          style={titleFont}
-                        >
+                        <h3 className="font-mukta tracking-normal text-lg font-semibold leading-snug text-[#241a12] line-clamp-2">
                           {HI ? chapter.title_hi || chapter.title : chapter.title}
                         </h3>
-                        <p className="mt-1 text-xs text-gray-400 flex items-center gap-2">
-                          <span>{chapter.read_time} {HI ? 'मिनट' : 'min read'}</span>
+                        <p className="mt-1 flex items-center gap-3 text-[15px] text-[#7a6a5c]">
+                          <span>{chapter.read_time} {HI ? 'मिनट' : 'min'}</span>
                           {done && (
                             <span className="inline-flex items-center gap-1 text-green-700">
-                              <Check className="w-3 h-3" strokeWidth={3} />
+                              <Check className="w-3.5 h-3.5" strokeWidth={3} />
                               {HI ? 'पढ़ा गया' : 'Read'}
                             </span>
                           )}
                           {reading && (
-                            <span className="inline-flex items-center gap-1 text-orange-600">
-                              <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />
+                            <span className="inline-flex items-center gap-1.5 text-[#c2410c]">
+                              <span className="w-1.5 h-1.5 rounded-full bg-[#ea580c]" />
                               {HI ? 'पढ़ रहे हैं' : 'In progress'}
                             </span>
                           )}
                         </p>
                       </div>
-                      <ChevronRight className="w-5 h-5 text-gray-300 group-hover:text-orange-500 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                      <span
+                        className={`flex-shrink-0 w-11 h-11 rounded-full flex items-center justify-center transition-transform group-hover:scale-105 ${
+                          done ? 'border border-[#241a12]/20 text-[#241a12]' : 'bg-[#241a12] text-white'
+                        }`}
+                        aria-hidden="true"
+                      >
+                        {done ? <Check className="w-5 h-5" /> : <ArrowRight className="w-5 h-5" />}
+                      </span>
                     </Link>
                   </li>
                 );
               })}
             </ol>
           ) : (
-            <p className="py-12 text-center text-gray-500 border-t border-gray-200">
-              {HI ? 'अध्याय जल्द ही जोड़े जाएंगे' : 'Chapters will be added soon'}
+            <p className="py-10 text-center text-[#7a6a5c]">
+              {HI ? 'अध्याय जल्द ही जोड़े जाएंगे' : 'Chapters are on their way'}
             </p>
           )}
-        </div>
-      </section>
+        </section>
+      </main>
 
       <Footer />
     </div>
