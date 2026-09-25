@@ -1,12 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import NextLink from 'next/link';
 import Link from '@/components/SiteLink';
 import { motion } from 'framer-motion';
 import { BookOpen, ArrowRight } from 'lucide-react';
-import CompactBhajanCard from '@/components/bhajan/CompactBhajanCard';
-import BhajanModal from '@/components/BhajanModal';
 import { supabase } from '@/lib/supabaseClient';
+import { slugify } from '@/lib/saints';
+import { getGradientClass } from '@/utils/categoryGradients';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { BhajanGridSkeleton } from '@/components/SkeletonCards';
 
@@ -25,8 +26,6 @@ interface Bhajan {
 const LandingBhajanSection = () => {
   const { language } = useLanguage();
   const [bhajans, setBhajans] = useState<Bhajan[]>([]);
-  const [selectedBhajan, setSelectedBhajan] = useState<Bhajan | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -61,8 +60,7 @@ const LandingBhajanSection = () => {
   if (bhajans.length === 0) return null;
 
   return (
-    <>
-      <section id="bhajans" className="py-12 md:py-16 relative scroll-mt-32 border-t border-gray-200">
+    <section id="bhajans" className="py-12 md:py-16 relative scroll-mt-32 border-t border-gray-200">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <motion.div
@@ -97,14 +95,25 @@ const LandingBhajanSection = () => {
             transition={{ duration: 0.55, ease: 'easeOut', delay: 0.1 }}
             className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
-            {bhajans.map((bhajan, index) => (
-              <div key={bhajan.id} className="w-40 sm:w-44 md:w-48 flex-shrink-0 snap-start">
-                <CompactBhajanCard
-                  bhajan={bhajan}
-                  onClick={() => { setSelectedBhajan(bhajan); setIsModalOpen(true); }}
-                  index={index}
-                />
-              </div>
+            {bhajans.map(bhajan => (
+              <NextLink
+                key={bhajan.id}
+                href={`/bhajans/${slugify(bhajan.title) || bhajan.id}`}
+                className="w-40 sm:w-44 md:w-48 flex-shrink-0 snap-start block group rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-200"
+              >
+                <div className={`${getGradientClass(bhajan.category)} aspect-square flex items-center justify-center`}>
+                  <BookOpen className="w-12 h-12 text-white/25" />
+                </div>
+                <div className="bg-white p-3 space-y-1">
+                  <h3 className="font-semibold text-gray-900 text-sm line-clamp-1 group-hover:text-orange-600 transition-colors">
+                    {bhajan.title}
+                  </h3>
+                  <p className="text-xs text-orange-500 line-clamp-1 font-medium">{bhajan.title_hi}</p>
+                  <span className="inline-block text-[10px] font-medium text-gray-400 bg-gray-50 border border-gray-100 px-2 py-0.5 rounded-full truncate">
+                    {bhajan.category}
+                  </span>
+                </div>
+              </NextLink>
             ))}
           </motion.div>
 
@@ -123,15 +132,8 @@ const LandingBhajanSection = () => {
               </button>
             </Link>
           </div>
-        </div>
-      </section>
-
-      <BhajanModal
-        bhajan={selectedBhajan}
-        isOpen={isModalOpen}
-        onClose={() => { setIsModalOpen(false); setSelectedBhajan(null); }}
-      />
-    </>
+      </div>
+    </section>
   );
 };
 
