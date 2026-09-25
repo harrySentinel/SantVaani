@@ -133,7 +133,7 @@ export default function Navbar() {
           </button>
 
           {/* Desktop Menu */}
-          <div className="hidden lg:flex items-center space-x-1">
+          <div className="hidden xl:flex items-center space-x-1">
             {primaryItems.map((item) => {
               const Icon = item.icon;
               return (
@@ -273,7 +273,7 @@ export default function Navbar() {
               {language === 'EN' ? 'हिं' : 'EN'}
             </Button>
 
-            <div className="lg:hidden">
+            <div className="xl:hidden">
               <Button
                 onClick={() => setIsOpen(!isOpen)}
                 variant="ghost"
@@ -293,7 +293,7 @@ export default function Navbar() {
 
       {/* Full-screen Mobile Menu Overlay */}
       <div
-        className={`fixed inset-0 z-[60] lg:hidden transition-all duration-300 ease-in-out ${
+        className={`fixed inset-0 z-[60] xl:hidden transition-all duration-300 ease-in-out ${
           isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
       >
