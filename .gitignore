@@ -65,3 +65,6 @@ upcoming_changes.md
 !**/README.md
 
 .vercel
+
+# Local planning doc, not for the repo
+web/SAINT_CONTENT_PLAN.md
