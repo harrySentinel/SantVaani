@@ -9,7 +9,6 @@ import SaintsPage from '@/pages/Saints'
 import DivineFormsPage from '@/pages/DivineForms'
 import BhajansPage from '@/pages/Bhajans'
 import SpiritualFactsPage from '@/pages/SpiritualFacts'
-import EventsPage from '@/pages/Events'
 import NoticesPage from '@/pages/Notices'
 import BlogsPage from '@/pages/Blogs'
 import LeelaayanBooksPage from '@/pages/LeelaayanBooks'
@@ -46,9 +45,6 @@ function App() {
 
               {/* Spiritual Facts Management */}
               <Route path="spiritual-facts" element={<SpiritualFactsPage />} />
-
-              {/* Events Management */}
-              <Route path="events" element={<EventsPage />} />
 
               {/* Notice Board Management */}
               <Route path="notices" element={<NoticesPage />} />

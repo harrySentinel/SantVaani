@@ -2641,12 +2641,6 @@ app.get('/api/sitemap.xml', async (req, res) => {
 
   <!-- Community -->
   <url>
-    <loc>https://santvaani.com/events</loc>
-    <lastmod>${today}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://santvaani.com/donation</loc>
     <lastmod>${today}</lastmod>
     <changefreq>monthly</changefreq>

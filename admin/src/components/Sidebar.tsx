@@ -5,7 +5,6 @@ import {
   Sparkles,
   Music,
   Lightbulb,
-  Calendar,
   Bell,
   Settings,
   X,
@@ -62,13 +61,6 @@ const navigation = [
     href: '/spiritual-facts',
     icon: Lightbulb,
     description: 'Interesting spiritual facts for homepage',
-    count: 0
-  },
-  {
-    name: 'Events',
-    href: '/events',
-    icon: Calendar,
-    description: 'Manage community event submissions',
     count: 0
   },
   {

@@ -51,7 +51,6 @@ export default function Footer() {
     { to: '/santvaani-space', label: language === 'EN' ? 'Santvaani Space' : 'संतवाणी स्पेस' },
     { to: '/prabhu-ki-leelaayen', label: language === 'EN' ? 'Divine Stories' : 'दिव्य कथाएं' },
     { to: '/naam-jap', label: language === 'EN' ? 'Naam Jap' : 'नाम जप' },
-    { to: '/events', label: language === 'EN' ? 'Events' : 'कार्यक्रम' },
     { to: '/donation', label: language === 'EN' ? 'Donate' : 'दान करें' },
   ];
 
