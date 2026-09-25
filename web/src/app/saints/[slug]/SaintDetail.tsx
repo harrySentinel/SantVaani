@@ -10,6 +10,8 @@ import { useToast } from '@/hooks/use-toast';
 import { nativeShare, copyToClipboard, shareOnWhatsApp } from '@/utils/shareUtils';
 import { trackUserBehavior } from '@/lib/analytics';
 import type { Saint } from '@/lib/saints';
+import type { SaintContent } from '@/content/saints/types';
+import SaintStory from './SaintStory';
 
 const focusRing =
   'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ea580c] focus-visible:ring-offset-2 focus-visible:ring-offset-[#faf8f5]';
@@ -38,11 +40,12 @@ interface SaintDetailProps {
   related: Saint[];
   prev: Saint;
   next: Saint;
+  content?: SaintContent | null;
 }
 
 const pressable = 'transition-transform duration-150 active:scale-[0.97]';
 
-export default function SaintDetail({ saint, related, prev, next }: SaintDetailProps) {
+export default function SaintDetail({ saint, related, prev, next, content }: SaintDetailProps) {
   const { language } = useLanguage();
   const { toast } = useToast();
   const HI = language === 'HI';
@@ -217,7 +220,9 @@ export default function SaintDetail({ saint, related, prev, next }: SaintDetailP
             </dl>
           )}
 
-          {description && (
+          {content ? (
+            <SaintStory content={content} saintName={saint.name} saintNameHi={saint.name_hi} saintId={saint.id} />
+          ) : description && (
             <blockquote
               lang={HI && saint.description_hi ? 'hi' : 'en'}
               className="mt-10 border-l-2 border-[#ea580c] pl-5 font-tiro text-[1.35rem] leading-[1.6] text-[#241a12]"
@@ -226,7 +231,7 @@ export default function SaintDetail({ saint, related, prev, next }: SaintDetailP
             </blockquote>
           )}
 
-          {bioTabs.length > 0 && (
+          {!content && bioTabs.length > 0 && (
             <section className="mt-12" aria-labelledby="life-story">
               <div className="flex items-end justify-between gap-4">
                 <h2 id="life-story" className="font-tiro font-normal tracking-normal text-[1.9rem] leading-tight">
