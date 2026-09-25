@@ -63,6 +63,8 @@ const BookCover = ({ title, author, small = false }: { title: string; author: st
   </div>
 );
 
+const stripChapterPrefix = (t: string) => t.replace(/^\s*(chapter|ch\.?|अध्याय)\s*[\d०-९]+\s*[:\-–—.]\s*/i, '') || t;
+
 const SAFFRON_TINT = '240, 150, 50';
 
 // Average the cover's colours (weighted toward saturated pixels) so the header can pick them up.
@@ -236,7 +238,7 @@ const BookDetail: React.FC = () => {
 
       {/* ── Hero ── */}
       <header
-        style={{ background: `linear-gradient(180deg, rgba(${tint}, 0.26) 0%, rgba(${tint}, 0.10) 55%, ${PAGE} 100%)` }}
+        style={{ background: `linear-gradient(180deg, rgba(${tint}, ${coverTint ? 0.5 : 0.26}) 0%, rgba(${tint}, ${coverTint ? 0.18 : 0.1}) 55%, ${PAGE} 100%)` }}
       >
         <div className="max-w-xl mx-auto px-5 pt-5">
           <Link
@@ -248,7 +250,7 @@ const BookDetail: React.FC = () => {
           </Link>
 
           <motion.div
-            className="mt-6 mx-auto w-48 sm:w-56"
+            className="mt-6 mx-auto w-60 sm:w-64"
             initial={reduceMotion ? false : { opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
@@ -376,7 +378,7 @@ const BookDetail: React.FC = () => {
                       <span className="w-6 flex-shrink-0 text-lg text-[#7a6a5c] tabular-nums">{chapter.chapter_number}</span>
                       <div className="flex-1 min-w-0">
                         <h3 className="font-mukta tracking-normal text-lg font-semibold leading-snug text-[#241a12] line-clamp-2">
-                          {HI ? chapter.title_hi || chapter.title : chapter.title}
+                          {stripChapterPrefix(HI ? chapter.title_hi || chapter.title : chapter.title)}
                         </h3>
                         {(HI ? chapter.summary_hi || chapter.summary : chapter.summary) && (
                           <p className="mt-0.5 text-[15px] leading-snug text-[#241a12]/70 line-clamp-2">

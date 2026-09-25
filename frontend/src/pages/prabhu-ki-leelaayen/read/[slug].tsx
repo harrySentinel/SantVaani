@@ -1,17 +1,12 @@
-// Enterprise-Level Story Reader
-// Continuous scroll, progress tracking, mobile gestures, keyboard shortcuts
-
-import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import ReadingProgressBar from '@/components/ReadingProgressBar';
-import {
-  Home, X, Moon, Sun, ZoomIn, ZoomOut, Maximize, Minimize, Maximize2, Minimize2, ChevronRight, ChevronLeft,
-  Languages, CheckCircle, ArrowUp, ChevronDown, Type, Settings, BookOpen, LogIn, TrendingUp
-} from 'lucide-react';
+// Chapter reader: full-page scroll, reading themes, saved position and progress tracking.
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { ChevronLeft, ChevronRight, ArrowRight, Check, Minus, Plus, X, Loader2 } from 'lucide-react';
+import SEO from '@/components/SEO';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabaseClient';
-import { markChapterReading, markChapterCompleted, calculateReadingPercentage } from '@/lib/readingProgress';
+import { markChapterReading, markChapterCompleted } from '@/lib/readingProgress';
 import { useChapterProgress } from '@/hooks/useReadingProgress';
 
 interface Chapter {
@@ -24,78 +19,124 @@ interface Chapter {
   content: string;
   content_hi: string;
   chapter_image?: string;
+  summary?: string | null;
+  summary_hi?: string | null;
   read_time: number;
 }
+
+interface BookInfo {
+  title: string;
+  title_hi: string;
+  slug: string;
+}
+
+type ThemeName = 'paper' | 'sepia' | 'night';
+type FontName = 'serif' | 'sans';
+
+const THEMES: Record<ThemeName, { bg: string; text: string; muted: string; accent: string; rule: string; chrome: string; card: string; label: [string, string] }> = {
+  paper: { bg: '#fbf8f3', text: '#2a211a', muted: '#7a6a5c', accent: '#c2410c', rule: 'rgba(42,33,26,0.12)', chrome: 'rgba(251,248,243,0.94)', card: '#ffffff', label: ['Paper', 'सादा'] },
+  sepia: { bg: '#f3e9d6', text: '#43321f', muted: '#7d6a52', accent: '#a8431a', rule: 'rgba(67,50,31,0.16)', chrome: 'rgba(243,233,214,0.94)', card: '#f9f2e4', label: ['Sepia', 'सीपिया'] },
+  night: { bg: '#1b1814', text: '#e6ddcf', muted: '#a39684', accent: '#f0a35e', rule: 'rgba(230,221,207,0.14)', chrome: 'rgba(27,24,20,0.94)', card: '#25211c', label: ['Night', 'रात'] },
+};
+
+const FONTS: Record<FontName, string> = {
+  serif: '"Tiro Devanagari Hindi", Georgia, serif',
+  sans: 'Mukta, system-ui, sans-serif',
+};
+
+const SIZES = [16, 17, 18, 19, 20, 22, 24, 26];
+const PREFS_KEY = 'santvaani-reader-prefs';
+
+interface Prefs { theme: ThemeName; font: FontName; size: number }
+const DEFAULT_PREFS: Prefs = { theme: 'paper', font: 'serif', size: 19 };
+
+const loadPrefs = (): Prefs => {
+  try {
+    const saved = JSON.parse(localStorage.getItem(PREFS_KEY) || '{}');
+    return {
+      theme: saved.theme in THEMES ? saved.theme : DEFAULT_PREFS.theme,
+      font: saved.font in FONTS ? saved.font : DEFAULT_PREFS.font,
+      size: SIZES.includes(saved.size) ? saved.size : DEFAULT_PREFS.size,
+    };
+  } catch {
+    return DEFAULT_PREFS;
+  }
+};
+
+// Titles are often stored as "Chapter 1: Early Life"; the reader shows the number separately.
+const stripChapterPrefix = (t: string) => t.replace(/^\s*(chapter|ch\.?|अध्याय)\s*[\d०-९]+\s*[:\-–—.]\s*/i, '') || t;
+
+const scrollPercent = () => {
+  const max = document.documentElement.scrollHeight - window.innerHeight;
+  return max > 0 ? Math.min(100, Math.max(0, Math.round((window.scrollY / max) * 100))) : 100;
+};
 
 const BookReader: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  const { language, toggleLanguage } = useLanguage();
+  const { language, setLanguage } = useLanguage();
   const { user } = useAuth();
-  const containerRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
+  const HI = language === 'HI';
 
   const [chapter, setChapter] = useState<Chapter | null>(null);
+  const [book, setBook] = useState<BookInfo | null>(null);
+  const [totalChapters, setTotalChapters] = useState(0);
   const [nextChapter, setNextChapter] = useState<Chapter | null>(null);
   const [prevChapter, setPrevChapter] = useState<Chapter | null>(null);
-  const [fontSize, setFontSize] = useState(18);
-  const [darkMode, setDarkMode] = useState(false);
-  const [isFullscreen, setIsFullscreen] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [showControls, setShowControls] = useState(true);
-  const [showMobileControls, setShowMobileControls] = useState(false);
-  const [showScrollTop, setShowScrollTop] = useState(false);
-  const [showLoginBanner, setShowLoginBanner] = useState(true);
 
-  // Reading progress state
-  const [readingPercentage, setReadingPercentage] = useState(0);
-  const [timeRemaining, setTimeRemaining] = useState(0);
+  const [prefs, setPrefs] = useState<Prefs>(loadPrefs);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [chromeVisible, setChromeVisible] = useState(true);
+  const [percent, setPercent] = useState(0);
+  const [resumedAt, setResumedAt] = useState<number | null>(null);
+  const [completed, setCompleted] = useState(false);
+
   const { progress: chapterProgress, refreshProgress } = useChapterProgress(chapter?.id);
 
-  // Touch gesture handling
-  const touchStartX = useRef(0);
-  const touchEndX = useRef(0);
+  const lastScrollY = useRef(0);
+  const percentRef = useRef(0);
+  const dirtyRef = useRef(false);
+  const restoredRef = useRef(false);
+  const completedRef = useRef(false);
+  const touchStart = useRef<{ x: number; y: number } | null>(null);
 
+  const theme = THEMES[prefs.theme];
+
+  // ── Data ──
   useEffect(() => {
     const fetchChapter = async () => {
       if (!slug) return;
-
       try {
         setLoading(true);
+        restoredRef.current = false;
+        completedRef.current = false;
+        setCompleted(false);
+        setResumedAt(null);
+
         const { data, error } = await supabase
           .from('leelaayen_chapters')
           .select('*')
           .eq('slug', slug)
           .eq('published', true)
           .single();
-
         if (error) throw error;
         setChapter(data);
 
-        // Fetch next chapter
-        const { data: nextData } = await supabase
-          .from('leelaayen_chapters')
-          .select('*')
-          .eq('book_id', data.book_id)
-          .eq('published', true)
-          .gt('chapter_number', data.chapter_number)
-          .order('chapter_number', { ascending: true })
-          .limit(1)
-          .single();
-        setNextChapter(nextData);
+        const [bookRes, nextRes, prevRes, countRes] = await Promise.all([
+          supabase.from('leelaayen_books').select('title, title_hi, slug').eq('id', data.book_id).single(),
+          supabase.from('leelaayen_chapters').select('*').eq('book_id', data.book_id).eq('published', true)
+            .gt('chapter_number', data.chapter_number).order('chapter_number', { ascending: true }).limit(1).maybeSingle(),
+          supabase.from('leelaayen_chapters').select('*').eq('book_id', data.book_id).eq('published', true)
+            .lt('chapter_number', data.chapter_number).order('chapter_number', { ascending: false }).limit(1).maybeSingle(),
+          supabase.from('leelaayen_chapters').select('id', { count: 'exact', head: true }).eq('book_id', data.book_id).eq('published', true),
+        ]);
+        setBook(bookRes.data);
+        setNextChapter(nextRes.data);
+        setPrevChapter(prevRes.data);
+        setTotalChapters(countRes.count || 0);
 
-        // Fetch previous chapter
-        const { data: prevData } = await supabase
-          .from('leelaayen_chapters')
-          .select('*')
-          .eq('book_id', data.book_id)
-          .eq('published', true)
-          .lt('chapter_number', data.chapter_number)
-          .order('chapter_number', { ascending: false })
-          .limit(1)
-          .single();
-        setPrevChapter(prevData);
-
+        window.scrollTo(0, 0);
         await supabase.rpc('increment_chapter_views', { chapter_slug: slug });
       } catch (err) {
         console.error('Error:', err);
@@ -104,837 +145,481 @@ const BookReader: React.FC = () => {
         setLoading(false);
       }
     };
-
     fetchChapter();
   }, [slug, navigate]);
 
-  // Mark chapter as reading when loaded
+  // ── Preferences ──
   useEffect(() => {
-    if (!user || !chapter) return;
+    try { localStorage.setItem(PREFS_KEY, JSON.stringify(prefs)); } catch { /* storage unavailable */ }
+  }, [prefs]);
 
-    const markAsReading = async () => {
-      await markChapterReading(user.id, chapter.id, chapter.book_id, 0, 0);
-      refreshProgress();
-    };
-
-    markAsReading();
-  }, [user, chapter, refreshProgress]);
-
-  // Scroll to saved position
+  // Match the page behind the reader (overscroll, safe areas) to the theme.
   useEffect(() => {
-    if (!chapterProgress || !contentRef.current) return;
+    const prev = document.body.style.backgroundColor;
+    document.body.style.backgroundColor = theme.bg;
+    return () => { document.body.style.backgroundColor = prev; };
+  }, [theme.bg]);
 
-    const scrollPosition = chapterProgress.scroll_position || 0;
-    if (scrollPosition > 0) {
-      setTimeout(() => {
-        contentRef.current?.scrollTo({ top: scrollPosition, behavior: 'smooth' });
-      }, 500);
-    }
-  }, [chapterProgress]);
+  // ── Progress saving ──
+  const saveProgress = useCallback(() => {
+    if (!user || !chapter || !dirtyRef.current) return;
+    dirtyRef.current = false;
+    markChapterReading(user.id, chapter.id, chapter.book_id, Math.round(window.scrollY), percentRef.current);
+  }, [user, chapter]);
 
-  // Track scroll progress and auto-save
-  useEffect(() => {
-    if (!chapter || !contentRef.current) return;
-
-    const handleScroll = () => {
-      const element = contentRef.current;
-      if (!element) return;
-
-      const scrollTop = element.scrollTop;
-      const scrollHeight = element.scrollHeight;
-      const clientHeight = element.clientHeight;
-
-      const percentage = calculateReadingPercentage(scrollTop, scrollHeight, clientHeight);
-      setReadingPercentage(percentage);
-
-      // Calculate time remaining (assuming 200 words per minute)
-      if (chapter.read_time) {
-        const remainingPercentage = 100 - percentage;
-        const remaining = Math.ceil((chapter.read_time * remainingPercentage) / 100);
-        setTimeRemaining(remaining);
-      }
-
-      // Show scroll-to-top button after 20% scroll
-      setShowScrollTop(percentage > 20);
-
-      // Auto-mark as completed when reaching 95% or more
-      if (user && percentage >= 95 && chapterProgress?.status !== 'completed') {
-        markChapterCompleted(user.id, chapter.id, chapter.book_id).then(() => {
-          refreshProgress();
-        });
-      }
-
-      // Auto-save progress
-      if (user) {
-        markChapterReading(user.id, chapter.id, chapter.book_id, scrollTop, percentage);
-      }
-    };
-
-    const saveInterval = setInterval(() => {
-      if (user && contentRef.current) {
-        const scrollPos = contentRef.current.scrollTop;
-        markChapterReading(user.id, chapter.id, chapter.book_id, scrollPos, readingPercentage);
-      }
-    }, 10000); // Save every 10 seconds
-
-    contentRef.current.addEventListener('scroll', handleScroll);
-    const currentContent = contentRef.current;
-
-    return () => {
-      clearInterval(saveInterval);
-      currentContent?.removeEventListener('scroll', handleScroll);
-    };
-  }, [user, chapter, readingPercentage, chapterProgress, refreshProgress]);
-
-  // Manually mark as completed
-  const handleMarkCompleted = async () => {
-    if (!user || !chapter) return;
+  const completeChapter = useCallback(async () => {
+    if (!user || !chapter || completedRef.current) return;
+    completedRef.current = true;
+    setCompleted(true);
     await markChapterCompleted(user.id, chapter.id, chapter.book_id);
     refreshProgress();
-  };
-
-  // Fullscreen handling
-  const toggleFullscreen = async () => {
-    try {
-      if (!document.fullscreenElement) {
-        await containerRef.current?.requestFullscreen();
-      } else {
-        await document.exitFullscreen();
-      }
-    } catch (err) {
-      console.error('Fullscreen error:', err);
-    }
-  };
+  }, [user, chapter, refreshProgress]);
 
   useEffect(() => {
-    const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
+    if (!user || !chapter) return;
+    markChapterReading(user.id, chapter.id, chapter.book_id, 0, 0);
+  }, [user, chapter]);
+
+  useEffect(() => {
+    if (chapterProgress?.status === 'completed') {
+      completedRef.current = true;
+      setCompleted(true);
+    }
+  }, [chapterProgress?.status]);
+
+  // Restore the reader's place once, after the chapter has rendered.
+  useEffect(() => {
+    if (restoredRef.current || loading || !chapter || !chapterProgress) return;
+    restoredRef.current = true;
+    const saved = chapterProgress.reading_percentage || 0;
+    if (saved > 3 && saved < 95) {
+      requestAnimationFrame(() => {
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        window.scrollTo({ top: (saved / 100) * max });
+        setResumedAt(saved);
+      });
+    }
+  }, [loading, chapter, chapterProgress]);
+
+  useEffect(() => {
+    if (resumedAt === null) return;
+    const t = setTimeout(() => setResumedAt(null), 5000);
+    return () => clearTimeout(t);
+  }, [resumedAt]);
+
+  useEffect(() => {
+    if (!chapter) return;
+    let saveTimer: ReturnType<typeof setTimeout> | undefined;
+
+    const onScroll = () => {
+      const y = window.scrollY;
+      const p = scrollPercent();
+      percentRef.current = p;
+      setPercent(p);
+
+      const goingDown = y > lastScrollY.current + 4;
+      const goingUp = y < lastScrollY.current - 4;
+      if (y < 80 || p >= 99) setChromeVisible(true);
+      else if (goingDown) setChromeVisible(false);
+      else if (goingUp) setChromeVisible(true);
+      lastScrollY.current = y;
+
+      if (p >= 95) completeChapter();
+      dirtyRef.current = true;
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(saveProgress, 1500);
     };
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
-  }, []);
 
-  // Auto-hide controls
+    const onHide = () => { if (document.visibilityState === 'hidden') saveProgress(); };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    document.addEventListener('visibilitychange', onHide);
+    window.addEventListener('pagehide', saveProgress);
+    return () => {
+      clearTimeout(saveTimer);
+      saveProgress();
+      window.removeEventListener('scroll', onScroll);
+      document.removeEventListener('visibilitychange', onHide);
+      window.removeEventListener('pagehide', saveProgress);
+    };
+  }, [chapter, saveProgress, completeChapter]);
+
+  // ── Navigation ──
+  const goTo = useCallback((c: Chapter | null) => {
+    if (c) navigate(`/prabhu-ki-leelaayen/read/${c.slug}`);
+  }, [navigate]);
+
   useEffect(() => {
-    if (!showControls) return;
-    const timer = setTimeout(() => setShowControls(false), 3000);
-    return () => clearTimeout(timer);
-  }, [showControls]);
-
-  // Touch gesture handling
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
-  };
-
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    touchEndX.current = e.changedTouches[0].clientX;
-    handleGesture();
-  };
-
-  const handleGesture = () => {
-    const swipeThreshold = 75;
-    const diff = touchStartX.current - touchEndX.current;
-
-    if (Math.abs(diff) < swipeThreshold) return;
-
-    if (diff > 0 && nextChapter) {
-      // Swipe left - next chapter
-      navigate(`/prabhu-ki-leelaayen/read/${nextChapter.slug}`);
-    } else if (diff < 0 && prevChapter) {
-      // Swipe right - previous chapter
-      navigate(`/prabhu-ki-leelaayen/read/${prevChapter.slug}`);
-    }
-  };
-
-  // Keyboard shortcuts
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
+    const onKey = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-
-      switch (e.key) {
-        case 'ArrowLeft':
-          if (prevChapter) navigate(`/prabhu-ki-leelaayen/read/${prevChapter.slug}`);
-          break;
-        case 'ArrowRight':
-          if (nextChapter) navigate(`/prabhu-ki-leelaayen/read/${nextChapter.slug}`);
-          break;
-        case ' ':
-        case 'ArrowDown':
-          e.preventDefault();
-          contentRef.current?.scrollBy({ top: 400, behavior: 'smooth' });
-          break;
-        case 'ArrowUp':
-          e.preventDefault();
-          contentRef.current?.scrollBy({ top: -400, behavior: 'smooth' });
-          break;
-        case 'Home':
-          e.preventDefault();
-          contentRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
-          break;
-        case 'End':
-          e.preventDefault();
-          contentRef.current?.scrollTo({ top: contentRef.current.scrollHeight, behavior: 'smooth' });
-          break;
-        case 'f':
-        case 'F':
-          toggleFullscreen();
-          break;
-        case 'd':
-        case 'D':
-          setDarkMode(!darkMode);
-          break;
-        case '+':
-        case '=':
-          setFontSize(Math.min(26, fontSize + 2));
-          break;
-        case '-':
-          setFontSize(Math.max(14, fontSize - 2));
-          break;
-      }
+      if (e.key === 'Escape') { setSettingsOpen(false); return; }
+      if (settingsOpen) return;
+      if (e.key === 'ArrowLeft') goTo(prevChapter);
+      else if (e.key === 'ArrowRight') goTo(nextChapter);
+      else if (e.key === '+' || e.key === '=') changeSize(1);
+      else if (e.key === '-') changeSize(-1);
     };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  });
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [fontSize, darkMode, prevChapter, nextChapter, navigate]);
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (!touchStart.current || settingsOpen) return;
+    const dx = e.changedTouches[0].clientX - touchStart.current.x;
+    const dy = e.changedTouches[0].clientY - touchStart.current.y;
+    touchStart.current = null;
+    if (Math.abs(dx) < 90 || Math.abs(dx) < Math.abs(dy) * 2) return;
+    goTo(dx < 0 ? nextChapter : prevChapter);
+  };
 
-  const scrollToTop = () => {
-    contentRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+  const changeSize = (step: number) => {
+    setPrefs(p => {
+      const i = SIZES.indexOf(p.size);
+      return { ...p, size: SIZES[Math.min(SIZES.length - 1, Math.max(0, i + step))] };
+    });
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50">
-        <div className="text-center">
-          <div className="text-6xl mb-4 animate-pulse">📖</div>
-          <p className="text-gray-600">
-            {language === 'HI' ? 'पुस्तक खुल रही है...' : 'Opening book...'}
-          </p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: theme.bg }}>
+        <Loader2 className="w-7 h-7 animate-spin" style={{ color: theme.accent }} />
       </div>
     );
   }
 
   if (!chapter) return null;
 
-  const content = language === 'HI' ? chapter.content_hi : chapter.content;
+  const hasHindi = !!chapter.content_hi?.trim();
+  const showingFallback = HI && !hasHindi;
+  const content = HI && hasHindi ? chapter.content_hi : chapter.content;
+  const title = stripChapterPrefix(HI ? chapter.title_hi || chapter.title : chapter.title);
+  const bookTitle = book ? (HI ? book.title_hi || book.title : book.title) : '';
+  const bookUrl = book ? `/prabhu-ki-leelaayen/book/${book.slug}` : '/prabhu-ki-leelaayen';
+  const chapterNum = HI ? chapter.chapter_number.toLocaleString('hi-IN-u-nu-deva') : String(chapter.chapter_number);
+  const totalNum = HI ? totalChapters.toLocaleString('hi-IN-u-nu-deva') : String(totalChapters);
+  const minutesLeft = Math.max(1, Math.ceil((chapter.read_time || 1) * (100 - percent) / 100));
+  const lineHeight = (prefs.font === 'serif' ? 1.8 : 1.75) + (HI && !showingFallback ? 0.12 : 0);
+  const nextSummary = nextChapter ? (HI ? nextChapter.summary_hi || nextChapter.summary : nextChapter.summary) : null;
+
+  const vars = {
+    '--r-bg': theme.bg,
+    '--r-text': theme.text,
+    '--r-muted': theme.muted,
+    '--r-accent': theme.accent,
+    '--r-rule': theme.rule,
+    '--r-card': theme.card,
+    '--r-font': FONTS[prefs.font],
+    '--r-size': `${prefs.size}px`,
+    '--r-lh': lineHeight,
+    background: theme.bg,
+    color: theme.text,
+  } as React.CSSProperties;
+
+  const iconBtn = 'w-10 h-10 rounded-full flex items-center justify-center transition-colors hover:bg-[var(--r-rule)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--r-accent)]';
+  const segBtn = (active: boolean) =>
+    `flex-1 h-11 rounded-xl text-[15px] font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--r-accent)] ${
+      active ? 'bg-[var(--r-text)] text-[var(--r-bg)]' : 'bg-[var(--r-rule)] hover:opacity-80'
+    }`;
 
   return (
-    <div
-      ref={containerRef}
-      className={`${isFullscreen ? 'fixed inset-0 z-50' : 'min-h-screen'} ${
-        darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-amber-50 via-orange-50 to-red-50'
-      } transition-colors duration-500`}
-      onMouseMove={() => setShowControls(true)}
-      onTouchStart={(e) => {
-        setShowControls(true);
-        handleTouchStart(e);
-      }}
-      onTouchEnd={handleTouchEnd}
-    >
-      <ReadingProgressBar targetRef={containerRef} />
-      {/* Top Controls */}
-      <div
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          showControls ? 'translate-y-0' : '-translate-y-full'
-        }`}
+    <div className="min-h-screen font-mukta" style={vars} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+      <SEO
+        title={`${chapter.title}${book ? ` — ${book.title}` : ''} | Santvaani`}
+        description={chapter.summary || `Read ${chapter.title} on Santvaani.`}
+        canonical={`https://santvaani.com/prabhu-ki-leelaayen/read/${chapter.slug}`}
+        ogType="article"
+      />
+
+      {/* ── Top bar ── */}
+      <header
+        className={`fixed inset-x-0 top-0 z-40 backdrop-blur transition-transform duration-300 ${chromeVisible || settingsOpen ? 'translate-y-0' : '-translate-y-full'}`}
+        style={{ background: theme.chrome, borderBottom: `1px solid ${theme.rule}` }}
       >
-        <div
-          className={`${darkMode ? 'bg-gray-800/95' : 'bg-white/95'} backdrop-blur-sm border-b ${
-            darkMode ? 'border-gray-700' : 'border-orange-200'
-          } shadow-lg`}
-        >
-          <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between gap-2">
-            {/* Left - Branding + Home */}
-            <div className="flex items-center gap-1 sm:gap-3">
-              <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-xs sm:text-sm">ॐ</span>
-              </div>
-              {!isFullscreen && (
-                <button
-                  onClick={() => navigate('/prabhu-ki-leelaayen')}
-                  className={`p-1.5 sm:p-2 rounded-lg ${
-                    darkMode ? 'hover:bg-gray-700 text-white' : 'hover:bg-orange-50 text-gray-700'
-                  } transition`}
-                  aria-label="Go home"
-                >
-                  <Home className="w-4 h-4 sm:w-5 sm:h-5" />
-                </button>
-              )}
-            </div>
-
-            {/* Center - Chapter Title + Progress */}
-            <div className="flex-1 text-center px-2 min-w-0">
-              <h1 className={`text-xs sm:text-sm md:text-base font-bold ${darkMode ? 'text-white' : 'text-gray-800'} truncate`}>
-                {language === 'HI' ? chapter.title_hi : chapter.title}
-              </h1>
-              <div className="flex items-center justify-center gap-2 mt-1">
-                {/* Progress Ring */}
-                <div className="relative w-8 h-8 hidden sm:flex">
-                  <svg className="w-full h-full transform -rotate-90">
-                    <circle
-                      cx="16"
-                      cy="16"
-                      r="14"
-                      stroke={darkMode ? '#374151' : '#fed7aa'}
-                      strokeWidth="2"
-                      fill="none"
-                    />
-                    <circle
-                      cx="16"
-                      cy="16"
-                      r="14"
-                      stroke={darkMode ? '#f59e0b' : '#ea580c'}
-                      strokeWidth="2"
-                      fill="none"
-                      strokeDasharray={`${2 * Math.PI * 14}`}
-                      strokeDashoffset={`${2 * Math.PI * 14 * (1 - readingPercentage / 100)}`}
-                      strokeLinecap="round"
-                      className="transition-all duration-300"
-                    />
-                  </svg>
-                  <span className={`absolute inset-0 flex items-center justify-center text-[10px] font-bold ${darkMode ? 'text-orange-400' : 'text-orange-600'}`}>
-                    {Math.round(readingPercentage)}
-                  </span>
-                </div>
-                <div className={`text-[10px] sm:text-xs ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                  {timeRemaining > 0 && (
-                    <span>{timeRemaining} {language === 'HI' ? 'मिनट बाकी' : 'min left'}</span>
-                  )}
-                  {timeRemaining === 0 && readingPercentage >= 95 && (
-                    <span className="text-green-500">✓ {language === 'HI' ? 'पूर्ण' : 'Complete'}</span>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Right - Controls */}
-            <div className="flex items-center gap-0.5 sm:gap-1.5 flex-shrink-0">
-              {/* Mark as Completed */}
-              {user && chapterProgress?.status !== 'completed' && (
-                <button
-                  onClick={handleMarkCompleted}
-                  className={`p-1.5 sm:p-2 rounded-lg ${
-                    darkMode ? 'bg-green-600 hover:bg-green-700' : 'bg-green-500 hover:bg-green-600'
-                  } text-white transition`}
-                  title={language === 'HI' ? 'पूर्ण करें' : 'Mark as Completed'}
-                  aria-label="Mark as completed"
-                >
-                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" />
-                </button>
-              )}
-
-              {/* Mobile Settings Button */}
-              <button
-                onClick={() => setShowMobileControls(!showMobileControls)}
-                className={`sm:hidden p-1.5 rounded-lg ${
-                  darkMode ? 'hover:bg-gray-700 text-white' : 'hover:bg-orange-50 text-gray-700'
-                } transition`}
-                aria-label="Settings"
-              >
-                <Settings className="w-4 h-4" />
-              </button>
-
-              {/* Desktop Controls */}
-              <div className="hidden sm:flex items-center gap-1.5">
-                <button
-                  onClick={toggleLanguage}
-                  className={`p-2 rounded-lg ${
-                    darkMode ? 'hover:bg-gray-700 text-white' : 'hover:bg-orange-50 text-gray-700'
-                  } transition`}
-                  title={language === 'HI' ? 'Switch to English' : 'हिंदी में बदलें'}
-                  aria-label="Toggle language"
-                >
-                  <Languages className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={() => setFontSize(Math.max(14, fontSize - 2))}
-                  className={`p-2 rounded-lg ${
-                    darkMode ? 'hover:bg-gray-700 text-white' : 'hover:bg-orange-50 text-gray-700'
-                  } transition`}
-                  aria-label="Decrease font size"
-                >
-                  <ZoomOut className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={() => setFontSize(Math.min(26, fontSize + 2))}
-                  className={`p-2 rounded-lg ${
-                    darkMode ? 'hover:bg-gray-700 text-white' : 'hover:bg-orange-50 text-gray-700'
-                  } transition`}
-                  aria-label="Increase font size"
-                >
-                  <ZoomIn className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={() => setDarkMode(!darkMode)}
-                  className={`p-2 rounded-lg ${
-                    darkMode ? 'hover:bg-gray-700 text-white' : 'hover:bg-orange-50 text-gray-700'
-                  } transition`}
-                  aria-label={darkMode ? 'Light mode' : 'Dark mode'}
-                >
-                  {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-                </button>
-                <button
-                  onClick={toggleFullscreen}
-                  className={`p-2 rounded-lg ${
-                    darkMode ? 'hover:bg-gray-700 text-white' : 'hover:bg-orange-50 text-gray-700'
-                  } transition`}
-                  aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
-                >
-                  {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
-                </button>
-              </div>
-
-              {isFullscreen && (
-                <button
-                  onClick={toggleFullscreen}
-                  className="p-1.5 sm:p-2 rounded-lg bg-red-500 hover:bg-red-600 text-white transition"
-                  aria-label="Exit fullscreen"
-                >
-                  <X className="w-4 h-4 sm:w-5 sm:h-5" />
-                </button>
-              )}
-            </div>
+        <div className="max-w-3xl mx-auto h-14 px-2 flex items-center gap-1">
+          <Link to={bookUrl} className={iconBtn} aria-label={HI ? 'पुस्तक पर वापस' : 'Back to book'}>
+            <ChevronLeft className="w-5 h-5" />
+          </Link>
+          <div className="flex-1 min-w-0 text-center">
+            <p className="truncate text-[15px] font-semibold leading-tight">{bookTitle}</p>
+            <p className="truncate text-xs" style={{ color: theme.muted }}>
+              {HI ? `अध्याय ${chapterNum}` : `Chapter ${chapterNum}`}
+              {percent > 0 && percent < 100 && (HI ? `, ${minutesLeft} मिनट बाकी` : `, ${minutesLeft} min left`)}
+            </p>
           </div>
+          <button
+            onClick={() => setSettingsOpen(o => !o)}
+            className={`${iconBtn} font-tiro text-lg`}
+            aria-label={HI ? 'पढ़ने की सेटिंग्स' : 'Reading settings'}
+            aria-expanded={settingsOpen}
+          >
+            Aa
+          </button>
         </div>
-      </div>
+        <div className="h-0.5" style={{ background: theme.rule }}>
+          <div className="h-full transition-[width] duration-150" style={{ width: `${percent}%`, background: theme.accent }} />
+        </div>
+      </header>
 
-      {/* Mobile Controls Drawer */}
-      {showMobileControls && (
-        <div className="sm:hidden fixed inset-x-0 bottom-0 z-50 bg-white dark:bg-gray-900 backdrop-blur-sm border-t-2 border-gray-200 dark:border-gray-700 shadow-2xl p-5 animate-slide-up">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-bold text-gray-800 dark:text-white uppercase tracking-wide">
-              {language === 'HI' ? 'सेटिंग्स' : 'Settings'}
-            </h3>
-            <button
-              onClick={() => setShowMobileControls(false)}
-              className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 transition-colors"
-            >
-              <ChevronDown className="w-5 h-5" />
-            </button>
-          </div>
-          <div className="space-y-3">
+      {/* ── Settings ── */}
+      {settingsOpen && (
+        <>
+          <button
+            className="fixed inset-0 z-40 bg-black/20 md:bg-transparent cursor-default"
+            aria-label={HI ? 'बंद करें' : 'Close'}
+            onClick={() => setSettingsOpen(false)}
+          />
+          <div
+            role="dialog"
+            aria-label={HI ? 'पढ़ने की सेटिंग्स' : 'Reading settings'}
+            className="fixed z-50 inset-x-0 bottom-0 rounded-t-3xl p-5 pb-8 md:inset-x-auto md:bottom-auto md:top-16 md:right-[max(1rem,calc(50vw-24rem+0.5rem))] md:w-80 md:rounded-2xl md:pb-5 shadow-2xl animate-in slide-in-from-bottom-4 md:slide-in-from-top-2 fade-in duration-200"
+            style={{ background: theme.card, border: `1px solid ${theme.rule}` }}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-lg font-semibold">{HI ? 'पढ़ने की सेटिंग्स' : 'Reading settings'}</p>
+              <button onClick={() => setSettingsOpen(false)} className={iconBtn} aria-label={HI ? 'बंद करें' : 'Close'}>
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
             <div className="grid grid-cols-3 gap-2">
-              <button
-                onClick={toggleLanguage}
-                className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl bg-gradient-to-br from-orange-50 to-red-50 dark:from-gray-700 dark:to-gray-800 text-gray-800 dark:text-white hover:from-orange-100 hover:to-red-100 dark:hover:from-gray-600 dark:hover:to-gray-700 border border-orange-200 dark:border-gray-600 transition-all shadow-sm hover:shadow-md"
-              >
-                <Languages className="w-5 h-5" />
-                <span className="text-xs font-semibold">{language === 'HI' ? 'English' : 'हिंदी'}</span>
+              {(Object.keys(THEMES) as ThemeName[]).map(name => {
+                const t = THEMES[name];
+                const active = prefs.theme === name;
+                return (
+                  <button
+                    key={name}
+                    onClick={() => setPrefs(p => ({ ...p, theme: name }))}
+                    className="h-16 rounded-xl flex flex-col items-center justify-center gap-0.5 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--r-accent)]"
+                    style={{ background: t.bg, color: t.text, border: `2px solid ${active ? theme.accent : t.rule}` }}
+                    aria-pressed={active}
+                  >
+                    <span className="font-tiro text-lg leading-none">{HI ? 'अ' : 'Aa'}</span>
+                    <span className="text-xs">{t.label[HI ? 1 : 0]}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="mt-4 flex items-center gap-3">
+              <button onClick={() => changeSize(-1)} disabled={prefs.size === SIZES[0]} className={`${iconBtn} bg-[var(--r-rule)] disabled:opacity-40`} aria-label={HI ? 'अक्षर छोटे करें' : 'Smaller text'}>
+                <Minus className="w-4 h-4" />
               </button>
-              <button
-                onClick={() => setDarkMode(!darkMode)}
-                className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl bg-gradient-to-br from-orange-50 to-red-50 dark:from-gray-700 dark:to-gray-800 text-gray-800 dark:text-white hover:from-orange-100 hover:to-red-100 dark:hover:from-gray-600 dark:hover:to-gray-700 border border-orange-200 dark:border-gray-600 transition-all shadow-sm hover:shadow-md"
-              >
-                {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-                <span className="text-xs font-semibold">{darkMode ? 'Light' : 'Dark'}</span>
-              </button>
-              <button
-                onClick={toggleFullscreen}
-                className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl bg-gradient-to-br from-orange-50 to-red-50 dark:from-gray-700 dark:to-gray-800 text-gray-800 dark:text-white hover:from-orange-100 hover:to-red-100 dark:hover:from-gray-600 dark:hover:to-gray-700 border border-orange-200 dark:border-gray-600 transition-all shadow-sm hover:shadow-md"
-              >
-                {isFullscreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
-                <span className="text-xs font-semibold">{isFullscreen ? (language === 'HI' ? 'बाहर निकलें' : 'Exit') : (language === 'HI' ? 'फुल स्क्रीन' : 'Fullscreen')}</span>
+              <div className="flex-1 flex items-end justify-center gap-1.5" aria-hidden="true">
+                {SIZES.map(s => (
+                  <span key={s} className="w-1.5 rounded-full" style={{ height: 6 + (s - 14) * 1.3, background: s <= prefs.size ? theme.accent : theme.rule }} />
+                ))}
+              </div>
+              <button onClick={() => changeSize(1)} disabled={prefs.size === SIZES[SIZES.length - 1]} className={`${iconBtn} bg-[var(--r-rule)] disabled:opacity-40`} aria-label={HI ? 'अक्षर बड़े करें' : 'Larger text'}>
+                <Plus className="w-4 h-4" />
               </button>
             </div>
-            <div className="bg-gradient-to-br from-gray-50 to-orange-50 dark:from-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-4 shadow-sm">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <Type className="w-5 h-5 text-orange-600 dark:text-orange-400" />
-                  <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">
-                    {language === 'HI' ? 'फ़ॉन्ट साइज़' : 'Font Size'}
-                  </span>
-                </div>
-                <span className="text-sm font-bold text-orange-600 dark:text-orange-400 bg-white dark:bg-gray-700 px-2 py-0.5 rounded-lg border border-orange-200 dark:border-orange-900">{fontSize}px</span>
-              </div>
-              <input
-                type="range"
-                min="14"
-                max="26"
-                step="2"
-                value={fontSize}
-                onChange={(e) => setFontSize(Number(e.target.value))}
-                className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer slider-thumb"
-                style={{
-                  background: darkMode
-                    ? `linear-gradient(to right, #f97316 0%, #f97316 ${((fontSize - 14) / 12) * 100}%, #374151 ${((fontSize - 14) / 12) * 100}%, #374151 100%)`
-                    : `linear-gradient(to right, #f97316 0%, #f97316 ${((fontSize - 14) / 12) * 100}%, #e5e7eb ${((fontSize - 14) / 12) * 100}%, #e5e7eb 100%)`
-                }}
-              />
+
+            <div className="mt-4 flex gap-2">
+              <button onClick={() => setPrefs(p => ({ ...p, font: 'serif' }))} className={`${segBtn(prefs.font === 'serif')} font-tiro`} aria-pressed={prefs.font === 'serif'}>
+                {HI ? 'पुस्तक' : 'Book'}
+              </button>
+              <button onClick={() => setPrefs(p => ({ ...p, font: 'sans' }))} className={`${segBtn(prefs.font === 'sans')} font-mukta`} aria-pressed={prefs.font === 'sans'}>
+                {HI ? 'सरल' : 'Clean'}
+              </button>
+            </div>
+
+            <div className="mt-2 flex gap-2">
+              <button onClick={() => setLanguage('HI')} className={segBtn(HI)} aria-pressed={HI}>हिंदी</button>
+              <button onClick={() => setLanguage('EN')} className={segBtn(!HI)} aria-pressed={!HI}>English</button>
             </div>
           </div>
-        </div>
+        </>
       )}
 
-      {/* Main Content - Continuous Scroll */}
-      <div
-        className={`${isFullscreen ? 'h-screen pt-20' : 'min-h-screen pt-24 sm:pt-20'} flex items-start justify-center ${
-          isFullscreen ? 'p-0' : 'p-2 sm:p-4 pb-20'
-        }`}
-      >
-        <div className={`w-full ${isFullscreen ? 'h-full' : 'max-w-4xl'}`}>
-          {/* Book Container */}
+      {/* ── Chapter ── */}
+      <main className="px-5 pt-28 pb-24 md:pt-36">
+        <article className="mx-auto max-w-[36rem]">
+          <header className="text-center mb-12 md:mb-16">
+            <p className="text-[15px]" style={{ color: theme.accent }}>
+              {HI ? `अध्याय ${chapterNum}` : `Chapter ${chapterNum}`}
+              {totalChapters > 1 && <span style={{ color: theme.muted }}>{HI ? ` / ${totalNum}` : ` of ${totalNum}`}</span>}
+            </p>
+            <h1 className="mt-4 font-tiro font-normal tracking-normal text-[2.1rem] sm:text-[2.6rem] leading-[1.2]">
+              {title}
+            </h1>
+            <p className="mt-4 text-sm" style={{ color: theme.muted }}>
+              {chapter.read_time} {HI ? 'मिनट का पाठ' : 'min read'}
+            </p>
+            {showingFallback && (
+              <p className="mt-4 inline-block rounded-full px-4 py-1.5 text-sm" style={{ background: theme.rule }}>
+                हिंदी अनुवाद जल्द आ रहा है, तब तक अंग्रेज़ी में पढ़ें
+              </p>
+            )}
+          </header>
+
+          {chapter.chapter_image && (
+            <img src={chapter.chapter_image} alt="" className="w-full rounded-xl mb-12" />
+          )}
+
           <div
-            className={`${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} ${
-              isFullscreen ? 'rounded-none h-full' : 'rounded-xl sm:rounded-2xl'
-            } shadow-2xl ${isFullscreen ? 'border-0' : 'border-2'} overflow-hidden`}
-            style={{ minHeight: isFullscreen ? '100%' : '70vh' }}
-          >
-            {/* Content - Continuous Scroll */}
-            <div
-              ref={contentRef}
-              className="h-full overflow-y-auto custom-scrollbar"
-              style={{ maxHeight: isFullscreen ? 'calc(100vh - 80px)' : '80vh' }}
-            >
-              <article className={`${isFullscreen ? 'p-6 sm:p-12 md:p-20 max-w-5xl' : 'p-6 sm:p-8 md:p-16 max-w-3xl'} mx-auto`}>
-                <div
-                  className="enhanced-content"
-                  style={{
-                    fontSize: `${fontSize}px`,
-                    lineHeight: '1.9',
-                    fontFamily: language === 'HI' ? "'Noto Sans Devanagari', sans-serif" : 'Georgia, serif',
-                    color: darkMode ? '#e5e7eb' : '#1f2937',
-                  }}
-                  dangerouslySetInnerHTML={{ __html: content }}
-                />
+            className={`reader-prose ${!HI || showingFallback ? 'drop-cap' : ''}`}
+            dangerouslySetInnerHTML={{ __html: content }}
+          />
 
-                {/* Chapter Image */}
-                {chapter.chapter_image && (
-                  <div className="mt-12 mb-8">
-                    <img
-                      src={chapter.chapter_image}
-                      alt={chapter.title}
-                      className="w-full rounded-2xl shadow-2xl"
-                    />
+          {/* ── End of chapter ── */}
+          <div className="mt-16 text-center font-tiro text-2xl" style={{ color: theme.accent }} aria-hidden="true">॥</div>
+
+          <section className="mt-10 space-y-4">
+            {user && completed && (
+              <p className="text-center text-sm inline-flex w-full items-center justify-center gap-1.5" style={{ color: theme.muted }}>
+                <Check className="w-4 h-4" style={{ color: theme.accent }} strokeWidth={3} />
+                {HI ? 'अध्याय पूरा हुआ' : 'Chapter finished'}
+              </p>
+            )}
+
+            {nextChapter ? (
+              <Link
+                to={`/prabhu-ki-leelaayen/read/${nextChapter.slug}`}
+                className="group block rounded-2xl p-5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--r-accent)]"
+                style={{ background: theme.card, border: `1px solid ${theme.rule}` }}
+              >
+                <p className="text-sm" style={{ color: theme.accent }}>{HI ? 'अगला अध्याय' : 'Next chapter'}</p>
+                <div className="mt-1 flex items-center gap-4">
+                  <div className="flex-1 min-w-0">
+                    <p className="font-tiro text-xl leading-snug">{stripChapterPrefix(HI ? nextChapter.title_hi || nextChapter.title : nextChapter.title)}</p>
+                    {nextSummary && <p className="mt-1 text-[15px] line-clamp-2" style={{ color: theme.muted }}>{nextSummary}</p>}
+                    <p className="mt-2 text-sm" style={{ color: theme.muted }}>{nextChapter.read_time} {HI ? 'मिनट' : 'min'}</p>
                   </div>
-                )}
-
-                {/* Login Banner for non-logged-in users */}
-                {!user && showLoginBanner && (
-                  <div className="my-12 p-6 bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 border-2 border-orange-300 dark:border-orange-700 rounded-2xl relative">
-                    <button
-                      onClick={() => setShowLoginBanner(false)}
-                      className="absolute top-3 right-3 p-1 rounded-full hover:bg-orange-200 dark:hover:bg-orange-800 transition"
-                      aria-label="Close"
-                    >
-                      <X className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-                    </button>
-                    <div className="flex flex-col sm:flex-row items-start gap-4">
-                      <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-orange-500 to-red-600 rounded-full flex items-center justify-center">
-                        <TrendingUp className="w-6 h-6 text-white" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-                          {language === 'HI' ? '🎯 अपनी पढ़ाई की प्रगति ट्रैक करें' : '🎯 Track Your Reading Progress'}
-                        </h3>
-                        <p className="text-gray-700 dark:text-gray-300 mb-4">
-                          {language === 'HI'
-                            ? 'लॉगिन करें और अपनी पढ़ाई जारी रखें जहां आपने छोड़ा था। हर डिवाइस पर अपनी प्रगति सिंक करें!'
-                            : 'Login to save your reading position, track progress across devices, and never lose your place!'}
-                        </p>
-                        <ul className="text-sm text-gray-600 dark:text-gray-400 mb-4 space-y-1">
-                          <li>✓ {language === 'HI' ? 'स्वचालित प्रगति सहेजना' : 'Auto-save your reading position'}</li>
-                          <li>✓ {language === 'HI' ? 'सभी डिवाइस में सिंक' : 'Sync across all devices'}</li>
-                          <li>✓ {language === 'HI' ? 'पूर्ण अध्यायों को ट्रैक करें' : 'Track completed chapters'}</li>
-                          <li>✓ {language === 'HI' ? 'पढ़ाई की आदतें देखें' : 'View your reading stats'}</li>
-                        </ul>
-                        <div className="flex gap-3">
-                          <button
-                            onClick={() => navigate('/login')}
-                            className="px-6 py-2.5 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all flex items-center gap-2"
-                          >
-                            <LogIn className="w-4 h-4" />
-                            {language === 'HI' ? 'लॉगिन करें' : 'Login'}
-                          </button>
-                          <button
-                            onClick={() => navigate('/signup')}
-                            className="px-6 py-2.5 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-800 dark:text-white font-semibold rounded-lg border-2 border-orange-300 dark:border-orange-700 transition-all"
-                          >
-                            {language === 'HI' ? 'साइन अप करें' : 'Sign Up Free'}
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Chapter Navigation */}
-                <div className="mt-16 pt-8 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
-                  {prevChapter ? (
-                    <button
-                      onClick={() => navigate(`/prabhu-ki-leelaayen/read/${prevChapter.slug}`)}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
-                        darkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-orange-50 hover:bg-orange-100 text-gray-800'
-                      } transition`}
-                    >
-                      <ChevronLeft className="w-5 h-5" />
-                      <div className="text-left">
-                        <div className="text-xs text-gray-500 dark:text-gray-400">
-                          {language === 'HI' ? 'पिछला' : 'Previous'}
-                        </div>
-                        <div className="text-sm font-semibold truncate max-w-32">
-                          {language === 'HI' ? prevChapter.title_hi : prevChapter.title}
-                        </div>
-                      </div>
-                    </button>
-                  ) : (
-                    <div></div>
-                  )}
-
-                  {nextChapter && (
-                    <button
-                      onClick={() => navigate(`/prabhu-ki-leelaayen/read/${nextChapter.slug}`)}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
-                        darkMode
-                          ? 'bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700'
-                          : 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600'
-                      } text-white transition`}
-                    >
-                      <div className="text-right">
-                        <div className="text-xs text-orange-100">
-                          {language === 'HI' ? 'अगला' : 'Next'}
-                        </div>
-                        <div className="text-sm font-semibold truncate max-w-32">
-                          {language === 'HI' ? nextChapter.title_hi : nextChapter.title}
-                        </div>
-                      </div>
-                      <ChevronRight className="w-5 h-5" />
-                    </button>
-                  )}
+                  <span className="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center transition-transform group-hover:translate-x-0.5" style={{ background: theme.text, color: theme.bg }}>
+                    <ArrowRight className="w-5 h-5" />
+                  </span>
                 </div>
-              </article>
-            </div>
-          </div>
-        </div>
-      </div>
+              </Link>
+            ) : (
+              <div className="rounded-2xl p-6 text-center" style={{ background: theme.card, border: `1px solid ${theme.rule}` }}>
+                <p className="font-tiro text-xl">{HI ? `आपने "${bookTitle}" पूरी पढ़ ली` : `You've reached the end of ${bookTitle}`}</p>
+                <Link
+                  to={bookUrl}
+                  className="mt-4 inline-flex items-center gap-2 h-11 px-6 rounded-full text-[15px] font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--r-accent)]"
+                  style={{ background: theme.text, color: theme.bg }}
+                >
+                  {HI ? 'पुस्तक पर वापस जाएं' : 'Back to the book'}
+                </Link>
+              </div>
+            )}
 
-      {/* Scroll to Top Button */}
-      {showScrollTop && (
-        <button
-          onClick={scrollToTop}
-          className={`fixed bottom-6 right-6 z-40 w-12 h-12 rounded-full ${
-            darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-white hover:bg-orange-50'
-          } shadow-xl border-2 ${
-            darkMode ? 'border-gray-600' : 'border-orange-300'
-          } flex items-center justify-center transition-all hover:scale-110 active:scale-95`}
-          aria-label="Scroll to top"
-        >
-          <ArrowUp className={`w-6 h-6 ${darkMode ? 'text-orange-400' : 'text-orange-600'}`} />
+            {prevChapter && (
+              <Link
+                to={`/prabhu-ki-leelaayen/read/${prevChapter.slug}`}
+                className="flex items-center gap-1 text-[15px] rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--r-accent)]"
+                style={{ color: theme.muted }}
+              >
+                <ChevronLeft className="w-4 h-4 flex-shrink-0" />
+                <span className="truncate">
+                  {HI ? 'पिछला: ' : 'Previous: '}
+                  {HI ? prevChapter.title_hi || prevChapter.title : prevChapter.title}
+                </span>
+              </Link>
+            )}
+
+            {!user && (
+              <p className="pt-2 text-center text-sm" style={{ color: theme.muted }}>
+                <Link to="/login" className="underline underline-offset-4" style={{ color: theme.text }}>
+                  {HI ? 'लॉगिन करें' : 'Sign in'}
+                </Link>{' '}
+                {HI ? 'ताकि आपकी जगह और प्रगति सहेजी रहे' : 'to save your place and progress'}
+              </p>
+            )}
+          </section>
+        </article>
+      </main>
+
+      {/* Desktop chapter arrows */}
+      {prevChapter && (
+        <button onClick={() => goTo(prevChapter)} className={`hidden xl:flex fixed left-6 top-1/2 -translate-y-1/2 ${iconBtn} w-12 h-12`} style={{ border: `1px solid ${theme.rule}` }} aria-label={HI ? 'पिछला अध्याय' : 'Previous chapter'}>
+          <ChevronLeft className="w-5 h-5" />
+        </button>
+      )}
+      {nextChapter && (
+        <button onClick={() => goTo(nextChapter)} className={`hidden xl:flex fixed right-6 top-1/2 -translate-y-1/2 ${iconBtn} w-12 h-12`} style={{ border: `1px solid ${theme.rule}` }} aria-label={HI ? 'अगला अध्याय' : 'Next chapter'}>
+          <ChevronRight className="w-5 h-5" />
         </button>
       )}
 
-      {/* Floating Navigation Buttons (only on desktop) */}
-      <div className="hidden lg:block">
-        {prevChapter && (
-          <button
-            onClick={() => navigate(`/prabhu-ki-leelaayen/read/${prevChapter.slug}`)}
-            className={`fixed left-4 top-1/2 -translate-y-1/2 z-40 w-14 h-14 rounded-full ${
-              darkMode ? 'bg-gray-800 hover:bg-gray-700' : 'bg-white hover:bg-orange-50'
-            } shadow-xl border-2 ${
-              darkMode ? 'border-gray-600' : 'border-orange-300'
-            } flex items-center justify-center transition-all hover:scale-110 active:scale-95`}
-            title={language === 'HI' ? 'पिछला अध्याय' : 'Previous Chapter'}
-            aria-label="Previous chapter"
-          >
-            <ChevronLeft className={`w-7 h-7 ${darkMode ? 'text-white' : 'text-orange-600'}`} />
-          </button>
-        )}
-
-        {nextChapter && (
-          <button
-            onClick={() => navigate(`/prabhu-ki-leelaayen/read/${nextChapter.slug}`)}
-            className={`fixed right-4 top-1/2 -translate-y-1/2 z-40 w-14 h-14 rounded-full ${
-              darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600'
-            } shadow-xl border-2 border-transparent flex items-center justify-center transition-all hover:scale-110 active:scale-95`}
-            title={language === 'HI' ? 'अगला अध्याय' : 'Next Chapter'}
-            aria-label="Next chapter"
-          >
-            <ChevronRight className="w-7 h-7 text-white" />
-          </button>
-        )}
-      </div>
-
-      {/* Progress Bar at Bottom */}
-      {!isFullscreen && (
-        <div className="fixed bottom-0 left-0 right-0 z-30 h-1 bg-gray-200 dark:bg-gray-800">
-          <div
-            className="h-full bg-gradient-to-r from-orange-500 via-red-500 to-orange-600 transition-all duration-300"
-            style={{ width: `${readingPercentage}%` }}
-          />
+      {/* Resume notice */}
+      {resumedAt !== null && (
+        <div className="fixed z-30 bottom-6 inset-x-0 flex justify-center px-5 animate-in fade-in slide-in-from-bottom-2 duration-300">
+          <div className="flex items-center gap-3 rounded-full pl-5 pr-2 py-2 shadow-lg text-sm" style={{ background: theme.text, color: theme.bg }}>
+            {HI ? `आप वहीं से पढ़ रहे हैं जहां छोड़ा था (${resumedAt}%)` : `Picked up where you left off (${resumedAt}%)`}
+            <button
+              onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); setResumedAt(null); }}
+              className="rounded-full px-3 py-1.5 font-semibold"
+              style={{ background: theme.bg, color: theme.text }}
+            >
+              {HI ? 'शुरू से' : 'Start over'}
+            </button>
+          </div>
         </div>
       )}
 
       <style>{`
-        /* Beautiful Chapter Headings */
-        .enhanced-content h1,
-        .enhanced-content h2 {
-          font-size: 2em;
-          font-weight: 800;
-          margin: 1.5em 0 1em;
-          padding-bottom: 0.5em;
-          border-bottom: 3px solid ${darkMode ? '#f59e0b' : '#ea580c'};
-          color: ${darkMode ? '#fbbf24' : '#ea580c'};
+        .reader-prose {
+          font-family: var(--r-font);
+          font-size: var(--r-size);
+          line-height: var(--r-lh);
+          color: var(--r-text);
+          overflow-wrap: break-word;
+        }
+        .reader-prose > h1:first-child { display: none; }
+        .reader-prose h1, .reader-prose h2 {
+          font-family: "Tiro Devanagari Hindi", Georgia, serif;
+          font-weight: 400;
+          letter-spacing: normal;
+          font-size: 1.45em;
+          line-height: 1.3;
+          margin: 2.2em 0 0.75em;
+          color: var(--r-text);
           text-align: center;
-          letter-spacing: 0.02em;
         }
-
-        .enhanced-content h3 {
-          font-size: 1.5em;
-          font-weight: 700;
-          margin: 1.2em 0 0.8em;
-          color: ${darkMode ? '#fcd34d' : '#f97316'};
+        .reader-prose h3 {
+          font-family: var(--r-font);
+          font-weight: 600;
+          letter-spacing: normal;
+          font-size: 1.1em;
+          line-height: 1.4;
+          margin: 2em 0 0.6em;
+          color: var(--r-text);
         }
-
-        /* Elegant Paragraphs */
-        .enhanced-content p {
-          margin-bottom: 1.5em;
-          text-align: justify;
-          text-indent: 2em;
-          hyphens: auto;
-          word-spacing: 0.05em;
+        .reader-prose p { margin: 0 0 1.15em; }
+        .reader-prose p:has(> em:only-child),
+        .reader-prose blockquote {
+          margin: 1.8em 0;
+          padding: 0.15em 0 0.15em 1.1em;
+          border-left: 2px solid var(--r-accent);
+          font-family: "Tiro Devanagari Hindi", Georgia, serif;
+          font-size: 1.08em;
+          line-height: 1.7;
         }
-
-        /* Magnificent Drop Cap */
-        .enhanced-content p:first-of-type {
-          margin-top: 1.5em;
-        }
-
-        .enhanced-content p:first-of-type::first-letter {
-          font-size: 4em;
-          font-weight: 900;
+        .reader-prose blockquote p { margin: 0; }
+        .reader-prose em { font-style: italic; }
+        .reader-prose strong { font-weight: 600; }
+        .reader-prose a { color: var(--r-accent); text-decoration: underline; text-underline-offset: 3px; }
+        .reader-prose ul, .reader-prose ol { margin: 0 0 1.15em; padding-left: 1.4em; }
+        .reader-prose ul { list-style: disc; }
+        .reader-prose ol { list-style: decimal; }
+        .reader-prose li { margin-bottom: 0.4em; }
+        .reader-prose hr { border: 0; margin: 2.4em 0; text-align: center; }
+        .reader-prose hr::after { content: "॥"; color: var(--r-accent); font-family: "Tiro Devanagari Hindi", serif; }
+        .reader-prose img { max-width: 100%; height: auto; border-radius: 10px; margin: 1.6em 0; }
+        .reader-prose.drop-cap > p:first-of-type::first-letter {
           float: left;
-          line-height: 0.85;
-          margin: 0.08em 0.12em 0 0;
-          padding: 0.1em 0.15em;
-          background: ${darkMode ? 'linear-gradient(135deg, #f59e0b 0%, #ea580c 100%)' : 'linear-gradient(135deg, #ea580c 0%, #dc2626 100%)'};
-          color: white;
-          border-radius: 8px;
-          box-shadow: 0 4px 12px rgba(234, 88, 12, 0.3);
+          font-family: "Tiro Devanagari Hindi", Georgia, serif;
+          font-size: 3.3em;
+          line-height: 0.9;
+          margin: 0.07em 0.1em 0 0;
+          color: var(--r-accent);
         }
-
-        /* Blockquotes for Sacred Texts */
-        .enhanced-content blockquote {
-          margin: 2em 0;
-          padding: 1.5em 2em;
-          border-left: 5px solid ${darkMode ? '#f59e0b' : '#ea580c'};
-          background: ${darkMode ? 'rgba(245, 158, 11, 0.1)' : 'rgba(234, 88, 12, 0.05)'};
-          font-style: italic;
-          border-radius: 0 8px 8px 0;
-        }
-
-        /* Strong emphasis */
-        .enhanced-content strong {
-          color: ${darkMode ? '#fbbf24' : '#ea580c'};
-          font-weight: 700;
-        }
-
-        /* Emphasis */
-        .enhanced-content em {
-          color: ${darkMode ? '#fcd34d' : '#f97316'};
-        }
-
-        /* Lists */
-        .enhanced-content ul,
-        .enhanced-content ol {
-          margin: 1.5em 0;
-          padding-left: 2.5em;
-        }
-
-        .enhanced-content li {
-          margin-bottom: 0.8em;
-          line-height: 1.9;
-        }
-
-        /* Horizontal Rules */
-        .enhanced-content hr {
-          margin: 2.5em auto;
-          border: none;
-          height: 3px;
-          background: ${darkMode ? 'linear-gradient(90deg, transparent, #f59e0b, transparent)' : 'linear-gradient(90deg, transparent, #ea580c, transparent)'};
-          width: 50%;
-        }
-
-        /* Beautiful Scrollbar */
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 12px;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: ${darkMode ? '#374151' : '#fed7aa'};
-          border-radius: 10px;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: ${darkMode ? 'linear-gradient(180deg, #f59e0b 0%, #ea580c 100%)' : 'linear-gradient(180deg, #f97316 0%, #dc2626 100%)'};
-          border-radius: 10px;
-          border: 2px solid ${darkMode ? '#374151' : '#fed7aa'};
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: ${darkMode ? 'linear-gradient(180deg, #fbbf24 0%, #f59e0b 100%)' : 'linear-gradient(180deg, #fb923c 0%, #ea580c 100%)'};
-        }
-
-        @keyframes slide-up {
-          from {
-            transform: translateY(100%);
-          }
-          to {
-            transform: translateY(0);
-          }
-        }
-
-        .animate-slide-up {
-          animation: slide-up 0.3s ease-out;
-        }
-
-        /* Beautiful Range Slider */
-        input[type="range"].slider-thumb {
-          -webkit-appearance: none;
-          appearance: none;
-          height: 8px;
-          border-radius: 8px;
-          outline: none;
-        }
-
-        input[type="range"].slider-thumb::-webkit-slider-thumb {
-          -webkit-appearance: none;
-          appearance: none;
-          width: 20px;
-          height: 20px;
-          border-radius: 50%;
-          background: ${darkMode ? 'linear-gradient(135deg, #fb923c 0%, #f97316 100%)' : 'linear-gradient(135deg, #f97316 0%, #dc2626 100%)'};
-          cursor: pointer;
-          box-shadow: 0 2px 8px rgba(249, 115, 22, 0.4);
-          border: 2px solid ${darkMode ? '#1f2937' : 'white'};
-          transition: all 0.2s ease;
-        }
-
-        input[type="range"].slider-thumb::-webkit-slider-thumb:hover {
-          transform: scale(1.15);
-          box-shadow: 0 4px 12px rgba(249, 115, 22, 0.6);
-        }
-
-        input[type="range"].slider-thumb::-webkit-slider-thumb:active {
-          transform: scale(1.05);
-        }
-
-        input[type="range"].slider-thumb::-moz-range-thumb {
-          width: 20px;
-          height: 20px;
-          border-radius: 50%;
-          background: ${darkMode ? 'linear-gradient(135deg, #fb923c 0%, #f97316 100%)' : 'linear-gradient(135deg, #f97316 0%, #dc2626 100%)'};
-          cursor: pointer;
-          box-shadow: 0 2px 8px rgba(249, 115, 22, 0.4);
-          border: 2px solid ${darkMode ? '#1f2937' : 'white'};
-          transition: all 0.2s ease;
-        }
-
-        input[type="range"].slider-thumb::-moz-range-thumb:hover {
-          transform: scale(1.15);
-          box-shadow: 0 4px 12px rgba(249, 115, 22, 0.6);
-        }
-
-        input[type="range"].slider-thumb::-moz-range-thumb:active {
-          transform: scale(1.05);
+        ::selection { background: color-mix(in srgb, var(--r-accent) 28%, transparent); }
+        @media (prefers-reduced-motion: reduce) {
+          header, .reader-prose { transition: none !important; }
         }
       `}</style>
     </div>

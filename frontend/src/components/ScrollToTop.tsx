@@ -1,14 +1,18 @@
 import { useState, useEffect } from 'react';
 import { ArrowUp } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 
 export default function ScrollToTop() {
   const [visible, setVisible] = useState(false);
+  const { pathname } = useLocation();
 
   useEffect(() => {
     const onScroll = () => setVisible(window.scrollY > 400);
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
+  if (pathname.startsWith('/prabhu-ki-leelaayen/read/')) return null;
 
   const scrollUp = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
