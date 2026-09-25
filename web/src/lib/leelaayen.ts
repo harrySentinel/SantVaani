@@ -126,3 +126,12 @@ export const getChapterPage = cache(async (slug: string) => {
     totalChapters: countRes.count ?? 0,
   };
 });
+
+export const getLibrary = cache(async () => {
+  const { data } = await supabase
+    .from('leelaayen_books')
+    .select('id, title, title_hi, slug, description, description_hi, cover_image, author, author_hi, total_chapters, views, is_santvaani_original')
+    .eq('published', true)
+    .order('created_at', { ascending: true });
+  return (data ?? []) as Book[];
+});

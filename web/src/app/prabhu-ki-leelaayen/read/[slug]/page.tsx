@@ -5,6 +5,11 @@ import ChapterReader from './ChapterReader';
 
 export const revalidate = 300;
 
+// Render each book/chapter on its first visit, then serve it from cache (refreshed every 5 minutes).
+export async function generateStaticParams() {
+  return [];
+}
+
 export async function generateMetadata(props: PageProps<'/prabhu-ki-leelaayen/read/[slug]'>): Promise<Metadata> {
   const { slug } = await props.params;
   const data = await getChapterPage(slug);

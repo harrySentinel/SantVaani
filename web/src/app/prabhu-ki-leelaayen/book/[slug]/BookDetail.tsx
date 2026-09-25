@@ -13,28 +13,12 @@ import { useBookProgress } from '@/hooks/useReadingProgress';
 import { useToast } from '@/hooks/use-toast';
 import { nativeShare, copyToClipboard } from '@/utils/shareUtils';
 import { stripChapterPrefix, type Book, type ChapterSummary as Chapter, type MoreBook } from '@/lib/leelaayen';
+import BookCover, { coverShadow } from '@/components/leelaayen/BookCover';
 
 const PAGE = '#faf8f5';
 
 const focusRing = 'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ea580c] focus-visible:ring-offset-2 focus-visible:ring-offset-[#faf8f5]';
 
-const coverShadow = 'shadow-[0_24px_48px_-16px_rgba(36,26,18,0.45)]';
-
-const BookCover = ({ title, author, small = false }: { title: string; author: string; small?: boolean }) => (
-  <div
-    className={`w-full aspect-[2/3] rounded-md bg-[#f1e7d8] border border-[#e4d6c1] flex flex-col justify-between text-center ${
-      small ? 'px-2 py-3 shadow-md' : `px-5 py-8 ${coverShadow}`
-    }`}
-  >
-    <span className={`font-tiro text-[#c2410c] ${small ? 'text-xs' : 'text-lg'}`}>ॐ</span>
-    <div className={small ? 'space-y-1.5' : 'space-y-4'}>
-      <div className={`h-px bg-[#241a12]/25 mx-auto ${small ? 'w-5' : 'w-10'}`} />
-      <p className={`font-tiro leading-tight text-[#241a12] ${small ? 'text-sm' : 'text-[1.7rem]'}`}>{title}</p>
-      <div className={`h-px bg-[#241a12]/25 mx-auto ${small ? 'w-5' : 'w-10'}`} />
-    </div>
-    <p className={`tracking-wide text-[#241a12]/60 ${small ? 'text-[9px]' : 'text-xs'}`}>{author}</p>
-  </div>
-);
 
 const SAFFRON_TINT = '240, 150, 50';
 
