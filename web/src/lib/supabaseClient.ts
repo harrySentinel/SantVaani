@@ -1,0 +1,17 @@
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+
+const isBrowser = typeof window !== 'undefined';
+
+// Same storage key as the legacy Vite app, so a session is shared across old and new pages on santvaani.com.
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: isBrowser,
+    autoRefreshToken: isBrowser,
+    detectSessionInUrl: isBrowser,
+    storageKey: 'santvaani-auth',
+    storage: isBrowser ? window.localStorage : undefined,
+  },
+});
