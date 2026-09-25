@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { useToast } from '@/hooks/use-toast'
 import { supabase } from '@/lib/supabase'
@@ -19,6 +20,8 @@ interface Chapter {
   content: string
   content_hi: string
   chapter_image?: string
+  summary?: string | null
+  summary_hi?: string | null
   read_time: number
   published: boolean
 }
@@ -44,6 +47,8 @@ export default function LeelaayanChapterForm({ chapter, bookId, onSuccess, onCan
     content: '',
     content_hi: '',
     chapter_image: '',
+    summary: '',
+    summary_hi: '',
     read_time: 10,
     published: false
   })
@@ -59,6 +64,8 @@ export default function LeelaayanChapterForm({ chapter, bookId, onSuccess, onCan
         content: chapter.content,
         content_hi: chapter.content_hi,
         chapter_image: chapter.chapter_image || '',
+        summary: chapter.summary || '',
+        summary_hi: chapter.summary_hi || '',
         read_time: chapter.read_time,
         published: chapter.published
       })
@@ -152,7 +159,13 @@ export default function LeelaayanChapterForm({ chapter, bookId, onSuccess, onCan
     try {
       setLoading(true)
 
+      const summaryFields =
+        formData.summary.trim() || formData.summary_hi.trim() || chapter?.summary || chapter?.summary_hi
+          ? { summary: formData.summary.trim() || null, summary_hi: formData.summary_hi.trim() || null }
+          : {}
+
       const chapterData = {
+        ...summaryFields,
         book_id: bookId,
         chapter_number: formData.chapter_number,
         title: formData.title,
@@ -308,6 +321,36 @@ export default function LeelaayanChapterForm({ chapter, bookId, onSuccess, onCan
               required
             />
           </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="summary" className="text-gray-700 font-semibold">Summary (English)</Label>
+            <Textarea
+              id="summary"
+              value={formData.summary}
+              onChange={(e) => setFormData(prev => ({ ...prev, summary: e.target.value }))}
+              placeholder="One line about what happens in this chapter"
+              className="mt-1"
+              rows={2}
+              maxLength={160}
+            />
+          </div>
+          <div>
+            <Label htmlFor="summary_hi" className="text-gray-700 font-semibold">Summary (Hindi)</Label>
+            <Textarea
+              id="summary_hi"
+              value={formData.summary_hi}
+              onChange={(e) => setFormData(prev => ({ ...prev, summary_hi: e.target.value }))}
+              placeholder="इस अध्याय में क्या होता है, एक पंक्ति में"
+              className="mt-1"
+              rows={2}
+              maxLength={160}
+            />
+          </div>
+          <p className="md:col-span-2 -mt-2 text-xs text-gray-500 italic">
+            Shown under the chapter title in the book's chapter list. Keep it to one line.
+          </p>
         </div>
 
         <div>

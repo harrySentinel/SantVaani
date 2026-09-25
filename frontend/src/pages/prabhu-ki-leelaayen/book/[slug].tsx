@@ -5,7 +5,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
-import { BookOpen, ChevronLeft, ArrowRight, Check, ListOrdered, Languages, Share2, Loader2 } from 'lucide-react';
+import { BookOpen, ChevronLeft, ArrowRight, Check, ListOrdered, Languages, Share2, Loader2, Clock } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabaseClient';
@@ -35,6 +35,8 @@ interface Chapter {
   title_hi: string;
   slug: string;
   chapter_image?: string;
+  summary?: string | null;
+  summary_hi?: string | null;
   read_time: number;
   views: number;
 }
@@ -45,17 +47,66 @@ const focusRing = 'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#
 
 const coverShadow = 'shadow-[0_24px_48px_-16px_rgba(36,26,18,0.45)]';
 
-const BookCover = ({ title, author }: { title: string; author: string; }) => (
-  <div className={`w-full aspect-[2/3] rounded-md bg-[#f1e7d8] border border-[#e4d6c1] ${coverShadow} flex flex-col justify-between text-center px-5 py-8`}>
-    <span className="font-tiro text-lg text-[#c2410c]">ॐ</span>
-    <div className="space-y-4">
-      <div className="w-10 h-px bg-[#241a12]/25 mx-auto" />
-      <p className="font-tiro text-[1.7rem] leading-tight text-[#241a12]">{title}</p>
-      <div className="w-10 h-px bg-[#241a12]/25 mx-auto" />
+const BookCover = ({ title, author, small = false }: { title: string; author: string; small?: boolean }) => (
+  <div
+    className={`w-full aspect-[2/3] rounded-md bg-[#f1e7d8] border border-[#e4d6c1] flex flex-col justify-between text-center ${
+      small ? 'px-2 py-3 shadow-md' : `px-5 py-8 ${coverShadow}`
+    }`}
+  >
+    <span className={`font-tiro text-[#c2410c] ${small ? 'text-xs' : 'text-lg'}`}>ॐ</span>
+    <div className={small ? 'space-y-1.5' : 'space-y-4'}>
+      <div className={`h-px bg-[#241a12]/25 mx-auto ${small ? 'w-5' : 'w-10'}`} />
+      <p className={`font-tiro leading-tight text-[#241a12] ${small ? 'text-sm' : 'text-[1.7rem]'}`}>{title}</p>
+      <div className={`h-px bg-[#241a12]/25 mx-auto ${small ? 'w-5' : 'w-10'}`} />
     </div>
-    <p className="text-xs tracking-wide text-[#241a12]/60">{author}</p>
+    <p className={`tracking-wide text-[#241a12]/60 ${small ? 'text-[9px]' : 'text-xs'}`}>{author}</p>
   </div>
 );
+
+const SAFFRON_TINT = '240, 150, 50';
+
+// Average the cover's colours (weighted toward saturated pixels) so the header can pick them up.
+const useCoverTint = (url?: string) => {
+  const [tint, setTint] = useState<string | null>(null);
+  useEffect(() => {
+    setTint(null);
+    if (!url) return;
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      try {
+        const size = 24;
+        const canvas = document.createElement('canvas');
+        canvas.width = canvas.height = size;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+        ctx.drawImage(img, 0, 0, size, size);
+        const d = ctx.getImageData(0, 0, size, size).data;
+        let r = 0, g = 0, b = 0, w = 0;
+        for (let i = 0; i < d.length; i += 4) {
+          const max = Math.max(d[i], d[i + 1], d[i + 2]);
+          const min = Math.min(d[i], d[i + 1], d[i + 2]);
+          if (max < 30 || min > 235) continue;
+          const weight = max - min + 8;
+          r += d[i] * weight; g += d[i + 1] * weight; b += d[i + 2] * weight; w += weight;
+        }
+        if (w) setTint(`${Math.round(r / w)}, ${Math.round(g / w)}, ${Math.round(b / w)}`);
+      } catch {
+        // Cover host doesn't allow CORS reads; fall back to the default tint.
+      }
+    };
+    img.src = url;
+  }, [url]);
+  return tint;
+};
+
+interface MoreBook {
+  id: string;
+  title: string;
+  title_hi: string;
+  slug: string;
+  cover_image?: string;
+}
 
 const BookDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -70,7 +121,9 @@ const BookDetail: React.FC = () => {
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState(false);
+  const [moreBooks, setMoreBooks] = useState<MoreBook[]>([]);
   const contentsRef = useRef<HTMLElement>(null);
+  const coverTint = useCoverTint(book?.cover_image);
 
   const { progress, getChapterStatus, isChapterCompleted } = useBookProgress(book?.id);
 
@@ -100,6 +153,15 @@ const BookDetail: React.FC = () => {
 
         if (chaptersError) throw chaptersError;
         setChapters(chaptersData || []);
+
+        const { data: moreData } = await supabase
+          .from('leelaayen_books')
+          .select('id, title, title_hi, slug, cover_image')
+          .eq('published', true)
+          .neq('id', bookData.id)
+          .order('views', { ascending: false })
+          .limit(8);
+        setMoreBooks(moreData || []);
 
         await supabase.rpc('increment_book_views', { book_slug: slug });
       } catch (err) {
@@ -152,6 +214,14 @@ const BookDetail: React.FC = () => {
   const chaptersLabel = HI
     ? `${chapterCount} अध्याय`
     : `${chapterCount} ${chapterCount === 1 ? 'chapter' : 'chapters'}`;
+  const totalMinutes = chapters.reduce((sum, ch) => sum + (ch.read_time || 0), 0);
+  const bilingual = !!(book.title_hi && book.title);
+  const tint = coverTint ?? SAFFRON_TINT;
+  const details = [
+    totalMinutes > 0 && { icon: Clock, label: HI ? `${totalMinutes} मिनट` : `${totalMinutes} min read` },
+    { icon: BookOpen, label: chaptersLabel },
+    bilingual && { icon: Languages, label: HI ? 'हिंदी और अंग्रेज़ी' : 'Hindi & English' },
+  ].filter(Boolean) as { icon: React.ElementType; label: string }[];
 
   return (
     <div className="min-h-screen font-mukta text-[#241a12]" style={{ background: PAGE }}>
@@ -165,7 +235,9 @@ const BookDetail: React.FC = () => {
       <Navbar />
 
       {/* ── Hero ── */}
-      <header>
+      <header
+        style={{ background: `linear-gradient(180deg, rgba(${tint}, 0.26) 0%, rgba(${tint}, 0.10) 55%, ${PAGE} 100%)` }}
+      >
         <div className="max-w-xl mx-auto px-5 pt-5">
           <Link
             to="/prabhu-ki-leelaayen"
@@ -192,12 +264,12 @@ const BookDetail: React.FC = () => {
             )}
           </motion.div>
 
-          <h1 className="mt-8 text-center font-tiro font-normal tracking-normal text-[2.6rem] sm:text-5xl leading-[1.15] text-[#241a12]">
+          <h1 className={`${book.cover_image ? 'mt-8' : 'sr-only'} text-center font-tiro font-normal tracking-normal text-[2.6rem] sm:text-5xl leading-[1.15] text-[#241a12]`}>
             {title}
           </h1>
         </div>
 
-        <div className="max-w-xl mx-auto px-5 pt-3 text-center">
+        <div className={`max-w-xl mx-auto px-5 text-center ${book.cover_image ? 'pt-3' : 'pt-7'}`}>
           <p className="text-[15px] text-[#7a6a5c]">
             {book.is_santvaani_original
               ? (HI ? 'संतवाणी ओरिजिनल' : 'A Santvaani original')
@@ -205,6 +277,15 @@ const BookDetail: React.FC = () => {
                 ? (HI ? `${author} द्वारा` : `By ${author}`)
                 : null}
           </p>
+
+          <ul className="mt-4 flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm text-[#241a12]/75">
+            {details.map(({ icon: Icon, label }) => (
+              <li key={label} className="inline-flex items-center gap-1.5">
+                <Icon className="w-4 h-4 text-[#c2410c]" strokeWidth={1.75} />
+                {label}
+              </li>
+            ))}
+          </ul>
 
           {primaryTarget && (
             <button
@@ -278,7 +359,7 @@ const BookDetail: React.FC = () => {
         {/* Chapters */}
         <section ref={contentsRef} className="mt-10 scroll-mt-24" aria-labelledby="contents-heading">
           <h2 id="contents-heading" className="font-mukta tracking-normal text-2xl font-semibold pb-4 border-b border-[#241a12]/10">
-            {chaptersLabel}
+            {HI ? 'अध्याय' : 'Chapters'}
           </h2>
 
           {chapters.length > 0 ? (
@@ -297,6 +378,11 @@ const BookDetail: React.FC = () => {
                         <h3 className="font-mukta tracking-normal text-lg font-semibold leading-snug text-[#241a12] line-clamp-2">
                           {HI ? chapter.title_hi || chapter.title : chapter.title}
                         </h3>
+                        {(HI ? chapter.summary_hi || chapter.summary : chapter.summary) && (
+                          <p className="mt-0.5 text-[15px] leading-snug text-[#241a12]/70 line-clamp-2">
+                            {HI ? chapter.summary_hi || chapter.summary : chapter.summary}
+                          </p>
+                        )}
                         <p className="mt-1 flex items-center gap-3 text-[15px] text-[#7a6a5c]">
                           <span>{chapter.read_time} {HI ? 'मिनट' : 'min'}</span>
                           {done && (
@@ -332,6 +418,33 @@ const BookDetail: React.FC = () => {
             </p>
           )}
         </section>
+
+        {moreBooks.length > 0 && (
+          <section className="mt-14" aria-labelledby="more-heading">
+            <h2 id="more-heading" className="font-mukta tracking-normal text-2xl font-semibold">
+              {HI ? 'और दिव्य कथाएं' : 'More divine stories'}
+            </h2>
+            <div className="mt-5 -mx-5 px-5 flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {moreBooks.map(b => {
+                const t = HI ? b.title_hi || b.title : b.title;
+                return (
+                  <Link
+                    key={b.id}
+                    to={`/prabhu-ki-leelaayen/book/${b.slug}`}
+                    className={`w-28 flex-shrink-0 snap-start rounded-md ${focusRing}`}
+                  >
+                    {b.cover_image ? (
+                      <img src={b.cover_image} alt="" className="w-full aspect-[2/3] object-cover rounded-md shadow-md" />
+                    ) : (
+                      <BookCover title={t} author="Santvaani" small />
+                    )}
+                    <p className="mt-2 text-sm font-medium leading-snug line-clamp-2">{t}</p>
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
+        )}
       </main>
 
       <Footer />
