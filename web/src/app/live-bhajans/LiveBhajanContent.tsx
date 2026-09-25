@@ -1,0 +1,547 @@
+'use client';
+
+import React, { useState, useEffect, useCallback } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Play, Users, Eye, Clock, RefreshCw, Wifi, WifiOff, AlertCircle, ArrowLeft } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+
+interface Bhajan {
+  id: string;
+  title: string;
+  channel: string;
+  duration: string;
+  thumbnail: string;
+  videoId: string;
+  views: string;
+  isLive: boolean;
+  publishedAt: string;
+}
+
+export default function LiveBhajanContent() {
+  const router = useRouter();
+  const [bhajans, setBhajans] = useState<Bhajan[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [nextUpdate, setNextUpdate] = useState<Date | null>(null);
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState('connected');
+
+  // API base URL - adjust this according to your backend deployment
+  const API_BASE_URL = process.env.NODE_ENV === 'production'
+    ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api`
+    : 'http://localhost:5000/api';
+
+  // Fetch bhajan data from backend
+  const fetchBhajans = useCallback(async (isManualRefresh = false) => {
+    try {
+      if (isManualRefresh) {
+        setIsRefreshing(true);
+      } else {
+        setLoading(true);
+      }
+      
+      setConnectionStatus('connecting');
+      
+      const response = await fetch(`${API_BASE_URL}/bhajans`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        // Add timeout for better error handling
+        signal: AbortSignal.timeout(30000) // 30 second timeout
+      });
+
+      if (!response.ok) {
+        throw new Error(`Server responded with ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      
+      if (data.success && data.data) {
+        setBhajans(data.data);
+        setLastUpdated(data.lastUpdated ? new Date(data.lastUpdated) : new Date());
+        setNextUpdate(data.nextUpdate ? new Date(data.nextUpdate) : null);
+        setError(null);
+        setConnectionStatus('connected');
+      } else {
+        throw new Error(data.message || 'Failed to fetch bhajan data');
+      }
+      
+    } catch (err) {
+      console.error('Error fetching bhajans:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load bhajan data. Please check your connection.');
+      setConnectionStatus('disconnected');
+      
+      // Fallback to sample data if no data exists
+      setBhajans((prevBhajans) => {
+        if (prevBhajans.length === 0) {
+          return [
+            {
+              id: 'fallback-1',
+              title: "Hare Krishna Hare Rama - Peaceful Chanting",
+              channel: "Divine Bhajans",
+              duration: "LIVE",
+              thumbnail: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=225&fit=crop&auto=format",
+              videoId: "dQw4w9WgXcQ",
+              views: "1.2K",
+              isLive: true,
+              publishedAt: new Date().toISOString()
+            },
+            {
+              id: 'fallback-2',
+              title: "Om Namah Shivaya - Divine Meditation",
+              channel: "Spiritual Sounds",
+              duration: "LIVE",
+              thumbnail: "https://images.unsplash.com/photo-1524863479829-916d8e77f114?w=400&h=225&fit=crop&auto=format",
+              videoId: "dQw4w9WgXcQ",
+              views: "2.5K",
+              isLive: true,
+              publishedAt: new Date().toISOString()
+            },
+            {
+              id: 'fallback-3',
+              title: "Gayatri Mantra - Sacred Chanting",
+              channel: "Vedic Chants",
+              duration: "25:30",
+              thumbnail: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=225&fit=crop&auto=format",
+              videoId: "dQw4w9WgXcQ",
+              views: "15K",
+              isLive: false,
+              publishedAt: new Date().toISOString()
+            }
+          ];
+        }
+        return prevBhajans;
+      });
+    } finally {
+      setLoading(false);
+      setIsRefreshing(false);
+    }
+  }, [API_BASE_URL]);
+
+  // Manual refresh function
+  const handleManualRefresh = useCallback(async () => {
+    try {
+      setIsRefreshing(true);
+      const response = await fetch(`${API_BASE_URL}/refresh-bhajans`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.data) {
+          setBhajans(data.data);
+          setLastUpdated(data.lastUpdated ? new Date(data.lastUpdated) : new Date());
+          setError(null);
+          setConnectionStatus('connected');
+        }
+      } else {
+        // Fallback to regular fetch if manual refresh fails
+        await fetchBhajans(false);
+      }
+    } catch (err) {
+      console.error('Manual refresh failed:', err);
+      // Fallback to regular fetch
+      await fetchBhajans(false);
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [API_BASE_URL, fetchBhajans]);
+
+  // Initial load
+  useEffect(() => {
+    fetchBhajans();
+  }, [fetchBhajans]);
+
+  // Auto-refresh every 30 minutes
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!isRefreshing) {
+        fetchBhajans();
+      }
+    }, 30 * 60 * 1000); // 30 minutes
+
+    return () => clearInterval(interval);
+  }, [isRefreshing, fetchBhajans]);
+
+  // Update current time every minute
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 60000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  const openYouTube = (videoId: string, title: string) => {
+    const url = `https://www.youtube.com/watch?v=${videoId}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
+  const liveBhajans = bhajans.filter(bhajan => bhajan.isLive);
+  const recentBhajans = bhajans.filter(bhajan => !bhajan.isLive);
+  const totalViewers = bhajans.reduce((acc, bhajan) => {
+    if (bhajan.isLive) {
+      const viewCount = parseInt(bhajan.views.replace(/[^0-9]/g, ''));
+      return acc + (isNaN(viewCount) ? 0 : viewCount);
+    }
+    return acc;
+  }, 0);
+
+  // Loading state
+  if (loading && bhajans.length === 0) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
+        <Navbar />
+        <div className="flex items-center justify-center min-h-[calc(100vh-80px)]">
+          <div className="text-center space-y-6">
+            <div className="w-20 h-20 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full mx-auto flex items-center justify-center animate-pulse">
+              <Play className="w-10 h-10 text-white" fill="white" />
+            </div>
+            <div className="space-y-2">
+              <h2 className="text-2xl font-bold text-gray-800">Loading Divine Content...</h2>
+              <p className="text-gray-600">Connecting to spiritual channels worldwide</p>
+            </div>
+            <div className="flex justify-center space-x-1">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-bounce"></div>
+              <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce delay-100"></div>
+              <div className="w-2 h-2 bg-teal-500 rounded-full animate-bounce delay-200"></div>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
+      <Navbar />
+
+      {/* Hero Section */}
+      <section className="relative py-20 bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 overflow-hidden">
+        {/* Animated background elements */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-20 left-20 w-32 h-32 bg-white rounded-full animate-pulse"></div>
+          <div className="absolute bottom-20 right-20 w-24 h-24 bg-white rounded-full animate-pulse delay-1000"></div>
+          <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-white rounded-full animate-pulse delay-500"></div>
+        </div>
+
+        {/* Navigation Button */}
+        <div className="absolute top-4 left-4 z-10">
+          <Button
+            onClick={() => router.back()}
+            className="bg-white/20 hover:bg-white/30 text-white border-white/30 backdrop-blur-sm"
+            variant="outline"
+            size="sm"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back
+          </Button>
+        </div>
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="flex justify-center items-center space-x-4 mb-8">
+            <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-3xl flex items-center justify-center shadow-2xl">
+              <Play className="w-10 h-10 text-white" fill="white" />
+            </div>
+            {liveBhajans.length > 0 && (
+              <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm border border-white/40 px-4 py-2 rounded-full shadow-lg">
+                <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                <span className="text-white font-bold text-lg">LIVE</span>
+              </div>
+            )}
+          </div>
+          
+          <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
+            Live Bhajan Experience
+          </h1>
+          <p className="text-xl md:text-2xl text-white/90 max-w-4xl mx-auto mb-8 leading-relaxed">
+            Immerse yourself in divine devotional content, streaming fresh from the most sacred channels
+          </p>
+          
+          <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-8 text-white/80">
+            <div className="flex items-center space-x-2">
+              <Users className="w-5 h-5" />
+              <span className="font-medium">
+                Total Viewers: {totalViewers > 0 ? `${Math.floor(totalViewers/1000)}K+` : 'Loading...'}
+              </span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Clock className="w-5 h-5" />
+              <span className="font-medium">
+                Updated: {lastUpdated ? lastUpdated.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Just now'}
+              </span>
+            </div>
+            <div className="flex items-center space-x-2">
+              {connectionStatus === 'connected' ? (
+                <Wifi className="w-5 h-5 text-green-300" />
+              ) : (
+                <WifiOff className="w-5 h-5 text-red-300" />
+              )}
+              <span className="font-medium capitalize">{connectionStatus}</span>
+            </div>
+          </div>
+
+          {/* Manual Refresh Button */}
+          <div className="mt-8">
+            <Button
+              onClick={handleManualRefresh}
+              disabled={isRefreshing}
+              className="bg-white/20 hover:bg-white/30 text-white border-white/30 backdrop-blur-sm"
+              variant="outline"
+            >
+              <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+              {isRefreshing ? 'Refreshing...' : 'Refresh Content'}
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Error Display */}
+      {error && (
+        <section className="py-8 bg-red-50 border-b border-red-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-center space-x-3 text-red-700">
+              <AlertCircle className="w-5 h-5" />
+              <span className="font-medium">{error}</span>
+              <Button
+                onClick={() => fetchBhajans()}
+                size="sm"
+                variant="outline"
+                className="border-red-300 text-red-700 hover:bg-red-100"
+              >
+                Retry
+              </Button>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Live Content Statistics */}
+      <section className="py-8 bg-white/80 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+            <div className="space-y-2">
+              <div className="text-2xl font-bold text-green-600">{liveBhajans.length}</div>
+              <div className="text-sm text-gray-600">Live Streams</div>
+            </div>
+            <div className="space-y-2">
+              <div className="text-2xl font-bold text-emerald-600">{recentBhajans.length}</div>
+              <div className="text-sm text-gray-600">Recent Videos</div>
+            </div>
+            <div className="space-y-2">
+              <div className="text-2xl font-bold text-teal-600">{bhajans.length}</div>
+              <div className="text-sm text-gray-600">Total Content</div>
+            </div>
+            <div className="space-y-2">
+              <div className="text-2xl font-bold text-green-600">
+                {nextUpdate ? Math.ceil((nextUpdate.getTime() - new Date().getTime()) / (1000 * 60)) : '~'}
+              </div>
+              <div className="text-sm text-gray-600">Mins to Update</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Live Bhajans Section - Enhanced with better layout */}
+      {liveBhajans.length > 0 && (
+        <section className="py-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <div className="flex justify-center items-center space-x-2 mb-4">
+                <div className="w-4 h-4 bg-red-500 rounded-full animate-pulse"></div>
+                <h2 className="text-3xl md:text-4xl font-bold text-gray-800">
+                  Currently Live ({liveBhajans.length})
+                </h2>
+              </div>
+              <p className="text-lg text-gray-600">
+                Join thousands of devotees in live spiritual experiences
+              </p>
+            </div>
+
+            <div className="grid gap-6 lg:gap-8">
+              {liveBhajans.map((bhajan, index) => (
+                <Card 
+                  key={bhajan.id || `live-${index}`} 
+                  className="group hover:shadow-2xl transition-all duration-500 border-0 shadow-lg bg-white/95 backdrop-blur-sm overflow-hidden"
+                >
+                  <CardContent className="p-0">
+                    <div className="flex flex-col lg:flex-row">
+                      {/* Thumbnail - Reduced size on desktop */}
+                      <div className="relative lg:w-80 xl:w-96 flex-shrink-0 group-hover:scale-105 transition-transform duration-500">
+                        <img 
+                          src={bhajan.thumbnail} 
+                          alt={bhajan.title}
+                          className="w-full h-48 lg:h-44 xl:h-52 object-cover"
+                          loading="lazy"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                        
+                        {/* Live Badge */}
+                        <div className="absolute top-3 left-3 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold flex items-center space-x-1">
+                          <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                          <span>LIVE</span>
+                        </div>
+                        
+                        {/* Play Button Overlay */}
+                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          <div className="w-16 h-16 bg-white/95 rounded-full flex items-center justify-center shadow-2xl transform scale-95 group-hover:scale-100 transition-transform duration-300">
+                            <Play className="w-8 h-8 text-green-600 ml-1" fill="currentColor" />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Content - Better padding and spacing */}
+                      <div className="flex-1 p-6 lg:p-6 xl:p-8 flex flex-col justify-between">
+                        <div className="space-y-3">
+                          <h3 className="text-xl lg:text-2xl font-bold text-gray-800 group-hover:text-green-600 transition-colors leading-tight line-clamp-2">
+                            {bhajan.title}
+                          </h3>
+
+                          <div className="flex flex-wrap items-center gap-4 text-gray-600">
+                            <span className="text-green-600 font-semibold">
+                              {bhajan.channel}
+                            </span>
+                            <div className="flex items-center space-x-1">
+                              <Eye className="w-4 h-4" />
+                              <span>{bhajan.views} views</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row gap-3 mt-6">
+                          <Button
+                            onClick={() => openYouTube(bhajan.videoId, bhajan.title)}
+                            className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-6 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                          >
+                            <Play className="w-5 h-5 mr-2" />
+                            Watch Live
+                          </Button>
+                          <div className="flex items-center space-x-2 text-sm text-gray-500 px-4 py-2">
+                            <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                            <span>Live now with {bhajan.views} viewers</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Recent Bhajans Section - Enhanced grid layout */}
+      {recentBhajans.length > 0 && (
+        <section className="py-16 bg-gradient-to-br from-gray-50 to-green-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+                Recent Devotional Content ({recentBhajans.length})
+              </h2>
+              <p className="text-lg text-gray-600">
+                Catch up on the latest spiritual bhajans and teachings
+              </p>
+            </div>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {recentBhajans.map((bhajan, index) => (
+                <Card 
+                  key={bhajan.id || `recent-${index}`} 
+                  className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-0 shadow-lg bg-white/90 backdrop-blur-sm overflow-hidden"
+                >
+                  <CardContent className="p-0">
+                    <div className="relative">
+                      <img 
+                        src={bhajan.thumbnail} 
+                        alt={bhajan.title}
+                        className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-500"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      
+                      {/* Duration */}
+                      <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-2 py-1 rounded">
+                        {bhajan.duration}
+                      </div>
+                      
+                      {/* Play Button */}
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <div className="w-12 h-12 bg-white/95 rounded-full flex items-center justify-center shadow-xl">
+                          <Play className="w-6 h-6 text-green-600 ml-1" fill="currentColor" />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-6 space-y-4">
+                      <h3 className="text-lg font-bold text-gray-800 group-hover:text-green-600 transition-colors leading-tight line-clamp-2">
+                        {bhajan.title}
+                      </h3>
+
+                      <div className="flex items-center justify-between text-sm text-gray-600">
+                        <span className="text-green-600 font-semibold truncate mr-2">
+                          {bhajan.channel}
+                        </span>
+                        <div className="flex items-center space-x-1 flex-shrink-0">
+                          <Eye className="w-3 h-3" />
+                          <span>{bhajan.views}</span>
+                        </div>
+                      </div>
+
+                      <Button
+                        onClick={() => openYouTube(bhajan.videoId, bhajan.title)}
+                        variant="outline"
+                        className="w-full border-green-300 text-green-600 hover:bg-green-50 hover:border-green-400 transition-colors duration-300"
+                      >
+                        <Play className="w-4 h-4 mr-2" />
+                        Watch Now
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Auto-Update Notice */}
+      <section className="py-12 bg-gradient-to-r from-green-50 to-emerald-50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-green-100">
+            <div className="flex justify-center items-center space-x-2 mb-4">
+              <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+              <span className="text-gray-800 font-bold text-lg">Real-time Updates</span>
+            </div>
+            <p className="text-gray-600 leading-relaxed mb-4">
+              Content is automatically synchronized with YouTube to bring you the freshest devotional experiences. 
+              No manual refresh needed - just pure spiritual connection.
+            </p>
+            {lastUpdated && (
+              <p className="text-sm text-gray-500">
+                Last synchronized: {lastUpdated.toLocaleString()}
+                {nextUpdate && (
+                  <span className="ml-2">
+                    • Next update: {nextUpdate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                  </span>
+                )}
+              </p>
+            )}
+          </div>
+        </div>
+      </section>
+
+      <Footer />
+    </div>
+  );
+}

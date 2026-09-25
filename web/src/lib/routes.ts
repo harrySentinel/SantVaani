@@ -1,6 +1,6 @@
 // Paths served by this Next.js app. Everything else is proxied to the legacy Vite app
 // (see `rewrites.fallback` in next.config.ts), so links to it must be full page loads.
-const MIGRATED_PATHS = ['/', '/prabhu-ki-leelaayen', '/blog', '/blog/hindi', '/blog/english', '/saints', '/divine', '/bhajans', '/naam-jap', '/horoscope', '/privacy-policy', '/terms-of-service', '/donation', '/about', '/jeevani', '/santvaani-space', '/login', '/signup', '/reset-password', '/dashboard', '/profile-settings'];
+const MIGRATED_PATHS = ['/', '/prabhu-ki-leelaayen', '/blog', '/blog/hindi', '/blog/english', '/saints', '/divine', '/bhajans', '/naam-jap', '/horoscope', '/privacy-policy', '/terms-of-service', '/donation', '/about', '/jeevani', '/santvaani-space', '/login', '/signup', '/reset-password', '/dashboard', '/profile-settings', '/live-bhajans', '/daily-guide'];
 const MIGRATED_PREFIXES = ['/prabhu-ki-leelaayen/book/', '/prabhu-ki-leelaayen/read/', '/blog/post/', '/blog/category/', '/saints/', '/divine/', '/bhajans/', '/santvaani-space/'];
 
 export const isMigrated = (href: string) => {

@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import ResetPasswordContent from './ResetPasswordContent';
 
 export const metadata: Metadata = {
-  title: 'Reset Password — Santvaani',
+  title: 'Reset Password',
   alternates: { canonical: '/reset-password' },
   robots: { index: false },
 };
