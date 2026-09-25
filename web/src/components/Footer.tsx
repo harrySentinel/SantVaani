@@ -80,7 +80,7 @@ export default function Footer() {
                 onChange={(e) => { setEmail(e.target.value); setSubStatus('idle'); }}
                 placeholder={language === 'EN' ? 'Enter your email' : 'ईमेल दर्ज करें'}
                 required
-                className="flex-1 md:w-64 px-4 py-2.5 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-orange-400 focus:bg-white/15 transition-colors"
+                className="flex-1 min-w-0 md:w-64 px-4 py-2.5 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-orange-400 focus:bg-white/15 transition-colors"
               />
               <button
                 type="submit"
