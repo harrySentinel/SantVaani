@@ -49,7 +49,7 @@ const LandingBhajanSection = () => {
 
   if (loading) {
     return (
-      <section id="bhajans" className="py-12 md:py-16 relative scroll-mt-32">
+      <section id="bhajans" className="py-8 md:py-16 relative scroll-mt-32">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <BhajanGridSkeleton count={6} />
         </div>
@@ -60,7 +60,7 @@ const LandingBhajanSection = () => {
   if (bhajans.length === 0) return null;
 
   return (
-    <section id="bhajans" className="py-12 md:py-16 relative scroll-mt-32 border-t border-gray-200">
+    <section id="bhajans" className="py-8 md:py-16 relative scroll-mt-32 border-t border-gray-200">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <motion.div
@@ -68,7 +68,7 @@ const LandingBhajanSection = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.4 }}
             transition={{ duration: 0.5, ease: 'easeOut' }}
-            className="flex items-end justify-between mb-8"
+            className="flex items-end justify-between mb-4 md:mb-8"
           >
             <div className="space-y-1">
               <p className="text-[13px] font-medium text-orange-600 tracking-wide">
@@ -99,17 +99,17 @@ const LandingBhajanSection = () => {
               <NextLink
                 key={bhajan.id}
                 href={`/bhajans/${slugify(bhajan.title) || bhajan.id}`}
-                className="w-40 sm:w-44 md:w-48 flex-shrink-0 snap-start block group rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-200"
+                className="w-28 sm:w-40 md:w-48 flex-shrink-0 snap-start block group rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-200"
               >
                 <div className={`${getGradientClass(bhajan.category)} aspect-square flex items-center justify-center`}>
-                  <BookOpen className="w-12 h-12 text-white/25" />
+                  <BookOpen className="w-7 h-7 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white/25" />
                 </div>
-                <div className="bg-white p-3 space-y-1">
-                  <h3 className="font-semibold text-gray-900 text-sm line-clamp-1 group-hover:text-orange-600 transition-colors">
+                <div className="bg-white p-2 sm:p-3 space-y-0.5 sm:space-y-1">
+                  <h3 className="font-semibold text-gray-900 text-xs sm:text-sm line-clamp-1 group-hover:text-orange-600 transition-colors">
                     {bhajan.title}
                   </h3>
-                  <p className="text-xs text-orange-500 line-clamp-1 font-medium">{bhajan.title_hi}</p>
-                  <span className="inline-block text-[10px] font-medium text-gray-400 bg-gray-50 border border-gray-100 px-2 py-0.5 rounded-full truncate">
+                  <p className="text-[11px] sm:text-xs text-orange-500 line-clamp-1 font-medium">{bhajan.title_hi}</p>
+                  <span className="hidden sm:inline-block text-[10px] font-medium text-gray-400 bg-gray-50 border border-gray-100 px-2 py-0.5 rounded-full truncate">
                     {bhajan.category}
                   </span>
                 </div>
@@ -118,15 +118,15 @@ const LandingBhajanSection = () => {
           </motion.div>
 
           {/* Bottom row */}
-          <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-100">
-            <p className="text-sm text-gray-400 flex items-center gap-2">
+          <div className="flex sm:items-center justify-between gap-3 mt-5 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-100">
+            <p className="hidden sm:flex text-sm text-gray-400 items-center gap-2">
               <BookOpen className="w-4 h-4 text-orange-400" />
               {language === 'HI'
                 ? 'देवनागरी और transliteration में अर्थ सहित पढ़ें'
                 : 'Read in देवनागरी & transliteration, with meanings'}
             </p>
-            <Link to="/bhajans">
-              <button className="flex items-center gap-2 text-sm font-semibold text-white bg-[#241a12] hover:bg-[#3a2b1c] px-5 py-2.5 rounded-full transition-colors">
+            <Link to="/bhajans" className="w-full sm:w-auto">
+              <button className="w-full sm:w-auto flex items-center justify-center gap-2 text-sm font-semibold text-white bg-[#241a12] hover:bg-[#3a2b1c] px-5 py-2.5 rounded-full transition-colors">
                 {language === 'HI' ? 'सभी भजन' : 'All Bhajans'}
                 <ArrowRight className="w-4 h-4" />
               </button>
