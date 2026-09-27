@@ -289,6 +289,13 @@ export default function NaamJapTracker() {
         <p className="mt-2 text-[15px] text-[#241a12]/70">
           {new Date().toLocaleDateString(HI ? 'hi-IN' : 'en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
         </p>
+        {!todayEntry && stats.currentStreak > 0 && (
+          <p className="mt-3 text-[13px] font-medium text-[#c2410c]">
+            {HI
+              ? `आपकी ${stats.currentStreak} दिन की स्ट्रीक जारी है — आज की गिनती जोड़ें`
+              : `Your ${stats.currentStreak}-day streak is alive — log today’s count`}
+          </p>
+        )}
       </header>
 
       <main className="max-w-lg mx-auto px-5 pb-24">

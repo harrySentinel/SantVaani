@@ -13,6 +13,9 @@ const SIZE = 280;
 const CENTER = SIZE / 2;
 const RING_R = 118;
 
+// The common ways people count japa: one mala (108 beads), and multiples of it.
+const QUICK_ADD = [108, 216, 540, 1080];
+
 // One physical mala has 108 beads plus a slightly larger "guru" bead marking where a round begins and ends.
 // Rounded to 2dp so server and client render byte-identical numbers — some
 // runtimes' Math.cos/sin differ in the last bit, which otherwise trips hydration.
@@ -53,7 +56,7 @@ const NaamJapCounter = ({ initialCount, onCountChange, language }: NaamJapCounte
   };
 
   const handleTap = () => applyCount(count + 1);
-  const addRound = () => applyCount(count + BEADS);
+  const addQuick = (n: number) => applyCount(count + n);
   const reset = () => applyCount(0);
 
   const arcPath = useMemo(() => {
@@ -62,15 +65,19 @@ const NaamJapCounter = ({ initialCount, onCountChange, language }: NaamJapCounte
   }, []);
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center w-full">
       <div className="relative" style={{ width: SIZE, height: SIZE }}>
+        {/* A quiet breathing glow invites the first tap of the day; stops once you've started. */}
+        {count === 0 && (
+          <div className="absolute inset-2 rounded-full bg-[#ea580c]/10 motion-safe:animate-pulse pointer-events-none" />
+        )}
         {roundComplete && (
           <div className="absolute inset-0 rounded-full animate-[ping_1.4s_ease-out] bg-[#d4a017]/20 pointer-events-none" />
         )}
 
         <button
           onClick={handleTap}
-          aria-label={HI ? 'नाम जप के लिए टैप करें' : 'Tap to chant'}
+          aria-label={HI ? 'एक गिनती जोड़ने के लिए टैप करें' : 'Tap to add one'}
           className={`relative w-full h-full rounded-full select-none transition-transform duration-150 ${pulse ? 'scale-[0.98]' : 'scale-100'} focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ea580c] focus-visible:ring-offset-4 focus-visible:ring-offset-[#faf8f5]`}
         >
           <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="absolute inset-0 w-full h-full -rotate-0">
@@ -102,27 +109,39 @@ const NaamJapCounter = ({ initialCount, onCountChange, language }: NaamJapCounte
                 ? (HI ? `${rounds} माला पूर्ण` : `${rounds} mala${rounds > 1 ? 's' : ''} complete`)
                 : count > 0
                 ? (HI ? 'जारी रखें' : 'keep going')
-                : (HI ? 'टैप करें' : 'tap to begin')}
+                : (HI ? 'आज शुरू करें' : 'begin today')}
             </span>
           </div>
         </button>
       </div>
 
-      <div className="flex items-center gap-5 mt-6">
-        <button
-          onClick={addRound}
-          className="text-[13px] font-medium text-[#c2410c] hover:text-[#9a3412] transition-colors"
-        >
-          {HI ? '+१ माला (१०८)' : '+1 mala (108)'}
-        </button>
-        <span className="w-1 h-1 rounded-full bg-[#241a12]/15" />
-        <button
-          onClick={reset}
-          className="text-[13px] font-medium text-[#7a6a5c] hover:text-[#241a12] transition-colors"
-        >
-          {HI ? 'रीसेट करें' : 'Reset'}
-        </button>
+      {/* Quick add — how most people actually log japa: by the mala, not bead by bead. */}
+      <div className="mt-7 w-full">
+        <p className="text-center text-[12px] text-[#7a6a5c] mb-2.5">
+          {HI ? 'माला जोड़ें' : 'Add a mala'}
+        </p>
+        <div className="grid grid-cols-4 gap-2">
+          {QUICK_ADD.map(n => (
+            <button
+              key={n}
+              onClick={() => addQuick(n)}
+              className="flex flex-col items-center justify-center rounded-2xl bg-white border border-[#241a12]/10 py-2.5 transition-all duration-150 active:scale-[0.96] hover:border-[#ea580c]/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ea580c]"
+            >
+              <span className="font-tiro text-[17px] leading-none text-[#241a12]">+{n}</span>
+              <span className="mt-1 text-[10px] text-[#7a6a5c]">
+                {n === 108 ? (HI ? '1 माला' : '1 mala') : `${n / 108} ${HI ? 'माला' : 'mala'}`}
+              </span>
+            </button>
+          ))}
+        </div>
       </div>
+
+      <button
+        onClick={reset}
+        className="mt-4 text-[12px] font-medium text-[#7a6a5c] hover:text-[#241a12] transition-colors"
+      >
+        {HI ? 'रीसेट करें' : 'Reset'}
+      </button>
     </div>
   );
 };
