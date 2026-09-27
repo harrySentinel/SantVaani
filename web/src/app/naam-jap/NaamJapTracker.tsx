@@ -12,11 +12,13 @@ import {
   LogIn,
   UserPlus,
   Check,
+  FileDown,
 } from 'lucide-react';
 import { LoadingPage } from '@/components/ui/loading-spinner';
 import { useToast } from '@/hooks/use-toast';
 import Link from '@/components/SiteLink';
 import NaamJapCounter from '@/components/naam-jap/NaamJapCounter';
+import { downloadMonthlyNaamJapReport } from '@/utils/naamJapReport';
 
 interface NaamJapEntry {
   id: string;
@@ -47,25 +49,28 @@ const MILESTONES = [
   { count: 1000000, label: { hi: 'प्रबुद्ध', en: 'Enlightened' } },
 ];
 
+// entry.date is a plain "YYYY-MM-DD" string. `new Date(dateString)` parses that as UTC
+// midnight, then .getMonth()/.getDate() read it back in local time — which silently
+// shifts the date by a day for anyone not in UTC. Parse and format from local parts instead.
+const toLocalDateStr = (d: Date) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const parseLocalDate = (dateStr: string) => {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return new Date(y, m - 1, d);
+};
+
 export default function NaamJapTracker() {
   const { language } = useLanguage();
   const { user, loading: authLoading } = useAuth();
   const { toast } = useToast();
   const HI = language === 'HI';
 
-  const getTodayDate = () => {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
-
-  const todayDate = getTodayDate();
+  const todayDate = toLocalDateStr(new Date());
   const [count, setCount] = useState('');
   const [notes, setNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [generatingReport, setGeneratingReport] = useState(false);
 
   const [entries, setEntries] = useState<NaamJapEntry[]>([]);
   const [stats, setStats] = useState<Stats>({
@@ -130,12 +135,12 @@ export default function NaamJapTracker() {
     const currentYear = new Date().getFullYear();
     const thisMonthCount = entriesData
       .filter(entry => {
-        const entryDate = new Date(entry.date);
+        const entryDate = parseLocalDate(entry.date);
         return entryDate.getMonth() === currentMonth && entryDate.getFullYear() === currentYear;
       })
       .reduce((sum, entry) => sum + entry.count, 0);
 
-    const sortedEntries = [...entriesData].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    const sortedEntries = [...entriesData].sort((a, b) => parseLocalDate(a.date).getTime() - parseLocalDate(b.date).getTime());
 
     let currentStreak = 0;
     const today = new Date();
@@ -143,7 +148,7 @@ export default function NaamJapTracker() {
     for (let i = 0; i < 365; i++) {
       const checkDate = new Date(today);
       checkDate.setDate(checkDate.getDate() - i);
-      const dateStr = checkDate.toISOString().split('T')[0];
+      const dateStr = toLocalDateStr(checkDate);
       if (entriesData.some(e => e.date === dateStr)) currentStreak++;
       else break;
     }
@@ -151,8 +156,8 @@ export default function NaamJapTracker() {
     let longestStreak = 0;
     let tempStreak = 1;
     for (let i = 1; i < sortedEntries.length; i++) {
-      const prevDate = new Date(sortedEntries[i - 1].date);
-      const currDate = new Date(sortedEntries[i].date);
+      const prevDate = parseLocalDate(sortedEntries[i - 1].date);
+      const currDate = parseLocalDate(sortedEntries[i].date);
       const daysDiff = Math.floor((currDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24));
       if (daysDiff === 1) tempStreak++;
       else { longestStreak = Math.max(longestStreak, tempStreak); tempStreak = 1; }
@@ -207,6 +212,21 @@ export default function NaamJapTracker() {
       });
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleDownloadReport = async () => {
+    setGeneratingReport(true);
+    try {
+      await downloadMonthlyNaamJapReport(entries, language, user?.user_metadata?.name);
+    } catch {
+      toast({
+        title: HI ? 'त्रुटि' : 'Error',
+        description: HI ? 'रिपोर्ट बनाने में विफल। पुनः प्रयास करें।' : 'Could not generate the report. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setGeneratingReport(false);
     }
   };
 
@@ -318,6 +338,18 @@ export default function NaamJapTracker() {
           ))}
         </div>
 
+        <button
+          onClick={handleDownloadReport}
+          disabled={generatingReport}
+          className={`mt-3 w-full h-11 rounded-full border border-[#241a12]/12 bg-white hover:bg-[#faf3e8] text-[13px] font-medium text-[#241a12] transition-colors disabled:opacity-50 flex items-center justify-center gap-2 ${pressable} ${focusRing}`}
+        >
+          {generatingReport ? (
+            <><Loader2 className="w-4 h-4 animate-spin" />{HI ? 'रिपोर्ट बन रही है...' : 'Preparing report...'}</>
+          ) : (
+            <><FileDown className="w-4 h-4 text-[#c2410c]" />{HI ? 'इस महीने की रिपोर्ट (PDF)' : 'This month’s report (PDF)'}</>
+          )}
+        </button>
+
         {/* Save form */}
         <form onSubmit={handleSubmit} className="mt-10 space-y-4">
           <div>
@@ -407,7 +439,7 @@ export default function NaamJapTracker() {
                 <li key={entry.id} className="flex items-center justify-between py-3">
                   <div className="min-w-0 pr-4">
                     <p className="text-[15px] font-medium">
-                      {new Date(entry.date).toLocaleDateString(HI ? 'hi-IN' : 'en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                      {parseLocalDate(entry.date).toLocaleDateString(HI ? 'hi-IN' : 'en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
                     </p>
                     {entry.notes && <p className="text-[13px] text-[#7a6a5c] truncate mt-0.5">{entry.notes}</p>}
                   </div>
