@@ -1,23 +1,17 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabaseClient';
-import {
-  Save,
-  Loader2,
-  LogIn,
-  UserPlus,
-  Check,
-  FileDown,
-} from 'lucide-react';
+import { Check, CloudOff, FileDown, Flame, Loader2, LogIn, Moon, Sun, Sunrise, Sunset, UserPlus } from 'lucide-react';
 import { LoadingPage } from '@/components/ui/loading-spinner';
 import { useToast } from '@/hooks/use-toast';
 import Link from '@/components/SiteLink';
 import NaamJapCounter from '@/components/naam-jap/NaamJapCounter';
+import { getDayPeriod, PERIODS, type DayPeriod } from '@/components/naam-jap/timeOfDay';
 import { downloadMonthlyNaamJapReport } from '@/utils/naamJapReport';
 
 interface NaamJapEntry {
@@ -25,18 +19,11 @@ interface NaamJapEntry {
   user_id: string;
   date: string;
   count: number;
-  notes?: string;
+  notes?: string | null;
   created_at: string;
 }
 
-interface Stats {
-  totalCount: number;
-  currentStreak: number;
-  longestStreak: number;
-  thisMonthCount: number;
-  averagePerDay: number;
-  totalDays: number;
-}
+type SaveState = 'idle' | 'pending' | 'saving' | 'saved' | 'error';
 
 const focusRing =
   'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ea580c] focus-visible:ring-offset-2 focus-visible:ring-offset-[#faf8f5]';
@@ -49,6 +36,8 @@ const MILESTONES = [
   { count: 1000000, label: { hi: 'प्रबुद्ध', en: 'Enlightened' } },
 ];
 
+const PERIOD_ICON = { brahma: Sunrise, morning: Sun, midday: Sun, dusk: Sunset, night: Moon } as const;
+
 // entry.date is a plain "YYYY-MM-DD" string. `new Date(dateString)` parses that as UTC
 // midnight, then .getMonth()/.getDate() read it back in local time — which silently
 // shifts the date by a day for anyone not in UTC. Parse and format from local parts instead.
@@ -59,6 +48,36 @@ const parseLocalDate = (dateStr: string) => {
   return new Date(y, m - 1, d);
 };
 
+const compact = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(n >= 10000 ? 0 : 1)}k` : String(n));
+
+function computeStats(entries: NaamJapEntry[], todayDate: string) {
+  const active = entries.filter(e => e.count > 0);
+  const dates = new Set(active.map(e => e.date));
+  const totalCount = active.reduce((s, e) => s + e.count, 0);
+
+  // A streak isn't broken until the day is over: if today isn't logged yet, count from yesterday.
+  let currentStreak = 0;
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  if (!dates.has(toLocalDateStr(d))) d.setDate(d.getDate() - 1);
+  while (dates.has(toLocalDateStr(d))) {
+    currentStreak++;
+    d.setDate(d.getDate() - 1);
+  }
+
+  let longestStreak = 0;
+  let run = 0;
+  let prev: Date | null = null;
+  for (const ds of [...dates].sort()) {
+    const cur = parseLocalDate(ds);
+    run = prev && Math.round((cur.getTime() - prev.getTime()) / 86400000) === 1 ? run + 1 : 1;
+    longestStreak = Math.max(longestStreak, run);
+    prev = cur;
+  }
+
+  return { totalCount, currentStreak, longestStreak, todayDone: dates.has(todayDate) };
+}
+
 export default function NaamJapTracker() {
   const { language } = useLanguage();
   const { user, loading: authLoading } = useAuth();
@@ -66,165 +85,142 @@ export default function NaamJapTracker() {
   const HI = language === 'HI';
 
   const todayDate = toLocalDateStr(new Date());
-  const [count, setCount] = useState('');
+  const [period, setPeriod] = useState<DayPeriod>(() => getDayPeriod());
+  const [count, setCount] = useState(0);
   const [notes, setNotes] = useState('');
-  const [submitting, setSubmitting] = useState(false);
+  const [entries, setEntries] = useState<NaamJapEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [saveState, setSaveState] = useState<SaveState>('idle');
   const [generatingReport, setGeneratingReport] = useState(false);
 
-  const [entries, setEntries] = useState<NaamJapEntry[]>([]);
-  const [stats, setStats] = useState<Stats>({
-    totalCount: 0,
-    currentStreak: 0,
-    longestStreak: 0,
-    thisMonthCount: 0,
-    averagePerDay: 0,
-    totalDays: 0,
-  });
-  const [todayEntry, setTodayEntry] = useState<NaamJapEntry | null>(null);
+  const syncedRef = useRef(false);
+  const todayIdRef = useRef<string | null>(null);
+  const lastSavedRef = useRef({ count: 0, notes: '' });
+  const latestRef = useRef({ count: 0, notes: '' });
+  const chainRef = useRef<Promise<unknown>>(Promise.resolve());
 
   useEffect(() => {
-    if (user) fetchEntries();
-  }, [user]);
+    latestRef.current = { count, notes };
+  }, [count, notes]);
+
+  const stats = useMemo(() => computeStats(entries, todayDate), [entries, todayDate]);
 
   useEffect(() => {
-    const entry = entries.find(e => e.date === todayDate);
-    if (entry) {
-      setTodayEntry(entry);
-      setCount(entry.count.toString());
-      setNotes(entry.notes || '');
-    } else {
-      setTodayEntry(null);
-      setCount('');
-      setNotes('');
-    }
-  }, [entries, todayDate]);
+    const t = setInterval(() => setPeriod(getDayPeriod()), 5 * 60 * 1000);
+    return () => clearInterval(t);
+  }, []);
 
-  const fetchEntries = async () => {
+  useEffect(() => {
     if (!user) return;
-    try {
+    let cancelled = false;
+    (async () => {
       setLoading(true);
       const { data, error } = await supabase
         .from('naam_jap_entries')
         .select('*')
         .eq('user_id', user.id)
         .order('date', { ascending: false });
-      if (error) throw error;
-      setEntries(data || []);
-      calculateStats(data || []);
-    } catch (error: any) {
-      toast({
-        title: HI ? 'त्रुटि' : 'Error',
-        description: error.message || (HI ? 'एंट्रीज़ लोड करने में विफल' : 'Failed to load entries'),
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const calculateStats = (entriesData: NaamJapEntry[]) => {
-    if (entriesData.length === 0) {
-      setStats({ totalCount: 0, currentStreak: 0, longestStreak: 0, thisMonthCount: 0, averagePerDay: 0, totalDays: 0 });
-      return;
-    }
-
-    const totalCount = entriesData.reduce((sum, entry) => sum + entry.count, 0);
-
-    const currentMonth = new Date().getMonth();
-    const currentYear = new Date().getFullYear();
-    const thisMonthCount = entriesData
-      .filter(entry => {
-        const entryDate = parseLocalDate(entry.date);
-        return entryDate.getMonth() === currentMonth && entryDate.getFullYear() === currentYear;
-      })
-      .reduce((sum, entry) => sum + entry.count, 0);
-
-    const sortedEntries = [...entriesData].sort((a, b) => parseLocalDate(a.date).getTime() - parseLocalDate(b.date).getTime());
-
-    let currentStreak = 0;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    for (let i = 0; i < 365; i++) {
-      const checkDate = new Date(today);
-      checkDate.setDate(checkDate.getDate() - i);
-      const dateStr = toLocalDateStr(checkDate);
-      if (entriesData.some(e => e.date === dateStr)) currentStreak++;
-      else break;
-    }
-
-    let longestStreak = 0;
-    let tempStreak = 1;
-    for (let i = 1; i < sortedEntries.length; i++) {
-      const prevDate = parseLocalDate(sortedEntries[i - 1].date);
-      const currDate = parseLocalDate(sortedEntries[i].date);
-      const daysDiff = Math.floor((currDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24));
-      if (daysDiff === 1) tempStreak++;
-      else { longestStreak = Math.max(longestStreak, tempStreak); tempStreak = 1; }
-    }
-    longestStreak = Math.max(longestStreak, tempStreak);
-
-    setStats({
-      totalCount,
-      currentStreak,
-      longestStreak,
-      thisMonthCount,
-      averagePerDay: Math.round(totalCount / entriesData.length),
-      totalDays: entriesData.length,
-    });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user) return;
-
-    if (!count || parseInt(count) < 0) {
-      toast({
-        title: HI ? 'अमान्य इनपुट' : 'Invalid Input',
-        description: HI ? 'कृपया एक मान्य संख्या दर्ज करें' : 'Please enter a valid number',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    setSubmitting(true);
-    try {
-      const entryData = { user_id: user.id, date: todayDate, count: parseInt(count), notes: notes.trim() || null };
-
-      if (todayEntry) {
-        const { error } = await supabase.from('naam_jap_entries').update(entryData).eq('id', todayEntry.id);
-        if (error) throw error;
-      } else {
-        const { error } = await supabase.from('naam_jap_entries').insert([entryData]);
-        if (error) throw error;
+      if (cancelled) return;
+      if (error) {
+        toast({ title: HI ? 'त्रुटि' : 'Error', description: HI ? 'एंट्रीज़ लोड करने में विफल' : 'Failed to load entries', variant: 'destructive' });
+        setLoading(false);
+        return;
       }
+      const rows = (data ?? []) as NaamJapEntry[];
+      setEntries(rows);
+      if (!syncedRef.current) {
+        const today = rows.find(e => e.date === todayDate);
+        todayIdRef.current = today?.id ?? null;
+        lastSavedRef.current = { count: today?.count ?? 0, notes: today?.notes ?? '' };
+        setCount(today?.count ?? 0);
+        setNotes(today?.notes ?? '');
+        syncedRef.current = true;
+      }
+      setLoading(false);
+    })();
+    return () => { cancelled = true; };
+  }, [user]);
 
-      toast({
-        title: HI ? 'सहेजा गया' : 'Saved',
-        description: HI ? 'आपकी आज की गिनती दर्ज कर ली गई है' : 'Today’s count has been recorded',
-      });
-      await fetchEntries();
-    } catch (error: any) {
-      toast({
-        title: HI ? 'त्रुटि' : 'Error',
-        description: error.message || (HI ? 'प्रविष्टि सहेजने में विफल' : 'Failed to save entry'),
-        variant: 'destructive',
-      });
-    } finally {
-      setSubmitting(false);
+  const doSave = async (c: number, n: string) => {
+    if (!user) return;
+    const last = lastSavedRef.current;
+    if (last.count === c && last.notes === n) { setSaveState('saved'); return; }
+    setSaveState('saving');
+    try {
+      const payload = { user_id: user.id, date: todayDate, count: c, notes: n.trim() || null };
+      const { data, error } = todayIdRef.current
+        ? await supabase.from('naam_jap_entries').update(payload).eq('id', todayIdRef.current).select().single()
+        : await supabase.from('naam_jap_entries').insert([payload]).select().single();
+      if (error) throw error;
+      const saved = data as NaamJapEntry;
+      todayIdRef.current = saved.id;
+      lastSavedRef.current = { count: c, notes: n };
+      setEntries(prev => [saved, ...prev.filter(e => e.id !== saved.id && e.date !== saved.date)]);
+      const cur = latestRef.current;
+      setSaveState(cur.count === c && cur.notes === n ? 'saved' : 'pending');
+    } catch {
+      setSaveState('error');
     }
   };
+
+  // Saves run one after another so a fast second save never creates a duplicate row.
+  const persist = (c: number, n: string) => {
+    const job = chainRef.current.then(() => doSave(c, n));
+    chainRef.current = job.catch(() => {});
+    return job;
+  };
+
+  // Auto-save: a moment after the count or notes settle.
+  useEffect(() => {
+    if (!user || !syncedRef.current) return;
+    const last = lastSavedRef.current;
+    if (last.count === count && last.notes === notes) return;
+    setSaveState('pending');
+    const t = setTimeout(() => { void persist(count, notes); }, 1200);
+    return () => clearTimeout(t);
+  }, [count, notes, user]);
+
+  // Leaving the app mid-chant shouldn't lose the last few beads.
+  useEffect(() => {
+    const flush = () => {
+      if (document.visibilityState !== 'hidden' || !syncedRef.current) return;
+      const { count: c, notes: n } = latestRef.current;
+      const last = lastSavedRef.current;
+      if (last.count !== c || last.notes !== n) void persist(c, n);
+    };
+    document.addEventListener('visibilitychange', flush);
+    return () => document.removeEventListener('visibilitychange', flush);
+  }, [user]);
+
+  const savedToday = entries.find(e => e.date === todayDate)?.count ?? 0;
+  const liveTotal = stats.totalCount - savedToday + count;
+  const liveStreak = stats.currentStreak + (count > 0 && !stats.todayDone ? 1 : 0);
+
+  const week = useMemo(
+    () =>
+      Array.from({ length: 7 }, (_, k) => {
+        const d = new Date();
+        d.setHours(0, 0, 0, 0);
+        d.setDate(d.getDate() - (6 - k));
+        const ds = toLocalDateStr(d);
+        const c = ds === todayDate ? count : entries.find(e => e.date === ds)?.count ?? 0;
+        return { ds, c, isToday: ds === todayDate, label: d.toLocaleDateString(HI ? 'hi-IN' : 'en-US', { weekday: 'narrow' }) };
+      }),
+    [entries, count, todayDate, HI],
+  );
+  const weekMax = Math.max(108, ...week.map(w => w.c));
+  const weekTotal = week.reduce((s, w) => s + w.c, 0);
 
   const handleDownloadReport = async () => {
     setGeneratingReport(true);
     try {
-      await downloadMonthlyNaamJapReport(entries, language, user?.user_metadata?.name);
+      const reportEntries = [
+        ...entries.filter(e => e.date !== todayDate).map(e => ({ date: e.date, count: e.count, notes: e.notes ?? undefined })),
+        ...(count > 0 ? [{ date: todayDate, count, notes }] : []),
+      ];
+      await downloadMonthlyNaamJapReport(reportEntries, language, user?.user_metadata?.name);
     } catch {
-      toast({
-        title: HI ? 'त्रुटि' : 'Error',
-        description: HI ? 'रिपोर्ट बनाने में विफल। पुनः प्रयास करें।' : 'Could not generate the report. Please try again.',
-        variant: 'destructive',
-      });
+      toast({ title: HI ? 'त्रुटि' : 'Error', description: HI ? 'रिपोर्ट बनाने में विफल। पुनः प्रयास करें।' : 'Could not generate the report. Please try again.', variant: 'destructive' });
     } finally {
       setGeneratingReport(false);
     }
@@ -236,36 +232,25 @@ export default function NaamJapTracker() {
     return (
       <div className="min-h-screen font-mukta text-[#241a12] bg-[#faf8f5]">
         <Navbar />
-
         <header
           className="px-5 pt-16 pb-10 text-center"
           style={{ background: 'linear-gradient(180deg, rgba(240,150,50,0.16) 0%, rgba(240,150,50,0.05) 60%, #faf8f5 100%)' }}
         >
           <p className="font-tiro text-5xl text-[#c2410c] select-none">ॐ</p>
-          <h1 className="mt-4 font-tiro font-normal tracking-normal text-[2.6rem] sm:text-5xl leading-[1.15]">
-            {HI ? 'नाम जप' : 'Naam Jap'}
-          </h1>
+          <h1 className="mt-4 font-tiro font-normal tracking-normal text-[2.6rem] sm:text-5xl leading-[1.15]">{HI ? 'नाम जप' : 'Naam Jap'}</h1>
           <p className="mt-4 max-w-md mx-auto text-[17px] leading-relaxed text-[#241a12]/75">
-            {HI
-              ? 'अपनी दैनिक साधना को ट्रैक करें और निरंतरता बनाएं।'
-              : 'Track your daily practice and build consistency.'}
+            {HI ? 'अपनी दैनिक साधना को ट्रैक करें और निरंतरता बनाएं।' : 'Track your daily practice and build consistency.'}
           </p>
         </header>
-
         <main className="max-w-sm mx-auto px-5 pb-20 text-center">
           <div className="rounded-3xl bg-white border border-[#241a12]/10 p-7 shadow-sm">
             <div className="w-14 h-14 mx-auto rounded-full bg-[#241a12] flex items-center justify-center">
               <LogIn className="w-6 h-6 text-white" strokeWidth={1.75} />
             </div>
-            <h2 className="mt-5 font-tiro font-normal text-2xl">
-              {HI ? 'लॉगिन आवश्यक है' : 'Sign in to continue'}
-            </h2>
+            <h2 className="mt-5 font-tiro font-normal text-2xl">{HI ? 'लॉगिन आवश्यक है' : 'Sign in to continue'}</h2>
             <p className="mt-2 text-[15px] text-[#7a6a5c] leading-relaxed">
-              {HI
-                ? 'अपनी यात्रा को सभी उपकरणों में सुरक्षित रखने के लिए लॉगिन करें।'
-                : 'Sign in to keep your streak and count safely synced across devices.'}
+              {HI ? 'अपनी यात्रा को सभी उपकरणों में सुरक्षित रखने के लिए लॉगिन करें।' : 'Sign in to keep your streak and count safely synced across devices.'}
             </p>
-
             <div className="mt-6 flex flex-col gap-3">
               <Link to="/login">
                 <button className={`w-full h-12 rounded-full bg-[#ea580c] hover:bg-[#d24e0a] text-white text-[15px] font-semibold transition-colors ${pressable} ${focusRing}`}>
@@ -281,7 +266,6 @@ export default function NaamJapTracker() {
             </div>
           </div>
         </main>
-
         <Footer />
       </div>
     );
@@ -289,138 +273,170 @@ export default function NaamJapTracker() {
 
   if (loading) return <LoadingPage />;
 
-  const facts = [
-    { label: HI ? 'आज' : 'Today', value: (parseInt(count) || 0).toLocaleString() },
-    { label: HI ? 'स्ट्रीक' : 'Streak', value: `${stats.currentStreak}` },
-    { label: HI ? 'कुल' : 'Total', value: stats.totalCount.toLocaleString() },
-  ];
+  const P = PERIODS[period];
+  const PeriodIcon = PERIOD_ICON[period];
+  const weekday = new Date().toLocaleDateString(HI ? 'hi-IN' : 'en-US', { weekday: 'long' });
+  const nextMilestone = MILESTONES.find(m => liveTotal < m.count);
 
   return (
     <div className="min-h-screen font-mukta text-[#241a12] bg-[#faf8f5]">
       <Navbar />
 
       <header
-        className="px-5 pt-14 pb-6 text-center"
-        style={{ background: 'linear-gradient(180deg, rgba(240,150,50,0.16) 0%, rgba(240,150,50,0.05) 60%, #faf8f5 100%)' }}
+        className="relative overflow-hidden px-5 pt-10 pb-10 text-center transition-[background] duration-1000"
+        style={{ background: `linear-gradient(180deg, ${P.sky[0]} 0%, ${P.sky[1]} 70%, #faf8f5 100%)` }}
       >
-        <h1 className="font-tiro font-normal tracking-normal text-[2.4rem] sm:text-5xl leading-[1.15]">
+        <div
+          aria-hidden="true"
+          className="absolute right-[12%] w-20 h-20 rounded-full animate-[naamjapDrift_6s_ease-in-out_infinite_alternate]"
+          style={{ top: P.orb.top, background: `radial-gradient(circle, ${P.orb.color} 0%, ${P.orb.color}00 70%)` }}
+        />
+        <p className="relative inline-flex items-center gap-1.5 rounded-full bg-white/55 backdrop-blur px-3 py-1 text-[13px] font-medium text-[#7a3f1c]">
+          <PeriodIcon className="w-3.5 h-3.5" />
+          {HI ? P.hi : P.en} · {weekday}
+        </p>
+        <h1 className="relative mt-3 font-tiro font-normal tracking-normal text-[2.6rem] sm:text-5xl leading-[1.1]">
           {HI ? 'नाम जप' : 'Naam Jap'}
         </h1>
-        <p className="mt-2 text-[15px] text-[#241a12]/70">
-          {new Date().toLocaleDateString(HI ? 'hi-IN' : 'en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-        </p>
-        {!todayEntry && stats.currentStreak > 0 && (
-          <p className="mt-3 text-[13px] font-medium text-[#c2410c]">
-            {HI
-              ? `आपकी ${stats.currentStreak} दिन की स्ट्रीक जारी है — आज की गिनती जोड़ें`
-              : `Your ${stats.currentStreak}-day streak is alive — log today’s count`}
+        <p className="relative mt-1.5 text-[15px] text-[#241a12]/70">{HI ? P.lineHi : P.lineEn}</p>
+        {!stats.todayDone && count === 0 && stats.currentStreak > 0 && (
+          <p className="relative mt-3 inline-flex items-center gap-1.5 text-[13px] font-medium text-[#c2410c]">
+            <Flame className="w-3.5 h-3.5" />
+            {HI ? `${stats.currentStreak} दिन की स्ट्रीक — आज की माला बाकी है` : `${stats.currentStreak}-day streak — today’s mala is waiting`}
           </p>
         )}
       </header>
 
-      <main className="max-w-lg mx-auto px-5 pb-24">
-        {/* Mala */}
-        <section className="flex flex-col items-center pt-4 pb-2">
-          <NaamJapCounter
-            initialCount={parseInt(count) || 0}
-            onCountChange={newCount => setCount(newCount.toString())}
-            language={language}
-          />
+      <main className="max-w-md mx-auto px-4 sm:px-5 pb-24 -mt-3">
+        <NaamJapCounter count={count} onCountChange={setCount} language={language} period={period} />
+
+        {/* Auto-save status */}
+        <div className="mt-3 h-5 flex items-center justify-center text-[12px] text-[#7a6a5c]">
+          {saveState === 'saving' || saveState === 'pending' ? (
+            <span className="inline-flex items-center gap-1.5"><Loader2 className="w-3 h-3 animate-spin" />{HI ? 'सहेज रहे हैं…' : 'Saving…'}</span>
+          ) : saveState === 'error' ? (
+            <button onClick={() => void persist(count, notes)} className="inline-flex items-center gap-1.5 text-[#c2410c] font-medium">
+              <CloudOff className="w-3.5 h-3.5" />{HI ? 'सहेजा नहीं जा सका — फिर कोशिश करें' : 'Couldn’t save — tap to retry'}
+            </button>
+          ) : todayIdRef.current ? (
+            <span className="inline-flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-[#15803d]" />{HI ? 'अपने आप सहेजा गया' : 'Saved automatically'}</span>
+          ) : null}
+        </div>
+
+        {/* The week, strung as beads */}
+        <section className="mt-8" aria-labelledby="week">
+          <div className="flex items-baseline justify-between">
+            <h2 id="week" className="font-tiro font-normal tracking-normal text-[1.5rem] leading-tight">{HI ? 'यह सप्ताह' : 'This week'}</h2>
+            <span className="text-[13px] text-[#7a6a5c] tabular-nums">{weekTotal.toLocaleString('en-IN')} {HI ? 'जप' : 'chants'}</span>
+          </div>
+          <div className="relative mt-5">
+            <div className="absolute left-[7%] right-[7%] top-[18px] h-px bg-[#241a12]/15" />
+            <ol className="relative grid grid-cols-7">
+              {week.map(w => {
+                const s = w.c ? 14 + 22 * Math.sqrt(w.c / weekMax) : 10;
+                return (
+                  <li key={w.ds} className="flex flex-col items-center">
+                    <div className="h-9 flex items-center justify-center">
+                      <span
+                        className="block rounded-full transition-all duration-500"
+                        style={{
+                          width: s,
+                          height: s,
+                          background: w.c
+                            ? 'radial-gradient(circle at 35% 30%, #c47650, #7c3a1d)'
+                            : 'radial-gradient(circle at 35% 30%, #f1e2c8, #d9bf94)',
+                          boxShadow: w.c ? '0 1px 2px rgba(36,26,18,0.35)' : undefined,
+                          outline: w.isToday ? '2px solid rgba(234,88,12,0.35)' : undefined,
+                          outlineOffset: 2,
+                        }}
+                      />
+                    </div>
+                    <span className={`mt-2 text-[11px] ${w.isToday ? 'text-[#c2410c] font-semibold' : 'text-[#7a6a5c]'}`}>{w.label}</span>
+                    <span className="text-[10px] text-[#7a6a5c]/80 tabular-nums">{w.c ? compact(w.c) : '·'}</span>
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
         </section>
 
-        {/* Quiet fact row */}
+        {/* Facts */}
         <div className="mt-8 grid grid-cols-3 gap-3">
-          {facts.map(f => (
-            <div key={f.label} className="rounded-2xl bg-white border border-[#241a12]/10 px-3 py-3.5 text-center">
-              <dd className="text-[20px] font-semibold leading-snug tabular-nums">{f.value}</dd>
-              <dt className="mt-0.5 text-[12px] text-[#7a6a5c]">{f.label}</dt>
+          {[
+            { label: HI ? 'आज' : 'Today', value: count.toLocaleString('en-IN') },
+            { label: HI ? 'दिन की स्ट्रीक' : 'Day streak', value: String(liveStreak) },
+            { label: HI ? 'कुल जप' : 'All time', value: liveTotal.toLocaleString('en-IN') },
+          ].map(f => (
+            <div key={f.label} className="rounded-2xl bg-white border border-[#241a12]/[0.08] px-3 py-3.5 text-center">
+              <p className="font-tiro text-[22px] leading-snug tabular-nums">{f.value}</p>
+              <p className="mt-0.5 text-[12px] text-[#7a6a5c]">{f.label}</p>
             </div>
           ))}
         </div>
 
+        {/* Reflection + exact count */}
+        <section className="mt-8 rounded-3xl bg-white border border-[#241a12]/[0.08] p-5" aria-labelledby="reflection">
+          <h2 id="reflection" className="font-tiro font-normal tracking-normal text-[1.35rem] leading-tight">
+            {HI ? 'आज का अनुभव' : 'Today’s reflection'}
+          </h2>
+          <textarea
+            value={notes}
+            onChange={e => setNotes(e.target.value)}
+            placeholder={HI ? 'मन कैसा रहा? एक पंक्ति लिखें…' : 'How did it feel? A line is enough…'}
+            rows={3}
+            className="mt-3 w-full rounded-xl bg-[#faf8f5] border border-[#241a12]/10 px-4 py-3 text-[15px] leading-relaxed placeholder:text-[#7a6a5c] focus:outline-none focus:border-[#ea580c]/50 focus:ring-2 focus:ring-[#ea580c]/20 resize-none"
+          />
+          <div className="mt-4 flex items-center justify-between gap-3">
+            <label htmlFor="exact-count" className="text-[13px] text-[#7a6a5c]">
+              {HI ? 'माला पर गिना? संख्या लिखें' : 'Counted on beads? Type it in'}
+            </label>
+            <input
+              id="exact-count"
+              type="number"
+              inputMode="numeric"
+              min={0}
+              value={count || ''}
+              onChange={e => setCount(Math.max(0, parseInt(e.target.value) || 0))}
+              placeholder="0"
+              className="w-28 h-10 rounded-xl bg-[#faf8f5] border border-[#241a12]/10 px-3 text-right text-[16px] tabular-nums focus:outline-none focus:border-[#ea580c]/50 focus:ring-2 focus:ring-[#ea580c]/20"
+            />
+          </div>
+        </section>
+
         <button
           onClick={handleDownloadReport}
           disabled={generatingReport}
-          className={`mt-3 w-full h-11 rounded-full border border-[#241a12]/12 bg-white hover:bg-[#faf3e8] text-[13px] font-medium text-[#241a12] transition-colors disabled:opacity-50 flex items-center justify-center gap-2 ${pressable} ${focusRing}`}
+          className={`mt-4 w-full h-11 rounded-full border border-[#241a12]/12 bg-white hover:bg-[#faf3e8] text-[13px] font-medium transition-colors disabled:opacity-50 flex items-center justify-center gap-2 ${pressable} ${focusRing}`}
         >
           {generatingReport ? (
-            <><Loader2 className="w-4 h-4 animate-spin" />{HI ? 'रिपोर्ट बन रही है...' : 'Preparing report...'}</>
+            <><Loader2 className="w-4 h-4 animate-spin" />{HI ? 'रिपोर्ट बन रही है…' : 'Preparing report…'}</>
           ) : (
             <><FileDown className="w-4 h-4 text-[#c2410c]" />{HI ? 'इस महीने की रिपोर्ट (PDF)' : 'This month’s report (PDF)'}</>
           )}
         </button>
 
-        {/* Save form */}
-        <form onSubmit={handleSubmit} className="mt-10 space-y-4">
-          <div>
-            <label className="block text-[13px] font-medium text-[#7a6a5c] mb-1.5">
-              {HI ? 'गिनती' : 'Count'}
-            </label>
-            <input
-              type="number"
-              inputMode="numeric"
-              value={count}
-              onChange={e => setCount(e.target.value)}
-              placeholder={HI ? 'जैसे १०८०' : 'e.g. 1080'}
-              min="0"
-              required
-              className={`w-full h-12 rounded-xl bg-white border border-[#241a12]/10 px-4 text-[16px] tabular-nums placeholder:text-[#7a6a5c] focus:outline-none focus:border-[#ea580c]/50 focus:ring-2 focus:ring-[#ea580c]/20`}
-            />
-          </div>
-
-          <div>
-            <label className="block text-[13px] font-medium text-[#7a6a5c] mb-1.5">
-              {HI ? 'नोट्स (वैकल्पिक)' : 'Notes (optional)'}
-            </label>
-            <textarea
-              value={notes}
-              onChange={e => setNotes(e.target.value)}
-              placeholder={HI ? 'अपने अनुभव के बारे में लिखें...' : 'Write about your experience...'}
-              rows={3}
-              className="w-full rounded-xl bg-white border border-[#241a12]/10 px-4 py-3 text-[15px] leading-relaxed placeholder:text-[#7a6a5c] focus:outline-none focus:border-[#ea580c]/50 focus:ring-2 focus:ring-[#ea580c]/20 resize-none"
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={submitting}
-            className={`w-full h-12 rounded-full bg-[#241a12] hover:bg-[#3a2b1c] text-white text-[15px] font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-2 ${pressable} ${focusRing}`}
-          >
-            {submitting ? (
-              <><Loader2 className="w-4 h-4 animate-spin" />{HI ? 'सहेजा जा रहा है...' : 'Saving...'}</>
-            ) : todayEntry ? (
-              <><Check className="w-4 h-4" />{HI ? 'अपडेट करें' : 'Update entry'}</>
-            ) : (
-              <><Save className="w-4 h-4" />{HI ? 'सहेजें' : 'Save entry'}</>
-            )}
-          </button>
-          <p className="text-center text-[12px] text-[#7a6a5c]">
-            {HI ? 'केवल आज की प्रविष्टि संपादित की जा सकती है' : 'Only today’s entry can be edited'}
-          </p>
-        </form>
-
         {/* Milestones */}
         <section className="mt-12" aria-labelledby="milestones">
-          <h2 id="milestones" className="font-tiro font-normal tracking-normal text-[1.6rem] leading-tight">
-            {HI ? 'माइलस्टोन' : 'Milestones'}
-          </h2>
+          <h2 id="milestones" className="font-tiro font-normal tracking-normal text-[1.5rem] leading-tight">{HI ? 'पड़ाव' : 'Milestones'}</h2>
+          {nextMilestone && (
+            <p className="mt-1 text-[13px] text-[#7a6a5c]">
+              {HI
+                ? `अगला पड़ाव "${nextMilestone.label.hi}" — ${(nextMilestone.count - liveTotal).toLocaleString('en-IN')} जप दूर`
+                : `Next: "${nextMilestone.label.en}" — ${(nextMilestone.count - liveTotal).toLocaleString('en-IN')} to go`}
+            </p>
+          )}
           <div className="mt-4 space-y-4">
             {MILESTONES.map(m => {
-              const progress = Math.min(100, (stats.totalCount / m.count) * 100);
-              const achieved = stats.totalCount >= m.count;
+              const progress = Math.min(100, (liveTotal / m.count) * 100);
+              const achieved = liveTotal >= m.count;
               return (
                 <div key={m.count}>
                   <div className="flex items-center justify-between text-[13px]">
-                    <span className={`font-medium ${achieved ? 'text-[#c2410c]' : 'text-[#241a12]'}`}>
-                      {HI ? m.label.hi : m.label.en}
-                    </span>
-                    <span className="text-[#7a6a5c] tabular-nums">{m.count.toLocaleString()}</span>
+                    <span className={`font-medium ${achieved ? 'text-[#c2410c]' : ''}`}>{achieved ? '✓ ' : ''}{HI ? m.label.hi : m.label.en}</span>
+                    <span className="text-[#7a6a5c] tabular-nums">{m.count.toLocaleString('en-IN')}</span>
                   </div>
-                  <div className="mt-1.5 h-1.5 rounded-full bg-[#241a12]/8 overflow-hidden">
-                    <div
-                      className={`h-full rounded-full transition-all duration-500 ${achieved ? 'bg-[#c2410c]' : 'bg-[#ea580c]/60'}`}
-                      style={{ width: `${progress}%` }}
-                    />
+                  <div className="mt-1.5 h-1.5 rounded-full bg-[#241a12]/[0.08] overflow-hidden">
+                    <div className={`h-full rounded-full transition-all duration-700 ${achieved ? 'bg-[#c2410c]' : 'bg-[#ea580c]/60'}`} style={{ width: `${progress}%` }} />
                   </div>
                 </div>
               );
@@ -429,13 +445,11 @@ export default function NaamJapTracker() {
         </section>
 
         {/* Recent entries */}
-        {entries.length > 0 && (
+        {entries.some(e => e.count > 0) && (
           <section className="mt-12" aria-labelledby="recent">
-            <h2 id="recent" className="font-tiro font-normal tracking-normal text-[1.6rem] leading-tight">
-              {HI ? 'हाल की प्रविष्टियां' : 'Recent entries'}
-            </h2>
-            <ul className="mt-4 divide-y divide-[#241a12]/8">
-              {entries.slice(0, 10).map(entry => (
+            <h2 id="recent" className="font-tiro font-normal tracking-normal text-[1.5rem] leading-tight">{HI ? 'हाल की प्रविष्टियां' : 'Recent days'}</h2>
+            <ul className="mt-4 divide-y divide-[#241a12]/[0.08]">
+              {entries.filter(e => e.count > 0).slice(0, 10).map(entry => (
                 <li key={entry.id} className="flex items-center justify-between py-3">
                   <div className="min-w-0 pr-4">
                     <p className="text-[15px] font-medium">
@@ -443,9 +457,7 @@ export default function NaamJapTracker() {
                     </p>
                     {entry.notes && <p className="text-[13px] text-[#7a6a5c] truncate mt-0.5">{entry.notes}</p>}
                   </div>
-                  <span className="text-[17px] font-semibold text-[#c2410c] tabular-nums flex-shrink-0">
-                    {entry.count.toLocaleString()}
-                  </span>
+                  <span className="font-tiro text-[18px] text-[#c2410c] tabular-nums flex-shrink-0">{entry.count.toLocaleString('en-IN')}</span>
                 </li>
               ))}
             </ul>
@@ -454,22 +466,26 @@ export default function NaamJapTracker() {
 
         {/* How it works */}
         <section className="mt-12" aria-labelledby="how-it-works">
-          <h2 id="how-it-works" className="font-tiro font-normal tracking-normal text-[1.6rem] leading-tight">
-            {HI ? 'यह कैसे काम करता है' : 'How it works'}
-          </h2>
+          <h2 id="how-it-works" className="font-tiro font-normal tracking-normal text-[1.5rem] leading-tight">{HI ? 'यह कैसे काम करता है' : 'How it works'}</h2>
           <dl className="mt-4 space-y-4">
             {[
               {
-                q: HI ? 'केवल आज' : 'Today only',
+                q: HI ? 'माला को छुएं या जप मोड खोलें' : 'Touch the mala, or open chanting mode',
                 a: HI
-                  ? 'आप केवल आज की प्रविष्टि जोड़ या बदल सकते हैं। दिन बीतने के बाद वह हमेशा के लिए लॉक हो जाती है।'
-                  : 'You can only add or change today’s entry. Once the day passes, it’s locked for good.',
+                  ? 'हर स्पर्श पर एक मनका आगे बढ़ता है। जप मोड में पूरी स्क्रीन पर कहीं भी टैप करें — आँखें बंद करके भी।'
+                  : 'Each touch moves one bead past the thumb. In chanting mode, tap anywhere on the screen — even with your eyes closed.',
               },
               {
-                q: HI ? 'प्रामाणिक स्ट्रीक' : 'Authentic streaks',
+                q: HI ? 'अपने आप सहेजा जाता है' : 'Saved automatically',
+                a: HI
+                  ? 'आपकी गिनती और अनुभव अपने आप सहेजे जाते हैं। केवल आज की प्रविष्टि बदली जा सकती है।'
+                  : 'Your count and reflection save on their own. Only today’s entry can be changed.',
+              },
+              {
+                q: HI ? 'प्रामाणिक स्ट्रीक' : 'Honest streaks',
                 a: HI
                   ? 'पिछली तारीख की एंट्री नहीं जोड़ी जा सकती। एक दिन चूकने पर स्ट्रीक टूट जाती है।'
-                  : 'No backdating. Miss a day and the streak breaks — this keeps it an honest record of daily practice.',
+                  : 'No backdating. Miss a day and the streak breaks — an honest record of daily practice.',
               },
             ].map(item => (
               <div key={item.q}>
