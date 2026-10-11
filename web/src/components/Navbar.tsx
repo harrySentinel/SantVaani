@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from '@/components/SiteLink';
 import { usePathname } from 'next/navigation';
-import { Menu, X, Users, Sparkles, Book, Info, IndianRupee, Star, ChevronDown, ChevronRight, LogIn, UserPlus, User, LogOut, BookOpen, BookMarked, Share2, Settings, Search, LayoutDashboard, ScrollText, CalendarDays } from 'lucide-react';
+import { Menu, X, Users, Sparkles, Book, Info, IndianRupee, Star, ChevronDown, ChevronRight, LogIn, UserPlus, User, LogOut, BookOpen, BookMarked, Share2, Settings, Search, LayoutDashboard, ScrollText, CalendarDays, Wind } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -80,6 +80,7 @@ export default function Navbar() {
   ];
 
   const secondaryItems = [
+    { to: '/meditation', label: 'Meditation', labelHi: 'ध्यान', icon: Wind },
     { to: '/jeevani', label: 'Jeevani', labelHi: 'जीवनी', icon: ScrollText },
     { to: '/divine', label: 'Divine Forms', labelHi: 'दिव्य रूप', icon: Sparkles },
     { to: '/bhajans', label: 'Bhajans', labelHi: 'भजन', icon: Book },

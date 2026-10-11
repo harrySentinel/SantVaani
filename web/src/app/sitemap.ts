@@ -22,6 +22,7 @@ const STATIC_ROUTES: { path: string; changeFrequency: MetadataRoute.Sitemap[numb
   { path: '/horoscope', changeFrequency: 'daily', priority: 0.8 },
   { path: '/daily-guide', changeFrequency: 'daily', priority: 0.7 },
   { path: '/naam-jap', changeFrequency: 'monthly', priority: 0.5 },
+  { path: '/meditation', changeFrequency: 'weekly', priority: 0.7 },
   { path: '/live-bhajans', changeFrequency: 'weekly', priority: 0.6 },
   { path: '/santvaani-space', changeFrequency: 'daily', priority: 0.6 },
   { path: '/jeevani', changeFrequency: 'monthly', priority: 0.6 },
