@@ -145,41 +145,51 @@ export default function DailyGuideContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f4f0e8] text-[#29231e]">
+    <div className="min-h-screen bg-[#f4f0e8] text-[#29231e]" style={{ backgroundImage: 'radial-gradient(circle at 10% 12%, rgba(213, 169, 105, 0.12) 0, transparent 24rem), radial-gradient(circle at 90% 48%, rgba(100, 76, 52, 0.07) 0, transparent 28rem)' }}>
       <Navbar />
       <main>
-        <header className="border-b border-[#d9d0c3] bg-[#f4f0e8]">
-          <div className="mx-auto grid max-w-7xl gap-10 px-5 pb-16 pt-12 sm:px-8 md:grid-cols-[1fr_0.62fr] md:pb-24 md:pt-20">
-            <div>
-              <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.22em] text-[#9a5d20]">
-                <span className="font-serif text-xl normal-case">ॐ</span>
-                <span className="h-px w-10 bg-[#caa77c]" />
+        <header className="relative isolate overflow-hidden bg-[#211914] text-[#fff4df]">
+          <div className="absolute inset-0 opacity-90" style={{ background: `radial-gradient(circle at 72% 25%, ${lens.accent}55 0, transparent 22rem), radial-gradient(circle at 14% 100%, #a55f283d 0, transparent 25rem), linear-gradient(135deg, #211914 0%, #34231a 55%, #18110e 100%)` }} />
+          <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#f4f0e8] to-transparent" />
+          <div className="relative mx-auto grid max-w-7xl gap-10 px-5 pb-24 pt-12 sm:px-8 md:grid-cols-[1fr_0.72fr] md:pb-32 md:pt-20">
+            <div className="relative z-10">
+              <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.22em] text-[#e7c48d]">
+                <span className="font-serif text-xl normal-case text-[#f0d4a9]">ॐ</span>
+                <span className="h-px w-10 bg-[#d4a967]/70" />
                 {hindi ? 'संतवाणी का आध्यात्मिक पंचांग' : 'Santvaani’s spiritual almanac'}
               </div>
-              <h1 className="mt-9 max-w-3xl font-serif text-5xl font-medium leading-[0.98] tracking-[-0.045em] text-[#29231e] sm:text-7xl md:text-8xl">
+              <h1 className="mt-9 max-w-3xl font-serif text-5xl font-medium leading-[0.94] tracking-[-0.05em] text-[#fff6e8] sm:text-7xl md:text-8xl">
                 {hindi ? 'दैनिक धर्म' : 'Daily Dharma'}
               </h1>
-              <p className="mt-7 max-w-xl font-tiro text-2xl font-normal leading-relaxed tracking-normal text-[#624f3d] sm:text-3xl">
+              <p className="mt-7 max-w-xl font-tiro text-2xl font-normal leading-relaxed tracking-normal text-[#efd5ab] sm:text-3xl">
                 {hindi ? 'आज के अर्थ को समझें। अपनी साधना चुनें।' : 'Understand the meaning of today. Choose your practice.'}
               </p>
-              <p className="mt-5 max-w-xl text-base leading-8 text-[#776858]">
+              <p className="mt-5 max-w-xl text-base leading-8 text-white/65">
                 {hindi ? 'पर्व, व्रत, परंपरा और दैनिक चिंतन को एक विश्वसनीय, शांत और गहरे अनुभव में पढ़ें।' : 'A considered guide to observances, traditions, and daily reflection — with room for both context and practice.'}
               </p>
-              <a href="#significance" className="mt-8 inline-flex items-center gap-2 border-b border-[#9a5d20] pb-1 text-sm font-semibold text-[#754619] transition hover:border-[#29231e] hover:text-[#29231e]">
-                {hindi ? 'आज की जानकारी पढ़ें' : 'Read today’s entry'} <ArrowDown className="h-4 w-4" />
-              </a>
-            </div>
-            <div className="flex flex-col justify-end border-l border-[#d9d0c3] pl-6 md:pl-10">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#927964]">{hindi ? 'आज' : 'Today'}</p>
-              <p className="mt-3 font-tiro text-3xl font-normal tracking-normal text-[#29231e]">{dateLabel}</p>
-              <div className="mt-8 border-t border-[#d9d0c3] pt-5">
-                <p className="text-xs uppercase tracking-[0.18em] text-[#927964]">{hindi ? 'साप्ताहिक संदर्भ' : 'Weekday context'}</p>
-                <p className="mt-2 font-serif text-2xl text-[#29231e]">{text(lens, hindi)}</p>
-                <p className="mt-1 text-sm text-[#786858]">{hindi ? `परंपरागत रूप से ${lens.deity.hi} से जुड़ा` : `Traditionally associated with ${lens.deity.en}`}</p>
+              <div className="mt-9 flex flex-wrap items-center gap-4">
+                <a href="#significance" className="inline-flex items-center gap-2 bg-[#f0d4a9] px-5 py-3 text-sm font-semibold text-[#36261a] transition hover:bg-white focus:outline-none focus:ring-2 focus:ring-[#f0d4a9] focus:ring-offset-2 focus:ring-offset-[#211914]">
+                  {hindi ? 'आज की जानकारी पढ़ें' : 'Read today’s entry'} <ArrowDown className="h-4 w-4" />
+                </a>
+                <button onClick={toggleNotifications} className="inline-flex items-center gap-2 border border-white/20 px-5 py-3 text-sm font-medium text-white/80 transition hover:border-white/50 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-[#f0d4a9]">
+                  <Bell className="h-4 w-4" /> {notificationsEnabled ? (hindi ? 'स्मरण सक्रिय' : 'Reminders active') : (hindi ? 'दैनिक स्मरण पाएं' : 'Receive daily reminders')}
+                </button>
               </div>
-              <button onClick={toggleNotifications} className="mt-8 inline-flex w-fit items-center gap-2 rounded-full border border-[#bca78e] px-4 py-2.5 text-sm font-semibold text-[#68492f] transition hover:bg-[#e9dfd1] focus:outline-none focus:ring-2 focus:ring-[#9a5d20]">
-                <Bell className="h-4 w-4" /> {notificationsEnabled ? (hindi ? 'स्मरण सक्रिय' : 'Reminders active') : (hindi ? 'दैनिक स्मरण पाएं' : 'Receive daily reminders')}
-              </button>
+            </div>
+            <div className="relative z-10 mx-auto flex w-full max-w-sm items-center justify-center md:ml-auto">
+              <div className="relative aspect-square w-full max-w-[23rem] rounded-full border border-[#f0d4a9]/35 bg-[#f0d4a9]/[0.07] p-4 shadow-[0_0_100px_rgba(238,190,113,0.12)] backdrop-blur-sm">
+                <div className="absolute inset-8 rounded-full border border-[#f0d4a9]/25" />
+                <div className="absolute inset-16 rounded-full border border-dashed border-[#f0d4a9]/25" />
+                <div className="absolute left-1/2 top-3 h-2 w-2 -translate-x-1/2 rounded-full bg-[#f0d4a9] shadow-[0_0_26px_10px_rgba(240,212,169,0.4)]" />
+                <div className="flex h-full flex-col items-center justify-center rounded-full border border-[#f0d4a9]/20 bg-[#f0d4a9]/[0.06] text-center">
+                  <p className="font-mukta text-5xl leading-none text-[#f0d4a9]">{today.getDate()}</p>
+                  <p className="mt-3 text-xs uppercase tracking-[0.24em] text-white/55">{today.toLocaleDateString(hindi ? 'hi-IN' : 'en-IN', { month: 'long' })}</p>
+                  <div className="my-6 h-px w-14 bg-[#f0d4a9]/40" />
+                  <p className="font-tiro text-3xl font-normal tracking-normal text-[#fff4df]">{text(lens, hindi)}</p>
+                  <p className="mt-2 text-sm text-[#e6c48f]">{hindi ? lens.deity.hi : lens.deity.en}</p>
+                </div>
+              </div>
+              <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 whitespace-nowrap border border-white/15 bg-[#211914]/80 px-4 py-2 text-xs text-white/65 backdrop-blur-md">{dateLabel}</div>
             </div>
           </div>
         </header>
@@ -191,7 +201,8 @@ export default function DailyGuideContent() {
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#9a5d20]">01 / {hindi ? 'आज का संदर्भ' : 'Today’s context'}</p>
                 <h2 className="mt-4 font-serif text-3xl font-medium leading-tight text-[#29231e] md:text-4xl">{hindi ? 'आज विशेष क्यों है?' : 'What is meaningful today?'}</h2>
               </div>
-              <div className="max-w-3xl">
+              <div className="relative max-w-3xl overflow-hidden bg-[#fff9ee] p-7 shadow-[0_18px_60px_rgba(91,61,32,0.08)] ring-1 ring-[#dfd0bd] sm:p-10">
+                <div className="absolute right-0 top-0 h-40 w-40 rounded-full bg-[#e9be78]/20 blur-2xl" />
                 {todayEvent ? (
                   <>
                     <div className="flex flex-wrap items-center gap-3"><span className="rounded-full bg-[#e6d4bc] px-3 py-1.5 text-xs font-semibold text-[#70451f]">{hindi ? 'आज का पर्व / व्रत' : 'Today’s observance'}</span><span className="text-sm text-[#806f5e]">{hindi ? todayEvent.nameHi || todayEvent.name : todayEvent.name}</span></div>
@@ -209,7 +220,9 @@ export default function DailyGuideContent() {
             </div>
           </section>
 
-          <section className="grid gap-10 border-b border-[#d9d0c3] py-14 md:grid-cols-[1fr_0.8fr] md:py-20">
+          <section className="relative grid gap-10 overflow-hidden border-b border-[#d9d0c3] bg-[#eadcc9] px-6 py-14 md:grid-cols-[1fr_0.8fr] md:px-12 md:py-20">
+            <div className="pointer-events-none absolute -right-16 -top-24 h-72 w-72 rounded-full border border-[#b6844f]/20" />
+            <div className="pointer-events-none absolute -right-6 -top-14 h-52 w-52 rounded-full border border-[#b6844f]/15" />
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#9a5d20]">02 / {hindi ? 'व्रत और परंपरा' : 'Vrat & tradition'}</p>
               <h2 className="mt-4 font-serif text-3xl font-medium leading-tight text-[#29231e] md:text-4xl">{todayEvent?.category === 'vrat' ? (hindi ? 'आज के व्रत को समझें' : 'Understanding today’s vrat') : (hindi ? 'यदि आप आज व्रत रख रहे हैं' : 'If you are observing a fast')}</h2>
@@ -238,7 +251,7 @@ export default function DailyGuideContent() {
             <div>{isLoading ? <div className="grid animate-pulse grid-cols-2 gap-x-8 gap-y-6 border-t border-[#d9d0c3] pt-6 sm:grid-cols-4"><div className="h-12 rounded bg-[#e8dfd3]" /><div className="h-12 rounded bg-[#e8dfd3]" /><div className="h-12 rounded bg-[#e8dfd3]" /><div className="h-12 rounded bg-[#e8dfd3]" /></div> : <div className="grid grid-cols-2 gap-x-8 gap-y-7 border-t border-[#d9d0c3] pt-6 sm:grid-cols-4">{[{ icon: CalendarDays, label: hindi ? 'तिथि' : 'Tithi', value: panchang?.tithi || todaysContent?.specialDay?.name || '—' }, { icon: Sunrise, label: hindi ? 'सूर्योदय' : 'Sunrise', value: panchang?.sunrise || '—' }, { icon: Sunset, label: hindi ? 'सूर्यास्त' : 'Sunset', value: panchang?.sunset || '—' }, { icon: Moon, label: hindi ? 'नक्षत्र' : 'Nakshatra', value: panchang?.nakshatra || '—' }, { icon: Clock3, label: hindi ? 'मुहूर्त' : 'Muhurat', value: panchang?.muhurat || '—' }, { icon: Moon, label: hindi ? 'चंद्र स्थिति' : 'Moon phase', value: hindi ? 'चंद्र जानकारी' : 'Moon information' }].map(({ icon: Icon, label, value }) => <div key={label}><Icon className="h-4 w-4 text-[#9a5d20]" strokeWidth={1.5} /><p className="mt-3 text-xs uppercase tracking-[0.14em] text-[#927964]">{label}</p><p className="mt-1 text-sm font-semibold text-[#493629]">{value}</p></div>)}</div>}</div>
           </section>
 
-          <section className="border-b border-[#d9d0c3] py-14 md:py-20"><div className="flex flex-col justify-between gap-5 md:flex-row md:items-end"><div><p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#9a5d20]">05 / {hindi ? 'आगे पढ़ें' : 'Continue deeper'}</p><h2 className="mt-4 font-serif text-3xl font-medium text-[#29231e] md:text-4xl">{hindi ? 'आज से आगे की यात्रा' : 'Let today lead somewhere deeper'}</h2></div><p className="max-w-md text-sm leading-7 text-[#776858]">{hindi ? 'इस दिन को केवल पढ़कर न छोड़ें। इसे किसी कथा, भजन या अभ्यास में आगे ले जाएं।' : 'Do not leave the day as something you only read. Carry it into a story, a song, or a practice.'}</p></div><div className="mt-10 grid divide-y divide-[#d9d0c3] border-y border-[#d9d0c3] md:grid-cols-3 md:divide-x md:divide-y-0"><SiteLink to="/prabhu-ki-leelaayen" className="group p-6 transition hover:bg-[#ebe3d8] md:p-8"><BookOpen className="h-5 w-5 text-[#9a5d20]" strokeWidth={1.5} /><h3 className="mt-8 font-serif text-2xl text-[#3d3025]">{hindi ? 'कथा पढ़ें' : 'Read a story'}</h3><p className="mt-2 text-sm leading-6 text-[#806f5e]">{hindi ? 'संतों और प्रभु की कथाओं में अर्थ खोजें।' : 'Find meaning in the lives and stories of the saints.'}</p><span className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-[#754619]">{hindi ? 'पुस्तकालय' : 'Open library'} <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" /></span></SiteLink><SiteLink to="/bhajans" className="group p-6 transition hover:bg-[#ebe3d8] md:p-8"><Heart className="h-5 w-5 text-[#9a5d20]" strokeWidth={1.5} /><h3 className="mt-8 font-serif text-2xl text-[#3d3025]">{hindi ? 'भजन सुनें' : 'Listen deeply'}</h3><p className="mt-2 text-sm leading-6 text-[#806f5e]">{hindi ? 'आज के भाव के साथ एक भजन चुनें।' : 'Choose a bhajan that meets the mood of today.'}</p><span className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-[#754619]">{hindi ? 'भजन संग्रह' : 'Bhajan library'} <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" /></span></SiteLink><SiteLink to="/naam-jap" className="group p-6 transition hover:bg-[#ebe3d8] md:p-8"><Flame className="h-5 w-5 text-[#9a5d20]" strokeWidth={1.5} /><h3 className="mt-8 font-serif text-2xl text-[#3d3025]">{hindi ? 'जप करें' : 'Keep the practice'}</h3><p className="mt-2 text-sm leading-6 text-[#806f5e]">{hindi ? 'नाम जप को अपनी दैनिक साधना बनाएं।' : 'Turn remembrance into a practice you can return to.'}</p><span className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-[#754619]">{hindi ? 'नाम जप ट्रैकर' : 'Naam Jap tracker'} <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" /></span></SiteLink></div></section>
+          <section className="border-b border-[#d9d0c3] py-14 md:py-20"><div className="flex flex-col justify-between gap-5 md:flex-row md:items-end"><div><p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#9a5d20]">05 / {hindi ? 'आगे पढ़ें' : 'Continue deeper'}</p><h2 className="mt-4 font-serif text-3xl font-medium text-[#29231e] md:text-4xl">{hindi ? 'आज से आगे की यात्रा' : 'Let today lead somewhere deeper'}</h2></div><p className="max-w-md text-sm leading-7 text-[#776858]">{hindi ? 'इस दिन को केवल पढ़कर न छोड़ें। इसे किसी कथा, भजन या अभ्यास में आगे ले जाएं।' : 'Do not leave the day as something you only read. Carry it into a story, a song, or a practice.'}</p></div><div className="mt-10 grid overflow-hidden border border-[#d9d0c3] bg-[#fff9ee] shadow-[0_18px_60px_rgba(91,61,32,0.06)] md:grid-cols-3"><SiteLink to="/prabhu-ki-leelaayen" className="group border-b border-[#d9d0c3] p-6 transition hover:bg-[#efe1cc] md:border-b-0 md:border-r md:p-8"><BookOpen className="h-5 w-5 text-[#9a5d20]" strokeWidth={1.5} /><h3 className="mt-8 font-serif text-2xl text-[#3d3025]">{hindi ? 'कथा पढ़ें' : 'Read a story'}</h3><p className="mt-2 text-sm leading-6 text-[#806f5e]">{hindi ? 'संतों और प्रभु की कथाओं में अर्थ खोजें।' : 'Find meaning in the lives and stories of the saints.'}</p><span className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-[#754619]">{hindi ? 'पुस्तकालय' : 'Open library'} <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" /></span></SiteLink><SiteLink to="/bhajans" className="group border-b border-[#d9d0c3] p-6 transition hover:bg-[#f1dfdf] md:border-b-0 md:border-r md:p-8"><Heart className="h-5 w-5 text-[#9a5d20]" strokeWidth={1.5} /><h3 className="mt-8 font-serif text-2xl text-[#3d3025]">{hindi ? 'भजन सुनें' : 'Listen deeply'}</h3><p className="mt-2 text-sm leading-6 text-[#806f5e]">{hindi ? 'आज के भाव के साथ एक भजन चुनें।' : 'Choose a bhajan that meets the mood of today.'}</p><span className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-[#754619]">{hindi ? 'भजन संग्रह' : 'Bhajan library'} <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" /></span></SiteLink><SiteLink to="/naam-jap" className="group p-6 transition hover:bg-[#dce9e2] md:p-8"><Flame className="h-5 w-5 text-[#9a5d20]" strokeWidth={1.5} /><h3 className="mt-8 font-serif text-2xl text-[#3d3025]">{hindi ? 'जप करें' : 'Keep the practice'}</h3><p className="mt-2 text-sm leading-6 text-[#806f5e]">{hindi ? 'नाम जप को अपनी दैनिक साधना बनाएं।' : 'Turn remembrance into a practice you can return to.'}</p><span className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-[#754619]">{hindi ? 'नाम जप ट्रैकर' : 'Naam Jap tracker'} <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" /></span></SiteLink></div></section>
 
           {nextFestival && <section className="py-14 md:py-20"><div className="grid gap-8 md:grid-cols-[0.38fr_1fr] md:items-center"><div><p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#9a5d20]">06 / {hindi ? 'कैलेंडर में आगे' : 'On the horizon'}</p><h2 className="mt-4 font-serif text-3xl font-medium text-[#29231e]">{hindi ? 'आने वाला विशेष दिन' : 'The next observance'}</h2></div><div className="flex flex-col justify-between gap-5 border-l border-[#d9d0c3] pl-6 sm:flex-row sm:items-center sm:pl-10"><div><p className="font-serif text-2xl text-[#3d3025]">{hindi ? nextFestival.nameHi || nextFestival.name : nextFestival.name}</p><p className="mt-2 max-w-xl text-sm leading-7 text-[#806f5e]">{hindi ? nextFestival.significanceHi || nextFestival.significance : nextFestival.significance}</p></div><span className="shrink-0 border border-[#bca78e] px-4 py-2 text-xs font-semibold text-[#754619]">{nextFestival.daysLeft === 1 ? (hindi ? 'कल' : 'Tomorrow') : `${nextFestival.daysLeft} ${hindi ? 'दिन बाद' : 'days away'}`}</span></div></div></section>}
         </div>
