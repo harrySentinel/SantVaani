@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import DailyGuideContent from './DailyGuideContent';
 
 export const metadata: Metadata = {
-  title: 'Aaj — Daily Spiritual Guide',
-  description: "A quiet daily companion for spiritual significance, vrat guidance, mantra, panchang and practice.",
+  title: 'Daily Dharma — Spiritual Almanac',
+  description: 'Understand the spiritual meaning of today, explore traditions, and choose a meaningful practice.',
   alternates: { canonical: '/daily-guide' },
 };
 

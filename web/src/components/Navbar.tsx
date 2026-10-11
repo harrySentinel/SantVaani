@@ -71,7 +71,7 @@ export default function Navbar() {
   }, []);
 
   const primaryItems = [
-    { to: '/daily-guide', label: 'Aaj', labelHi: 'आज', icon: CalendarDays },
+    { to: '/daily-guide', label: 'Daily Dharma', labelHi: 'दैनिक धर्म', icon: CalendarDays },
     { to: '/horoscope', label: 'Horoscope', labelHi: 'राशिफल', icon: Star },
     { to: '/saints', label: 'Saints', labelHi: 'संत', icon: Users },
     { to: '/santvaani-space', label: 'Space', labelHi: 'स्पेस', icon: Share2 },

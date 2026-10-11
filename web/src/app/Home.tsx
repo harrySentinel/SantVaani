@@ -32,7 +32,7 @@ export default function Home() {
   ];
 
   const quickLinks = [
-    { id: 'aaj', to: '/daily-guide', icon: CalendarDays, label: { EN: 'Aaj', HI: 'आज' } },
+    { id: 'daily-dharma', to: '/daily-guide', icon: CalendarDays, label: { EN: 'Daily Dharma', HI: 'दैनिक धर्म' } },
     { id: 'bhajans', to: '#bhajans', icon: Music2, label: { EN: 'Bhajans', HI: 'भजन' } },
     { id: 'horoscope', to: '#horoscope', icon: Moon, label: { EN: 'Horoscope', HI: 'राशिफल' } },
     { id: 'naam-jap', to: '#naam-jap', icon: Flame, label: { EN: 'Naam Jap', HI: 'नाम जप' } },

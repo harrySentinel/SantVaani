@@ -42,7 +42,7 @@ export default function Footer() {
   };
 
   const exploreLinks = [
-    { to: '/daily-guide', label: language === 'EN' ? 'Aaj · Today' : 'आज' },
+    { to: '/daily-guide', label: language === 'EN' ? 'Daily Dharma' : 'दैनिक धर्म' },
     { to: '/saints', label: language === 'EN' ? 'Saints' : 'संत' },
     { to: '/divine', label: language === 'EN' ? 'Divine Forms' : 'दिव्य रूप' },
     { to: '/bhajans', label: language === 'EN' ? 'Bhajans' : 'भजन' },
