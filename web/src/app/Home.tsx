@@ -7,7 +7,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Link from '@/components/SiteLink';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Video, MessageSquare, Music2, Moon, Flame, Share2, BookMarked, BookOpen, ScrollText } from 'lucide-react';
+import { ArrowRight, Video, MessageSquare, Music2, Moon, Flame, Share2, BookMarked, BookOpen, ScrollText, CalendarDays } from 'lucide-react';
 import VisitorCounter from '@/components/VisitorCounter';
 import SpiritualFactBox from '@/components/SpiritualFactBox';
 import FeedbackForm from '@/components/FeedbackForm';
@@ -32,6 +32,7 @@ export default function Home() {
   ];
 
   const quickLinks = [
+    { id: 'aaj', to: '/daily-guide', icon: CalendarDays, label: { EN: 'Aaj', HI: 'आज' } },
     { id: 'bhajans', to: '#bhajans', icon: Music2, label: { EN: 'Bhajans', HI: 'भजन' } },
     { id: 'horoscope', to: '#horoscope', icon: Moon, label: { EN: 'Horoscope', HI: 'राशिफल' } },
     { id: 'naam-jap', to: '#naam-jap', icon: Flame, label: { EN: 'Naam Jap', HI: 'नाम जप' } },
